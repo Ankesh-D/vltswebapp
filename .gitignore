@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+.angular/
+.vscode/
+package-lock.json/
+src/environments/environment.ts
+**/package-lock.json
