@@ -1,0 +1,266 @@
+
+.content-i {
+  padding: 20px;
+}
+
+.content-box {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.element-wrapper {
+  margin-bottom: 20px;
+}
+
+.element-box {
+  padding: 1rem;
+}
+
+.pagetitleborder {
+  border-bottom: 3px solid #0b58b9;
+  padding: 10px 0;
+  margin-bottom: 15px;
+}
+
+// ✅ TAB STYLES
+.nav-tabs {
+  border-bottom: 2px solid #dee2e6;
+  background: #f8f9fa;
+  border-radius: 4px 4px 0 0;
+  padding: 8px;
+}
+
+.nav-tabs .nav-item {
+  margin-right: 5px;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #495057;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 0;
+
+  &:hover {
+    background-color: #e9ecef;
+    color: #0b58b9;
+  }
+
+  i {
+    margin-right: 8px;
+  }
+}
+
+.nav-tabs .nav-link.active {
+  color: #0b58b9;
+  background-color: #fff;
+  border-bottom: 3px solid #0b58b9;
+  font-weight: bold;
+}
+
+// ✅ TAB CONTENT
+.tab-content {
+  border: 1px solid #dee2e6;
+  border-top: none;
+  padding: 20px;
+  background: #fff;
+  border-radius: 0 0 4px 4px;
+}
+
+.tab-pane {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ✅ TABLE STYLES
+.table {
+  margin-bottom: 0;
+  border-collapse: collapse;
+}
+
+table th {
+  background: linear-gradient(135deg, #8fb18f 0%, #7a9e7a 100%);
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: #fff;
+  padding: 12px 8px;
+  border: 1px solid #6a8e6a;
+}
+
+table td {
+  text-align: center;
+  vertical-align: middle;
+  font-size: 12px;
+  padding: 10px 8px;
+  border: 1px solid #dee2e6;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+// ✅ BUTTON STYLES
+.btn {
+  margin: 2px;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 11px;
+}
+
+// ✅ BADGE STYLES
+.badge {
+  font-size: 11px;
+  padding: 6px 12px;
+  font-weight: bold;
+}
+
+// ✅ PAGINATION
+.d-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-top: 1px solid #dee2e6;
+  margin-top: 15px;
+}
+
+// ✅ MODAL STYLES
+.modal {
+  z-index: 1050;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-dialog {
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  border-bottom: 2px solid #dee2e6;
+  padding: 20px;
+
+  .modal-title {
+    font-weight: bold;
+    font-size: 18px;
+
+    i {
+      margin-right: 10px;
+    }
+  }
+}
+
+.modal-body {
+  padding: 25px;
+
+  .alert {
+    border-radius: 4px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  textarea {
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    resize: vertical;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    &:focus {
+      border-color: #0b58b9;
+      box-shadow: 0 0 0 0.2rem rgba(11, 88, 185, 0.25);
+    }
+
+    &:disabled {
+      background-color: #f5f5f5;
+    }
+  }
+
+  small {
+    color: #666;
+    display: block;
+    margin-top: 5px;
+  }
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+}
+
+.btn-close {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+
+  &:not(:disabled):hover {
+    opacity: 1;
+  }
+}
+
+// ✅ CURSOR POINTER
+.cursor-pointer {
+  cursor: pointer;
+}
+
+// ✅ RESPONSIVE
+@media (max-width: 768px) {
+  table {
+    font-size: 11px;
+
+    th,
+    td {
+      padding: 8px 4px;
+    }
+  }
+
+  .modal-lg {
+    max-width: 90vw;
+  }
+}
+.bg-warning-text {
+  color: #f16a10;
+}

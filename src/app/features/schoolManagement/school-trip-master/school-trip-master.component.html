@@ -1,0 +1,624 @@
+<div class="container-fluid py-2 school-trip-master">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-2">
+      <!-- Page Title Row -->
+      <div class="d-flex justify-content-between align-items-center border-bottom border-primary py-2 mb-2">
+        <div class="pagetitlestyle">{{ detailsToggle ? 'School Trip Details' : (viewOnly ? 'View Trip' : (updateFlag ? 'Edit Trip' : 'School Trip Master Form')) }}</div>
+        <a style="font-size: 12px;" class="btn btn-primary btn-sm" (click)="detailsToggle ? addNewTrip() : toggleDetails()">
+          <i class="fa" [ngClass]="detailsToggle ? 'fa-plus' : 'fa-arrow-left'"></i>
+          {{ detailsToggle ? ' Add New' : ' Back to Details' }}
+        </a>
+      </div>
+
+      <!-- ==================== GRID VIEW ==================== -->
+      @if (detailsToggle) {
+        <form autocomplete="off" class="mb-2">
+          <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <!-- Search + Reload -->
+            <div class="d-flex align-items-center flex-wrap">
+              <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Search :</label>
+              <div class="input-group input-group-sm">
+                <input type="search" class="form-control shadow-none" placeholder="Trip name / code..."
+                  [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" autocomplete="off"
+                  style="font-size: 11px; width: 200px;">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-primary search-btn" (click)="getSearchDetails()">
+                    <i class="fa fa-search" style="font-size: 11px;"></i>
+                  </button>
+                </div>
+              </div>
+              <button type="button" (click)="reloadData()" class="btn btn-outline-success btn-sm ms-2"
+                style="font-size: 11px;" title="Reload">
+                <i class="fa fa-refresh me-1" [class.fa-spin]="loading"></i>
+                {{ loading ? 'Reloading...' : 'Reload' }}
+              </button>
+            </div>
+            <!-- Right controls -->
+            <div class="d-flex align-items-center flex-wrap mt-1 mt-md-0">
+              <div class="d-flex align-items-center me-3">
+                <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Download :</label>
+                <select name="downloadType" [(ngModel)]="selectedDownloadType" (change)="onDownloadChange()"
+                  class="form-control form-control-sm" style="font-size: 11px; width: auto;">
+                  <option value="">Select</option>
+                  <!-- <option value="Excel">Excel</option> -->
+                  <option value="">Excel</option>
+                  <!-- <option value="PDF">Print / PDF</option> -->
+                </select>
+              </div>
+              <div class="me-3 position-relative">
+                <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size: 11px;"
+                  (click)="showColumnChooser = !showColumnChooser">
+                  <i class="fa fa-columns me-1"></i> Columns
+                </button>
+                @if (showColumnChooser) {
+                  <div class="column-chooser-panel shadow-sm">
+                    @for (col of columns; track col) {
+                      <div class="form-check">
+                        <label class="form-check-label">
+                          <input type="checkbox" class="form-check-input" [checked]="col.visible" (change)="toggleColumn(col)">
+                          {{ col.label }}
+                        </label>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+              <div class="d-flex align-items-center me-3">
+                <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Show Rows :</label>
+                <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" name="pageSize"
+                  class="form-control form-control-sm" style="font-size: 11px; width: auto;">
+                  @for (size of pageSizeOptions; track size) {
+                    <option [value]="size">{{ size }}</option>
+                  }
+                </select>
+              </div>
+              <span class="fw-bold" style="font-size: 11px;">
+                Total Records : <span class="text-primary">{{ pageCount }} of {{ totalCount }}</span>
+              </span>
+            </div>
+          </div>
+        </form>
+        <div class="table-responsive">
+          <table class="table table-striped app-table table-sm table-bordered mb-1" id="schoolTripTable">
+            <thead>
+              <tr>
+                <th style="width:35px;">#</th>
+                @if (isColumnVisible('tripcode')) {
+                  <th (click)="sortBy('param2')" style="cursor:pointer;">Trip Code
+                    <i class="fa" [ngClass]="sortKey==='param2' ? (sortDir==='asc'?'fa-sort-up':'fa-sort-down') : 'fa-sort'"></i>
+                  </th>
+                }
+                @if (isColumnVisible('tripname')) {
+                  <th (click)="sortBy('param3')" style="cursor:pointer;">Trip Name
+                    <i class="fa" [ngClass]="sortKey==='param3' ? (sortDir==='asc'?'fa-sort-up':'fa-sort-down') : 'fa-sort'"></i>
+                  </th>
+                }
+                @if (isColumnVisible('triptype')) {
+                  <th>Type</th>
+                }
+                @if (isColumnVisible('vehicle')) {
+                  <th>Vehicle</th>
+                }
+                @if (isColumnVisible('driver')) {
+                  <th>Driver</th>
+                }
+                @if (isColumnVisible('source')) {
+                  <th>Source</th>
+                }
+                @if (isColumnVisible('destination')) {
+                  <th>Destination</th>
+                }
+                @if (isColumnVisible('starttime')) {
+                  <th>Start</th>
+                }
+                @if (isColumnVisible('endtime')) {
+                  <th>End</th>
+                }
+                @if (isColumnVisible('distance')) {
+                  <th>Distance (km)</th>
+                }
+                @if (isColumnVisible('duration')) {
+                  <th>Duration (min)</th>
+                }
+                @if (isColumnVisible('status')) {
+                  <th>Status</th>
+                }
+                <th style="width: 260px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (!loading && totalCount === 0) {
+                <tr>
+                  <td colspan="13" class="text-center">No Records Found</td>
+                </tr>
+              }
+              @for (row of detailData; track row; let i = $index) {
+                <tr>
+                  <td>
+                    <a href="javascript:void(0)" (click)="toggleTimeline(i)" title="Toggle timeline">
+                      {{ (pageSize * (currentPage - 1)) + i + 1 }}
+                      <i class="fa" [ngClass]="expandedRow === i ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </a>
+                  </td>
+                  @if (isColumnVisible('tripcode')) {
+                    <td>{{ row.param2 }}</td>
+                  }
+                  @if (isColumnVisible('tripname')) {
+                    <td>{{ row.param3 }}</td>
+                  }
+                  @if (isColumnVisible('triptype')) {
+                    <td>{{ row.param4 }}</td>
+                  }
+                  @if (isColumnVisible('vehicle')) {
+                    <td>{{ row.param23 }}</td>
+                  }
+                  @if (isColumnVisible('driver')) {
+                    <td>{{ row.param24 }}</td>
+                  }
+                  @if (isColumnVisible('source')) {
+                    <td>{{ row.param21 }}</td>
+                  }
+                  @if (isColumnVisible('destination')) {
+                    <td>{{ row.param22 }}</td>
+                  }
+                  @if (isColumnVisible('starttime')) {
+                    <td>{{ row.param9 }}</td>
+                  }
+                  @if (isColumnVisible('endtime')) {
+                    <td>{{ row.param10 }}</td>
+                  }
+                  @if (isColumnVisible('distance')) {
+                    <td>{{ row.param17 }}</td>
+                  }
+                  @if (isColumnVisible('duration')) {
+                    <td>{{ row.param18 }}</td>
+                  }
+                  @if (isColumnVisible('status')) {
+                    <td>
+                      <span class="badge" [ngClass]="row.param14 === 'Active' ? 'badge-success' : 'badge-secondary'">{{ row.param14 }}</span>
+                    </td>
+                  }
+                  <td class="text-center text-nowrap">
+                    <a class="btn btn-outline-secondary btn-sm" title="View" (click)="setData(row, 'view')"><i class="fa fa-eye"></i></a>
+                    <a class="btn btn-primary btn-sm" title="Edit" (click)="setData(row, 'edit')"><i class="fa fa-edit"></i></a>
+                    <a class="btn btn-outline-info btn-sm" title="Copy" (click)="setData(row, 'copy')"><i class="fa fa-copy"></i></a>
+                    <a class="btn btn-sm" title="{{ row.param14 === 'Active' ? 'Deactivate' : 'Activate' }}"
+                      [ngClass]="row.param14 === 'Active' ? 'btn-outline-warning' : 'btn-outline-success'"
+                      (click)="toggleStatus(row)">
+                      <i class="fa" [ngClass]="row.param14 === 'Active' ? 'fa-ban' : 'fa-check'"></i>
+                    </a>
+                    <a class="btn btn-danger btn-sm" title="Delete" (click)="openDeleteModal(row)"><i class="fa fa-trash"></i></a>
+                  </td>
+                </tr>
+                @if (expandedRow === i) {
+                  <tr>
+                    <td [attr.colspan]="13" class="bg-light">
+                      <div class="timeline">
+                        @for (stop of getStopsFromRow(row); track stop) {
+                          <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                              <h6 class="mb-1">{{ stop.sequence }}. {{ stop.stopname }}</h6>
+                              <small class="text-muted">
+                                Arrival: <strong>{{ stop.arrivaltime }}</strong> &nbsp; Departure: <strong>{{ stop.departuretime }}</strong>
+                                &nbsp; Distance: <strong>{{ stop.distance }} km</strong> &nbsp; Students: <strong>{{ stop.studentcount }}</strong>
+                              </small>
+                            </div>
+                          </div>
+                        }
+                        @if (getStopsFromRow(row).length === 0) {
+                          <div class="timeline-item">
+                            <small class="text-muted">No stops recorded for this trip.</small>
+                          </div>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="float-end">
+          @if (totalCount > pageSize) {
+            <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+              [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+              [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+            </ngb-pagination>
+          }
+        </div>
+      }
+
+      <!-- ==================== FORM VIEW ==================== -->
+      @if (!detailsToggle) {
+        <form #masterForm="ngForm" (ngSubmit)="onSubmit(masterForm)" class="school-trip-form">
+          <div class="row px-2">
+            <!-- ============ LEFT COLUMN ============ -->
+            <div class="col-md-8">
+              <!-- Trip Information -->
+              <div class="card mb-2">
+                <div class="card-header py-1"><strong style="font-size: 12px;">Trip Information</strong></div>
+                <div class="card-body py-2">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Trip Code <span>*</span></label>
+                        <input type="text" name="tripcode" class="form-control form-control-sm"
+                          [(ngModel)]="tripForm.tripcode" #tripcodeCtrl="ngModel" [readonly]="viewOnly"
+                          minlength="2" maxlength="30" required placeholder="Enter Trip Code">
+                        @if (tripcodeCtrl.invalid && (tripcodeCtrl.touched || masterForm.submitted)) {
+                          <div class="text-danger" style="font-size: 11px;">
+                            @if (tripcodeCtrl.errors?.['required']) {
+                              <div>Trip Code is required.</div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Trip Name <span>*</span></label>
+                        <input type="text" name="tripname" class="form-control form-control-sm"
+                          [(ngModel)]="tripForm.tripname" #tripnameCtrl="ngModel" [readonly]="viewOnly"
+                          minlength="3" maxlength="120" required placeholder="Enter Trip Name">
+                        @if (tripnameCtrl.invalid && (tripnameCtrl.touched || masterForm.submitted)) {
+                          <div class="text-danger" style="font-size: 11px;">
+                            @if (tripnameCtrl.errors?.['required']) {
+                              <div>Trip Name is required.</div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Trip Type <span>*</span></label>
+                        <ng-select placeholder="Select Trip Type" [(ngModel)]="tripForm.triptype" name="triptype"
+                          #triptypeCtrl="ngModel" [disabled]="viewOnly" [clearable]="true" required>
+                          @for (t of tripTypeList; track t) {
+                            <ng-option [value]="t">{{ t }}</ng-option>
+                          }
+                        </ng-select>
+                        @if (triptypeCtrl.invalid && (triptypeCtrl.touched || masterForm.submitted)) {
+                          <div class="text-danger" style="font-size: 11px;">
+                            @if (triptypeCtrl.errors?.['required']) {
+                              <div>Trip Type is required.</div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Academic Session</label>
+                        <ng-select placeholder="Select Session" [(ngModel)]="tripForm.academicsession" name="academicsession"
+                          [disabled]="viewOnly" [clearable]="true">
+                          @for (s of academicSessionList; track s) {
+                            <ng-option [value]="s">{{ s }}</ng-option>
+                          }
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Vehicle <span>*</span></label>
+                        <ng-select placeholder="Select Vehicle" [(ngModel)]="vehicleObj" name="vehicleObj"
+                          #vehicleCtrl="ngModel" bindLabel="name" [disabled]="viewOnly" [clearable]="true"
+                          (change)="onVehicleChange()" required>
+                          @for (v of vehicleList; track v) {
+                            <ng-option [value]="v">{{ v.name }}</ng-option>
+                          }
+                        </ng-select>
+                        @if (vehicleCtrl.invalid && (vehicleCtrl.touched || masterForm.submitted)) {
+                          <div class="text-danger" style="font-size: 11px;">
+                            @if (vehicleCtrl.errors?.['required']) {
+                              <div>Vehicle is required.</div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Driver <span>*</span></label>
+                        <ng-select placeholder="Select Driver" [(ngModel)]="driverObj" name="driverObj"
+                          #driverCtrl="ngModel" bindLabel="name" [disabled]="viewOnly" [clearable]="true"
+                          (change)="onDriverChange()" required>
+                          @for (d of driverList; track d) {
+                            <ng-option [value]="d">{{ d.name }}</ng-option>
+                          }
+                        </ng-select>
+                        @if (driverCtrl.invalid && (driverCtrl.touched || masterForm.submitted)) {
+                          <div class="text-danger" style="font-size: 11px;">
+                            @if (driverCtrl.errors?.['required']) {
+                              <div>Driver is required.</div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Attendant</label>
+                        <ng-select placeholder="Select Attendant" [(ngModel)]="attendantObj" name="attendantObj"
+                          bindLabel="name" [disabled]="viewOnly" [clearable]="true" (change)="onAttendantChange()">
+                          @for (a of attendantList; track a) {
+                            <ng-option [value]="a">{{ a.name }}</ng-option>
+                          }
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Source <span>*</span></label>
+                        <ng-select placeholder="Select Source" [(ngModel)]="sourceObj" name="sourceObj"
+                          #sourceCtrl="ngModel" bindLabel="name" [disabled]="viewOnly" [clearable]="true"
+                          (change)="onSourceChange()" required>
+                          @for (p of poiList; track p) {
+                            <ng-option [value]="p">{{ p.name }}</ng-option>
+                          }
+                        </ng-select>
+                        @if (sourceCtrl.invalid && (sourceCtrl.touched || masterForm.submitted)) {
+                          <div class="text-danger" style="font-size: 11px;">
+                            @if (sourceCtrl.errors?.['required']) {
+                              <div>Source is required.</div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Destination <span>*</span></label>
+                        <ng-select placeholder="Select Destination" [(ngModel)]="destinationObj" name="destinationObj"
+                          #destinationCtrl="ngModel" bindLabel="name" [disabled]="viewOnly" [clearable]="true"
+                          (change)="onDestinationChange()" required>
+                          @for (p of poiList; track p) {
+                            <ng-option [value]="p">{{ p.name }}</ng-option>
+                          }
+                        </ng-select>
+                        @if (destinationCtrl.invalid && (destinationCtrl.touched || masterForm.submitted)) {
+                          <div class="text-danger" style="font-size: 11px;">
+                            @if (destinationCtrl.errors?.['required']) {
+                              <div>Destination is required.</div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Start Time <span>*</span></label>
+                        <input type="time" name="starttime" class="form-control form-control-sm"
+                          [(ngModel)]="tripForm.starttime" #starttimeCtrl="ngModel" [readonly]="viewOnly"
+                          (ngModelChange)="formDirty = true" required>
+                        @if (starttimeCtrl.invalid && (starttimeCtrl.touched || masterForm.submitted)) {
+                          <div class="text-danger" style="font-size: 11px;">
+                            @if (starttimeCtrl.errors?.['required']) {
+                              <div>Start Time is required.</div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">End Time <span>*</span></label>
+                        <input type="time" name="endtime" class="form-control form-control-sm"
+                          [(ngModel)]="tripForm.endtime" #endtimeCtrl="ngModel" [readonly]="viewOnly"
+                          (ngModelChange)="formDirty = true" required>
+                        @if (endtimeCtrl.invalid && (endtimeCtrl.touched || masterForm.submitted)) {
+                          <div class="text-danger" style="font-size: 11px;">
+                            @if (endtimeCtrl.errors?.['required']) {
+                              <div>End Time is required.</div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="field-label">Status</label>
+                        <select name="status" class="form-control form-control-sm" [(ngModel)]="tripForm.status" [disabled]="viewOnly">
+                          <option value="Active">Active</option>
+                          <option value="Inactive">Inactive</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label class="field-label">Remarks</label>
+                        <textarea name="remarks" class="form-control form-control-sm" rows="2" [readonly]="viewOnly"
+                        [(ngModel)]="tripForm.remarks" maxlength="250" placeholder="Optional remarks"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Trip Stops -->
+              <div class="card mb-2">
+                <div class="card-header py-1 d-flex justify-content-between align-items-center">
+                  <strong style="font-size: 12px;">Trip Stops</strong>
+                  @if (!viewOnly) {
+                    <div>
+                      <button type="button" class="btn btn-outline-primary btn-sm me-1" (click)="toggleMapAddMode()">
+                        <i class="fa fa-map-marker me-1"></i>{{ isMapAddMode ? 'Click Map to Add Stop (On)' : 'Add Stop from Map' }}
+                      </button>
+                      <button type="button" class="btn btn-primary btn-sm" (click)="addStop()">
+                        <i class="fa fa-plus me-1"></i>Add Stop
+                      </button>
+                    </div>
+                  }
+                </div>
+                <div class="card-body py-2">
+                  <div class="table-responsive">
+                    <table class="table table-sm table-bordered mb-0 stops-table">
+                      <thead>
+                        <tr>
+                          <th style="width:30px;">#</th>
+                          <th style="min-width:140px;">Stop Name</th>
+                          <th style="width:100px;">Latitude</th>
+                          <th style="width:100px;">Longitude</th>
+                          <th style="width:100px;">Arrival</th>
+                          <th style="width:100px;">Departure</th>
+                          <th style="width:80px;">Distance (km)</th>
+                          <th style="width:80px;">Time (min)</th>
+                          <th style="width:70px;">Students</th>
+                          <th style="min-width:120px;">Remarks</th>
+                          @if (!viewOnly) {
+                            <th style="width:100px;">Action</th>
+                          }
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @if (stops.length === 0) {
+                          <tr>
+                            <td colspan="11" class="text-center text-muted">No stops added yet.</td>
+                          </tr>
+                        }
+                        @for (stop of stops; track stop; let i = $index) {
+                          <tr>
+                            <td>{{ stop.sequence }}</td>
+                            <td><input type="text" class="form-control form-control-sm" [readonly]="viewOnly"
+                            [(ngModel)]="stop.stopname" [name]="'stopname'+i" (ngModelChange)="onStopFieldChange()"></td>
+                            <td><input type="text" class="form-control form-control-sm" [readonly]="viewOnly"
+                            [(ngModel)]="stop.latitude" [name]="'lat'+i" (ngModelChange)="onStopFieldChange()"></td>
+                            <td><input type="text" class="form-control form-control-sm" [readonly]="viewOnly"
+                            [(ngModel)]="stop.longitude" [name]="'lng'+i" (ngModelChange)="onStopFieldChange()"></td>
+                            <td><input type="time" class="form-control form-control-sm" [readonly]="viewOnly"
+                            [(ngModel)]="stop.arrivaltime" [name]="'arr'+i" (ngModelChange)="onStopFieldChange()"></td>
+                            <td><input type="time" class="form-control form-control-sm" [readonly]="viewOnly"
+                            [(ngModel)]="stop.departuretime" [name]="'dep'+i" (ngModelChange)="onStopFieldChange()"></td>
+                            <td><input type="number" class="form-control form-control-sm" [readonly]="true"
+                            [(ngModel)]="stop.distance" [name]="'dist'+i"></td>
+                            <td><input type="number" class="form-control form-control-sm" [readonly]="true"
+                            [(ngModel)]="stop.estimatedtraveltime" [name]="'time'+i"></td>
+                            <td><input type="number" min="0" class="form-control form-control-sm" [readonly]="viewOnly"
+                            [(ngModel)]="stop.studentcount" [name]="'stu'+i" (ngModelChange)="formDirty=true"></td>
+                            <td><input type="text" class="form-control form-control-sm" [readonly]="viewOnly"
+                            [(ngModel)]="stop.remarks" [name]="'rem'+i" (ngModelChange)="formDirty=true"></td>
+                            @if (!viewOnly) {
+                              <td class="text-center">
+                                <a class="btn btn-outline-secondary btn-sm" title="Move Up" (click)="moveStopUp(i)"><i class="fa fa-arrow-up"></i></a>
+                                <a class="btn btn-outline-secondary btn-sm" title="Move Down" (click)="moveStopDown(i)"><i class="fa fa-arrow-down"></i></a>
+                                <a class="btn btn-outline-danger btn-sm" title="Remove" (click)="removeStop(i)"><i class="fa fa-trash"></i></a>
+                              </td>
+                            }
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <!-- Trip Summary -->
+              <div class="card mb-2">
+                <div class="card-header py-1"><strong style="font-size: 12px;">Trip Summary</strong></div>
+                <div class="card-body py-2">
+                  <div class="row text-center">
+                    <div class="col-6 col-md-2 summary-item">
+                      <div class="summary-value">{{ totalStops }}</div>
+                      <div class="summary-label">Total Stops</div>
+                    </div>
+                    <div class="col-6 col-md-2 summary-item">
+                      <div class="summary-value">{{ tripForm.totaldistance | number:'1.1-2' }}</div>
+                      <div class="summary-label">Distance (km)</div>
+                    </div>
+                    <div class="col-6 col-md-2 summary-item">
+                      <div class="summary-value">{{ tripForm.estimatedduration | number:'1.0-0' }}</div>
+                      <div class="summary-label">Duration (min)</div>
+                    </div>
+                    <div class="col-6 col-md-3 summary-item">
+                      <div class="summary-value" style="font-size: 12px;">{{ firstStopName }}</div>
+                      <div class="summary-label">First Stop</div>
+                    </div>
+                    <div class="col-6 col-md-3 summary-item">
+                      <div class="summary-value" style="font-size: 12px;">{{ lastStopName }}</div>
+                      <div class="summary-label">Last Stop</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              @if (!viewOnly) {
+                <div class="d-flex justify-content-end mb-3">
+                  <button type="button" class="btn btn-secondary btn-sm me-2" (click)="resetForm()">Reset</button>
+                  <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSaving">
+                    @if (isSaving) {
+                      <i class="fa fa-spinner fa-spin me-1"></i>
+                    }
+                    {{ updateFlag ? 'Update' : 'Submit' }}
+                  </button>
+                </div>
+              }
+            </div>
+            <!-- ============ RIGHT COLUMN : MAP ============ -->
+            <div class="col-md-4">
+              <div class="map-sticky-wrapper">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <strong style="font-size: 12px;">Route Map</strong>
+                  <div>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" title="Toggle Satellite" (click)="toggleSatelliteView()">
+                      <i class="fa fa-globe"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" title="Reset Route" (click)="resetRouteView()">
+                      <i class="fa fa-refresh"></i>
+                    </button>
+                  </div>
+                </div>
+                <div [id]="mapContainerId" class="school-trip-map"></div>
+                @if (isMapAddMode) {
+                  <small class="text-muted d-block mt-1" style="font-size: 10px;">
+                    Click anywhere on the map to add a stop at that location.
+                  </small>
+                }
+              </div>
+            </div>
+          </div>
+        </form>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true"
+  data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Trip</h5>
+        <button type="button" class="close" (click)="closeDeleteModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form #deleteForm="ngForm" (ngSubmit)="confirmDelete()">
+          <div class="form-group">
+            <label for="deleteRemark">Remark <span class="required">*</span></label>
+            <textarea class="form-control" id="deleteRemark" rows="3" placeholder="Enter remark (min 10 characters)"
+              #deleteRemarkModel="ngModel" name="deleteRemark" [(ngModel)]="deleteRequest.remarks"
+            minlength="10" maxlength="100" required></textarea>
+            @if (deleteRemarkModel.invalid && (deleteRemarkModel.dirty || deleteRemarkModel.touched)) {
+              <div class="text-danger">
+                @if (deleteRemarkModel.errors?.['required']) {
+                  <div>Remark is required.</div>
+                }
+                @if (deleteRemarkModel.errors?.['minlength']) {
+                  <div>Remark must be at least 10 characters long.</div>
+                }
+                @if (deleteRemarkModel.errors?.['maxlength']) {
+                  <div>Remark cannot exceed 100 characters.</div>
+                }
+              </div>
+            }
+          </div>
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary btn-sm me-2" (click)="closeDeleteModal()">Cancel</button>
+            <button type="submit" class="btn btn-danger btn-sm" [disabled]="deleteForm.invalid">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

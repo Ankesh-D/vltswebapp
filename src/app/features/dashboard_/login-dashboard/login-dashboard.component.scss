@@ -1,0 +1,386 @@
+/* =========================================================
+   DASHBOARD SUMMARY WIDGETS
+   UI ONLY - NO LOGIC CHANGE
+   ========================================================= */
+
+.widget-card,
+.widget-card-a {
+  border: 1px solid #edf0f4;
+  border-radius: 10px;
+  background: #ffffff;
+  height: 94px;
+  max-height: 94px;
+  overflow: hidden;
+  min-width: 0;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.045);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.widget-card:hover,
+.widget-card-a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+
+/* =========================================================
+   SUMMARY CARD CONTENT
+   ========================================================= */
+
+.widget-card > .d-flex,
+.widget-card-a > .d-flex {
+  height: 100%;
+}
+
+.widget-inner {
+  gap: 12px;
+}
+
+
+/* =========================================================
+   ICON
+   ========================================================= */
+
+.widget-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 1rem;
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease;
+}
+
+.widget-card:hover .widget-icon,
+.widget-card-a:hover .widget-icon {
+  transform: scale(1.05);
+}
+
+
+/* Primary */
+.widget-icon-primary {
+  background: rgba(0, 123, 255, 0.09);
+  color: #007bff;
+}
+
+/* Success */
+.widget-icon-success {
+  background: rgba(40, 167, 69, 0.09);
+  color: #28a745;
+}
+
+
+/* =========================================================
+   VALUE
+   ========================================================= */
+
+.widget-value {
+  font-size: 1.45rem;
+  line-height: 1.05;
+  font-weight: 700;
+
+  letter-spacing: -0.02em;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   LABEL
+   ========================================================= */
+
+.widget-label {
+  font-size: 0.68rem;
+
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+
+  line-height: 1.2;
+
+  color: #7b8490 !important;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   STATUS / TREND BADGE
+   ========================================================= */
+
+.widget-trend {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 0.61rem;
+  font-weight: 700;
+
+  min-height: 21px;
+  padding: 0.15rem 0.5rem;
+
+  border-radius: 20px;
+
+  white-space: nowrap;
+
+  letter-spacing: 0.01em;
+}
+
+.widget-trend-primary {
+  background: rgba(0, 123, 255, 0.09);
+  color: #007bff;
+}
+
+.widget-trend-success {
+  background: rgba(40, 167, 69, 0.09);
+  color: #28a745;
+}
+
+
+/* =========================================================
+   ROLE SECTION
+   ========================================================= */
+
+.role-section-title {
+  font-size: 0.78rem;
+
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+
+  color: #495057 !important;
+}
+
+
+/* =========================================================
+   ROLE HORIZONTAL SCROLLER
+   ========================================================= */
+
+.role-scroll-wrap {
+  position: relative;
+
+  width: 100%;
+}
+
+
+/* Scroll area */
+.role-scroller {
+  display: flex;
+  align-items: stretch;
+
+  gap: 12px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-behavior: smooth;
+
+  padding: 5px 44px;
+
+  scrollbar-width: none;
+
+  -ms-overflow-style: none;
+}
+
+.role-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* Individual role card */
+.role-widget {
+  flex: 0 0 178px;
+  min-width: 178px;
+}
+
+
+/* =========================================================
+   ROLE CARD
+   ========================================================= */
+
+.widget-card-a {
+  height: 76px;
+  max-height: 76px;
+
+  border-radius: 9px;
+}
+
+.widget-card-a .widget-icon {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+
+  border-radius: 9px;
+
+  font-size: 0.95rem;
+}
+
+.widget-card-a .widget-value {
+  font-size: 1.25rem;
+}
+
+.widget-card-a .widget-label {
+  font-size: 0.64rem;
+}
+
+
+/* =========================================================
+   SCROLL ARROWS
+   ========================================================= */
+
+.role-scroll-arrow {
+  position: absolute;
+
+  top: 50%;
+  transform: translateY(-50%);
+
+  z-index: 5;
+
+  width: 32px;
+  height: 32px;
+
+  border-radius: 50%;
+
+  border: 1px solid #e4e8ed;
+
+  background: #ffffff;
+
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.10);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #6c757d;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.role-scroll-arrow:hover {
+  color: #007bff;
+
+  background: #f8fbff;
+
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.14);
+
+  transform: translateY(-50%) scale(1.04);
+}
+
+.role-scroll-arrow.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.role-scroll-arrow-left {
+  left: 2px;
+}
+
+.role-scroll-arrow-right {
+  right: 2px;
+}
+
+
+/* =========================================================
+   FADE EFFECT
+   ========================================================= */
+
+.role-fade {
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+
+  width: 45px;
+
+  z-index: 4;
+
+  pointer-events: none;
+}
+
+.role-fade-left {
+  left: 0;
+
+  background: linear-gradient(
+    90deg,
+    #ffffff 20%,
+    rgba(255, 255, 255, 0)
+  );
+}
+
+.role-fade-right {
+  right: 0;
+
+  background: linear-gradient(
+    270deg,
+    #ffffff 20%,
+    rgba(255, 255, 255, 0)
+  );
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+  .widget-card {
+    height: 88px;
+  }
+
+  .role-widget {
+    flex-basis: 170px;
+    min-width: 170px;
+  }
+
+  .role-scroller {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+
+@media (max-width: 767px) {
+
+  .widget-card {
+    height: 84px;
+  }
+
+  .widget-icon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+  }
+
+  .widget-value {
+    font-size: 1.3rem;
+  }
+
+  .role-widget {
+    flex-basis: 160px;
+    min-width: 160px;
+  }
+
+  .role-scroller {
+    gap: 9px;
+  }
+}

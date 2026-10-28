@@ -1,0 +1,53 @@
+<div class="content-i py-0">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder"
+          style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="pagetitlestyle"><span>{{pageTitle}}</span></div>
+          <div class="modern-nav-group">
+            <a class="nav-pill-item pointer" [ngClass]="{'active': tabTitle=='sim-validity'}" (click)="tabTitle='sim-validity'; pageTitle='Update SIM Details';"
+              style=" z-index: 99 !important;">
+              <i class="fa fa-calendar"></i><span>Sim Validity</span>
+            </a>
+            <a class="nav-pill-item pointer" [ngClass]="{'active': tabTitle=='Customer'}" (click)="tabTitle='Customer'; pageTitle='Update Customer Details';"
+              style=" z-index: 99 !important;">
+              <i class="fa fa-user"></i><span>Customer</span>
+            </a>
+            <a class="nav-pill-item pointer" [ngClass]="{'active': tabTitle=='Dealer'}"
+              style=" z-index: 99 !important;" (click)="tabTitle = 'Dealer';  pageTitle='Update Dealer Details';">
+              <i class="fa fa-user"></i><span>Dealer</span>
+            </a>
+            <a class="nav-pill-item pointer" [ngClass]="{'active': tabTitle=='Vehicle'}"
+              (click)="tabTitle='Vehicle';  pageTitle='Update Vehicle Details'; showDealer=false"
+              style=" z-index: 99 !important;">
+              <i class="fa fa-truck"></i><span>Vehicle</span>
+            </a>
+            <a class="nav-pill-item pointer" (click)="tabTitle='Device'; pageTitle='Update Device Details';"
+              [ngClass]="{'active': tabTitle=='Device'}"
+              style=" z-index: 99 !important;">
+              <i class="fa fa-microchip"></i><span>Device</span>
+            </a>
+          </div>
+        </div>
+
+        @if (tabTitle=='sim-validity') {
+          <app-update-sim-validity></app-update-sim-validity>
+        }
+        @if (tabTitle=='Customer') {
+          <app-update-customer-details></app-update-customer-details>
+        }
+        @if (tabTitle=='Dealer') {
+          <app-dealer-list [isVisible]="showDealer"></app-dealer-list>
+        }
+        @if (tabTitle=='Vehicle') {
+          <app-update-vehicle-details></app-update-vehicle-details>
+        }
+        @if (tabTitle=='Device') {
+          <app-update-device-details></app-update-device-details>
+        }
+
+      </div>
+    </div>
+  </div>
+</div>

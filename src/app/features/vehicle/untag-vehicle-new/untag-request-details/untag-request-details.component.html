@@ -1,0 +1,167 @@
+<!-- SEARCH + CONTROLS BAR -->
+<div class="top-controls-row">
+
+  <!-- LEFT SEARCH -->
+  <div class="left-controls">
+
+    <!-- SEARCH WITH INNER BUTTON -->
+    <div class="search-box">
+      <input type="search" class="search-input inner" placeholder="Type here and press button...."
+        maxlength="50" [(ngModel)]="detailsRequest.param1" (keyup.enter)="getDetails('search')"
+        name="searchTextBox" />
+
+      <button type="button" class="search-inner-btn" (click)="getDetails('search')">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
+
+    <!-- RELOAD -->
+    <button (click)="getDetails('init')" [disabled]="loading"
+      style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+      <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
+      <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+    </button>
+
+  </div>
+
+
+  <!-- RIGHT CONTROLS -->
+  <div class="right-controls">
+    <select class="rows-select" [(ngModel)]="detailsRequest.param3" (change)="getDetails('pageSize')">
+      @for (size of pageSizeOptions; track size) {
+        <option [value]="size === totalCount ? totalCount : size">
+          {{ size === totalCount ? totalCount : size }}
+        </option>
+      }
+    </select>
+
+    <div class="total-records-text">
+      Total Records : {{ pageCount }} of {{ totalCount }}
+    </div>
+
+  </div>
+</div>
+
+<!-- TABLE -->
+<div class="table-responsive">
+  <table class="table app-table" style="font-size: 11px;">
+    <thead>
+      <tr>
+        <th>IMEI No. <hr class="m-0"> Serial No.<hr class="m-0">ICCID No.</th>
+        <th>Vehicle No.<hr class="m-0">Chassis No.<hr class="m-0">Engine No.</th>
+        <th>Vendor Name</th>
+        <th>Vehicle Type<hr class="m-0">Mfg. Year </th>
+        <th style="width: 100px;">
+          Activation Date
+          <hr class="m-0">
+          Validity Upto
+        </th>
+        <th>Customer Name
+          <hr class="m-0">
+          Customer Mobile No.
+        </th>
+        <th>Last Polling Time
+          <hr class="m-0">
+        Last Alert</th>
+        <th>Request Time
+          <hr class="m-0">
+          Reason
+        </th>
+        <th>Action Status</th>
+        <th>Action Time
+          <hr class="m-0">
+        Action Remark</th>
+      </tr>
+    </thead>
+
+    @if (totalCount == 0) {
+      <tbody>
+        <tr>
+          <td class="fw-bold text-center" colspan="25">
+            No Record Found
+          </td>
+        </tr>
+      </tbody>
+    }
+
+    @if (totalCount > 0) {
+      <tbody>
+        @for (item of detailsData; track item) {
+          <tr>
+            <td>{{ item.param3 || '-' }} <!-- Device IMEI No. -->
+              <hr class="m-0">
+              {{ item.param4 || '-' }} <!-- Device Unique No. -->
+              <hr class="m-0">
+            {{ item.param5 || '-' }}</td>  <!-- Device ICCID No. -->
+            <td>{{ item.param9 || '-' }} <!-- Vehicle  No. -->
+              <hr class="m-0">
+              {{ item.param10 || '-' }} <!-- Vehicle Chassis No. -->
+              <hr class="m-0">
+              {{ item.param11 || '-' }} <!-- Vehicle Engine No. -->
+            </td>
+            <td>{{ item.param7 || '-' }}</td>  <!-- Vendor Name -->
+            <td>{{ item.param14 || '-' }} <!-- Vehicle Type -->
+              <hr class="m-0">
+            {{ item.param13 || '-' }}</td> <!-- Vehicle Manufacturing Year -->
+            <td>{{ item.param12 || '-' }} <!-- Activation Date -->
+              <hr class="m-0">
+              {{ item.param15 || '-' }} <!-- Validity Upto -->
+            </td>
+            <td>{{ item.param17 || '-' }} <!-- Customer Name -->
+              <hr class="m-0">
+            {{ item.param18 || '-' }}</td> <!-- Customer Mobile No. -->
+            <td>{{ item.param19 || '-' }} <!-- Last Polling Time -->
+              <hr class="m-0">
+              {{ item.param20 || '-' }} <!-- Last Alert -->
+              <td>  {{ item.param22 || '-' }} <!-- Request Time -->
+                <hr class="m-0">
+              {{ item.param23 || '-' }}</td> <!-- Reason -->
+              <td>{{ item.param24 || '-' }}</td> <!-- Approve Status -->
+              <td>{{ item.param25 || '-' }}<hr class="m-0"> <!-- Approve Time -->
+              {{ item.param26 || '-' }}</td> <!-- Action Remark -->
+            </tr>
+          }
+        </tbody>
+      }
+    </table>
+    <div class="float-end">
+      @if (totalCount > pageSize) {
+        <ngb-pagination [collectionSize]="totalCount" [(page)]="detailsRequest.param2"
+          [pageSize]="detailsRequest.param3" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+          [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+        </ngb-pagination>
+      }
+    </div>
+    <!-- <div class="custom-pagination" style="display:flex;justify-content: end;"
+    *ngIf="totalCount > pageSize">
+
+    <button class="pg-btn" (click)="changePage(pageNo - 1)" [disabled]="pageNo === 1">
+      Prev
+    </button>
+
+    <span *ngIf="pageNo > 3" class="pg-dots">...</span>
+
+    <button *ngIf="pageNo > 2" class="pg-num" (click)="changePage(pageNo - 1)">
+      {{ pageNo - 1 }}
+    </button>
+
+    <button class="pg-num active">
+      {{ pageNo }}
+    </button>
+
+    <button *ngIf="pageNo < totalPages - 1" class="pg-num" (click)="changePage(pageNo + 1)">
+      {{ pageNo + 1 }}
+    </button>
+
+    <span *ngIf="pageNo < totalPages - 2" class="pg-dots">...</span>
+
+    <button class="pg-num" (click)="changePage(totalPages)">
+      {{ totalPages }}
+    </button>
+
+    <button class="pg-btn" (click)="changePage(pageNo + 1)" [disabled]="pageNo === totalPages">
+      Next
+    </button>
+
+  </div> -->
+</div>

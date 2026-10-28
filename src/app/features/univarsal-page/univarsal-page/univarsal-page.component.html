@@ -1,0 +1,870 @@
+
+
+
+
+<ng-template #universalPage>
+
+<div class="universal-page fw-bold">
+  <div class="tabs-container">
+    <nz-tabset
+      [nzSelectedIndex]="selectedIndex"
+      (nzSelectedIndexChange)="selectedIndex = $event"
+      nzType="editable-card"
+      (nzAdd)="newTab()"
+      (nzClose)="closeTab($event)"
+    >
+      @for (tab of tabs; track tab.id) {
+        <ng-template #tabTitle>
+          <span class="tab-title" [attr.title]="getTitleTooltip(tab)" [attr.aria-label]="getTitleTooltip(tab)">
+            @if (tab.loading) {
+              <span class="tab-loading-spinner" aria-hidden="true"></span>
+            }
+            <span class="tab-label">{{ tab.title }}</span>
+          </span>
+        </ng-template>
+
+        <nz-tab [nzTitle]="tabTitle" [nzClosable]="true">
+          <div class="tab-content" [attr.data-tab-id]="tab.id">
+            @if (tab.screen === 'search') {
+              <section class="search-screen" aria-label="Device search">
+                <div class="screen-heading">
+                  <div>
+                    <p class="eyebrow">DEVICE LOOKUP</p>
+                    <h2>Find a device</h2>
+                    <p class="intro-copy">Search the device master using a supported identifier.</p>
+                  </div>
+                </div>
+
+                <form class="search-form" (ngSubmit)="search(tab.id)">
+              
+
+                  <div class="form-field search-input-field">
+                    <label [for]="'search-input-' + tab.id">{{ getSearchTypeLabel(tab.searchType) }} number</label>
+                    <input
+                      [id]="'search-input-' + tab.id"
+                      [name]="'search-input-' + tab.id"
+                      type="text"
+                      
+                     
+                      autocomplete="off"
+                  
+                      [placeholder]="getSearchPlaceholder(tab.searchType)"
+                      [(ngModel)]="tab.searchInput"
+                      [disabled]="tab.loading"
+                      (keydown.enter)="$event.preventDefault(); search(tab.id)"
+                    />
+                  </div>
+
+                  <div class="form-actions">
+                    <button class="button button-primary" type="submit" [disabled]="tab.loading">
+                      @if (tab.loading) {
+                        <span class="spinner" aria-hidden="true"></span>
+                        Searching
+                      } @else {
+                        Search
+                      }
+                    </button>
+                    <button class="button button-secondary" type="button" (click)="clear(tab.id)">
+                      Clear
+                    </button>
+                  </div>
+                </form>
+
+                @if (tab.loading) {
+                  <div class="inline-loading" role="status">
+                    <span class="spinner" aria-hidden="true"></span>
+                    Loading this tab's device...
+                  </div>
+                }
+
+                <p class="api-limit-note">
+                  Serial number and ICCID search are unavailable in the current API contract. The existing
+                  device lookup accepts a search value but has no identifier-type parameter; 
+                </p>
+
+                @if (tab.error) {
+                  <div class="message message-error" role="alert">{{ tab.error }}</div>
+                }
+
+                @if (!tab.hasSearched && !tab.loading) {
+                  <div class="empty-state">
+                    <span class="empty-mark" aria-hidden="true">IMEI</span>
+                    <h3>Ready when you are</h3>
+                    <p>Enter an IMEI to load the device and associated vehicle details.</p>
+                  </div>
+                }
+              </section>
+            } @else {
+              <section class="details-screen" aria-label="Device details">
+                <div class="details-toolbar">
+                  <button class="button button-secondary" type="button" (click)="backToSearch(tab.id)">
+                    <span aria-hidden="true">&#8592;</span>
+                    Back to Search
+                  </button>
+                  <button class="button button-primary" type="button" (click)="refresh(tab.id)" [disabled]="tab.loading">
+                    @if (tab.loading) {
+                      <span class="spinner" aria-hidden="true"></span>
+                      Refreshing Details
+                    } @else {
+                      Refresh Details
+                    }
+                  </button>
+                  <button class="button button-secondary" type="button" (click)="clear(tab.id)">
+                    Clear Search
+                  </button>
+                </div>
+
+             
+
+                @if (tab.error) {
+                  <div class="message message-error" role="alert">{{ tab.error }}</div>
+                }
+
+                <div class="details-card-row">
+ <div class="details-card-row">
+<div class="vts-details-grid">
+
+  <!-- OWNER DETAILS -->
+
+
+<!-- Owner Details Card -->
+<section class="vts-card owner-card">
+
+  <div class="vts-card-header">
+    <div class="vts-card-title">
+      <i class="fa fa-user-circle" aria-hidden="true"></i>
+      <h3>Owner Details</h3>
+    </div>
+
+    <button
+      class="vts-btn vts-btn-outline"
+      type="button"
+      (click)="onDetailsCardClick('Edit Owner Details')">
+      <i class="fa fa-pencil" aria-hidden="true"></i>
+      Edit
+    </button>
+  </div>
+
+  <div class="vts-card-body">
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Customer Name</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        {{ tab.details?.['param37'] || 'NA' }}
+      </span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Mobile No.</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        {{ tab.details?.['param38'] || 'NA' }}
+      </span>
+    </div>
+
+  </div>
+
+
+  <div class="vts-card-header">
+    <div class="vts-card-title">
+      <i class="fa fa-id-card" aria-hidden="true"></i>
+      <h3>MVI Details</h3>
+    </div>
+
+ 
+  </div>
+
+<div class="vts-card-body">
+
+  <!-- MVI Verification Status -->
+  <div class="vts-detail-row">
+    <span class="vts-label">MVI Status</span>
+    <span class="vts-colon">:</span>
+    <span class="vts-value">
+      <span
+        [ngClass]="{
+          'text-warning': tab.details?.['param74'] === 'Pending',
+          'text-success': tab.details?.['param74'] === 'Verified',
+          'text-danger': tab.details?.['param74'] === 'Rejected'
+        }">
+        {{ tab.details?.['param74'] || 'NA' }}
+      </span>
+    </span>
+  </div>
+
+
+  <!-- Approved By -->
+  <div class="vts-detail-row">
+    <span class="vts-label">Approved By</span>
+    <span class="vts-colon">:</span>
+    <span class="vts-value">
+      {{ tab.details?.['param75'] || '-' }}
+    </span>
+  </div>
+
+  <!-- Approved On -->
+  <div class="vts-detail-row">
+    <span class="vts-label">Approved On</span>
+    <span class="vts-colon">:</span>
+    <span class="vts-value">
+      {{ tab.details?.['param76'] || '-' }}
+    </span>
+  </div>
+
+</div>
+
+
+</section>
+
+
+<!-- MVI Details Card -->
+
+
+
+  <!-- VEHICLE DETAILS -->
+
+<!-- VEHICLE DETAILS -->
+<section class="vts-card vehicle-card">
+  <div class="vts-card-header">
+    <div class="vts-card-title">
+   <i class="fa fa-bus" aria-hidden="true"></i>
+
+      <h3>Vehicle Details</h3>
+    </div>
+
+    <button class="vts-btn vts-btn-outline"
+            type="button"
+            (click)="onDetailsCardClick('Edit Vehicle Details')">
+      <span>✎</span> Edit
+    </button>
+  </div>
+
+  <div class="vts-card-body">
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Vehicle Type</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param28'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Vehicle No.</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param20'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Chassis No.</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param21'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Engine No.</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param22'] || 'NA' }}</span>
+    </div>
+ <div class="vts-detail-row">
+      <span class="vts-label">RTO</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param27'] || 'NA' }}</span>
+    </div>
+    <div class="vts-detail-row">
+      <span class="vts-label">Make</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param52'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Model</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param53'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Class</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param65'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Manufacture Year</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param25'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Assign Date</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param54'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Certificate Validity</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        @if (tab.details?.['param77']) {
+          {{ tab.details?.['param77'] }} YEARS
+        } @else {
+          NA
+        }
+      </span>
+    </div>
+
+  </div>
+</section>
+
+
+
+<!-- DEVICE DETAILS -->
+<section class="vts-card device-card">
+  <div class="vts-card-header">
+    <div class="vts-card-title">
+  <i class="fa fa-apple" aria-hidden="true"></i>
+      <h3>Device Details</h3>
+    </div>
+
+    <button
+      class="vts-btn vts-btn-outline"
+      type="button"
+      (click)="onDetailsCardClick('Edit Device Details')">
+      <span>✎</span> Edit
+    </button>
+  </div>
+
+  <div class="vts-card-body">
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Device Mfg Name</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        {{ tab.details?.['param15'] || 'NA' }}
+      </span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Serial No.</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        {{ tab.details?.['param6'] || 'NA' }}
+      </span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">IMEI No.</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        {{ tab.details?.['param5'] || 'NA' }}
+      </span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Dealer</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param16'] || 'NA' }}</span>
+    </div>
+    <div class="vts-detail-row">
+      <span class="vts-label">Model Code</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        {{ tab.details?.['param18'] || 'NA' }}
+      </span>
+    </div>
+
+   
+  <div class="vts-detail-row">
+      <span class="vts-label">Assignment Date</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param54'] || 'NA' }}</span>
+    </div>
+      <div class="vts-detail-row">
+      <span class="vts-label">Vehicle Assignment</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        <span class="vts-status"
+              [class.status-green]="tab.details?.['param47'] === 'Assigned'"
+              [class.status-red]="tab.details?.['param47'] !== 'Assigned'">
+          {{ tab.details?.['param47'] || 'NA' }}
+        </span>
+      </span>
+    </div>
+    <div class="vts-detail-row">
+      <span class="vts-label">Activation Status</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        <span class="vts-status"
+          [class.status-green]="tab.details?.['param35'] === 'Activated'"
+          [class.status-red]="tab.details?.['param35'] !== 'Activated'">
+          {{ tab.details?.['param35'] || 'NA' }}
+        </span>
+      </span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Device Status</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        {{ tab.details?.['param58'] || 'NA' }}
+      </span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Polling Status</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">
+        {{ tab.details?.['param48'] || 'NA' }}
+      </span>
+    </div>
+
+  </div>
+</section>
+
+
+  <!-- SIM DETAILS -->
+
+<!-- SIM DETAILS -->
+
+<section class="vts-card sim-card">
+  <div class="vts-card-header">
+    <div class="vts-card-title">
+      <i class="fa fa-signal" aria-hidden="true"></i>
+      <h3>SIM Details</h3>
+    </div>
+
+    <div class="sim-card-actions">
+      <!-- Automatic Validity Update -->
+     
+      <!-- Edit SIM Details -->
+      <button
+        class="vts-btn vts-btn-outline"
+        type="button"
+        title="Edit SIM Details"
+        (click)="onDetailsCardClick('Edit SIM Details')">
+        <i class="fa fa-pencil" aria-hidden="true"></i>
+        <span>Edit</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="vts-card-body">
+    <div class="vts-detail-row">
+      <span class="vts-label">ICCID No.</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param7'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">eSIM Provider</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param14'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Mobile No. 1</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param8'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Network 1</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param10'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Validity 1</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param50'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Mobile No. 2</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param9'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Network 2</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param11'] || 'NA' }}</span>
+    </div>
+
+    <div class="vts-detail-row">
+      <span class="vts-label">Validity 2</span>
+      <span class="vts-colon">:</span>
+      <span class="vts-value">{{ tab.details?.['param51'] || 'NA' }}</span>
+    </div>
+  </div>
+   <div class="vts-card-footer d-flex justify-content-around">
+  <button
+        class="vts-btn vts-btn-outline sim-action-btn"
+        type="button"
+        title="Validity Update"
+        aria-label="Validity Update"
+        (click)="onDetailsCardClick('Validity Update')">
+        <i class="fa fa-refresh" aria-hidden="true"></i>
+     Validity Update
+      </button>
+
+      <!-- Manual Validity Update -->
+      <button
+        class="vts-btn vts-btn-outline sim-action-btn"
+        type="button"
+        title="Manual Validity"
+        aria-label="Manual Validity"
+        (click)="onDetailsCardClick('Manual Validity')">
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>Manual Validity
+      </button> 
+  </div>
+
+</section>
+
+
+
+</div>
+
+<div class="vts-action-panel">
+ 
+
+
+<div class="vts-action-panel">
+  <div class="vts-action-grid">
+
+   
+<button
+  type="button"
+  class="vts-action-btn blue"
+  (click)="openVahanComparison(tab.id)"
+  [disabled]="!tab.details">
+
+  <i class="bi bi-arrow-left-right"></i>
+  <span>Compare Vahan</span>
+</button>
+
+  
+
+    <button type="button" class="vts-action-btn orange"
+      (click)="onVtsAction('Force Activation', tab.id)">
+      <i class="bi bi-lightning-charge-fill"></i><span>Force Activation</span>
+    </button>
+
+    <button type="button" class="vts-action-btn red"
+      (click)="onVtsAction('Push Panic', tab.id)">
+      <i class="bi bi-exclamation-triangle-fill"></i><span>Push Panic</span>
+    </button>
+
+<button
+  type="button"
+  class="vts-action-btn slate"
+  (click)="openRawDetails(tab.id)">
+  <i class="bi bi-code-slash"></i>
+  <span>Raw Details</span>
+</button>
+
+    <button type="button" class="vts-action-btn cyan"
+      (click)="onVtsAction('Push Vahan', tab.id)">
+      <i class="bi bi-cloud-arrow-up-fill"></i><span>Push Vahan</span>
+    </button>
+
+    <button type="button" class="vts-action-btn teal"
+      (click)="onVtsAction('Pull Vahan', tab.id)">
+      <i class="bi bi-cloud-arrow-down-fill"></i><span>Pull Vahan</span>
+    </button>
+
+    <button type="button" class="vts-action-btn indigo"
+      (click)="onVtsAction('Change Device Details', tab.id)">
+      <i class="bi bi-pencil-square"></i><span>Change Device</span>
+    </button>
+
+    <button type="button" class="vts-action-btn green"
+      (click)="onVtsAction('Change Owner Details', tab.id)">
+      <i class="bi bi-person-gear"></i><span>Change Owner</span>
+    </button>
+
+    <button type="button" class="vts-action-btn blue"
+      (click)="onVtsAction('Change Vehicle Details', tab.id)">
+      <i class="bi bi-car-front"></i><span>Change Vehicle</span>
+    </button>
+
+    <button type="button" class="vts-action-btn purple"
+      (click)="onVtsAction('Update SIM Validity Manually', tab.id)">
+      <i class="bi bi-sim-fill"></i><span>SIM Validity Manual</span>
+    </button>
+
+    <button type="button" class="vts-action-btn cyan"
+      (click)="onVtsAction('Update SIM Validity Automatically', tab.id)">
+      <i class="bi bi-calendar-check"></i><span>SIM Validity Auto</span>
+    </button>
+
+    <button type="button" class="vts-action-btn green"
+      (click)="onVtsAction('Compliance Check', tab.id)">
+      <i class="bi bi-shield-check"></i><span>Compliance Check</span>
+    </button>
+
+    <button type="button" class="vts-action-btn orange"
+      (click)="onVtsAction('Track Vehicle', tab.id)">
+      <i class="bi bi-geo-alt-fill"></i><span>Track Vehicle</span>
+    </button>
+
+    <button type="button" class="vts-action-btn blue"
+      (click)="onVtsAction('Live Vehicle Tracking', tab.id)">
+      <i class="bi bi-broadcast-pin"></i><span>Live Tracking</span>
+    </button>
+
+    <button type="button" class="vts-action-btn indigo"
+      (click)="onVtsAction('Track History', tab.id)">
+      <i class="bi bi-clock-history"></i><span>Track History</span>
+    </button>
+
+    <button type="button" class="vts-action-btn orange"
+      (click)="onVtsAction('Untag Device', tab.id)">
+      <i class="bi bi-link-45deg"></i><span>Untag Device</span>
+    </button>
+
+    <button type="button" class="vts-action-btn red"
+      (click)="onVtsAction('Delete Device', tab.id)">
+      <i class="bi bi-trash3"></i><span>Delete Device</span>
+    </button>
+
+    <button type="button" class="vts-action-btn dark"
+      (click)="onVtsAction('Download PDF', tab.id)">
+      <i class="bi bi-file-earmark-pdf"></i><span>Download PDF</span>
+    </button>
+
+  </div>
+</div>
+
+</div>
+
+</div>
+
+
+</div>
+              </section>
+            }
+          </div>
+        </nz-tab>
+      }
+    </nz-tabset>
+  </div>
+</div>
+
+<div class="vahan-comparison-overlay" *ngIf="vahanComparison as comparison">
+  <div class="vahan-comparison-modal">
+
+    <div class="vahan-comparison-header">
+      <div>
+        <h3>Compare Vehicle with Vahan</h3>
+     
+      </div>
+
+      <button type="button"
+              class="vahan-close-btn"
+              (click)="closeVahanComparison()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="vahan-comparison-table-wrapper">
+      <table class="vahan-comparison-table">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Existing VLTS Data</th>
+            <th>Vahan Data</th>
+            <th>Comparison</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let row of comparison.rows"
+              [class.row-match]="row.status === 'MATCH'"
+              [class.row-mismatch]="row.status === 'MISMATCH'">
+
+            <td class="field-name">{{ row.label }}</td>
+            <td>{{ row.existingValue }}</td>
+            <td>{{ row.vahanValue }}</td>
+
+            <td>
+              <span class="comparison-status"
+                    [class.status-match]="row.status === 'MATCH'"
+                    [class.status-mismatch]="row.status === 'MISMATCH'"
+                    [class.status-na]="row.status === 'NOT AVAILABLE'">
+
+                <i class="bi"
+                   [ngClass]="{
+                     'bi-check-circle-fill': row.status === 'MATCH',
+                     'bi-exclamation-circle-fill': row.status === 'MISMATCH',
+                     'bi-dash-circle-fill': row.status === 'NOT AVAILABLE'
+                   }"></i>
+
+                {{ row.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+   
+
+  </div>
+</div>
+
+</ng-template>
+
+<ng-container *ngIf="showRawDetails; else universalPage">
+
+
+<!-- Raw Data Modal -->
+<div class="vahan-comparison-overlay"
+     *ngIf="showRawDetails">
+
+  <div class="vahan-comparison-modal raw-data-modal">
+
+    <!-- Header -->
+    <div class="vahan-comparison-header">
+      <div>
+        <h3>Raw Device Data</h3>
+        <p class="raw-modal-subtitle">
+          IMEI: {{ rawDetailsImei }}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="vahan-close-btn"
+        (click)="backToUniversalPage()"
+        aria-label="Close Raw Data">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="raw-modal-filters">
+      <div class="raw-modal-date">
+        <label for="rawDate">Date</label>
+        <input
+          id="rawDate"
+          type="date"
+          [(ngModel)]="rawSelectedDate">
+      </div>
+
+      <div class="raw-modal-actions">
+        <button
+          type="button"
+          class="vts-btn vts-btn-primary"
+          [disabled]="rawLoading"
+          (click)="searchRawData()">
+          <i class="bi bi-search"></i>
+          Apply Date
+        </button>
+
+        <button
+          type="button"
+          class="vts-btn vts-btn-outline"
+          [disabled]="rawLoading"
+          (click)="clearRawFilters()">
+          <i class="bi bi-arrow-counterclockwise"></i>
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Packet Tabs -->
+    <div class="raw-modal-tabs">
+      <button
+        *ngFor="let packet of rawPacketTabs"
+        type="button"
+        [class.active]="rawPacketType === packet.value"
+        [disabled]="rawLoading"
+        (click)="selectRawPacket(packet.value)">
+        {{ packet.label }}
+      </button>
+    </div>
+
+    <!-- Table -->
+    <div class="raw-modal-table-wrapper">
+
+      <div class="raw-modal-table-heading">
+        <h4>Raw Data Records</h4>
+        <span>Total Records: {{ rawTotalCount }}</span>
+      </div>
+
+      <div *ngIf="rawLoading" class="raw-modal-state">
+        <i class="bi bi-arrow-repeat"></i>
+        Loading raw data...
+      </div>
+
+      <div
+        *ngIf="!rawLoading && rawError"
+        class="raw-modal-state raw-modal-error">
+        {{ rawError }}
+      </div>
+
+      <div
+        class="raw-table-scroll"
+        *ngIf="!rawLoading && rawRows.length">
+
+        <table class="vahan-comparison-table raw-modal-table">
+          <thead>
+            <tr>
+              <th>Sr. No.</th>
+              <th>Server Polling Time</th>
+              <th>Raw Packet Data</th>
+              <th>Device IP</th>
+              <th>Port</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let row of rawRows; let i = index">
+              <td>
+                {{ (rawCurrentPage - 1) * rawPageSize + i + 1 }}
+              </td>
+
+              <td>{{ row.param3 }}</td>
+
+              <td class="raw-modal-packet">
+                <pre>{{ row.param4 }}</pre>
+              </td>
+
+              <td>{{ row.param5 }}</td>
+              <td>{{ row.param6 }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div
+        *ngIf="!rawLoading && !rawError && !rawRows.length"
+        class="raw-modal-state">
+        No raw data found.
+      </div>
+
+    </div>
+
+    <!-- Pagination -->
+    <div class="raw-modal-pagination">
+      <ngb-pagination
+        *ngIf="rawTotalCount > rawPageSize"
+        [collectionSize]="rawTotalCount"
+        [(page)]="rawCurrentPage"
+        [pageSize]="rawPageSize"
+        (pageChange)="changeRawPage($event)"
+        [maxSize]="5"
+        [rotate]="true"
+        [ellipses]="false"
+        [boundaryLinks]="true"
+        size="sm"
+        class="d-flex justify-content-center mt-2 mb-1">
+      </ngb-pagination>
+    </div>
+
+  </div>
+</div>
+
+
+</ng-container>

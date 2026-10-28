@@ -1,0 +1,357 @@
+<!-- <div class="container-fluid">
+
+<div *ngIf="!showForm">
+  <h2>SIM Validity List</h2>
+  <button type="button" class="btn btn-sm btn-success" (click)="showForm = true">
+    New sim validity
+  </button>
+
+  <div class="top-controls-row">
+
+    <div class="left-controls">
+      <span class="search-label">Search :</span>
+
+      <div class="search-box">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search ICCID..."
+          [(ngModel)]="searchText"
+          name="searchText"
+          (keyup.enter)="searchSim()"
+          />
+
+        <button type="button" class="search-inner-btn" (click)="searchSim()">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
+    </div>
+
+
+    <div class="right-controls">
+      <div class="control-item">
+        <label>Show Rows :</label>
+
+        <select
+          [(ngModel)]="pageSize"
+          (change)="onPageSizeChange(pageSize)"
+          name="pageSize"
+          >
+          <option
+            *ngFor="let size of pageSizeOptions"
+            [value]="size === totalCount ? 'All' : size"
+            >
+            {{ size === totalCount ? "All" : size }}
+          </option>
+        </select>
+      </div>
+
+      <div class="total-records-text">
+        Total Records : {{ simList.length }} of {{ totalCount }}
+      </div>
+    </div>
+  </div>
+
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>ICCID</th>
+        <th>Network1</th>
+        <th>Mobile1</th>
+        <th>Network2</th>
+        <th>Mobile2</th>
+        <th>Validity1</th>
+        <th>Validity2</th>
+        <th>Esim provider</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let row of simList">
+        <td>{{ row.param1 }}</td>
+        <td>{{ row.param2 }}</td>
+        <td>{{ row.param3 }}</td>
+        <td>{{ row.param4 }}</td>
+        <td>{{ row.param5 }}</td>
+        <td>{{ row.param6 }}</td>
+        <td>{{ row.param7 }}</td>
+        <td>{{ row.param8 }}</td>
+        <td>{{ row.param12 }}</td>
+        <td>
+          <button class="btn btn-primary" (click)="openUpdateForm(row)">
+            Update
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <div class="pagination-wrapper" *ngIf="totalCount > 0">
+    <div class="total-records-text">
+      Total Records : {{ simList.length }} of {{ totalCount }}
+    </div>
+
+    <ul class="pagination">
+      <li [class.disabled]="pageNo === 1">
+        <button (click)="onPageChange(pageNo - 1)" [disabled]="pageNo === 1">
+          Prev
+        </button>
+      </li>
+
+      <li
+        *ngFor="let page of getPageNumbers()"
+        [class.active]="page === pageNo"
+        [class.ellipsis]="page === -1"
+        >
+        <span *ngIf="page === -1">…</span>
+
+        <button *ngIf="page !== -1" (click)="onPageChange(page)">
+          {{ page }}
+        </button>
+      </li>
+
+      <li [class.disabled]="pageNo >= getTotalPages()">
+        <button
+          (click)="onPageChange(pageNo + 1)"
+          [disabled]="pageNo >= getTotalPages()"
+          >
+          Next
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+<div *ngIf="showForm">
+  <button class="btn btn-secondary mb-3" (click)="showForm = false">
+    ← Back
+  </button>
+
+  <div class="form-container">
+    <h2>SIM Validity Update</h2>
+
+    <form [formGroup]="simForm">
+
+      <div class="row">
+        <div class="col-md-4">
+          <label>ICCID</label>
+          <input class="form-control" formControlName="iccid" />
+        </div>
+
+        <div class="col-md-4">
+          <label>M2M Provider</label>
+
+          <select class="form-control" formControlName="m2m">
+            <option value="">Select</option>
+
+            <option
+              *ngFor="let provider of m2mProviderList"
+              [value]="provider.param1"
+              >
+              {{ provider.param2 }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label>Customer Mobile No</label>
+          <input class="form-control" formControlName="customerMobile" />
+        </div>
+      </div>
+
+
+      <div class="row mt-3">
+        <div class="col-md-4">
+          <label>Mobile 1</label>
+          <input class="form-control" formControlName="mobile1" />
+        </div>
+
+        <div class="col-md-4">
+          <label>Network 1</label>
+
+          <select class="form-control" formControlName="network1">
+            <option value="">Select</option>
+
+            <option
+              *ngFor="let network of networkList"
+              [value]="network.param2"
+              >
+              {{ network.param2 }}
+            </option>
+          </select>
+        </div>
+
+
+      </div>
+
+
+      <div class="row mt-3">
+        <div class="col-md-4">
+          <label>Mobile 2</label>
+          <input class="form-control" formControlName="mobile2" />
+        </div>
+
+        <div class="col-md-4">
+          <label>Network 2</label>
+
+          <select class="form-control" formControlName="network2">
+            <option value="">Select</option>
+
+            <option
+              *ngFor="let network of networkList"
+              [value]="network.param2"
+              >
+              {{ network.param2 }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label>Validity 2</label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="validity2"
+            />
+        </div>
+      </div>
+
+
+      <div class="mt-4">
+        <button type="button" class="btn btn-sm btn-success" (click)="saveData()">
+          Update
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+</div> -->
+
+
+
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+
+        <!-- HEADER -->
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle">
+            <span>SIM Validity Update</span>
+          </div>
+        </div>
+
+        <!-- FORM -->
+        <div class="entrypagediv">
+          <form [formGroup]="simForm">
+
+            <!-- ROW 1 -->
+            <div class="form-row ">
+              <div class="form-group">
+                <label>ICCID</label>
+                <input
+                  class="form-control"
+                  placeholder="Enter ICCID"
+                  formControlName="iccid" />
+              </div>
+
+              <div class="form-group">
+                <label>M2M Provider</label>
+                <select class="form-control" formControlName="m2m">
+                  <option value="">Select M2M Provider</option>
+                  @for (provider of m2mProviderList; track provider) {
+                    <option [value]="provider.param1">
+                      {{ provider.param2 }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Customer Mobile</label>
+                <input
+                  class="form-control"
+                  placeholder="Enter Customer Mobile"
+                  formControlName="customerMobile" />
+              </div>
+            </div>
+
+            <!-- ROW 2 -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>Mobile 1</label>
+                <input
+                  class="form-control"
+                  placeholder="Enter Primary Mobile"
+                  formControlName="mobile1" />
+              </div>
+
+              <div class="form-group">
+                <label>Network 1</label>
+                <select class="form-control" formControlName="network1">
+                  <option value="">Select Network</option>
+                  @for (network of networkList; track network) {
+                    <option [value]="network.param2">
+                      {{ network.param2 }}
+                    </option>
+                  }
+                </select>
+              </div>
+              <div class="form-group">
+
+              </div>
+            </div>
+
+            <!-- ROW 3 -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>Mobile 2</label>
+                <input
+                  class="form-control"
+                  placeholder="Enter Secondary Mobile"
+                  formControlName="mobile2" />
+              </div>
+
+              <div class="form-group">
+                <label>Network 2</label>
+                <select class="form-control" formControlName="network2">
+                  <option value="">Select Network</option>
+                  @for (network of networkList; track network) {
+                    <option [value]="network.param2">
+                      {{ network.param2 }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Validity</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  formControlName="validity2" />
+              </div>
+            </div>
+
+            <!-- BUTTON -->
+            <div class="form-actions">
+              <button type="button" class="btn-submit" (click)="saveData()">
+                Update SIM
+              </button>
+
+              <button type="button" class="btn-reset" (click)="resetForm()">
+                Reset
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

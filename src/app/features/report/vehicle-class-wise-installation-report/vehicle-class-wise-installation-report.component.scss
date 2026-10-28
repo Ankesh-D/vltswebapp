@@ -1,0 +1,297 @@
+/* =========================================================
+   VEHICLE CLASS WISE INSTALLATION REPORT CSS
+   ========================================================= */
+
+::ng-deep {
+
+  /* ===== MAIN ===== */
+
+  .content-i {
+    // padding: 20px;
+    background: #f5f5f5;
+  }
+
+  .content-box {
+    background: #ffffff;
+  }
+
+  .element-box {
+    padding: 1rem;
+  }
+
+  /* ===== PAGE TITLE ===== */
+
+  .pagetitleborder {
+    border-bottom: 2px solid #0b58b9 !important;
+    padding: 10px 0;
+  }
+
+  /* ===== HEADER ===== */
+
+  .page-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .header-btn {
+    height: 26px;
+    padding: 0 12px;
+    font-size: 11px;
+    font-weight: bold;
+    background: #fff;
+    color: #0b58b9;
+    border: 1px solid #0b58b9;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .header-btn:hover {
+    background: #0b58b9;
+    color: #fff;
+  }
+
+  /* ===== TOP CONTROLS ===== */
+
+  .top-controls-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .left-controls,
+  .right-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .search-label {
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  .search-box {
+    display: flex;
+    border: 1px solid #0b58b9;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 24px;
+    background: #fff;
+  }
+
+  .search-input.inner {
+    border: none;
+    outline: none;
+    padding: 0 8px;
+    font-size: 11px;
+    width: 180px;
+    background: #fff;
+  }
+
+  .search-inner-btn {
+    width: 30px;
+    background: #0b58b9;
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .reload-btn {
+    height: 26px;
+    padding: 0 12px;
+    font-size: 11px;
+    font-weight: bold;
+    background: #fff;
+    color: #0b58b9;
+    border: 1px solid #0b58b9;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .reload-btn:hover {
+    background: #0b58b9;
+    color: #fff;
+  }
+
+  .control-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+  }
+
+  .control-item label {
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .control-item select {
+    height: 24px;
+    font-size: 11px;
+    border: 1px solid #0b58b9;
+    border-radius: 4px;
+    padding: 0 6px;
+    background: #fff;
+  }
+
+  .total-records-text {
+    font-size: 11px;
+    font-weight: bold;
+    color: #0b58b9;
+    white-space: nowrap;
+  }
+
+  /* =========================================================
+     TABLE
+     ========================================================= */
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #d9e7d8 !important;
+  }
+
+  .table-striped tbody tr:nth-of-type(even) {
+    background-color: #fcfcfc !important;
+  }
+
+  /* ===== TABLE HEADER ===== */
+
+  .device-thead th {
+    background: #aacda8 !important;
+    border: 1px solid #d3a130 !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    padding: 8px 6px !important;
+    color: #000 !important;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* ===== TABLE BODY ===== */
+
+  .table td {
+    font-size: 11px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 6px;
+    border: 1px solid #d3a130 !important;
+    color: #000;
+  }
+
+  /* ===== NO DATA ===== */
+
+  .no-data {
+    text-align: center;
+    font-weight: bold;
+    padding: 20px !important;
+    color: red;
+  }
+
+  /* =========================================================
+     PAGINATION
+     ========================================================= */
+
+  .pagination-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+
+  .pagination {
+    list-style: none;
+    display: flex;
+    gap: 4px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .pagination li {
+    display: inline-flex;
+  }
+
+  .pagination button {
+    border: 1px solid #0b58b9;
+    background: #ffffff;
+    color: #0b58b9;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .pagination button:hover:not(:disabled) {
+    background: #eaf2ff;
+  }
+
+  .pagination li.active button {
+    background: #0b58b9;
+    color: #fff;
+  }
+
+  .pagination li.disabled button {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f4f6f9;
+    color: #7a8aa0;
+  }
+
+  .pagination li.ellipsis span {
+    padding: 0 6px;
+    font-weight: 700;
+  }
+
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 992px) {
+
+  .top-controls-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .left-controls,
+  .right-controls {
+    width: 100%;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .search-input.inner {
+    width: 120px;
+  }
+
+  .right-controls {
+    gap: 8px;
+  }
+
+}

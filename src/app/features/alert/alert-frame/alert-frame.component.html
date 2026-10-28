@@ -1,0 +1,45 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle"><span>Panic Alert Tracking</span></div>
+        </div>
+
+        <div id="alertmap" style="width: 100%; height: 600px; border: 2px solid #818181;"></div>
+
+        <div class="table-responsive" style="margin-top: 20px;">
+          <table class="table table-striped app-table" style="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Vehicle No.</th>
+                <th>Alert Time</th>
+                <th>Location</th>
+                <th>Customer</th>
+                <th>Mobile</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (panicAlerts.length === 0 && !loading) {
+                <tr>
+                  <td colspan="6" style="font-weight: bold; text-align: center;">NO DATA FOUND</td>
+                </tr>
+              }
+              @for (alert of panicAlerts; track alert; let i = $index) {
+                <tr>
+                  <td>{{i + 1}}</td>
+                  <td>{{alert.param11 || 'NA'}}</td>
+                  <td>{{alert.param5 || 'NA'}}</td>
+                  <td>{{alert.param28 || 'NA'}}, {{alert.param27 || 'NA'}}</td>
+                  <td>{{alert.param28 || 'NA'}}</td>
+                  <td>{{alert.param29 || 'NA'}}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

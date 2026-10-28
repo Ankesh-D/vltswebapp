@@ -1,0 +1,502 @@
+<div class="content-i mt-3">
+  <!-- <div class="content-box"> -->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="element-wrapper">
+        <div class="element-box"
+          style=" border-radius: 6px; box-shadow: 0px 2px 4px rgba(126, 142, 177, 0.12);">
+          <div class="col-md-12 pagetitleborder"
+            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dde2ec;">
+            <div class="pagetitlestyle" style="font-size: 18px; font-weight: bold; color: #0b58b9;">
+              <span>User Details</span>
+            </div>
+            @if (showEntryForm) {
+              <button class="pagebtn" (click)="toggleView(false)"
+                style="background-color: #0b58b9; border-color: #0b58b9; padding: 6px 15px; border-radius: 4px; margin-right: 10px;">
+                <span
+                  style="color: white; text-decoration: none; font-size: 12px; font-weight: bold; cursor: pointer;"><i
+                class="fa fa-list"></i>&nbsp;&nbsp;Details</span>
+              </button>
+            }
+
+            @if (!showEntryForm) {
+              <button class="btn btn-sm btn-primary mb-1" (click)="toggleView(true)">
+                <span style="cursor: pointer; color: white; font-size: 12px; font-weight: bold;"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add New</span>
+              </button>
+            }
+          </div>
+
+          @if (!showEntryForm) {
+            <div class="row">
+              <!-- Search and Pagination Controls -->
+              <form autocomplete="off" class="mb-2">
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                  <!-- Left Side: Search -->
+                  <div class="d-flex align-items-center">
+                    <!-- <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Search :</label> -->
+                    <div class="input-group input-group-sm">
+                      <input type="search" class="form-control shadow-none" placeholder="Type here..."
+                        [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" autocomplete="off"
+                        style="font-size: 11px; width: 200px;">
+                      <div class="input-group-append">
+                        <button type="button" class="btn btn-sm btn-primary" (click)="getSearchDetails()">
+                          <i class="fa fa-search" style="font-size: 11px;"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <button type="button" (click)="reloadData()" class="btn btn-outline-success btn-sm ms-2"
+                      style="font-size: 11px;" title="Reload">
+                      <i class="fa fa-refresh me-1" [class.fa-spin]="loading"></i>
+                      {{ loading ? 'Reloading...' : 'Reload' }}
+                    </button>
+                  </div>
+                  <!-- Right Side: Controls -->
+                  <div class="d-flex align-items-center">
+                    <!-- Download -->
+                    <div class="d-flex align-items-center me-3">
+                      <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Download :</label>
+                      <select name="excelpdfdownload" id="excelpdfdownload"
+                        class="form-control form-control-sm" style="font-size: 11px; width: auto;">
+                        <option value="Select">Select</option>
+                        <!-- <option value="Excel">Excel</option> -->
+                        <option value="">Excel</option>
+                      </select>
+                    </div>
+                    <!-- Show Rows -->
+                    <div class="d-flex align-items-center me-3">
+                      <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Show Rows :</label>
+                      <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize"
+                        class="form-control form-control-sm" style="font-size: 11px; width: auto;">
+                        @for (size of pageSizeOptions; track size) {
+                          <option [value]="size === totalCount ? 'All' : size">
+                            {{size === totalCount ? 'All' : size}}
+                          </option>
+                        }
+                      </select>
+                    </div>
+                    <!-- Total Records -->
+                    <span class="fw-bold" style="font-size: 11px;">
+                      Total Records : <span class="text-primary">{{pageCount}} of {{totalCount}}</span>
+                    </span>
+                  </div>
+                </div>
+              </form>
+              <!-- <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
+              <table style="width: 100%;">
+                <tbody class="bg-body">
+                  <tr>
+                    <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                      <font style="font-weight: bold; color: #0b58b9;">Search : </font>
+                    </td>
+                    <td>
+                      <div style="display: flex; align-items: center;">
+                        <input type="search" readonly
+                          onfocus="this.removeAttribute('readonly');" class="form-control"
+                          id="searchby" placeholder="Type here and press button...."
+                          style="border: 1px solid #ced4da; height: 28px; width: 220px; font-size: 12px; border-radius: 4px 0 0 4px; padding: 4px 10px; "
+                          autocomplete="disabled" maxlength="50" [(ngModel)]="searchText"
+                          (keyup.enter)="getSearchDetails()" name="searchby">
+                        <button id="searchbtn" style="cursor: pointer; margin-left: 0; height: 28px; border: none; background-color: #0b58b9; color: white; border-radius: 0 4px 4px 0; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; transition: background-color 0.2s;"
+                          (click)="getSearchDetails()" title="Search">
+                          <i class="fa fa-search"></i>
+                        </button>
+                        <button type="button" (click)="reloadData()" [disabled]="loading"
+                          style="margin-left: 6px; height: 28px; border: 1px solid #0b58b9; background-color: white; color: #0b58b9; border-radius: 4px; padding: 0 12px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s;"
+                          onmouseover="this.style.backgroundColor='#0b58b9'; this.style.color='white';"
+                          onmouseout="this.style.backgroundColor='white'; this.style.color='#0b58b9';">
+                          <span *ngIf="!loading" style="display: inline-flex; align-items: center;"><i class="fa fa-refresh" style="margin-right: 4px;"></i>Reload</span>
+                          <span *ngIf="loading" style="display: inline-flex; align-items: center;"><i class="fa fa-spinner fa-spin" style="margin-right: 4px;"></i>Reloading...</span>
+                        </button>
+                      </div>
+                    </td>
+                    <td>
+                      <table style="float: right;">
+                        <tbody>
+                          <tr>
+                            <td style="vertical-align: middle; padding-right: 15px;">
+                              <div style="display: flex; align-items: center;">
+                                <label class="control-label" for="excelpdfdownload"
+                                style="color: #0b58b9; margin-bottom: 0; margin-right: 5px; font-size: 12px; font-weight: bold;">Download :</label>
+                                <select class="" name="excelpdfdownload"
+                                  id="excelpdfdownload" style="height: 25px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;">
+                                  <option value="Select">Select</option>
+                                  <option value="Excel" id="downloadexcel">Excel
+                                  </option>
+                                </select>
+                              </div>
+                            </td>
+                            <td style="vertical-align: middle; padding-right: 5px;">
+                              <div style="font-weight: bold; color: #0b58b9; font-size: 12px;">
+                                Show Rows :
+                              </div>
+                            </td>
+                            <td style="vertical-align: middle; padding-right: 15px;">
+                              <select [(ngModel)]="pageSize"
+                                (change)="onPageSizeChange(pageSize)" name="pageSize"
+                                style="font-size: 11px; height: 25px; border: 1px solid #ccc; border-radius: 3px;">
+                                <option *ngFor="let size of pageSizeOptions"
+                                  [value]="size === totalCount ? 'All' : size">
+                                  {{size === totalCount ? 'All' : size}}
+                                </option>
+                              </select>
+                            </td>
+                            <td style="vertical-align: middle; padding-right: 9px;">
+                              <div style="text-align: right; font-weight: bold; font-size: 12px; color: #0b58b9;">
+                                <span class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</span>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </form> -->
+            <div class="table-responsive">
+              <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+                <div class="col-sm-12">
+                  <ng-template #rtoUserCell let-user let-column="column" let-i="index">
+                    @if (column.key === 'index') {
+                      {{ (currentPage - 1) * pageSize + i + 1 }}
+                    } @else if (column.key === 'param12') {
+                      <button class="btn btn-sm btn-primary"
+                        [ngClass]="{'btn-success': user.param12=='Activate', 'btn-danger': user.param12!='Activate'}"
+                        (click)="openStatusModal(user)">{{user.param12}}</button>
+                    } @else {
+                      {{ $any(user)[column.key] || 'NA' }}
+                    }
+                  </ng-template>
+                  <app-common-table [columns]="tableColumns" [rows]="getPaginatedUsers()" [loading]="loading"
+                    [cellTemplate]="rtoUserCell" [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
+                    tableClass="table table-striped app-table" tableId="devicetable"
+                    tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
+                    emptyMessage="NO DATA FOUND">
+                  </app-common-table>
+                  <!-- Pagination Controls -->
+                  @if (totalCount > 0) {
+                    <div class="pagination-wrapper"
+                      style="text-align: center; margin-top: 10px;">
+                      <ul class="pagination"
+                        style="display: inline-flex; list-style: none; padding: 0;">
+                        <li [class.disabled]="currentPage === 1">
+                          <button (click)="onPageChange(currentPage - 1)"
+                          [disabled]="currentPage === 1">Previous</button>
+                        </li>
+                        @for (page of getPageNumbers(); track page; let i = $index) {
+                          <li
+                            [class.active]="currentPage === (i + 1)">
+                            <button (click)="onPageChange(i + 1)">{{i + 1}}</button>
+                          </li>
+                        }
+                        <li [class.disabled]="currentPage >= getTotalPages()">
+                          <button (click)="onPageChange(currentPage + 1)"
+                          [disabled]="currentPage >= getTotalPages()">Next</button>
+                        </li>
+                      </ul>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (showEntryForm) {
+          <div class="row">
+            <div class="col-md-12">
+              <form id="userentryform" autocomplete="off">
+                <div class="alert alert-info"
+                  style="font-size: 12px; padding: 1px 15px; background-color: #e6f7ff; border: 1px solid #91d5ff; color: #0050b3;">
+                  <strong><i class="fa fa-info-circle"></i> Note :</strong> Fields marked with <span
+                class="mandetory" style="color: red;">*</span> are mandatory.
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="entrypagediv" style="padding: 0;">
+                    <div class="row">
+                      <div class="col-md-8">
+                        <div
+                          style="background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid #c4c3c3; height: 100%;">
+                          <h6
+                            style="color: #0b58b9; border-bottom: 1px solid #b3afaf; padding: 5px 20px; margin: -20px -20px 20px -20px; font-size: 15px; font-weight: 700; background: #d6dcdd; border-radius: 10px 10px 0 0; display: flex; align-items: center;">
+                            <i class="fa fa-user-circle"
+                            style="margin-right: 10px; font-size: 18px;"></i> Basic
+                            Information
+                          </h6>
+                          <div class="row">
+                            <!-- Select RTO (conditional) -->
+                            <div class="col-md-8 col-sm-8" id="subrtolist"
+                              [style.display]="showRTOList ? 'block' : 'none'">
+                              <div class="form-group">
+                                <label for="rtoname">Select RTO <span
+                                  class="mandetory"
+                                style="color: red;">*</span></label>
+                                <select id="rtoname" class="form-control searchable"
+                                  [class.error]="getFieldError('rto')"
+                                  [(ngModel)]="selectedRTOId"
+                                  (change)="onRTOChange()" name="rtoname">
+                                  <option value="">-- Select RTO --</option>
+                                  @for (rto of rtoList; track rto) {
+                                    <option
+                                    [value]="rto.param1">{{rto.param2}}</option>
+                                  }
+                                </select>
+                              </div>
+                            </div>
+                            <!-- Contact Person -->
+                            <div class="col-md-8 col-sm-8">
+                              <div class="form-group">
+                                <label for="contactperson">Contact Person <span
+                                  class="mandetory"
+                                style="color: red;">*</span></label>
+                                <input class="form-control ignoresymbol_name"
+                                  [class.error]="getFieldError('contactPerson')"
+                                  placeholder="Enter Contact Person" type="text"
+                                  id="contactperson" maxlength="200"
+                                  [(ngModel)]="contactPerson" name="contactperson"
+                                  autocomplete="off">
+                              </div>
+                            </div>
+                            <!-- Mobile No -->
+                            <div class="col-md-4 col-sm-4">
+                              <div class="form-group">
+                                <label for="mobileno">Mobile No <span
+                                  class="mandetory"
+                                style="color: red;">*</span></label>
+                                <input class="form-control acceptnumeric_nodecimal"
+                                  [class.error]="getFieldError('mobileNo')"
+                                  placeholder="Enter Mobile No" type="text"
+                                  id="mobileno" maxlength="10"
+                                  [(ngModel)]="mobileNo" name="mobileno"
+                                  (blur)="validateMobileNo()" autocomplete="off">
+                                @if (formErrors['mobileNo']) {
+                                  <small id="mobilenomsg" class="text-danger"
+                                  style="font-size: 10px; color: red;">{{errorMessage}}</small>
+                                }
+                              </div>
+                            </div>
+                            <!-- Email ID -->
+                            <div class="col-md-6 col-sm-6">
+                              <div class="form-group">
+                                <label for="emailid">Email Id </label>
+                                <input class="form-control"
+                                  [class.error]="getFieldError('emailId')"
+                                  placeholder="Enter Email Id" type="email"
+                                  id="emailid" [(ngModel)]="emailId"
+                                  name="emailid" (keyup)="validateEmail()"
+                                  autocomplete="off">
+                                @if (emailMessage) {
+                                  <small id="emailmsg" class="text-danger"
+                                  style="font-size: 10px; color: red;">{{emailMessage}}</small>
+                                }
+                              </div>
+                            </div>
+                            <!-- Address -->
+                            <div class="col-md-6 col-sm-6">
+                              <div class="form-group">
+                                <label for="address">Address </label>
+                                <textarea
+                                  class="form-control ignorespecialcharacter_address"
+                                  [class.error]="getFieldError('address')"
+                                  placeholder="Enter Address" maxlength="60"
+                                  rows="1" style="resize: none; height: 36px;"
+                                  id="address" [(ngModel)]="address"
+                                name="address" autocomplete="off"></textarea>
+                              </div>
+                            </div>
+                            <!-- Pincode -->
+                            <div class="col-md-6 col-sm-6">
+                              <div class="form-group">
+                                <label for="pincode">Pincode </label>
+                                <input class="form-control acceptnumeric_nodecimal"
+                                  [class.error]="getFieldError('pincode')"
+                                  placeholder="Enter Pincode" type="text"
+                                  id="pincode" maxlength="6" [(ngModel)]="pincode"
+                                  name="pincode" (blur)="validatePincode()"
+                                  autocomplete="off">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <!-- Login Details -->
+                        <div
+                          style="background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid #c4c3c3; height: 100%;">
+                          <h6
+                            style="color: #0b58b9; border-bottom: 1px solid #bebcbc; padding: 5px 20px; margin: -20px -20px 20px -20px; font-size: 15px; font-weight: 700; background: #d6dcdd; border-radius: 10px 10px 0 0; display: flex; align-items: center;">
+                            <i class="fa fa-lock"
+                            style="margin-right: 10px; font-size: 18px;"></i> Login
+                            Credentials
+                          </h6>
+                          <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                              <div class="form-group">
+                                <label for="loginname">Login Name <span
+                                  class="mandetory"
+                                style="color: red;">*</span></label>
+                                <input class="form-control accept_loginName"
+                                  [class.error]="getFieldError('loginName')"
+                                  placeholder="Enter Login Name" type="text"
+                                  id="loginname" [(ngModel)]="loginName"
+                                  name="loginname" autocomplete="nope">
+                              </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                              <div class="form-group">
+                                <label for="password">Password <span
+                                  class="mandetory"
+                                style="color: red;">*</span></label>
+                                <div style="position: relative;">
+                                  <input class="form-control"
+                                    [class.error]="getFieldError('password')"
+                                    placeholder="Enter Password" type="password"
+                                    id="password" #passwordInput
+                                    [(ngModel)]="password" name="password"
+                                    (keyup)="validatePassword()"
+                                    autocomplete="new-password"
+                                    style="padding-right: 30px;">
+                                  <i class="fa"
+                                    [ngClass]="passwordInput.type === 'text' ? 'fa-eye-slash' : 'fa-eye'"
+                                    (click)="passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password'"
+                                  style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
+                                </div>
+                                @if (passwordMessage) {
+                                  <small [ngStyle]="passwordMessageStyle"
+                                  style="font-size: 10px;">{{passwordMessage}}</small>
+                                }
+                              </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                              <div class="form-group">
+                                <label for="confirm_password">Confirm Password<span
+                                  class="mandetory"
+                                style="color: red;">*</span>
+                              </label>
+                              <div style="position: relative;">
+                                <input class="form-control"
+                                  [class.error]="getFieldError('confirmPassword')"
+                                  placeholder="Confirm Password"
+                                  type="password" id="confirm_password"
+                                  #confirmPasswordInput
+                                  [(ngModel)]="confirmPassword"
+                                  name="confirm_password"
+                                  (change)="comparePasswords()"
+                                  (blur)="validateConfirmPassword()"
+                                  autocomplete="off"
+                                  style="padding-right: 30px;">
+                                <i class="fa"
+                                  [ngClass]="confirmPasswordInput.type === 'text' ? 'fa-eye-slash' : 'fa-eye'"
+                                  (click)="confirmPasswordInput.type = confirmPasswordInput.type === 'password' ? 'text' : 'password'"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
+                              </div>
+                              @if (confirmPasswordMessage) {
+                                <small id="cpasswordmsg" class="text-danger"
+                                style="font-size: 10px; color: red;">{{confirmPasswordMessage}}</small>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-buttons-w mt-4 pt-4" style=" border-top: 1px solid #eee;">
+              <button type="button" (click)="userEntry()" [disabled]="loading"
+                style="background-color: #0b58b9; border-color: #0b58b9; min-width: 120px;">
+                @if (!loading) {
+                  <span><i class="fa fa-check"></i> Submit</span>
+                }
+                @if (loading) {
+                  <span><i class="fa fa-spinner fa-spin"></i> Submitting...</span>
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+</div>
+</div>
+<!-- </div> -->
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade app-modal" id="changeStatusModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Action ({{contactName}})</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body py-0">
+        <form #blockForm="ngForm" (ngSubmit)="activeDeactiveUser()">
+          <div class="modal-body px-2 py-1">
+            <div class="border-bottom pb-2 mb-2" style="font-size: 12px;">
+              <span class="text-primary fw-bold ms-1"><strong>UserName:</strong>{{userName}}</span>
+            </div>
+            <div class="form-group mb-2">
+              <label class="field-label" style="color: #555;">
+                Action:<span class="text-danger">*</span>
+              </label>
+              <div class="d-flex gap-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="activate" value="Activate"
+                    [(ngModel)]="statusAction" name="statusAction" required>
+                  <label class="form-check-label px-1 pt-1" for="activate" style="margin-bottom: 0;">
+                    Activate
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="deactivate" value="Deactivate"
+                    [(ngModel)]="statusAction" name="statusAction" required>
+                  <label class="form-check-label  px-1 pt-1" for="deactivate" style="margin-bottom: 0;">
+                    Deactivate
+                  </label>
+                </div>
+                <!-- <div class="form-check">
+                <input class="form-check-input" type="radio" id="delete" value="Delete"
+                  [(ngModel)]="statusAction" name="statusAction" required>
+                <label class="form-check-label" for="delete" style="margin-bottom: 0;">
+                  Delete
+                </label>
+              </div> -->
+            </div>
+          </div>
+          <div class="form-group mb-0">
+            <label class="field-label" style="color: #555;">
+              Remark:<span class="text-danger">*</span>
+            </label>
+            <textarea class="form-control form-control-sm shadow-sm" placeholder="Enter reason (min 10 chars)..."
+              maxlength="100" [(ngModel)]="remarkForStatus" name="remarkForBlock"
+              style="min-height: 70px; resize: none;"
+              required minlength="10" #blockRemarkRef="ngModel"
+            ></textarea>
+
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center px-0" style="background: #f8f9fa;">
+          <button type="submit" [disabled]="loading" class="btn btn-sm px-4 btn-success">
+            Submit
+          </button>
+          <button type="button" (click)="closeStatusModal()" class="btn btn-dark btn-sm px-4">
+            <i class="fa fa-times me-1"></i> Back
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+</div>
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}

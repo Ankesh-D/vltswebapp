@@ -1,0 +1,119 @@
+/* ===== Page container ===== */
+.content-box {
+  background: #fff;
+  padding: 10px;
+}
+
+.element-box {
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Page title ===== */
+.pagetitleborder {
+  border-bottom: 1px solid #dcdcdc;
+  margin-bottom: 10px;
+}
+
+/* ===== Labels ===== */
+.control-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* ===== Vendor select ===== */
+#vendorselector {
+  width: 100%;
+  height: 34px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid #cfcfcf;
+  padding: 4px 6px;
+}
+
+/* ===== ng-select IMEI ===== */
+.imei-ng-select,
+ng-select {
+  width: 100%;
+}
+
+ng-select .ng-select-container {
+  min-height: 34px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid #cfcfcf;
+}
+
+ng-select .ng-value {
+  font-size: 12px;
+}
+
+ng-select .ng-placeholder {
+  font-size: 12px;
+  color: #999;
+}
+
+/* ===== Button ===== */
+button {
+  height: 34px;
+  padding: 4px 14px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: none;
+  background-color: #0b58b9;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #094a9c;
+}
+
+/* ===== Search box ===== */
+.tabletitlesearch {
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 3px;
+}
+
+/* ===== Table ===== */
+.table {
+  font-size: 12px;
+}
+
+.table thead th {
+  background-color: #f2f2f2;
+  font-weight: 600;
+  border-bottom: 1px solid #ccc;
+}
+
+.table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* ===== Pagination ===== */
+.pagination button {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.pagination .active button {
+  background: #0b58b9;
+  color: #fff;
+  border-color: #0b58b9;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ===== No data row ===== */
+.testclassalert {
+  font-size: 12px;
+  color: #444;
+}

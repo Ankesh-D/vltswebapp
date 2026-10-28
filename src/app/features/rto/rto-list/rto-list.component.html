@@ -1,0 +1,235 @@
+<div class="content-i">
+  <div class="content-box">
+    <!-- <div class="element-wrapper"> -->
+    <!-- Home Button (when type is dashboard) -->
+
+
+    <div class="element-box">
+      <div class="col-md-12 pagetitleborder">
+        <div class="pagetitlestyle"><span>RTO Details</span></div>
+        @if (type !== '10') {
+          <button class="pagebtn" style="margin-right: 10px">
+            <a routerLink="/rto/entry"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add New</a>
+          </button>
+        }
+
+      </div>
+
+      <!-- Error Message Display -->
+      @if (errorMessage) {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          {{ errorMessage }}
+          <button type="button" class="close" aria-label="Close" (click)="errorMessage = ''">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      }
+      <!-- SEARCH + CONTROLS BAR -->
+      <div class="top-controls-row">
+        <!-- LEFT SEARCH -->
+        <div class="left-controls">
+          <!-- SEARCH WITH INNER BUTTON -->
+          <div class="search-box">
+            <input type="search" class="search-input inner" placeholder="Type here and press button...."
+              maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchTextBox" />
+
+            <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+
+          <!-- RELOAD -->
+            <button (click)="reloadData()" [disabled]="loading" style="
+                margin-left: 10px;
+                background: #fff;
+                border: 1px solid #0b58b9;
+                color: #0b58b9;
+                border-radius: 4px;
+                height: 26px;
+                padding: 0 12px;
+                font-size: 11px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                font-weight: bold;
+              ">
+            <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px"></i>
+            <span>{{ loading ? "Reloading..." : "Reload" }}</span>
+          </button>
+        </div>
+        <!-- <div>
+        <div>
+          <label class="control-label" for="statename" style="color: #0e0e0e">State:</label>
+          <select class="" name="statename" id="statename" [(ngModel)]="selectedStateCode"
+            (change)="onStateChange()" style="height: 23px">
+            <option value="">All States</option>
+            <option *ngFor="let rto of rtolist" [value]="rto.param1">
+              {{ rto.param2 }}
+            </option>
+          </select>
+        </div>
+      </div> -->
+      <!-- RIGHT CONTROLS -->
+      <div class="right-controls">
+        <div style="display: flex; align-items: center; margin-right: 15px">
+          <!-- <label class="total-records-text">
+          Download: &nbsp;
+        </label> -->
+
+        <!-- <select [(ngModel)]="selectedDownloadType" (change)="onDownloadChange()"
+        [disabled]="isExporting"
+        style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; background: white;">
+
+        <option value="">Select</option>
+        <option value="Excel">Excel</option>
+      </select> -->
+
+      <!-- <span *ngIf="isExporting"
+      style="margin-left:8px; font-size:11px; color:#0b58b9;">
+      <i class="fa fa-spinner fa-spin"></i> Generating...
+    </span> -->
+  </div>
+  <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)">
+    @for (size of pageSizeOptions; track size) {
+      <option [value]="size === totalCount ? totalCount : size">
+        {{ size === totalCount ? totalCount : size }}
+      </option>
+    }
+  </select>
+
+  <div class="total-records-text">
+    Total Records : {{ pageCount }} of {{ totalCount }}
+  </div>
+</div>
+</div>
+
+<div class="table-responsive">
+  <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+    <!-- <div class="col-sm-12"> -->
+    <app-common-table [columns]="tableColumns" [rows]="rtos" [loading]="loading"
+      [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped app-table mb-1"
+      tableId="devicetable" tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
+      (sortChange)="sort($event)">
+    </app-common-table>
+
+    <!-- Pagination Controls -->
+    <div class="float-end">
+      @if (totalCount > pageSize) {
+        <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+          [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+          [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+        </ngb-pagination>
+      }
+    </div>
+    <!-- <div *ngIf="totalCount > 0" class="pagination-wrapper" style="text-align: center; margin-top: 10px">
+    <ul class="pagination" style="display: inline-flex; list-style: none; padding: 0">
+      <li [class.disabled]="currentPage === 1">
+        <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
+          Previous
+        </button>
+      </li>
+      <li *ngFor="let page of getPageNumbers()">
+        <span *ngIf="page === -1">...</span>
+        <button *ngIf="page !== -1" (click)="onPageChange(page)" [class.active]="currentPage === page">
+          {{ page }}
+        </button>
+      </li>
+      <li [class.disabled]="currentPage >= getTotalPages()">
+        <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">
+          Next
+        </button>
+      </li>
+    </ul>
+  </div> -->
+<!-- </div> -->
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- </div> -->
+
+<!-- Edit Modal -->
+@if (showEditModal) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <!-- HEADER -->
+      <div class="modal-header">
+        <span class="modal-title">Update RTO</span>
+        <button class="modal-close" (click)="closeEditModal()">&times;</button>
+      </div>
+      <!-- BODY -->
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-field">
+            <label>RTO Code <span class="mandetory">*</span></label>
+            <input class="form-control"
+              maxlength="5"
+              placeholder="{{ stateCode }}30"
+              type="text"
+              [(ngModel)]="rtoCode"
+              name="rtoCode"
+              autocomplete="off"
+              style="text-transform: uppercase" />
+          </div>
+          <div class="form-field">
+            <label>Pin Code <span class="mandetory">*</span></label>
+            <input class="form-control"
+              maxlength="6"
+              placeholder="PIN Code"
+              type="text"
+              [(ngModel)]="pinCode"
+              name="pinCode"
+              autocomplete="off" />
+          </div>
+        </div>
+        <div class="form-field full">
+          <label>Remark <span class="mandetory">*</span></label>
+          <textarea class="form-control"
+            placeholder="Remark"
+            maxlength="100"
+            [(ngModel)]="updateRemark"
+          name="updateRemark"></textarea>
+        </div>
+      </div>
+      <!-- FOOTER -->
+      <div class="modal-footer">
+        <button class="btn-primary-ui" (click)="editRTODetails()">Submit</button>
+        <button class="btn-secondary-ui" (click)="closeEditModal()">Back</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Modal -->
+@if (showDeleteModal) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-box delete-modal" (click)="$event.stopPropagation()">
+      <!-- HEADER -->
+      <div class="modal-header danger">
+        <span class="modal-title">Delete RTO</span>
+        <button class="modal-close" (click)="closeDeleteModal()">&times;</button>
+      </div>
+      <!-- BODY -->
+      <div class="modal-body">
+        <div class="warning-text">
+          Are you sure you want to delete RTO:
+          <strong>{{ rtoName }}</strong> ?
+        </div>
+        <div class="form-field full">
+          <label>Remark <span class="mandetory">*</span></label>
+          <textarea class="form-control"
+            placeholder="Enter remark (min 10 characters)"
+            [(ngModel)]="deleteRemark"
+            name="deleteRemark"
+          maxlength="100"></textarea>
+        </div>
+      </div>
+      <!-- FOOTER -->
+      <div class="modal-footer">
+        <button class="btn-danger-ui" (click)="deleteRTODetails()">Delete</button>
+        <button class="btn-secondary-ui" (click)="closeDeleteModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+}

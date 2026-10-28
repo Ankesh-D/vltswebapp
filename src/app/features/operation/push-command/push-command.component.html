@@ -1,0 +1,197 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle">
+            <span>Push Command</span>
+          </div>
+        </div>
+        
+        <form class="form-horizontal" role="form" autocomplete="off">
+          <div class="form-desc">
+            <strong>NOTE :</strong><label for="" class="mandetory">*</label> Are Mandatory Fields.
+          </div>
+          
+          <div class="col-md-12 entrypagediv">
+            <div id="myRadioGroup" style="display: none;">
+              <div class="row">
+                <div class="col-sm-6 col-lg-6">
+                  <div class="form-group has-feedback">
+                    <label for="inputEmail" class="col-md-4 control-label">
+                      <font color="black">Select IMEI Mode:</font><b style="color: Red; font-weight: normal;">*</b>
+                    </label>
+                    <input type="radio" name="cars" id="imei_single_command" [checked]="commandMode === '2'" 
+                      (change)="onCommandModeChange('2')" value="2" />
+                    <label for="imei_single_command">Single</label>
+                    <input type="radio" name="cars" id="imei_company" [checked]="commandMode === '3'" 
+                      (change)="onCommandModeChange('3')" value="3" />
+                    <label for="imei_company">Company Wise</label>
+                    <input type="radio" name="cars" style="display: none;" id="imei_rto" [checked]="commandMode === '4'" 
+                      (change)="onCommandModeChange('4')" value="4" />
+                    <label for="imei_rto" style="display: none;">RTO Wise</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <datalist id="command_list_for_all">
+              <option *ngFor="let y of commandDetailsAll" [value]="y.param5"></option>
+            </datalist>
+
+            <datalist id="cmdlist">
+              <option *ngFor="let y of commandDetailsCompany" [value]="y.param5"></option>
+            </datalist>
+
+            <!-- Single Command Section -->
+            <div id="Cars2" class="desc" style="margin-left: 10px;" *ngIf="commandMode === '2'">
+              <div class="row">
+                <div class="col-md-2">
+                  <label class="col-md-12 control-label">
+                    <font color="black">Select SMS/TCP IP:</font>
+                  </label>
+                  <select class="searchable" id="tcpip_for_single_command" [(ngModel)]="tcpIpMode" 
+                    style="width: 180px; height: 29px;" name="tcpip">
+                    <option value="">Select</option>
+                    <option value="SMS">SMS</option>
+                    <option value="TCP IP">TCP IP</option>
+                  </select>
+                </div>
+                
+                <div class="col-md-2">
+                  <label class="col-md-12 control-label">
+                    <font color="black">IMEI No.:</font>
+                  </label>
+                  <div class="col-md-12">
+                    <input class="form-control clearable acceptnumeric_nodecimal" id="imei_no" 
+                      [(ngModel)]="imeiNo" placeholder="Device Imei No." type="text" maxlength="15" name="imeiNo">
+                  </div>
+                </div>
+
+                <div class="col-md-2">
+                  <label class="col-lg-12 control-label">
+                    <font color="black">Command:</font>
+                  </label>
+                  <div class="col-lg-12">
+                    <input style="height: 30px; width: 260px;" class="form-control clearable" 
+                      id="commandtosendsingle" [(ngModel)]="singleCommand" list="command_list_for_all" 
+                      style="font-size: 15px;" type="text" autocomplete="off" placeholder="select command" name="singleCommand">
+                  </div>
+                </div>
+                
+                <div class="col-md-2" style="margin-top: 25px;">
+                  <button type="button" (click)="sendCommand()">Send</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Company Command Section -->
+            <div id="Cars3" class="desc" style="display: none;" *ngIf="commandMode === '3'">
+              <div class="container">
+                <div class="row">
+                  <div class="col-md-2">
+                    <label class="col-md-12 control-label">
+                      <font color="black">Select Vendor:</font>
+                    </label>
+                    <select class="searchable" id="companyselector" [(ngModel)]="selectedCompany" 
+                      (change)="onCompanyChange()" style="width: 180px; height: 29px;" name="company">
+                      <option value="">Select Vendor:</option>
+                      <option *ngFor="let item of companyList" [value]="item.param1">{{item.param2}}</option>
+                    </select>
+                  </div>
+                  
+                  <div class="col-md-2">
+                    <label class="col-md-12 control-label">
+                      <font color="black">Select IMEI No.:</font>
+                    </label>
+                    <select id="imeino_list" class="searchable" [(ngModel)]="selectedImeiList" 
+                      multiple="multiple" name="imeiList">
+                      <option value="">Select IMEI No.</option>
+                      <option value="All">ALL</option>
+                      <option *ngFor="let item of deviceList" [value]="item.param2">{{item.param2}}</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="form-group has-feedback">
+                      <label class="col-lg-6 control-label">
+                        <font color="black">Command:</font>
+                      </label>
+                      <div class="col-md-8">
+                        <input style="height: 30px; width: 260px;" class="form-control clearable" 
+                          id="send_command_to_company" [(ngModel)]="companyCommand" list="cmdlist" 
+                          style="font-size: 15px;" type="text" autocomplete="off" placeholder="select command" name="companyCommand">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="col-md-2" style="margin-top: 25px;">
+                    <button type="button" (click)="sendCommand()">Send</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RTO Command Section -->
+            <div id="Cars4" class="desc" style="display: none;" *ngIf="commandMode === '4'">
+              <div class="container">
+                <div class="row">
+                  <div class="col-md-2">
+                    <label class="col-md-6 control-label">
+                      <font color="black">Select RTO:</font>
+                    </label>
+                    <select id="rtocode" class="searchable" [(ngModel)]="selectedRTO" 
+                      (change)="onRTOChange()" style="width: 180px; height: 29px;" name="rto">
+                      <option value="">Select RTO</option>
+                      <option *ngFor="let x of rtoList" [value]="x.param1">{{x.param2}}</option>
+                    </select>
+                  </div>
+                  
+                  <div class="col-md-2" style="margin-left: 30px;">
+                    <label class="col-md-12 control-label">
+                      <font color="black">Select Vendor:</font>
+                    </label>
+                    <select class="searchable" id="rto_company_obj" [(ngModel)]="selectedRTOCompany" 
+                      (change)="onRTOCompanyChange()" style="width: 180px; height: 29px;" name="rtoCompany">
+                      <option value="">Select Vendor</option>
+                      <option *ngFor="let item of rtoCompanyList" [value]="item.param1">{{item.param2}}</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-2" style="margin-left: 30px;">
+                    <label class="col-md-12 control-label">
+                      <font color="black">Select IMEI No.:</font>
+                    </label>
+                    <select id="imeino_list_rto" class="searchable" [(ngModel)]="selectedRTOImeiList" 
+                      multiple="multiple" name="rtoImeiList">
+                      <option value="">Select IMEI No.</option>
+                      <option value="All">ALL</option>
+                      <option *ngFor="let item of deviceList" [value]="item.param2">{{item.param2}}</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-2" style="margin-left: 20px;">
+                    <div class="form-group has-feedback">
+                      <label class="col-lg-4 control-label">
+                        <font color="black">Command:</font>
+                      </label>
+                      <div class="col-md-8">
+                        <input style="height: 30px; width: 260px;" class="form-control clearable" 
+                          id="send_command_to_rto" [(ngModel)]="rtoCommand" list="cmdlist" 
+                          style="font-size: 15px;" type="text" autocomplete="off" placeholder="select command" name="rtoCommand">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="col-md-2" style="margin-top: 25px;">
+                    <button type="button" (click)="sendCommand()">Send</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

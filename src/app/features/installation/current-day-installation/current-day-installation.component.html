@@ -1,0 +1,41 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle"><span>Current Day Installation</span></div>
+        </div>
+
+        <app-common-table [columns]="tableColumns" [rows]="devices" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="installationCell"
+          tableClass="table table-striped app-table"
+          tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;"
+          (sortChange)="sort($event)">
+        </app-common-table>
+        <ng-template #installationCell let-device let-column="column">
+          @switch (column.key) {
+            @case ('serial') {
+              <font>{{device.param5 && toString(device.param5).length > 0 ? device.param5 : 'NA'}}<br>{{device.param4 && toString(device.param4).length > 0 ? device.param4 : 'NA'}}</font>
+            }
+            @case ('customer') {
+              <font>{{device.param8 && toString(device.param8).length > 0 ? device.param8 : 'NA'}}<br>{{device.param7 && toString(device.param7).length > 0 ? device.param7 : 'NA'}}</font>
+            }
+            @case ('installation') {
+              <font>{{device.param28 && toString(device.param28).length > 0 ? device.param28 : 'NA'}}<br>{{device.param29 && toString(device.param29).length > 0 ? device.param29 : 'NA'}}</font>
+            }
+            @default {
+              {{column.value ? column.value(device) : device[column.key]}}
+            }
+          }
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (loading) {
+  <app-loading></app-loading>
+}
+@if (errorMessage) {
+  <app-error-message [message]="errorMessage"></app-error-message>
+}

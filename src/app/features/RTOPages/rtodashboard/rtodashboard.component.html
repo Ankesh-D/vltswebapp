@@ -1,0 +1,528 @@
+<div class="content-i">
+
+  <div class="content-box">
+    <!-- Widgets Row -->
+    <div class="row">
+      <!-- Manufacturer Count -->
+      <div class="col-sm-12 col-md-6 col-xl-2 col-lg-4 mb-3">
+        <div class="stats-card single-card card-manufacturer animate-fade-up delay-1">
+          <div class="card-body-flex">
+            <div class="meta-info">
+              <span class="card-label">Manufacturer</span>
+              <div class="card-value">
+                @if (!loadingWidgets) {
+                  <span>{{manufacturerCount || 0}}</span>
+                }
+                @if (loadingWidgets) {
+                  <div class="loader"></div>
+                }
+              </div>
+            </div>
+            <div class="icon-large">
+              <i class="fa fa-industry"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Dealers Count -->
+      <div class="col-sm-12 col-md-6 col-xl-2 col-lg-4 mb-3">
+        <div class="stats-card single-card card-dealers animate-fade-up delay-2">
+          <div class="card-body-flex">
+            <div class="meta-info">
+              <span class="card-label">Dealers</span>
+              <div class="card-value">
+                @if (!loadingWidgets) {
+                  <span>{{dealersCount || 0}}</span>
+                }
+                @if (loadingWidgets) {
+                  <div class="loader"></div>
+                }
+              </div>
+            </div>
+            <div class="icon-large">
+              <i class="fa fa-users"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Devices Count -->
+      <div class="col-sm-12 col-md-6 col-xl-2 col-lg-4 mb-3">
+        <div class="stats-card single-card card-devices animate-fade-up delay-3">
+          <div class="card-body-flex">
+            <div class="meta-info">
+              <span class="card-label">Devices</span>
+              <div class="card-value">
+                @if (!loadingWidgets) {
+                  <span>{{devicesCount || 0}}</span>
+                }
+                @if (loadingWidgets) {
+                  <div class="loader"></div>
+                }
+              </div>
+            </div>
+            <div class="icon-large">
+              <i class="fa fa-microchip"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Installed Assets Counts -->
+      <div class="col-sm-12 col-md-6 col-xl-3 col-lg-4 mb-3">
+        <div class="stats-card dual-card animate-fade-up delay-4">
+          <div class="card-head">
+            <span>Installed Assets</span>
+          </div>
+          <div class="dual-content">
+            <div class="stat-pill pill-success">
+              <div class="pill-icon"><i class="fa fa-arrow-up"></i></div>
+              <div class="pill-data">
+                @if (!loadingWidgets) {
+                  <span class="pill-value">{{newAssetsCount || 0}}</span>
+                }
+                @if (loadingWidgets) {
+                  <div class="loader"></div>
+                }
+                <span class="pill-label">New</span>
+              </div>
+            </div>
+            <div class="stat-pill pill-info">
+              <div class="pill-icon"><i class="fa fa-history"></i></div>
+              <div class="pill-data">
+                @if (!loadingWidgets) {
+                  <span class="pill-value">{{oldAssetsCount || 0}}</span>
+                }
+                @if (loadingWidgets) {
+                  <div class="loader"></div>
+                }
+                <span class="pill-label">Old</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Action Assets Count -->
+      <div class="col-sm-12 col-md-6 col-xl-3 col-lg-4 mb-3">
+        <div class="stats-card dual-card animate-fade-up delay-5">
+          <div class="card-head">
+            <span>Action Assets</span>
+          </div>
+          <div class="dual-content">
+            <div class="stat-pill pill-primary">
+              <div class="pill-icon"><i class="fa fa-check"></i></div>
+              <div class="pill-data">
+                @if (!loadingWidgets) {
+                  <span class="pill-value">{{approvedAssetsCount || 0}}</span>
+                }
+                @if (loadingWidgets) {
+                  <div class="loader"></div>
+                }
+                <span class="pill-label">Approved</span>
+              </div>
+            </div>
+            <div class="stat-pill pill-danger">
+              <div class="pill-icon"><i class="fa fa-clock-o"></i></div>
+              <div class="pill-data">
+                @if (!loadingWidgets) {
+                  <span class="pill-value">{{pendingAssetsCount || 0}}</span>
+                }
+                @if (loadingWidgets) {
+                  <div class="loader"></div>
+                }
+                <span class="pill-label">Pending</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Row -->
+    <div class="element-wrapper" >
+      <div class="element-box"
+        style="padding: 12px; border-radius: 15px; border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.03);">
+        <div class="os-tabs-w">
+          <div class="os-tabs-controls text-center">
+            <ul class="nav nav-tabs material-tabs nav-justified w-100">
+              <div class="tab-slider" [style.left.px]="sliderLeft" [style.width.px]="sliderWidth"></div>
+              <li class="nav-item" #tabItem>
+                <a class="nav-link" [class.active]="activeTab === 'today'" (click)="selectTab('today', 0)">
+                  <i class="fa fa-calendar-check-o me-2"></i> Today Installation
+                </a>
+              </li>
+              <li class="nav-item" #tabItem>
+                <a class="nav-link" [class.active]="activeTab === 'vendor'" (click)="selectTab('vendor', 1)">
+                  <i class="fa fa-users me-2"></i> Vendor Wise Installation
+                </a>
+              </li>
+              <li class="nav-item" #tabItem>
+                <a class="nav-link" [class.active]="activeTab === 'summary'" (click)="selectTab('summary', 2)">
+                  <i class="fa fa-list-alt me-2"></i> Installation Summary
+                </a>
+              </li>
+              <li class="nav-item" #tabItem>
+                <a class="nav-link" [class.active]="activeTab === 'classwise'" (click)="selectTab('classwise', 3)">
+                  <i class="fa fa-list-alt me-2"></i> Class Wise Installation
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="tab-content" style="padding-top: 25px;">
+
+            <!-- Today Installation Tab -->
+            @if (activeTab === 'today') {
+              <div class="tab-pane" [class.active]="activeTab === 'today'">
+                <div class="row">
+                  <div class="col-md-12 text-end" style="margin-bottom: 10px;">
+                    <button class="btn btn-sm btn-primary btn-rounded" (click)="toggletodayDetails();"
+                      style=" background-color: #002da7;;" [disabled]="loadingTodayGraph || todayGraphData.length === 0">
+                      {{ showTodayDetails ? 'View Graph' : 'View Details' }}
+                    </button>
+                  </div>
+                </div>
+                <!-- Graph View -->
+                @if (!showTodayDetails) {
+                  <div class="slide-in-left" style="animation: slideInLeft 0.5s forwards;">
+                    @if (loadingTodayGraph) {
+                      <div class="graph-placeholder">
+                        <div class="loader"></div>
+                        <div>Loading Graph...</div>
+                      </div>
+                    }
+                    @if (!loadingTodayGraph && todayGraphData.length > 0) {
+                      <div #todayGraph id="todayInstallationGraph"
+                        class="graph-container">
+                      </div>
+                    }
+                    @if (!loadingTodayGraph && todayGraphData.length === 0) {
+                      <div class="graph-placeholder">
+                        <i class="fa fa-bar-chart"></i>
+                        <div>Data Not Found</div>
+                      </div>
+                    }
+                  </div>
+                }
+                <!-- Details View -->
+                @if (showTodayDetails) {
+                  <div class="slide-in-right" style="animation: slideInRight 0.5s forwards;">
+                    <ng-container *ngTemplateOutlet="tableControls"></ng-container>
+                    <div class="table-responsive">
+                      <table class="table table-striped app-table table-lightborder" style="font-size: 11px;">
+                        <thead>
+                          <tr>
+                            <th>Vendor Name</th>
+                            <th>Installed</th>
+                            <th>Approved</th>
+                            <th>Pending</th>
+                          </tr>
+                        </thead>
+                        @if (loadingTodayDetails) {
+                          <tbody>
+                            <tr>
+                              <td colspan="4" class="text-center">
+                                <div class="loader" style="margin: auto;"></div>
+                                <div>Loading...</div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        }
+                        @if (!loadingTodayDetails) {
+                          <tbody>
+                            @if (todayInstallationData.length > 0) {
+                              @for (item of todayInstallationData; track item) {
+                                <tr>
+                                  <td>{{item.vendorName}}</td>
+                                  <td>{{item.installed}}</td>
+                                  <td>{{item.approved}}</td>
+                                  <td>{{item.pending}}</td>
+                                </tr>
+                              }
+                            }
+                            @if (todayInstallationData.length === 0) {
+                              <tr>
+                                <td colspan="4" class="text-center">No Data Available</td>
+                              </tr>
+                            }
+                          </tbody>
+                        }
+                      </table>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Vendor Wise Installation Tab -->
+            @if (activeTab === 'vendor') {
+              <div class="tab-pane" [class.active]="activeTab === 'vendor'">
+                <div class="row">
+                  <div class="col-md-12 text-end" style="margin-bottom: 10px;">
+                    <button class="btn btn-sm btn-primary btn-rounded" (click)="toggleVendorDetails()"
+                      style=" background-color: #002da7;;" [disabled]="loadingVendorGraph || vendorGraphData.length === 0">
+                      {{ showVendorDetails ? 'View Graph' : 'View Details' }}
+                    </button>
+                  </div>
+                </div>
+                <!-- Graph View -->
+                @if (!showVendorDetails) {
+                  <div class="slide-in-left" style="animation: slideInLeft 0.5s forwards;">
+                    @if (loadingVendorGraph) {
+                      <div class="graph-placeholder">
+                        <div class="loader"></div>
+                        <div>Loading Graph...</div>
+                      </div>
+                    }
+                    @if (!loadingVendorGraph && vendorGraphData.length > 0) {
+                      <div #vendorGraph
+                        id="vendorInstallationGraph" class="graph-container">
+                      </div>
+                    }
+                    @if (!loadingVendorGraph && vendorGraphData.length === 0) {
+                      <div class="graph-placeholder">
+                        <i class="fa fa-bar-chart"></i>
+                        <div>Data Not Found</div>
+                      </div>
+                    }
+                  </div>
+                }
+                <!-- Details View -->
+                @if (showVendorDetails) {
+                  <div class="slide-in-right" style="animation: slideInRight 0.5s forwards;">
+                    <ng-container *ngTemplateOutlet="tableControls"></ng-container>
+                    <div class="table-responsive">
+                      <table class="table table-striped app-table table-lightborder" style="font-size: 11px;">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Vendor Name</th>
+                            <th>Installed</th>
+                            <th>Approved</th>
+                            <th>Pending</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @if (loadingVendorDetails) {
+                            <tr>
+                              <td colspan="4" class="text-center">
+                                <div class="loader" style="margin: auto;"></div>
+                                <div>Loading...</div>
+                              </td>
+                            </tr>
+                          }
+                          @if (!loadingVendorDetails) {
+                            @for (item of getPaginatedData(); track item) {
+                              <tr>
+                                <td>{{item.srno}}</td>
+                                <td>{{item.vendorName}}</td>
+                                <td>{{item.installed}}</td>
+                                <td>{{item.approved}}</td>
+                                <td>{{item.pending}}</td>
+                              </tr>
+                            }
+                            @if (!getPaginatedData() || getPaginatedData().length === 0) {
+                              <tr>
+                                <td colspan="4" class="text-center">No Data Available</td>
+                              </tr>
+                            }
+                          }
+                        </tbody>
+                      </table>
+                      @if (getTotalPages() > 1) {
+                        <div class="pagination-wrapper">
+                          <ul class="pagination" style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+                            <li [class.disabled]="currentPage === 1">
+                              <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+                            </li>
+                            @for (page of getPageNumbers(); track page) {
+                              <li [class.active]="currentPage === page">
+                                <button (click)="onPageChange(page)">{{page}}</button>
+                              </li>
+                            }
+                            <li [class.disabled]="currentPage >= getTotalPages()">
+                              <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+                            </li>
+                          </ul>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Installation Summary Tab -->
+            @if (activeTab === 'summary') {
+              <div class="tab-pane" [class.active]="activeTab === 'summary'">
+                <ng-container *ngTemplateOutlet="tableControls"></ng-container>
+                <div class="table-responsive">
+                  <table class="table table-striped app-table table-lightborder" style="font-size: 11px;">
+                    <thead>
+                      <tr>
+                        <th>Vendor Name</th>
+                        <th>Installed</th>
+                        <th>Approved (Received)</th>
+                        <th>Approved (Not Received)</th>
+                        <th>Pending</th>
+                      </tr>
+                    </thead>
+                    @if (loadingInstallationSummary) {
+                      <tbody>
+                        <tr>
+                          <td colspan="5" class="text-center">
+                            <div class="loader" style="margin: auto;"></div>
+                            <div>Loading...</div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    }
+                    @if (!loadingInstallationSummary) {
+                      <tbody>
+                        @if (installationSummaryData.length > 0) {
+                          @for (item of installationSummaryData; track item) {
+                            <tr>
+                              <td>{{item.vendorName}}</td>
+                              <td>{{item.installed}}</td>
+                              <td>{{item.approvedReceived}}</td>
+                              <td>{{item.approvedNotReceived}}</td>
+                              <td>{{item.pending}}</td>
+                            </tr>
+                          }
+                        }
+                        @if (installationSummaryData.length === 0) {
+                          <tr>
+                            <td colspan="5" class="text-center">No Data Available</td>
+                          </tr>
+                        }
+                      </tbody>
+                    }
+                  </table>
+                </div>
+              </div>
+            }
+
+            <!-- Class Wise Installation Tab -->
+            @if (activeTab === 'classwise') {
+              <div class="tab-pane" [class.active]="activeTab === 'classwise'">
+                <!-- <div class="row">
+                <div class="col-md-12 text-end" style="margin-bottom: 10px;">
+                  <button class="btn btn-sm btn-primary btn-rounded" (click)="toggleclasswiseDetails();"
+                    style=" background-color: black;;">
+                    {{ showclasswiseDetails ? 'View Graph' : 'View Details' }}
+                  </button>
+                </div>
+              </div> -->
+              <!-- Graph View -->
+              @if (!showclasswiseDetails) {
+                <div class="slide-in-left" style="animation: slideInLeft 0.5s forwards;">
+                  @if (loadingClasswiseGraph) {
+                    <div class="graph-placeholder">
+                      <div class="loader"></div>
+                      <div>Loading Graph...</div>
+                    </div>
+                  }
+                  @if (!loadingClasswiseGraph && classwiseGraphData.length > 0) {
+                    <div #classwiseInstallationGraph
+                      id="classwiseInstallationGraph" class="graph-container">
+                    </div>
+                  }
+                  @if (!loadingClasswiseGraph && classwiseGraphData.length === 0) {
+                    <div class="graph-placeholder">
+                      <i class="fa fa-bar-chart"></i>
+                      <div>Data Not Found</div>
+                    </div>
+                  }
+                </div>
+              }
+              <!-- Details View -->
+              @if (showclasswiseDetails) {
+                <div class="slide-in-right" style="animation: slideInRight 0.5s forwards;">
+                  <ng-container *ngTemplateOutlet="tableControls"></ng-container>
+                  <div class="table-responsive">
+                    <!-- <table class="table table-striped app-table table-lightborder" style="font-size: 11px;">
+                    <thead>
+                      <tr>
+                        <th>Vendor Name</th>
+                        <th>Installed</th>
+                        <th>Approved</th>
+                        <th>Pending</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of todayInstallationData">
+                        <td>{{item.vendorName}}</td>
+                        <td>{{item.installed}}</td>
+                        <td>{{item.approved}}</td>
+                        <td>{{item.pending}}</td>
+                      </tr>
+                      <tr *ngIf="!todayInstallationData || todayInstallationData.length === 0">
+                        <td colspan="4" class="text-center">No Data Available</td>
+                      </tr>
+                    </tbody>
+                  </table> -->
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- Reusable Table Controls Template -->
+<ng-template #tableControls>
+  <form autocomplete="off" style="width: 100%; padding: 5px 0px 10px 0px;">
+    <table style="width: 100%;">
+      <tbody class="bg-body">
+        <tr>
+          <td style="width: 60px; padding-top: 0px; padding-left: 5px;">
+            <span style="font-weight: 600; font-size: 11px; color: #333;">Search : </span>
+          </td>
+          <td>
+            <div class="">
+              <input type="search" class="form-control form-control-sm d-inline-block" placeholder="Type here..."
+                style="width: 180px; font-size: 11px; display: inline-block;">
+              &nbsp;
+              <button class="btn btn-sm btn-primary btn-rounded"
+                style="cursor: pointer; padding: 2px 8px; font-size: 11px;">
+                <i class="fa fa-search"></i>
+              </button>
+              &nbsp;
+              <button class="btn btn-sm btn-secondary btn-rounded"
+                style="cursor: pointer; padding: 2px 8px; font-size: 11px;">
+                <i class="fa fa-refresh"></i> Refresh
+              </button>
+            </div>
+          </td>
+          <td>
+            <table style="float: right;">
+              <tbody>
+                <tr>
+                  <td>
+                    <div>
+                      <label class="control-label" style="color: #333; font-size: 11px; margin-right: 5px;">Download
+                      :</label>
+                      <button class="btn btn-sm btn-success btn-rounded"
+                        style="margin-left: 2px; font-size: 10px; padding: 2px 8px;"><i class="fa fa-file-excel-o"></i>
+                      Excel</button>
+                      <button class="btn btn-sm btn-danger btn-rounded"
+                        style="margin-left: 2px; font-size: 10px; padding: 2px 8px;"><i class="fa fa-file-pdf-o"></i>
+                      PDF</button>
+                    </div>
+                  </td>
+                  <td style="padding-right: 5px;">
+                    <div style="text-align: right; font-weight: 600; margin-left: 15px; font-size: 11px; color: #333;">
+                      Total Records : {{totalRecords || 0}}
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</ng-template>

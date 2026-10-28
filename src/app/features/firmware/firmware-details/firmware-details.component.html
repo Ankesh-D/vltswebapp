@@ -1,0 +1,133 @@
+<div style="padding: 10px 10px;">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+
+        <!-- TITLE BAR -->
+        <div class="page-header-row">
+
+          <!-- TITLE -->
+          <div class="pagetitlestyle">
+            Firware Details
+          </div>
+
+          <!-- ADD NEW BUTTON -->
+          <button type="button" class="add-new-btn" [routerLink]="'/firmware/upload'">
+            <i class="fa fa-plus"></i>
+            <span>Upload New</span>
+          </button>
+
+        </div>
+
+
+        <!-- SEARCH + CONTROLS BAR -->
+        <div class="top-controls-row">
+
+          <!-- LEFT SEARCH -->
+          <div class="left-controls">
+
+            <!-- SEARCH WITH INNER BUTTON -->
+            <div class="search-box">
+              <input type="search" class="search-input inner" placeholder="Type here and press button...."
+                maxlength="50" [(ngModel)]="detailsRequest.param1" (keyup.enter)="getDetails('search')"
+                name="searchTextBox" />
+
+              <button type="button" class="search-inner-btn" (click)="getDetails('search')">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+
+            <!-- RELOAD -->
+            <button (click)="getDetails('init')" [disabled]="loading"
+              style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+              <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
+              <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+            </button>
+
+          </div>
+
+          <!-- RIGHT CONTROLS -->
+          <div class="right-controls">
+            <!-- <div style="display: flex; align-items: center; margin-right: 15px;">
+            <label class="total-records-text">
+              Download: &nbsp;
+            </label>
+
+            <select [(ngModel)]="selectedDownloadType" (change)="onDownloadChange()"
+              [disabled]="isExporting"
+              style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; background: white;">
+
+              <option value="" selected>Select</option>
+              <option value="Excel">Excel</option>
+            </select>
+
+            <span *ngIf="isExporting" style="margin-left:8px; font-size:11px; color:#0b58b9;">
+              <i class="fa fa-spinner fa-spin"></i> Generating...
+            </span>
+          </div> -->
+          <select class="rows-select" [(ngModel)]="detailsRequest.param3" (change)="getDetails('pageSize')">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size === totalCount ? 'All' : size">
+                {{ size === totalCount ? 'All' : size }}
+              </option>
+            }
+          </select>
+
+          <div class="total-records-text">
+            Total Records : {{ pageCount }} of {{ totalCount }}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <ng-template #firmwareCell let-item let-column="column">
+        @if (column.key === 'download') {
+          <a class="text-primary" style="cursor: pointer; text-decoration: none;" [href]="item.param10">
+            {{getFileName(item.param10)}} <i class="fa fa-download"></i>
+          </a>
+        } @else {
+          {{ firmwareTable.cellValue(item, column) }}
+        }
+      </ng-template>
+      <app-common-table #firmwareTable [columns]="tableColumns" [rows]="detailsData" [loading]="loading"
+        [cellTemplate]="firmwareCell" tableClass="table app-table" tableId="devicetable"
+        emptyMessage="No Record Found">
+      </app-common-table>
+          @if (totalCount > pageSize || pageNo > 1) {
+            <div class="custom-pagination" style="display:flex;justify-content: end;"
+              >
+              <button class="pg-btn" (click)="changePage(pageNo - 1)" [disabled]="pageNo === 1">
+                Prev
+              </button>
+              @if (pageNo > 3) {
+                <span class="pg-dots">...</span>
+              }
+              @if (pageNo > 2) {
+                <button class="pg-num" (click)="changePage(pageNo - 1)">
+                  {{ pageNo - 1 }}
+                </button>
+              }
+              <button class="pg-num active">
+                {{ pageNo }}
+              </button>
+              @if (pageNo < totalPages - 1) {
+                <button class="pg-num" (click)="changePage(pageNo + 1)">
+                  {{ pageNo + 1 }}
+                </button>
+              }
+              @if (pageNo < totalPages - 2) {
+                <span class="pg-dots">...</span>
+              }
+              <button class="pg-num" (click)="changePage(totalPages)">
+                {{ totalPages }}
+              </button>
+              <button class="pg-btn" (click)="changePage(pageNo + 1)" [disabled]="pageNo === totalPages">
+                Next
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>

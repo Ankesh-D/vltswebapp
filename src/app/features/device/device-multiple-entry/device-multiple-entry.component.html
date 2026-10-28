@@ -1,0 +1,122 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              @if (roleId !== '13') {
+                <button class="pagebtn">
+                  <a routerLink="/device/entry"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add New</a>
+                </button>
+              }
+              <button class="pagebtn" style="margin-right: 10px;">
+                <a routerLink="/DeviceActivationDetails"><i class="fa fa-plus"></i>&nbsp;&nbsp;Details</a>
+              </button>
+              <div class="pagetitlestyle"><span>Multiple Device Entry</span></div>
+            </div>
+
+            <form autocomplete="off">
+              <div class="form-desc">
+                <strong>NOTE :</strong><label for="" class="mandetory">*</label> Are Mandatory Fields.
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="entrypagediv">
+                    <div class="row">
+                      @if (roleId !== '11') {
+                        <div class="col-sm-2" id="list_for_vendor">
+                          <div class="form-group">
+                            <label for=""> Vendor:</label><label for="" style="width: 100px;" class="mandetory">*</label>
+                            <ng-select
+                              [items]="vendorList"
+                              bindLabel="param2"
+                              bindValue="param1"
+                              placeholder="Select Vendor"
+                              [(ngModel)]="selectedVendor"
+                              (change)="onVendorChange()"
+                              name="vendor">
+                            </ng-select>
+                          </div>
+                        </div>
+                      }
+
+                      <div class="col-sm-2">
+                        @if (roleId === '11' || roleId === '13' || roleId === '19' || roleId === '18') {
+                          <label style="font-weight: bold; width: 200px;">{{companyLabel}}</label>
+                        }
+                        <div class="form-group">
+                          <label for=""> Model Code:</label><label for="" class="mandetory">*</label>
+                          <ng-select
+                            [items]="deviceModelList"
+                            bindLabel="param2"
+                            bindValue="param1"
+                            placeholder="Select Model Code"
+                            [(ngModel)]="selectedModel"
+                            name="model">
+                          </ng-select>
+                        </div>
+                      </div>
+
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Esim Provider</label><label for="" class="mandetory">*</label>
+                          <ng-select
+                            [items]="m2mProviderList"
+                            bindLabel="param2"
+                            bindValue="param1"
+                            placeholder="Select Esim Provider"
+                            [(ngModel)]="selectedM2mProvider"
+                            name="m2mProvider">
+                          </ng-select>
+                        </div>
+                      </div>
+
+                      <div class="col-sm-5">
+                        <label for="">Select Excel File:</label><label for="" class="mandetory">*</label><br>
+                        <label for="uploadfiledevicemaster" class="custom-file-upload">
+                          <i class="fa fa-cloud-upload"></i> Upload File
+                        </label>
+                        <input
+                          id="uploadfiledevicemaster"
+                          name="upload_cont_img"
+                          type="file"
+                          (change)="onFileSelected($event)"
+                          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.xls"
+                          style="display:none;" />
+
+                        <label for="" style="margin-left:20px;">View Format:</label>
+                        <a (click)="viewFormat()">
+                          <img
+                            src="assets/images/appimages/excel-format/viewexcel.png"
+                            title="View Excel Format File"
+                            style="width: 25px; height: 25px; cursor: pointer;"
+                            aria-hidden="true" />
+                        </a>
+
+                        <label for="" style="margin-left:20px;">Download Format:</label>
+                        <a (click)="downloadFormat()">
+                          <img
+                            src="assets/images/appimages/excel-format/downloadexcel1.png"
+                            style="width: 25px; height: 25px;"
+                            title="Download Excel Format File" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-buttons-w">
+                <button type="button" (click)="submit()" [disabled]="loading">Submit</button>
+                <button type="button" (click)="goBack()">Back</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,139 @@
+
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="pagetitleborder">
+          <div class="page-actions">
+            <button class="pagebtn">
+              <a routerLink="/alert/management"><i class="fa fa-plus"></i>&nbsp;&nbsp;Alert Management</a>
+            </button>
+            <button class="pagebtn">
+              <a routerLink="/config/configure"><i class="fa fa-plus"></i>&nbsp;&nbsp;Configure</a>
+            </button>
+          </div>
+          <div class="pagetitlestyle"><span>Configure Details</span></div>
+        </div>
+
+        <div class="controls-header">
+          <div class="search-group">
+            <label>Search :</label>
+            <div style="display: flex; align-items: center;">
+              <input type="search" class="custom-search-input" id="searchby" placeholder="Type here..."
+                [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby"
+                style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: 0;">
+              <button class="btn-icon" id="searchbtn" (click)="getSearchDetails()"
+                style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                <i class="fa fa-search"></i>
+              </button>
+              <button class="btn-reload" (click)="reloadData()" style="margin-left: 10px;">
+                <i class="fa fa-refresh" [class.fa-spin]="loading"></i>&nbsp;
+                {{loading ? 'Reloading...' : 'Reload'}}
+              </button>
+            </div>
+          </div>
+
+          <div class="pagination-controls">
+            <label>Show Rows :</label>
+            <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
+              @for (size of pageSizeOptions; track size) {
+                <option [value]="size === totalCount ? 'All' : size">
+                  {{size === totalCount ? 'All' : size}}
+                </option>
+              }
+            </select>
+            <span class="total-records">Total Records : {{pageCount}} of {{totalCount}}</span>
+          </div>
+        </div>
+
+        <app-common-table [columns]="tableColumns" [rows]="alertConfigData" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="alertConfigCell"
+          tableClass="table table-striped app-table"
+          tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
+          wrapperClass="table-container" (sortChange)="sort($event)">
+        </app-common-table>
+        <ng-template #alertConfigCell let-alert let-column="column">
+          @if (column.key === 'actions') {
+            <div class="btn-group">
+              <button type="button" class="btn-delete" data-target="#deletealert" data-toggle="modal"
+                (click)="updateDetail(alert)">Delete</button>
+            </div>
+          } @else {
+            {{column.value ? column.value(alert) : ''}}
+          }
+        </ng-template>
+
+        @if (getTotalPages() > 1) {
+          <div class="pagination-wrapper">
+            <ul class="pagination" style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+              <li [class.disabled]="currentPage === 1">
+                <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+              </li>
+              @for (page of getPageNumbers(); track page) {
+                <li [class.active]="currentPage === page">
+                  <button (click)="onPageChange(page)">{{page}}</button>
+                </li>
+              }
+              <li [class.disabled]="currentPage >= getTotalPages()">
+                <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+              </li>
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deletealert" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="padding: 0.5rem;">
+        <h5 class="modal-title">Delete Configuration</h5>
+        <button type="button" class="close" data-dismiss="modal" (click)="back()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="margin-top: -15px;">
+        <div>
+          <div style="width: 100%;">
+            <div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label for="" style="font-weight:bold; font-size: 12px;">Remark: <span
+                    style="color:red">*</span></label>
+                    <textarea class="form-control ignorespecialcharacter_address" id="deleteremark" placeholder="Remark"
+                      [(ngModel)]="editRemark" (keyup)="checkRemark()" name="remark"
+                    [ngClass]="{'border-danger': isRemarkInvalid, 'border-success': !isRemarkInvalid && editRemark.length >= 10}"></textarea>
+                    @if (isRemarkInvalid) {
+                      <div style="color: red; font-size: 11px;">
+                        Remark must be at least 10 characters.
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="updatemodelheaderbutton" class="modelbtnstyle">
+        <button (click)="deleteConfig()" [disabled]="isRemarkInvalid || loading">
+          {{loading ? 'Deleting...' : 'Delete'}}
+        </button>
+        <button id="btnstyle" type="reset" data-dismiss="modal" (click)="back()">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success" (closed)="successMessage = null"></app-toast>
+}

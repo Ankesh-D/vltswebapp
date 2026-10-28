@@ -1,0 +1,71 @@
+// Header
+.pagetitleborder {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  margin-bottom: 6px;
+}
+
+// Table Section
+.table-responsive {
+  overflow-x: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 0;
+  font-size: 11px;
+  border-collapse: collapse;
+}
+
+.table thead th {
+  background: #aacda8;
+  color: #212529;
+  font-family: serif;
+  padding: 8px;
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 1px solid #d3a130;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.table tbody td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f8f9fa;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(11, 88, 185, 0.05);
+}
+
+// Sorting Icons
+.sorting {
+  display: inline-block;
+  margin-left: 5px;
+  vertical-align: middle;
+  border: 4px solid transparent;
+  border-top-color: #ccc;
+  margin-top: 2px;
+}
+
+.sorting_asc {
+  border-top-color: transparent;
+  border-bottom-color: #333;
+  margin-top: -6px;
+}
+
+.sorting_desc {
+  border-top-color: #333;
+}

@@ -1,0 +1,504 @@
+<div class="map-tracking-container">
+  <!-- Map container -->
+  <app-leaflet-map
+    mapId="map"
+    mapClass="map-container"
+    [mapStyles]="{
+      border: '8px solid #ffffff',
+      'box-shadow': 'rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px'
+    }"
+    (mapReady)="onMapReady($event)">
+  </app-leaflet-map>
+
+  <!-- Compact Map Legend -->
+  <div class="map-legend" [class.collapsed]="isLegendCollapsed">
+    <button type="button" class="legend-toggle" (click)="isLegendCollapsed = !isLegendCollapsed"
+      [attr.aria-expanded]="!isLegendCollapsed"
+      [attr.aria-label]="isLegendCollapsed ? 'Expand map legend' : 'Collapse map legend'"
+      [title]="isLegendCollapsed ? 'Expand legend' : 'Collapse legend'">
+      <i class="fa" [ngClass]="isLegendCollapsed ? 'fa-chevron-right' : 'fa-chevron-left'"></i>
+    </button>
+    <div class="legend-items">
+      <div class="legend-item">
+        <span class="legend-symbol vehicle"></span>
+        <span>Vehicle</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-symbol live-route"></span>
+        <span>Live</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-symbol history-route"></span>
+        <span>History</span>
+      </div>
+      <div class="legend-item speed-low">
+        <span class="legend-symbol speed-arrow"></span>
+        <span>≤30</span>
+      </div>
+      <div class="legend-item speed-medium">
+        <span class="legend-symbol speed-arrow"></span>
+        <span>31-50</span>
+      </div>
+      <div class="legend-item speed-high">
+        <span class="legend-symbol speed-arrow"></span>
+        <span>>50</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compact collapsible top toolbar background -->
+  <div class="top-control-strip" [class.collapsed]="isTopToolbarCollapsed">
+    <button type="button" class="top-strip-toggle"
+      (click)="isTopToolbarCollapsed = !isTopToolbarCollapsed; isFilterPanelOpen = false; isLayerSwitcherOpen = false"
+      [attr.aria-expanded]="!isTopToolbarCollapsed"
+      [attr.aria-label]="isTopToolbarCollapsed ? 'Expand map controls' : 'Collapse map controls'"
+      [title]="isTopToolbarCollapsed ? 'Show controls' : 'Hide controls'">
+      <i class="fa" [ngClass]="isTopToolbarCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+    </button>
+  </div>
+
+  <!-- Search Bar Overlay - Top Right -->
+  <div class="search-overlay" [class.toolbar-collapsed]="isTopToolbarCollapsed">
+    <div class="search-box">
+      <i class="fa fa-search search-icon"></i>
+      <ng-select [items]="autocompleteVehicleList" bindLabel="param2" [typeahead]="vehicleSearchInput"
+        [minTermLength]="4" [loading]="isVehicleSearchLoading" typeToSearchText="Enter last 4 digit of vehicle number"
+        notFoundText="No vehicle found" placeholder="Search vehicle (min 4 chars)..."
+        (change)="onVehicleSelected($event)" [(ngModel)]="selectedVehicleFromSearch" [clearable]="true"
+        [searchable]="true" appendTo="body">
+        <ng-template ng-label-tmp let-item="item">
+          @if (item) {
+            <span><i class="fa fa-car"></i> {{ item.param2 || item.param11 || item.vehicleno ||
+          item.vehicleregno }}</span>
+        }
+      </ng-template>
+      <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
+        <div class="vehicle-option">
+          <i class="fa fa-car"></i>
+          <span>{{ item.param2 || item.param11 || item.vehicleno || item.vehicleregno || 'Unknown' }}</span>
+        </div>
+      </ng-template>
+    </ng-select>
+  </div>
+</div>
+
+<!-- View Toggle (Moved next to Search Bar Overlay) -->
+<div class="toggle-container modern-toggle view-type-toggle d-flex" [class.toolbar-collapsed]="isTopToolbarCollapsed">
+  <button class="toggle-option" [class.active]="viewType === 'NEW-activated'"
+    (click)="viewType = 'NEW-activated'; clusterDataFun()">
+    NEW
+  </button>
+  <button class="toggle-option" [class.active]="viewType === 'OLD-activated'"
+    (click)="viewType = 'OLD-activated'; clusterDataFun()">
+    OLD
+  </button>
+</div>
+<!-- Right Side Information Panel -->
+<div class="side-panel" [class.open]="panelOpen">
+  <button class="toggle-btn" (click)="panelOpen = !panelOpen" [disabled]="!selectedVehicleFromSearch || !liveData"
+    [style.cursor]="(!selectedVehicleFromSearch || !liveData) ? 'not-allowed' : 'pointer'">
+    <i class="arrow" [class.left]="panelOpen" [class.right]="!panelOpen"></i>
+  </button>
+  @if (selectedVehicleFromSearch && liveData) {
+    <div class="panel-content">
+      <div class="panel-header">
+        <div class="vehicle-info">
+          <div class="vehicle-icon">
+            <i class="fa fa-car"></i>
+          </div>
+          <div class="vehicle-details">
+            <h4>{{ liveData.vehicleno }}</h4>
+            <span class="vehicle-class">{{ liveData.vehicleMake }} {{ liveData.vehicleModel }}</span>
+          </div>
+        </div>
+        <!-- New Bottom Row for Status and Speed -->
+        <div class="header-status-row d-flex justify-content-between align-items-center ">
+          <!-- Left side: Status Badges -->
+          <div class="status-badges">
+            <span class="badge" [class.active]="liveData.ignition === 'On'"
+              [class.inactive]="liveData.ignition === 'Off'">
+              <i class="fa fa-bolt"></i> {{ liveData.ignition }}
+            </span>
+            <!-- <span class="badge" [class.active]="liveData.gpsStatus === 'Active'"
+            [class.inactive]="liveData.gpsStatus !== 'Active'">
+            <i class="fa fa-satellite-dish"></i> {{ liveData.gpsStatus }}
+          </span> -->
+        </div>
+        <!-- Right side: Speed Display -->
+        <div class="speed-display">
+          <div class="speed-value" [class.fast]="liveData.speed > 50"
+            [class.medium]="liveData.speed > 30 && liveData.speed >= 60">
+            {{ liveData.speed }}
+          </div>
+          <span class="speed-unit">km/h</span>
+        </div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab-link" [class.active]="activeTab === 'live'" (click)="activeTab = 'live'; switchTab('live');">
+        <i class="fa fa-broadcast-tower"></i> Live
+      </button>
+      <button class="tab-link" [class.active]="activeTab === 'history'"
+        (click)="activeTab = 'history'; switchTab('history');">
+        <i class="fa fa-history"></i> History
+      </button>
+    </div>
+    <!-- Live Tab Content -->
+    @if (activeTab === 'live') {
+      <div class="tab-content">
+        <ul class="info-list">
+          <li class="info-item">
+            <span class="info-label"><i class="fa fa-clock"></i> Last Updated</span>
+            <span class="info-value">{{ liveData.time | date:'medium' }}</span>
+          </li>
+          <li class="info-item">
+            <span class="info-label"><i class="fa fa-map-marker"></i> Location</span>
+            <span class="info-value coord">{{ liveData.lat | number:'1.6-6' }}, {{ liveData.lng | number:'1.6-6'
+            }}</span>
+          </li>
+          @if (liveData.alert) {
+            <li class="info-item">
+              <span class="info-label"><i class="fa fa-exclamation-triangle text-danger"></i> Alert</span>
+              <span class="info-value text-danger">{{ liveData.alert }}</span>
+            </li>
+          }
+          <li class="info-item">
+            <span class="info-label"><i class="fa fa-home"></i> Address</span>
+            <span class="info-value">{{ liveData.address || 'Not available' }}</span>
+          </li>
+        </ul>
+        <div class="info-section">
+          <div class="section-title">
+            <i class="fa fa-user"></i> Customer Info
+          </div>
+          <ul class="info-list">
+            <li class="info-item"><span class="info-label">Name</span><span class="info-value">{{ liveData.customerName
+          }}</span></li>
+          @if (liveData.customerMobile) {
+            <li class="info-item"><span class="info-label">Mobile</span><span
+          class="info-value">{{ liveData.customerMobile }}</span></li>
+        }
+      </ul>
+    </div>
+    <div class="info-section">
+      <div class="section-title">
+        <i class="fa fa-car"></i> Vehicle Info
+      </div>
+      <ul class="info-list">
+        <li class="info-item"><span class="info-label">Chassis No</span><span class="info-value">{{
+      liveData.chassisNo }}</span></li>
+      <li class="info-item"><span class="info-label">Engine No</span><span class="info-value">{{ liveData.engineNo
+    }}</span></li>
+    <li class="info-item"><span class="info-label">RTO</span><span class="info-value">{{ liveData.rtoName
+  }}</span></li>
+</ul>
+</div>
+<div class="info-section">
+  <div class="section-title">
+    <i class="fa fa-microchip"></i> Device Info
+  </div>
+  <ul class="info-list">
+    <li class="info-item"><span class="info-label">IMEI</span><span class="info-value">{{ liveData.imei
+  }}</span></li>
+  <li class="info-item"><span class="info-label">Vendor</span><span class="info-value">{{ liveData.vendorName
+}}</span></li>
+</ul>
+</div>
+</div>
+}
+<!-- History Tab Content -->
+@if (activeTab === 'history') {
+  <div class="tab-content">
+    <div class="history-controls">
+      <ul class="info-list">
+        <li class="info-item">
+          <span class="info-label"><i class="fa fa-clock"></i> Last Updated</span>
+          <span class="info-value">{{ liveData.time | date:'medium' }}</span>
+        </li>
+        <li class="info-item">
+          <span class="info-label"><i class="fa fa-map-marker"></i> Location</span>
+          <span class="info-value coord">{{ liveData.lat | number:'1.6-6' }}, {{ liveData.lng | number:'1.6-6'
+          }}</span>
+        </li>
+        @if (liveData.alert) {
+          <li class="info-item">
+            <span class="info-label"><i class="fa fa-exclamation-triangle text-danger"></i> Alert</span>
+            <span class="info-value text-danger">{{ liveData.alert }}</span>
+          </li>
+        }
+        <li class="info-item">
+          <span class="info-label"><i class="fa fa-home"></i> Address</span>
+          <span class="info-value">{{ liveData.address || 'Not available' }}</span>
+        </li>
+      </ul>
+      <div class="info-section">
+        <div class="section-title">
+          <i class="fa fa-user"></i> Customer Info
+        </div>
+        <ul class="info-list">
+          <li class="info-item"><span class="info-label">Name</span><span class="info-value">{{
+          liveData.customerName
+        }}</span></li>
+        @if (liveData.customerMobile) {
+          <li class="info-item"><span class="info-label">Mobile</span><span
+        class="info-value">{{ liveData.customerMobile }}</span></li>
+      }
+    </ul>
+  </div>
+  <div class="info-section">
+    <div class="section-title">
+      <i class="fa fa-car"></i> Vehicle Info
+    </div>
+    <ul class="info-list">
+      <li class="info-item"><span class="info-label">Chassis No</span><span class="info-value">{{
+    liveData.chassisNo }}</span></li>
+    <li class="info-item"><span class="info-label">Engine No</span><span class="info-value">{{
+    liveData.engineNo
+  }}</span></li>
+  <li class="info-item"><span class="info-label">RTO</span><span class="info-value">{{ liveData.rtoName
+}}</span></li>
+</ul>
+</div>
+<div class="info-section">
+  <div class="section-title">
+    <i class="fa fa-microchip"></i> Device Info
+  </div>
+  <ul class="info-list">
+    <li class="info-item"><span class="info-label">IMEI</span><span class="info-value">{{ liveData.imei
+  }}</span></li>
+  <li class="info-item"><span class="info-label">Vendor</span><span class="info-value">{{
+  liveData.vendorName
+}}</span></li>
+</ul>
+</div>
+<div class="info-section">
+  <div class="section-title">
+    <i class="fa fa-stumbleupon"></i> Plot History Track
+  </div>
+  <div class="date-time-row" style=" border-top: 1px solid lightgray; ">
+    <div class="date-picker-wrapper mt-3">
+      <i class="fa fa-calendar date-icon"></i>
+      <input type="text" ngxDaterangepickerMd [singleDatePicker]="true" [drops]="'up'"
+        [locale]="{ format: 'DD-MMM-YYYY' }" class="form-control" id="historydate" placeholder="Select Date"
+        [(ngModel)]="historyDate">
+    </div>
+  </div>
+  <div class="time-row">
+    <div class="time-picker-label">
+      <i class="fa fa-clock"></i>
+    </div>
+    <div class="time-picker-wrapper">
+      <timepicker [(ngModel)]="fromTime" [showMeridian]="true" [showSpinners]="false" [hourStep]="1"
+      [minuteStep]="1"></timepicker>
+    </div>
+    <span class="time-separator">to</span>
+    <div class="time-picker-wrapper">
+      <timepicker [(ngModel)]="toTime" [showMeridian]="true" [showSpinners]="false" [minuteStep]="1">
+      </timepicker>
+    </div>
+    <button class="btn btn-play-history" (click)="showHistoryTrack()" title="Plot History Track">
+      <i class="fa fa-history"></i>
+    </button>
+  </div>
+  <div class="history-save-row">
+    <input type="text" name="routename" class="form-control form-control-sm" placeholder="Enter Route Name"
+      [(ngModel)]="routeName" required minlength="3" maxlength="50" pattern="[A-Za-z0-9 _-]*"
+      [disabled]="!isHistoryRouteReady || isSavingHistoryRoute" (ngModelChange)="onRouteNameChange($event)">
+    <button class="btn btn-save-route" type="button" (click)="saveHistoryRoute()"
+      [disabled]="!isHistoryRouteReady || !isRouteNameValid || isSavingHistoryRoute" title="Save Route">
+      <i class="fa" [ngClass]="isSavingHistoryRoute ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+      <span>{{ isSavingHistoryRoute ? 'Saving' : 'Save Route' }}</span>
+    </button>
+  </div>
+  <!-- <div class="time-row">
+  <button class="btn btn-play-history" (click)="showHistoryTrack()" title="Plot History Track">
+    <i class="fa fa-history"></i>
+  </button>
+</div> -->
+</div>
+</div>
+@if (historyPathCoordinates.length > 0) {
+  <div class="playback-controls">
+    <div class="playback-buttons">
+      <button class="btn btn-play" (click)="playHistory()" [disabled]="isHistoryPlaying">
+        <i class="fa fa-play"></i>
+      </button>
+      <button class="btn btn-restart" (click)="restartHistory()" title="Restart">
+        <i class="fa fa-refresh"></i>
+      </button>
+      <button class="btn btn-stop" (click)="stopHistory()" [disabled]="!isHistoryPlaying">
+        <i class="fa fa-stop-circle"></i>
+      </button>
+    </div>
+    <div class="speed-slider">
+      <label>Speed</label>
+      <input type="range" min="1" max="20" [(ngModel)]="speedSliderValue" (change)="onSpeedChange($event)">
+    </div>
+  </div>
+}
+<!-- History Info Panel (Updates during playback) -->
+@if (historyPathCoordinates.length > 0) {
+  <div class="history-info">
+    <div class="section-title">
+      <i class="fa fa-info-circle"></i> Playback Info
+    </div>
+    <ul class="info-list">
+      <li class="info-item">
+        <span class="info-label"><i class="fa fa-tachometer"></i> Speed</span>
+        <span class="info-value">{{ liveData.speed }} km/h</span>
+      </li>
+      <li class="info-item">
+        <span class="info-label"><i class="fa fa-clock"></i> Time</span>
+        <span class="info-value">{{ liveData.time | date:'medium' }}</span>
+      </li>
+      <li class="info-item">
+        <span class="info-label"><i class="fa fa-map-marker"></i> Location</span>
+        <span class="info-value coord">{{ liveData.lat | number:'1.6-6' }}, {{ liveData.lng | number:'1.6-6'
+        }}</span>
+      </li>
+      <li class="info-item">
+        <span class="info-label"><i class="fa fa-bolt"></i> Ignition</span>
+        <span class="info-value" [class.text-success]="liveData.ignition === 'On'"
+        [class.text-danger]="liveData.ignition === 'Off'">{{ liveData.ignition }}</span>
+      </li>
+    </ul>
+  </div>
+}
+</div>
+}
+</div>
+}
+@if (!selectedVehicleFromSearch) {
+  <div class="panel-content-placeholder">
+    <div class="placeholder-content">
+      <i class="fa fa-map-marked-alt"></i>
+      <p>Search and select a vehicle to start tracking</p>
+    </div>
+  </div>
+}
+</div>
+</div>
+
+<!-- Stats Bar -->
+<div class="stats-bar" style=" display: none;">
+  <div class="stat-item">
+    <span class="stat-value">{{ counts.total }}</span>
+    <span class="stat-label">Total</span>
+  </div>
+  <div class="stat-item moving">
+    <span class="stat-value">{{ counts.moving }}</span>
+    <span class="stat-label">Moving</span>
+  </div>
+</div>
+
+<!-- Top Left Controls -->
+<div class="top-left-controls" [class.toolbar-collapsed]="isTopToolbarCollapsed">
+  <!-- Control Bar -->
+  <div class="control-bar">
+    <!-- All Vehicles Button -->
+    <button class="btn-control btn-vehicles" (click)="clusterDataFun()" title="Show All Vehicles"
+      [disabled]="!isLiveTracking && historyPathCoordinates.length === 0">
+      <div class="btn-icon">
+        <i class="fa fa-layer-group"></i>
+      </div>
+      <span class="btn-text">All</span>
+    </button>
+
+    <!-- Filter Button -->
+    <button class="btn-control btn-filter" (click)="toggleFilterPanel()" [class.active]="isFilterPanelOpen"
+      title="Filters" [class.has-filter]="vendorFilter || rtoFilter || vehicleClassFilter">
+      <div class="btn-icon">
+        <i class="fa fa-filter"></i>
+        @if (vendorFilter || rtoFilter || vehicleClassFilter) {
+          <span class="filter-indicator"></span>
+        }
+      </div>
+      <span class="btn-text">Filters</span>
+    </button>
+
+    <!-- Layer Switcher Button -->
+    <button class="btn-control btn-layers" (click)="toggleLayerPanel()" [class.active]="isLayerSwitcherOpen"
+      title="Change Map Style">
+      <div class="btn-icon">
+        <i class="fa fa-map"></i>
+      </div>
+      <span class="btn-text">Layers</span>
+    </button>
+  </div>
+
+  <!-- Filter Dropdown Panel -->
+  <div class="dropdown-panel filter-panel" [class.open]="isFilterPanelOpen">
+    <div class="filter-header">
+      <i class="fa fa-filter"></i>
+      <span>Filter Vehicles</span>
+      <button class="btn-close" (click)="isFilterPanelOpen = false"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="filter-body">
+      <div class="filter-field">
+        <label><i class="fa fa-building"></i> Vendor</label>
+        <ng-select [items]="vendorList" bindLabel="param2" bindValue="param1" placeholder="Select Vendor"
+          [(ngModel)]="vendorFilter" (change)="onVendorFilterChange($event)" name="vendorFilter" [clearable]="true"
+          [searchable]="true" appendTo="body">
+        </ng-select>
+      </div>
+      <div class="filter-field">
+        <label><i class="fa fa-car"></i> RTO</label>
+        <ng-select [items]="rtoList" bindLabel="param2" bindValue="param1" placeholder="Select RTO"
+          [(ngModel)]="rtoFilter" (change)="onRTOFilterChange($event)" name="rtoFilter" [clearable]="true"
+          [searchable]="true" appendTo="body">
+        </ng-select>
+      </div>
+      <div class="filter-field">
+        <label><i class="fa fa-truck"></i> Vehicle Class</label>
+        <ng-select [items]="vehicleClassList" bindLabel="param2" bindValue="param1" placeholder="Select Vehicle Class"
+          [(ngModel)]="vehicleClassFilter" (change)="onVehicleClassFilterChange($event)" name="vehicleClassFilter"
+          [clearable]="true" [searchable]="true" appendTo="body">
+        </ng-select>
+      </div>
+    </div>
+    @if (vendorFilter || rtoFilter || vehicleClassFilter) {
+      <div class="filter-footer">
+        <button class="btn-clear-filters"
+          (click)="vendorFilter = null; rtoFilter = null; vehicleClassFilter = ''; clusterDataFun()">
+          <i class="fa fa-times-circle"></i> Clear Filters
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Layer Dropdown Panel -->
+  <div class="dropdown-panel layer-panel" [class.open]="isLayerSwitcherOpen">
+    <div class="layer-header">
+      <i class="fa fa-map"></i>
+      <span>Map Layers</span>
+      <button class="btn-close" (click)="isLayerSwitcherOpen = false"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="layer-body">
+      <app-map-layer-options [active]="activeMapStyle" (selected)="changeMapStyle($event)"></app-map-layer-options>
+      <div class="layer-option" (click)=" isLayerSwitcherOpen = false">
+        <div class="layer-info">
+          <label class="layer-name layer-checkbox" for="Police_Stations">
+            <input type="checkbox" id="Police_Stations" [(ngModel)]="showPoliceStations"
+              (change)="togglePoliceStations(); $event.stopPropagation()" (click)="$event.stopPropagation()">
+            <span class="ml-4">Police Stations</span>
+          </label>
+          <span class="layer-desc ml-4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Show / Hide</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+@if (isLoadingLiveTrack) {
+  <div class="loading-overlay">
+    <div class="loading-spinner">
+      <i class="fa fa-spinner fa-spin"></i>
+      <span>Loading map tracking data...</span>
+    </div>
+  </div>
+}
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" [type]="errorType" (closed)="errorMessage = null"></app-toast>
+}

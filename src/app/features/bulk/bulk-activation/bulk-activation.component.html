@@ -1,0 +1,123 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <!-- <button class="pagebtn" style="margin-right: 10px;">
+              <a routerLink="/bulk-activation/logs"><i class="fa fa-list"></i>&nbsp;&nbsp;View Logs</a>
+            </button> -->
+            <div class="pagetitlestyle"><span style=" color:#3E4B5B; letter-spacing: 0.8px;">Bulk Vehicle Activation</span></div>
+          </div>
+
+          <form id="bulk_activation_form" autocomplete="off">
+            <div class="form-desc">
+              <strong>NOTE :</strong><label for="" class="mandetory">*</label> Are Mandatory Fields.
+              <br>
+                <strong>Instructions:</strong> Upload an Excel file with vehicle activation data.
+                <!-- <a href="javascript:void(0)" (click)="downloadSample()" style="color: blue; text-decoration: underline;">Download Sample File</a> -->
+                <a (click)="downloadSample()" download="">
+                  <img src="/assets/excelformat/downloadexcel1.png"
+                    style="width: 25px; height: 25px;" title="Download Excel File Format">
+                </a>
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="entrypagediv">
+                    <div class="row">
+                      @if (roleId !== '11') {
+                        <div class="col-sm-3" id="list_for_vendor">
+                          <div class="form-group">
+                            <label for="">Vendor:</label><label for="" style="width: 100px;" class="mandetory">*</label>
+                            <select id="vendor_obj_id" class="form-control searchable" style="width:285px;"
+                              [(ngModel)]="selectedVendor" name="vendor" (change)="onVendorChange()">
+                              <option value="">Select Vendor</option>
+                              @for (item of vendorList; track item) {
+                                <option [value]="item.param1">{{item.param2}}</option>
+                              }
+                            </select>
+                          </div>
+                        </div>
+                      }
+
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Model Code:</label><label for=""
+                        class="mandetory">*</label>
+                        <select id="modelid" class="form-control searchable" [(ngModel)]="selectedModel" name="model">
+                          <option value="">Select Model Code</option>
+                          @for (y of deviceModelList; track y) {
+                            <option [value]="y.param1">{{y.param2}} - {{y.param3}}
+                            </option>
+                          }
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="">Excel File:</label><label for="" class="mandetory">*</label>
+                        <input type="file" id="excelFile" class="form-control" accept=".xlsx,.xls"
+                          (change)="onFileSelected($event)" name="excelFile">
+                        <small class="form-text text-muted">Select .xlsx or .xls file</small>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-3" style="margin-top: 30px;">
+                      <button type="submit" class="btn btn-sm btn-secondary mx-2" (click)="resetForm();">Reset</button>
+                      <button type="button" class="btn btn-sm btn-success" (click)="uploadBulkActivation()"
+                        [disabled]="loading || !selectedFile || !selectedVendor || !selectedModel">
+                        @if (loading) {
+                          <span>
+                            <i class="fa fa-spinner fa-spin"></i> Uploading...
+                          </span>
+                        }
+                        @if (!loading) {
+                          <span>
+                            <i class="fa fa-upload"></i> Upload & Activate
+                          </span>
+                        }
+                      </button>
+                    </div>
+
+                    @if (roleId === '11') {
+                      <div class="col-md-12">
+                        <label style="font-weight: bold;">{{companyLabel}}</label>
+                      </div>
+                    }
+                  </div>
+
+
+
+                  <!-- <div *ngIf="errorMessage" class="alert alert-danger" style="margin-top: 15px;">
+                  <strong>Error:</strong> {{errorMessage}}
+                </div>
+
+                <div *ngIf="successMessage" class="alert alert-success" style="margin-top: 15px;">
+                  <strong>Success:</strong> {{successMessage}}
+                </div> -->
+
+                @if (showResult) {
+                  <div class="alert alert-info" style="margin-top: 15px;">
+                    <strong>Upload Result:</strong>
+                    <pre>{{uploadResult | json}}</pre>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+          <!-- <div class="form-buttons-w">
+          <button type="submit" (click)="resetForm();">Reset</button>
+          <button type="submit" id="vehicleactivation" (click)="bulkactivation();">Submit</button>
+        </div> -->
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+
+

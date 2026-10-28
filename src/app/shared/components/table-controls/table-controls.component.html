@@ -1,0 +1,68 @@
+<div class="top-controls-row">
+  <div class="left-controls">
+    <ng-container *ngIf="showSearch">
+      <!-- <span class="search-label">{{ searchLabel }}</span> -->
+      <div class="search-box">
+        <input
+          type="search"
+          class="search-input inner"
+          [placeholder]="searchPlaceholder"
+          maxlength="50"
+          [ngModel]="searchValue"
+          (ngModelChange)="onSearchValueChange($event)"
+          (keyup.enter)="onSearch()"
+          [name]="searchName"
+        />
+        <button type="button" class="search-inner-btn" (click)="onSearch()">
+          <i appIcon="fa fa-search" ></i>
+        </button>
+      </div>
+    </ng-container>
+
+    <button *ngIf="showReload" type="button" class="reload-btn" (click)="onReload()" [disabled]="loading">
+      <i appIcon="fa fa-refresh" [class.fa-spin]="loading"></i>
+      <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+    </button>
+
+    <ng-content select="[controls-left-extra]"></ng-content>
+  </div>
+
+  <div class="center-controls">
+    <ng-content select="[controls-center]"></ng-content>
+  </div>
+
+  <div class="right-controls">
+    <ng-content select="[controls-right-before]"></ng-content>
+
+    <div class="control-item" *ngIf="showDownload">
+      <label>{{ downloadLabel }}</label>
+      <select
+        [ngModel]="selectedDownloadType"
+        (ngModelChange)="onDownloadTypeChanged($event)"
+        [disabled]="isExporting"
+      >
+        <option *ngFor="let option of downloadOptions" [value]="option === 'Select' ? '' : option">
+          {{ option }}
+        </option>
+      </select>
+      <span *ngIf="isExporting" class="exporting-text">
+        <i appIcon="fa fa-spinner fa-spin" ></i> Generating...
+      </span>
+    </div>
+
+    <div class="control-item" *ngIf="showPageSize">
+      <label>{{ pageSizeLabel }}</label>
+      <select [ngModel]="pageSize" (ngModelChange)="onPageSizeChanged($event)">
+        <option *ngFor="let size of pageSizeOptions" [value]="size">
+          {{ size }}
+        </option>
+      </select>
+    </div>
+
+    <div class="total-records-text" *ngIf="showTotalRecords">
+      {{ totalRecordsLabel }} {{ pageCount }} of {{ totalCount }}
+    </div>
+
+    <ng-content select="[controls-right-after]"></ng-content>
+  </div>
+</div>

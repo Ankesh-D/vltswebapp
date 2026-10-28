@@ -1,0 +1,96 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="col-md-12 pagetitleborder mt-3">
+        <div class="pagetitlestyle"><span>New Device Count</span></div>
+      </div>
+
+
+      <!-- Search Toolbar -->
+      <div class="top-controls-row">
+        <div class="left-controls">
+          <div class="search-box">
+            <input type="text" class="search-input inner" [(ngModel)]="searchText"
+              placeholder="Search Vendor Name..." (keyup.enter)="getSearchDetails()">
+            <button class="search-inner-btn" (click)="getSearchDetails()" title="Search">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+          <button class="reload-btn btn btn-outline-primary btn-sm shadow-sm ms-2" (click)="reloadData()" [disabled]="loading">
+            <i class="fa fa-refresh me-1" [class.fa-spin]="loading"></i>
+            {{ loading ? 'Reloading...' : 'Reload' }}
+          </button>
+        </div>
+
+        <div class="right-controls">
+          <div class="rows-selector">
+            <label class="toolbar-label">Show Rows:</label>
+            <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)">
+              @for (size of pageSizeOptions; track size) {
+                <option [value]="size">{{size}}</option>
+              }
+              <option [value]="totalCount">All</option>
+            </select>
+          </div>
+          <span class="total-records-badge">Total: <b>{{pageCount}}</b> of <b>{{totalCount}}</b></span>
+        </div>
+      </div>
+
+      <!-- Main Table Area -->
+      @if (!loading) {
+        <ng-template #deviceCountHeader>
+          <tr>
+            <th rowspan="2" class="text-center" style="vertical-align: middle;">#</th>
+            <th rowspan="2" style="vertical-align: middle;">Vendor Name</th>
+            <th colspan="4" class="text-center">Devices</th>
+            <th colspan="3" class="text-center">Polling Status</th>
+          </tr>
+          <tr class="small-header">
+            <th class="text-center">Installed</th>
+            <th class="text-center">Activated</th>
+            <th class="text-center text-success">RTO Approve Count</th>
+            <th class="text-center text-danger">Not Activated Count</th>
+            <th class="text-center text-success">Received</th>
+            <th class="text-center text-danger">Not Received</th>
+            <th class="text-center text-warning">Never Received</th>
+          </tr>
+        </ng-template>
+        <ng-template #deviceCountCell let-row let-column="column" let-index="index">
+          @if (column.key === 'rowNumber') {
+            {{ index + 1 }}
+          } @else {
+            {{ deviceCountTable.cellValue(row, column) }}
+          }
+        </ng-template>
+        <ng-template #deviceCountFooter>
+          @if (rtowisedevicedetails.length > 0) {
+            <tr class="bg-light fw-bold" style="border-top: 2px solid #94a3b8;">
+              <td colspan="2" class="text-end pe-3">GRAND TOTAL:</td>
+              <td class="text-center text-primary">{{ InstalledCount }}</td>
+              <td class="text-center text-muted">{{ ActivatedCount }}</td>
+              <td class="text-center fw-bold">{{ PendingCount }}</td>
+              <td class="text-center">{{ RTOApprovedCount }}</td>
+              <td class="text-center text-success">{{ Received }}</td>
+              <td class="text-center text-danger">{{ NotReceived }}</td>
+              <td class="text-center text-warning">{{ NeverReceived }}</td>
+            </tr>
+          }
+        </ng-template>
+        <app-common-table #deviceCountTable [columns]="tableColumns" [rows]="rtowisedevicedetails"
+          [headerRowsTemplate]="deviceCountHeader" [cellTemplate]="deviceCountCell"
+          [footerTemplate]="deviceCountFooter" tableClass="table table-hover table-striped table-bordered mb-0"
+          wrapperClass="mt-3 shadow-sm border rounded" maxHeight="500px" [stickyHeader]="true"
+          emptyMessage="No device records found.">
+        </app-common-table>
+      }
+
+      <!-- Inline Loader -->
+      @if (loading) {
+        <div class="text-center py-5">
+          <i class="fa fa-spinner fa-spin fa-3x text-primary opacity-50"></i>
+          <p class="mt-2 text-muted fw-bold">Loading device counts...</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

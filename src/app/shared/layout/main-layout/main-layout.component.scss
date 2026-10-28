@@ -1,0 +1,856 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--app-page-bg);
+  color: var(--app-text);
+}
+
+.layout-w {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.nav-toggle:focus-visible,
+.header-action:focus-visible {
+  outline: 2px solid var(--app-primary);
+  outline-offset: 2px;
+}
+
+.content-w {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  flex: 0 0 auto;
+  min-height: var(--app-header-height);
+  align-items: center;
+  gap: 14px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface);
+}
+
+.nav-toggle,
+.header-action {
+  display: inline-flex;
+  min-width: 36px;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #435169;
+  cursor: pointer;
+}
+
+.nav-toggle {
+  display: none;
+}
+
+.nav-toggle:hover,
+.header-action:hover {
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #17427a;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.topbar-brand img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.topbar-user {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.welcome-name {
+  max-width: 220px;
+  overflow: hidden;
+  color: #526176;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-action {
+  padding: 0 9px;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.change-password {
+  color: #315f91;
+}
+
+.android-link {
+  color: #78a700;
+  font-size: 20px;
+}
+
+.logout-action {
+  border-color: var(--app-border);
+  color: #35445b;
+}
+
+.content-i {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0px;
+  background: var(--app-page-bg);
+}
+
+#loadpage {
+  min-width: 0;
+  width: 100%;
+}
+
+#footer {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: #68768a;
+  font-size: 11px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+@media (max-width: 767px) {
+  .nav-toggle {
+    display: inline-flex;
+    flex: 0 0 36px;
+  }
+
+  .topbar {
+    min-height: calc(var(--app-header-height) - 4px);
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .topbar-brand {
+    gap: 5px;
+    font-size: 11px;
+  }
+
+  .topbar-brand img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .topbar-user {
+    gap: 3px;
+  }
+
+  .welcome-name {
+    max-width: 90px;
+    font-size: 11px;
+  }
+
+  .change-password {
+    width: 36px;
+    overflow: hidden;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .change-password::after {
+    content: "PW";
+    font-size: 11px;
+  }
+
+  .content-i {
+    padding: 8px;
+  }
+
+  .footer-container {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 420px) {
+  .topbar-brand span,
+  .welcome-name,
+  .android-link {
+    display: none;
+  }
+
+  .topbar {
+    min-height: calc(var(--app-header-height) - 8px);
+  }
+}
+
+.reset-password-modal-header {
+  background-color: #e3e3e3;
+  color: black;
+  font-size: 12px;
+  padding: 4px 9px;
+}
+.reset-password-modal-header .modal-title  {
+  background-color: #e3e3e3;
+  color: black;
+  font-size: 12px;
+}
+.formlabel {
+  font-size: 12px;
+  margin-bottom: 1px;
+}
+.invalid-feedback{
+  font-size: 11px;
+}
+.reset-password-form .form-group {
+  margin-bottom: 0px;
+  height: 72px;
+}
+.loader-div {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    height: 100%;
+    width: 100%;
+    background-color: #525b5291;
+    z-index: 9999;
+}
+.loader-style {
+      position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    background-color: rgb(117 112 112 / 9%);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+
+}
+
+.android {
+    font-size: 30px;
+    margin-right: 19px;
+    margin-top: -10px;
+    color: hsl(78.84deg 91.19% 44.51%);
+}
+
+
+/* =========================================================
+   RESET PASSWORD MODAL
+   BOOTSTRAP 5 - LIVE STYLE
+   ========================================================= */
+
+
+/* ================= MODAL DIALOG ================= */
+
+.reset-password-modal-dialog {
+  width: 300px !important;
+
+  max-width: 300px !important;
+
+  margin: 0 auto !important;
+}
+
+
+/* ================= MODAL CONTENT ================= */
+
+.reset-password-modal-content {
+  width: 300px !important;
+
+  max-width: 300px !important;
+
+  border: 1px solid #bdbdbd !important;
+
+  border-radius: 5px !important;
+
+  background: #fff;
+
+  overflow: hidden;
+
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ================= HEADER ================= */
+
+.reset-password-modal-header {
+  min-height: 34px !important;
+
+  height: 34px !important;
+
+  padding: 4px 8px !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  justify-content: space-between !important;
+
+  background: #e3e3e3 !important;
+
+  border-bottom: 1px solid #cfcfcf !important;
+}
+
+
+/* ================= TITLE ================= */
+
+.reset-password-modal-header .modal-title {
+  margin: 0 !important;
+
+  padding: 0 !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 400 !important;
+
+  line-height: 24px !important;
+
+  color: #000 !important;
+
+  white-space: nowrap;
+}
+
+
+/* ================= CLOSE BUTTON ================= */
+
+.reset-password-close {
+  width: 18px !important;
+
+  height: 18px !important;
+
+  padding: 0 !important;
+
+  margin: 0 !important;
+
+  opacity: 1 !important;
+
+  background-size: 10px !important;
+
+  box-shadow: none !important;
+
+  flex-shrink: 0;
+}
+
+.reset-password-close:hover {
+  opacity: 0.7 !important;
+}
+
+
+/* ================= BODY ================= */
+
+.reset-password-form {
+  padding: 12px 16px 14px !important;
+
+  background: #fff !important;
+}
+
+
+/* ================= FORM GROUP ================= */
+
+.reset-password-form .form-group {
+  margin-bottom: 10px !important;
+
+  height: auto !important;
+}
+
+
+/* ================= LABEL ================= */
+
+.reset-password-form .formlabel {
+  display: block;
+
+  margin-bottom: 3px !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 400 !important;
+
+  line-height: 1.2;
+
+  color: #333 !important;
+}
+
+
+/* ================= INPUT + EYE ================= */
+
+.password-input-group {
+  position: relative;
+
+  width: 100%;
+}
+
+
+/* Input */
+
+.password-input-group .form-control {
+  width: 100% !important;
+
+  height: 31px !important;
+
+  min-height: 31px !important;
+
+  padding: 5px 36px 5px 8px !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 400 !important;
+
+  line-height: 20px;
+
+  color: #333;
+
+  background: #fff;
+
+  border: 1px solid #ced4da !important;
+
+  border-radius: 4px !important;
+
+  box-shadow: none !important;
+}
+
+
+/* Input focus */
+
+.password-input-group .form-control:focus {
+  border-color: #86b7fe !important;
+
+  box-shadow: 0 0 0 0.1rem rgba(13, 110, 253, 0.12) !important;
+}
+
+
+/* ================= EYE BUTTON ================= */
+
+.password-eye-btn {
+  position: absolute;
+
+  top: 0;
+
+  right: 0;
+
+  width: 32px;
+
+  height: 31px;
+
+  padding: 0;
+
+  margin: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border: 0;
+
+  border-left: 1px solid #ced4da;
+
+  border-radius: 0 4px 4px 0;
+
+  background: #fff;
+
+  color: #6c757d;
+
+  cursor: pointer;
+
+  z-index: 5;
+}
+
+
+/* Eye icon */
+
+.password-eye-btn i {
+  font-size: 13px !important;
+
+  line-height: 1;
+
+  color: #6c757d !important;
+}
+
+
+/* Eye hover */
+
+.password-eye-btn:hover {
+  background: #f5f5f5;
+
+  color: #495057;
+}
+
+.password-eye-btn:hover i {
+  color: #495057 !important;
+}
+
+
+/* ================= VALIDATION ================= */
+
+.reset-password-form .invalid-feedback {
+  display: block;
+
+  margin-top: 2px;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+
+  font-size: 10px !important;
+
+  line-height: 1.2;
+
+  color: #dc3545 !important;
+}
+
+
+/* ================= CHANGE PASSWORD ================= */
+
+.reset-password-action {
+  display: flex;
+
+  justify-content: center;
+
+  margin-top: 14px;
+}
+
+
+.change-password-btn {
+  min-width: 132px;
+
+  height: 31px;
+
+  padding: 5px 12px !important;
+
+  background: #333cff !important;
+
+  border: 1px solid #333cff !important;
+
+  border-radius: 4px !important;
+
+  color: #fff !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 400 !important;
+
+  line-height: 20px;
+}
+
+.change-password-btn:hover {
+  background: #2931e8 !important;
+
+  border-color: #2931e8 !important;
+
+  color: #fff !important;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 400px) {
+
+  .reset-password-modal-dialog {
+    width: calc(100% - 20px) !important;
+
+    max-width: calc(100% - 20px) !important;
+  }
+
+  .reset-password-modal-content {
+    width: 100% !important;
+
+    max-width: 100% !important;
+  }
+
+}
+
+
+/* =========================================================
+   DEVICE WARNING MODAL
+   KEEP OLD MODEL
+   ========================================================= */
+
+.device-warning-modal {
+    border: 1px solid #dc3545 !important;
+    border-radius: 4px !important;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+
+/* =========================
+   HEADER
+   ========================= */
+
+.device-warning-modal .modal-header {
+    min-height: 36px !important;
+    height: 36px !important;
+
+    padding: 4px 8px !important;
+
+    background-color: #dc3545 !important;
+
+    border-bottom: 1px solid #c82333 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+
+/* =========================
+   TITLE
+   ========================= */
+
+.device-warning-modal .modal-title {
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #fff !important;
+
+    font-size: 13px !important;
+    font-weight: 600 !important;
+
+    line-height: 26px !important;
+
+    white-space: nowrap;
+}
+
+
+/* Warning icon */
+.device-warning-modal .modal-title i {
+    font-size: 13px;
+    margin-right: 6px;
+}
+
+
+/* =========================
+   EXIT / CLOSE BUTTON
+   ========================= */
+
+.device-warning-close {
+    width: 25px;
+    height: 25px;
+
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0 !important;
+
+    background: transparent !important;
+
+    color: #fff !important;
+
+    cursor: pointer;
+
+    opacity: 1;
+
+    outline: none;
+
+    box-shadow: none !important;
+}
+
+
+/* × */
+.device-warning-close span {
+    display: block;
+
+    width: 20px;
+    height: 20px;
+
+    color: #fff;
+
+    font-size: 23px;
+    font-weight: 400;
+
+    line-height: 18px;
+
+    text-align: center;
+}
+
+
+/* Hover */
+.device-warning-close:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+
+    border-radius: 3px;
+}
+
+.device-warning-close:hover span {
+    color: #fff;
+}
+
+
+/* Focus */
+.device-warning-close:focus {
+    outline: none !important;
+
+    box-shadow: none !important;
+}
+
+
+/* =========================
+   BODY
+   ========================= */
+
+.device-warning-modal .modal-body {
+    padding: 15px 12px !important;
+
+    background: #fff;
+
+    font-size: 12px;
+}
+
+
+/* Warning text */
+.device-warning-modal .modal-body p {
+    margin: 0;
+
+    font-size: 13px;
+
+    line-height: 20px;
+}
+
+
+/* =========================
+   MODAL SIZE
+   ========================= */
+
+#deviceWarningModal .modal-dialog {
+    max-width: 300px;
+}
+
+
+/* =========================
+   CENTER
+   ========================= */
+
+#deviceWarningModal .modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 400px) {
+
+    #deviceWarningModal .modal-dialog {
+        max-width: calc(100% - 20px);
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+}
+
+// Keep tracking maps between the menu and footer at every viewport size.
+:host ::ng-deep .all-wrapper:has(app-location-wise-vehicle-details, app-plain-map-tracking, app-map-tracking-new) {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+
+    .layout-w {
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        min-height: 0;
+        min-width: 0;
+    }
+
+    .menu-w {
+        flex: 0 0 auto;
+        min-width: 0;
+    }
+
+    .content-w {
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    .content-i {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        height: auto;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    #loadpage {
+        min-width: 0;
+        min-height: 0;
+        height: 100%;
+        margin-top: 0 !important;
+        padding: 0;
+    }
+
+    #loadpage > :not(app-loader) {
+        display: block;
+        height: 100%;
+        min-height: 0;
+    }
+
+    #loadpage > app-loader {
+        display: none;
+    }
+
+    #footer {
+        flex: 0 0 auto;
+        height: auto;
+        min-height: 35px;
+        padding: 6px 12px;
+    }
+
+    .footer-container {
+        flex-wrap: wrap;
+        gap: 4px 12px;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+}

@@ -1,0 +1,183 @@
+<div class="content-i vehicle-group-mapping-page">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box mapping-shell">
+            <div class="page-header-card">
+              <div class="page-title-block">
+                <div class="page-icon">
+                  <i class="fa fa-random" aria-hidden="true"></i>
+                </div>
+                <div class="page-title-copy">
+                  <h2 class="page-title">Vehicle to Group Mapping</h2>
+                  <p class="page-subtitle">Map vehicles quickly using compact searchable selectors and grouped actions.</p>
+                </div>
+              </div>
+
+              <div class="page-actions">
+                <a class="header-action-btn secondary" routerLink="/vehicle-group/entry">
+                  <i class="fa fa-car" aria-hidden="true"></i>
+                  <span>New Vehicle Group</span>
+                </a>
+                <a class="header-action-btn primary" routerLink="/vehicle-group/mapping-details">
+                  <i class="fa fa-list-alt" aria-hidden="true"></i>
+                  <span>Mapping Details</span>
+                </a>
+              </div>
+            </div>
+
+            <form id="vehiclegrpmappingform" autocomplete="off" class="mapping-form-card">
+              <div class="form-note">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <span><strong>Note:</strong> <label class="mandetory">*</label> fields are mandatory.</span>
+              </div>
+
+              <div class="mapping-grid">
+                <div class="field-card">
+                  <label for="searchfilter">Select Type <span class="mandetory">*</span></label>
+                  <div class="input-shell">
+                    <div class="input-icon">
+                      <i class="fa fa-sliders" aria-hidden="true"></i>
+                    </div>
+                    <ng-select
+                      id="searchfilter"
+                      class="compact-ng-select"
+                      [items]="[
+                        { label: 'Vendor', value: '11' },
+                        { label: 'RTO', value: '19' }
+                      ]"
+                      bindLabel="label"
+                      bindValue="value"
+                      [clearable]="true"
+                      [searchable]="false"
+                      placeholder="Select type"
+                      [(ngModel)]="selectedFilter"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="onFilterChange()">
+                    </ng-select>
+                  </div>
+                </div>
+
+                <div class="field-card" [style.display]="showVendorList ? 'block' : 'none'" id="comp">
+                  <label for="selectcomplist">Select Vendor <span class="mandetory">*</span></label>
+                  <div class="input-shell">
+                    <div class="input-icon">
+                      <i class="fa fa-building-o" aria-hidden="true"></i>
+                    </div>
+                    <ng-select
+                      id="selectcomplist"
+                      class="compact-ng-select"
+                      [items]="vendorList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      [multiple]="true"
+                      [searchable]="true"
+                      [closeOnSelect]="false"
+                      [clearable]="true"
+                      placeholder="Search and select vendor"
+                      [(ngModel)]="selectedVendorIds"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="onVendorSelectionChange()">
+                    </ng-select>
+                  </div>
+                </div>
+
+                <div class="field-card" [style.display]="showRTOList ? 'block' : 'none'" id="rto">
+                  <label for="selectrtolist">Select RTO <span class="mandetory">*</span></label>
+                  <div class="input-shell">
+                    <div class="input-icon">
+                      <i class="fa fa-map-marker" aria-hidden="true"></i>
+                    </div>
+                    <ng-select
+                      id="selectrtolist"
+                      class="compact-ng-select"
+                      [items]="rtoList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      [multiple]="true"
+                      [searchable]="true"
+                      [closeOnSelect]="false"
+                      [clearable]="true"
+                      placeholder="Search and select RTO"
+                      [(ngModel)]="selectedRTOIds"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="onRTOSelectionChange()">
+                    </ng-select>
+                  </div>
+                </div>
+
+                <div class="field-card">
+                  <label for="vehiclenolist">Vehicle / Chassis No <span class="mandetory">*</span></label>
+                  <div class="input-shell">
+                    <div class="input-icon">
+                      <i class="fa fa-truck" aria-hidden="true"></i>
+                    </div>
+                    <ng-select
+                      id="vehiclenolist"
+                      class="compact-ng-select"
+                      [items]="vehicleList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      [multiple]="true"
+                      [searchable]="true"
+                      [closeOnSelect]="false"
+                      [clearable]="true"
+                      placeholder="Search vehicle / chassis no"
+                      [(ngModel)]="selectedVehicleIds"
+                      [ngModelOptions]="{ standalone: true }">
+                    </ng-select>
+                  </div>
+                </div>
+
+                <div class="field-card">
+                  <label for="selectgrouplist">Select Group <span class="mandetory">*</span></label>
+                  <div class="input-shell">
+                    <div class="input-icon">
+                      <i class="fa fa-object-group" aria-hidden="true"></i>
+                    </div>
+                    <ng-select
+                      id="selectgrouplist"
+                      class="compact-ng-select"
+                      [items]="vehicleGroupList"
+                      bindLabel="param3"
+                      bindValue="param2"
+                      [multiple]="false"
+                      [searchable]="true"
+                      [clearable]="true"
+                      placeholder="Search and select group"
+                      [(ngModel)]="selectedGroupId"
+                      [ngModelOptions]="{ standalone: true }">
+                    </ng-select>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button class="secondary-btn" type="button" (click)="resetForm()">
+                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                    <span>Reset</span>
+                  </button>
+                  <button class="submit-btn" type="button" (click)="vehicleGroupMappingCreate()">
+                    <i class="fa fa-link" aria-hidden="true"></i>
+                    <span>Create Mapping</span>
+                  </button>
+                </div>
+              </div>
+
+
+
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (loading) {
+  <app-loading></app-loading>
+}
+@if (errorMessage) {
+  <app-error-message [message]="errorMessage"></app-error-message>
+}

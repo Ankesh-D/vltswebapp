@@ -1,0 +1,318 @@
+<div class="dealer-dashboard">
+
+  <!-- ===================== PAGE HEADER ===================== -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1 class="page-title">Dealer Dashboard</h1>
+      <!-- <p class="page-subtitle">Vehicle Location Tracking System — Dealer Portal</p> -->
+    </div>
+
+    
+  </div>
+
+  <!-- ===================== KPI CARDS ===================== -->
+  <div class="kpi-grid">
+    <div class="kpi-card" *ngFor="let card of kpiCards" [ngClass]="card.colorClass">
+      <div class="kpi-icon">
+        <i [class]="card.icon"></i>
+      </div>
+      <div class="kpi-body">
+        <div class="kpi-count">{{ card.count }}</div>
+        <div class="kpi-label">{{ card.label }}</div>
+        <div class="kpi-desc">{{ card.description }}</div>
+      </div>
+    </div>
+  </div>
+<!-- ===================== QUICK LINKS ===================== -->
+<div class="quick-links-section">
+
+  <div class="quick-links-header">
+    <div>
+      <h6>Quick Links</h6>
+      <span>Frequently used dealer services</span>
+    </div>
+  </div>
+
+  <div class="quick-links-grid">
+
+    <!-- Vehicle Activation -->
+    <button class="quick-link-card" type="button" (click)="openQuickLink('activation')">
+      <div class="quick-link-icon quick-blue">
+        <i class="bx bx-car"></i>
+      </div>
+
+      <div class="quick-link-content">
+        <div class="quick-link-title">Vehicle Activation</div>
+        <div class="quick-link-desc">Activate a new vehicle</div>
+      </div>
+
+      <i class="bx bx-chevron-right quick-link-arrow"></i>
+    </button>
+
+    <!-- Vehicle Renewal -->
+    <button class="quick-link-card" type="button" (click)="openQuickLink('renewal')">
+      <div class="quick-link-icon quick-orange">
+        <i class="bx bx-refresh"></i>
+      </div>
+
+      <div class="quick-link-content">
+        <div class="quick-link-title">Vehicle Renewal</div>
+        <div class="quick-link-desc">Renew expired vehicles</div>
+      </div>
+
+      <i class="bx bx-chevron-right quick-link-arrow"></i>
+    </button>
+
+    <!-- Device Replacement -->
+    <button class="quick-link-card" type="button" (click)="openQuickLink('replacement')">
+      <div class="quick-link-icon quick-purple">
+        <i class="bx bx-chip"></i>
+      </div>
+
+      <div class="quick-link-content">
+        <div class="quick-link-title">Device Replacement</div>
+        <div class="quick-link-desc">Replace or reassign device</div>
+      </div>
+
+      <i class="bx bx-chevron-right quick-link-arrow"></i>
+    </button>
+
+    <!-- Support -->
+    <button class="quick-link-card" type="button" (click)="openQuickLink('support')">
+      <div class="quick-link-icon quick-green">
+        <i class="bx bx-download"></i>
+      </div>
+
+      <div class="quick-link-content">
+        <div class="quick-link-title">Download receipt</div>
+        <div class="quick-link-desc">Get vehicle receipt </div>
+      </div>
+
+      <i class="bx bx-chevron-right quick-link-arrow"></i>
+    </button>
+
+  </div>
+</div>
+  <!-- ===================== FILTER BAR ===================== -->
+  <!-- <div class="filter-bar">
+
+    <div class="filter-search">
+      <i class="bx bx-search"></i>
+      <input
+        type="text"
+        placeholder="Search by Vehicle No. / IMEI / Owner Name..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onFilterChange()">
+    </div>
+
+    <div class="filter-select">
+      <label>Status</label>
+      <select [(ngModel)]="selectedStatus" (ngModelChange)="onFilterChange()">
+        <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </div>
+
+    <div class="filter-select">
+      <label>RTO</label>
+      <select [(ngModel)]="selectedRto" (ngModelChange)="onFilterChange()">
+        <option *ngFor="let opt of rtoOptions" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </div>
+
+    <div class="filter-select">
+      <label>Validity</label>
+      <select [(ngModel)]="selectedValidity" (ngModelChange)="onFilterChange()">
+        <option *ngFor="let opt of validityOptions" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </div>
+
+    <button class="btn-clear-filter" (click)="clearFilters()">
+      <i class="bx bx-x"></i> Clear Filters
+    </button>
+  </div> -->
+
+  <!-- ===================== ACTION NOTICE (local placeholder toast) ===================== -->
+  <div class="action-notice" *ngIf="actionNotice">
+    <i class="bx bx-info-circle"></i> {{ actionNotice }}
+  </div>
+
+  <!-- ===================== VEHICLE TABLE ===================== -->
+  <div class="table-card">
+
+    <div class="table-card-header">
+      <h6>Vehicle Details</h6>
+      <span>Showing {{ rangeStart }}–{{ rangeEnd }} of {{ totalRecords }} vehicles</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="vehicle-table">
+        <thead>
+          <tr>
+            <th style="width:50px;">Sr. No.</th>
+            <th>Vehicle Number</th>
+            <th>Device / IMEI</th>
+            <th>Owner Name</th>
+            <th>Mobile Number</th>
+            <th>RTO</th>
+            <!-- <th>Device Status</th>
+            <th>SIM Status</th>
+            <th>Activation Date</th> -->
+            <th>Validity</th>
+            <th>Last Communication</th>
+            <!-- <th style="width:140px;">Action</th> -->
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let v of pagedVehicles; let i = index; trackBy: trackByVehicle">
+            <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td><strong>{{ v.vehicleNumber }}</strong></td>
+            <td>{{ v.imei }}</td>
+            <td>{{ v.ownerName }}</td>
+            <td>{{ v.mobileNumber }}</td>
+            <td>{{ v.rto }}</td>
+            <!-- <td><span [ngClass]="getDeviceStatusBadgeClass(v.deviceStatus)">{{ v.deviceStatus }}</span></td>
+            <td><span [ngClass]="getSimStatusBadgeClass(v.simStatus)">{{ v.simStatus }}</span></td>
+            <td>{{ v.activationDate }}</td> -->
+            <td>{{ v.validity }}</td>
+            <td>{{ v.lastCommunication }}</td>
+            <!-- <td>
+              <div class="action-cell">
+                <button class="action-btn" title="View" (click)="viewVehicle(v)">
+                  <i class="bx bx-show"></i>
+                </button>
+                <button class="action-btn" title="Vehicle Details" (click)="viewVehicle(v)">
+                  <i class="bx bx-detail"></i>
+                </button>
+                <button class="action-btn" title="Renewal" (click)="handleRenewal(v)">
+                  <i class="bx bx-refresh"></i>
+                </button>
+                <button class="action-btn" title="More" (click)="handleMoreAction(v)">
+                  <i class="bx bx-dots-horizontal-rounded"></i>
+                </button>
+              </div>
+            </td> -->
+          </tr>
+
+          <!-- EMPTY STATE -->
+          <tr *ngIf="pagedVehicles.length === 0">
+            <td colspan="12">
+              <div class="empty-state">
+                <i class="bx bx-search-alt"></i>
+                <h6>No vehicles found</h6>
+                <p>Try adjusting your search or filter criteria.</p>
+                <button class="btn-clear-filter" (click)="clearFilters()">
+                  <i class="bx bx-x"></i> Reset Filters
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===================== PAGINATION ===================== -->
+    <div class="table-footer" *ngIf="totalRecords > 0">
+
+      <div class="page-size-selector">
+        <label>Rows per page:</label>
+        <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+          <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+        </select>
+      </div>
+
+      <div class="pagination-controls">
+        <button
+          class="page-btn"
+          [disabled]="currentPage === 1"
+          (click)="previousPage()">
+          <i class="bx bx-chevron-left"></i> Prev
+        </button>
+
+        <button
+          *ngFor="let page of getPageNumbers()"
+          class="page-btn page-number"
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)">
+          {{ page }}
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === getTotalPages()"
+          (click)="nextPage()">
+          Next <i class="bx bx-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="record-count">
+        Page {{ currentPage }} of {{ getTotalPages() }}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== VEHICLE DETAILS MODAL (local only) ===================== -->
+  <div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeDetailsModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h6>Vehicle Details</h6>
+        <button class="modal-close" (click)="closeDetailsModal()">
+          <i class="bx bx-x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedVehicle as v">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Vehicle Number</span>
+            <span class="detail-value">{{ v.vehicleNumber }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Device / IMEI</span>
+            <span class="detail-value">{{ v.imei }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Owner Name</span>
+            <span class="detail-value">{{ v.ownerName }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Mobile Number</span>
+            <span class="detail-value">{{ v.mobileNumber }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">RTO</span>
+            <span class="detail-value">{{ v.rto }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Device Status</span>
+            <span [ngClass]="getDeviceStatusBadgeClass(v.deviceStatus)">{{ v.deviceStatus }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">SIM Status</span>
+            <span [ngClass]="getSimStatusBadgeClass(v.simStatus)">{{ v.simStatus }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Activation Date</span>
+            <span class="detail-value">{{ v.activationDate }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Validity</span>
+            <span class="detail-value">{{ v.validity }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Last Communication</span>
+            <span class="detail-value">{{ v.lastCommunication }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeDetailsModal()">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,140 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="element-wrapper">
+          <button style="background: #2bdc16;border-color: #2bdc16;" class="btn btn-primary returnbtn">
+            <i class="fa fa-angle-double-left" style="width: 20px;"></i>
+            <a routerLink="/AdminDashboard" style="float: right;">Home</a>
+          </button>
+          <br>
+            <div class="element-box">
+              <div class="col-md-12 pagetitleborder">
+                <div class="pagetitlestyle"><span>{{title}} Alert Details</span></div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="table-responsive">
+                    <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
+                      <table style="width: 100%;">
+                        <tbody class="bg-body">
+                          <tr>
+                            <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                              <font style="font-weight: bold;">Search : </font>
+                            </td>
+                            <td>
+                              <div class="">
+                                <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="tabletitlesearch"
+                                  id="searchby" placeholder="Type here and press button...." style="border: 1px solid #0b58b9; height: 25px; width: 200px;"
+                                  autocomplete="disabled" maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby">
+                                &nbsp;&nbsp;
+                                <button class="" id="searchbtn" style="cursor: pointer;" (click)="getSearchDetails()">
+                                  <i class="fa fa-search"></i>
+                                </button>
+                                &nbsp;&nbsp;
+                                <button>
+                                  @if (!loading) {
+                                    <span id="notspin" style="font-size: 11px; cursor: pointer; margin-top: 6px;"
+                                    title="Reload" (click)="reloadData()">Reload</span>
+                                  }
+                                  @if (loading) {
+                                    <span id="spin" style="font-size: 11px; cursor: pointer; display: inline; margin-top: 6px;">Reloading...</span>
+                                  }
+                                </button>
+                              </div>
+                            </td>
+                            <td>
+                              <table style="float: right;">
+                                <tbody>
+                                  <tr>
+                                    <td>
+                                      <label style="color: #0e0e0e;">Show Rows : </label>
+                                    </td>
+                                    <td>
+                                      <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize" style="font-size: 10px; height: 23px;">
+                                        @for (size of pageSizeOptions; track size) {
+                                          <option [value]="size === totalCount ? 'All' : size">
+                                            {{size === totalCount ? 'All' : size}}
+                                          </option>
+                                        }
+                                      </select>
+                                    </td>
+                                    <td style="padding-right: 9px;">
+                                      <div style="text-align: right; font-weight: bold; margin-left: 25px;">
+                                        <font class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</font>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </form>
+
+                    <span style="font-size: 10px; color: red;">**Note : Click on vehicle number for {{title}} Alert on map</span>
+
+                    <ng-template #alertCell let-data let-column="column">
+                      @switch (column.key) {
+                        @case ('param7') {
+                          <a style="cursor: pointer; color: #0a2ca9;" (click)="openMapView(data.param7, data)">{{data.param7 || 'NA'}}</a>
+                          <br>{{data.param6 || 'NA'}}
+                        }
+                        @case ('param25') { {{data.param25 || 'NA'}}<br>{{data.param24 || 'NA'}} }
+                        @case ('param9') { {{data.param9 || 'NA'}}<br>{{data.param10 || 'NA'}} }
+                        @default { {{data[column.key] || 'NA'}} }
+                      }
+                    </ng-template>
+                    <app-common-table [columns]="tableColumns" [rows]="alertDetails" [loading]="loading"
+                      [cellTemplate]="alertCell" [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
+                      tableClass="table table-striped app-table" tableId="devicetable"
+                      tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
+                      emptyMessage="NO DATA FOUND">
+                    </app-common-table>
+                    </div>
+
+                    @if (getTotalPages() > 1) {
+                      <div class="pagination-wrapper">
+                        <ul class="pagination" style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+                          <li [class.disabled]="currentPage === 1">
+                            <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+                          </li>
+                          @for (page of getPageNumbers(); track page) {
+                            <li [class.active]="currentPage === page">
+                              <button (click)="onPageChange(page)">{{page}}</button>
+                            </li>
+                          }
+                          <li [class.disabled]="currentPage >= getTotalPages()">
+                            <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+                          </li>
+                        </ul>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Modal -->
+    <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header" style="padding: 0.5rem;">
+            <h5 class="modal-title">Alert Location Map</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="alertMap" style="width: 100%; height: 500px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>

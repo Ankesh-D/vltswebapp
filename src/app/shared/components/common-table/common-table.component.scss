@@ -1,0 +1,59 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.common-table {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.common-table {
+  overflow: visible;
+  max-height: none;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-surface);
+}
+
+.common-table .common-table__message { padding: 16px 10px; color: var(--app-text-muted); }
+.common-table th.sortable { cursor: pointer; user-select: none; }
+.common-table th.sortable:hover { color: var(--app-primary); }
+.common-table thead th.sortable:hover { color: #eaf4ff; background-color: #244f84; }
+.common-table .sorting { margin-left: 6px; vertical-align: middle; opacity: .55; }
+.common-table thead .sorting { opacity: .9; }
+.common-table__sub-label { display: block; font-size: .85em; line-height: 1.2; }
+.table-heading-divider { margin: .25rem 0; }
+
+.common-table__message {
+  font-weight: 700;
+  text-align: center;
+}
+
+th.sortable {
+  cursor: pointer;
+}
+
+.common-table--scrollable,
+.common-table--sticky-header {
+  overflow: auto;
+}
+
+.common-table--sticky-header thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.common-table td.clickable {
+  cursor: pointer;
+}
+
+.common-table td .btn + .btn {
+  margin-left: 4px;
+}
+
+.common-table__detail-row > td {
+  white-space: normal;
+}

@@ -1,0 +1,193 @@
+// ============================================================
+// Holiday Calendar Master — aligned with school-master /
+// school-trip-master conventions (compact controls, ng-select
+// sizing, search button height). Calendar-preview specific
+// styles are kept since they are unique to this module.
+// ============================================================
+
+::ng-deep .ng-dropdown-panel.ng-select-bottom {
+  font-size: 12px;
+}
+
+::ng-deep .ng-select .ng-select-container {
+  color: #333;
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  min-height: 27px !important;
+  align-items: center;
+}
+
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+  height: 27px !important;
+}
+
+.search-btn {
+  height: 27px;
+  padding-top: 2px;
+}
+
+// ---------- Side panels (Summary / Calendar Preview) ----------
+.side-panel {
+  border: 1px solid #e9ecef;
+  border-radius: 0.4rem;
+  background: #fff;
+}
+
+.side-panel-header {
+  padding: 0.4rem 0.6rem;
+  font-size: 12px;
+  font-weight: 700;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fb;
+  border-radius: 0.4rem 0.4rem 0 0;
+}
+
+.side-panel-body {
+  padding: 0.6rem;
+}
+
+// ---------- Summary stat boxes ----------
+.summary-stats {
+  .stat-box {
+    background: #f8f9fb;
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.4rem;
+    border: 1px solid #eef0f3;
+  }
+  .stat-num {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .stat-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    color: #6c757d;
+    letter-spacing: 0.02em;
+  }
+}
+
+// ---------- Month calendar preview ----------
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c757d;
+  padding-bottom: 4px;
+}
+
+.calendar-day {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.35rem;
+  font-size: 0.75rem;
+  background: #f4f5f7;
+  color: #212529;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+
+  &.other-month {
+    opacity: 0.35;
+  }
+
+  &.today {
+    outline: 2px solid #0d6efd;
+    font-weight: 700;
+  }
+}
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 0.7rem;
+  color: #495057;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.agenda-list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+// ---------- Grid / table ----------
+#holidayTable thead th {
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  font-size: 11px;
+}
+
+#holidayTable td {
+  font-size: 11px;
+  vertical-align: middle;
+}
+
+.skeleton-row {
+  height: 18px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+.column-chooser-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  min-width: 180px;
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 30;
+
+  &.show {
+    display: block;
+  }
+}
+
+.custom-control-label {
+  position: relative;
+  margin-bottom: 0;
+  vertical-align: top;
+  font-size: 13px;
+}
+
+// ---------- Print ----------
+@media print {
+  .card-body > .row > .col-md-4,
+  .btn,
+  a.btn {
+    display: none !important;
+  }
+}
+

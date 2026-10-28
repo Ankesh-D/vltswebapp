@@ -1,0 +1,150 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle"><span>Device Health</span></div>
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+          <div class="col-sm-2">
+            <label for="name" class="control-label">
+              <font>Select Date:</font><b style="color: Red; font-weight: normal;">*</b>
+            </label>
+            <font>
+              <input class="form-control datepick" type="text" id="daterawdata" [(ngModel)]="selectedDate" name="selectedDate">
+            </font>
+          </div>
+
+          @if (roleId !== '11') {
+            <div class="form-group col-xs-2 col-md-2" id="comp">
+              <label for="name" class="control-label">
+                Search By Vendor<b style="color: Red; font-weight: normal;">*</b>
+              </label><br>
+              <select
+                id="vendorselector"
+                [(ngModel)]="selectedVendor"
+                name="vendor"
+                (ngModelChange)="onVendorChange()"
+                >
+                <option value="">Select</option>
+                @for (item of vendorList; track item) {
+                  <option [value]="item.param1">
+                    {{ item.param2 }}
+                  </option>
+                }
+              </select>
+            </div>
+          }
+
+          <div class="form-group col-xs-2 col-md-2" id="deviceno">
+            <label for="name" class="control-label">
+              Select Imei No.<b style="color: Red; font-weight: normal;">*</b>
+            </label><br>
+            <ng-select
+              [items]="imeiList"
+              bindLabel="param2"
+              bindValue="param2"
+              placeholder="Select / Search IMEI"
+              [(ngModel)]="selectedIMEI"
+              [searchable]="true"
+              [clearable]="true"
+              [virtualScroll]="true">
+            </ng-select>
+
+
+
+
+          </div>
+
+          <div class="col-sm-2" style="padding-top: 22px;">
+            <button type="button" (click)="getHealthDetails()">View</button>
+          </div>
+        </div>
+
+        @if (showTable) {
+          <div id="devicehealthtable" style="padding-top: 19px;">
+            <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
+              <table style="width: 100%;">
+                <tbody class="bg-body">
+                  <tr>
+                    <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                      <font style="font-weight: bold;">Search : </font>
+                    </td>
+                    <td>
+                      <div class="">
+                        <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="tabletitlesearch"
+                          id="searchby" placeholder="Type here and press button...." style="border: 1px solid #0b58b9; height: 25px; width: 200px;"
+                          autocomplete="disabled" maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby">
+                        &nbsp;&nbsp;
+                        <button class="" id="searchbtn" style="cursor: pointer;" (click)="getSearchDetails()">
+                          <i class="fa fa-search"></i>
+                        </button>
+                        &nbsp;&nbsp;
+                        <button>
+                          @if (!loading) {
+                            <span id="notspin" style="font-size: 11px; cursor: pointer; margin-top: 6px;"
+                            title="Reload" (click)="reloadData()">Reload</span>
+                          }
+                          @if (loading) {
+                            <span id="spin" style="font-size: 11px; cursor: pointer; display: inline; margin-top: 6px;">Reloading...</span>
+                          }
+                        </button>
+                      </div>
+                    </td>
+                    <td>
+                      <table style="float: right;">
+                        <tbody>
+                          <tr>
+                            <td>
+                              <label style="color: #0e0e0e;">Show Rows : </label>
+                            </td>
+                            <td>
+                              <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize" style="font-size: 10px; height: 23px;">
+                                @for (size of pageSizeOptions; track size) {
+                                  <option [value]="size === totalCount ? 'All' : size">
+                                    {{size === totalCount ? 'All' : size}}
+                                  </option>
+                                }
+                              </select>
+                            </td>
+                            <td style="padding-right: 9px;">
+                              <div style="text-align: right; font-weight: bold; margin-left: 25px;">
+                                <font class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</font>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
+            <app-common-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
+              [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
+              tableClass="table table-striped app-table" emptyMessage="NO DATA FOUND">
+            </app-common-table>
+            @if (getTotalPages() > 1) {
+              <div class="pagination-wrapper">
+                <ul class="pagination" style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+                  <li [class.disabled]="currentPage === 1">
+                    <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+                  </li>
+                  @for (page of getPageNumbers(); track page) {
+                    <li [class.active]="currentPage === page">
+                      <button (click)="onPageChange(page)">{{page}}</button>
+                    </li>
+                  }
+                  <li [class.disabled]="currentPage >= getTotalPages()">
+                    <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+                  </li>
+                </ul>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

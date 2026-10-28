@@ -1,0 +1,839 @@
+<div class="content-i px-0">
+  <div class="content-box px-0">
+    <div class="element-wrapper">
+      <div class="element-box px-0">
+        <div class="table-responsive">
+          <div
+            id="dataTable1_wrapper"
+            class="dataTables_wrapper container-fluid dt-bootstrap4">
+            <div class="col-md-12 pagetitleborder p-0">
+              <div class="page-header-row">
+                <div class="pagetitlestyle">Transfer Ownership</div>
+
+                <!-- <div class="header-actions" *ngIf="roleId=='10' || roleId=='12' ||roleId=='61' || roleId=='13' || roleId=='64'">
+                <button type="button" class="header-btn" (click)="redirectInsert()">
+                  <i class="fa fa-plus"></i>
+                  Add New
+                </button>
+
+                <button type="button" class="header-btn" routerLink="/bulk-device-entry" *ngIf="roleId == '10' ||roleId=='61' || roleId=='12' || roleId=='13' || roleId=='64'">
+                  <i class="fa fa-plus"></i>
+                  Add Multiple
+                </button>
+              </div> -->
+            </div>
+          </div>
+          <form autocomplete="off" class="top-controls-row">
+
+            <!-- LEFT SEARCH -->
+            <div class="left-controls">
+
+              <span class="search-label">Search :</span>
+
+              <div class="search-box">
+                <input type="search"
+                  class="search-input inner"
+                  placeholder="Search..."
+                  maxlength="50"
+                  [(ngModel)]="searchText"
+                  placeholder="Search vehicle no, IMEI, customer..."
+                  (keyup.enter)="getSearchDetails()"
+                  [disabled]="loadingVehicles"
+                  name="searchby" />
+
+                <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+
+              <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loadingVehicles || transferLoading">
+                {{ loadingVehicles || transferLoading ? 'Reloading...' : 'Reload' }}
+              </button>
+
+            </div>
+
+            <!-- RIGHT CONTROLS -->
+            <div class="right-controls">
+
+
+
+              <!-- SHOW ROWS -->
+              <div class="control-item">
+                <label>Show Rows :</label>
+                <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize">
+                  @for (size of pageSizeOptions; track size) {
+                    <option [value]="size === totalCount ? 'All' : size">
+                      {{ size === totalCount ? 'All' : size }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <!-- TOTAL RECORDS -->
+              <div class="total-records-text">
+                Total Records : {{ pageCount }} of {{ totalCount }}
+              </div>
+
+            </div>
+          </form>
+
+          <div
+            class="col-sm-12 px-0">
+            <table
+              class="table-striped table app-table"
+                style="
+                  border-top: 1px solid black;
+                  border-bottom: 1px solid black;
+                  margin-left: 0px;
+                "
+              id="devicetable"
+              >
+              <thead class="device-thead">
+                <tr>
+                  <th>#</th>
+                  <th>Vehicle</th>
+                  <th>IMEI</th>
+                  <th>Customer</th>
+                  <th>Dealer / Vendor</th>
+                  <th>Status</th>
+                  @if (roleId == '10' || roleId == '64') {
+                    <th class="action-col">Action</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @if (devices.length === 0) {
+                  <tr>
+                    <td class="fw-bold text-center" colspan="8">No records found</td>
+                  </tr>
+                }
+                @if (devices.length > 0) {
+                  @for (d of devices; track trackByVehicle($index, d)) {
+                    <tr>
+                      <td data-label="#">{{ d.param1 || "NA" }}</td>
+                      <td data-label="Vehicle">
+                        <strong>{{ d.param11 || "NA" }}</strong>
+                        <br>
+                          <span>{{ d.param12 || "NA" }}</span>
+                        </td>
+                        <td data-label="IMEI">
+                          <strong>{{ d.param4 || "NA" }}</strong>
+                          <br>
+                            <span>{{ d.param5 || "NA" }}</span>
+                          </td>
+                          <td data-label="Customer">
+                            <strong>{{ d.param28 || "NA" }}</strong>
+                            <br>
+                              <span>{{ d.param29 || "NA" }}</span>
+                            </td>
+                            <td data-label="Dealer / Vendor">
+                              <strong>{{ d.param8 || "NA" }}</strong>
+                              <br>
+                                <span>{{ d.param7 || "NA" }}</span>
+                              </td>
+                              <td data-label="Status">
+                                <span
+                                  class="status-pill"
+                                  [class.active]="d.param25 === 'Activated'"
+                                  >
+                                  {{ d.param25 || "NA" }}
+                                </span>
+                              </td>
+                              @if (roleId == '10' || roleId == '64') {
+                                <td
+                                  data-label="Action"
+                                  class="action-col"
+                                  >
+                                  <button
+                                    class="btn-transfer"
+                                    type="button"
+                                    (click)="openTransferModal(d)"
+                                    [disabled]="transferLoading"
+                                    >
+                                    Transfer
+                                  </button>
+                                </td>
+                              }
+                            </tr>
+                          }
+                        }
+                      </tbody>
+                    </table>
+                    <!-- Pagination Controls -->
+                    @if (totalCount > 0) {
+                      <div class="pagination-wrapper">
+                        <ul class="pagination">
+                          <li [class.disabled]="currentPage === 1">
+                            <button (click)="onPageChange(currentPage - 1)"
+                              [disabled]="currentPage === 1">
+                              Prev
+                            </button>
+                          </li>
+                          @for (page of getPageNumbers(); track page) {
+                            <li
+                              [class.active]="page === currentPage"
+                              [class.ellipsis]="page === -1">
+                              @if (page === -1) {
+                                <span>…</span>
+                              }
+                              @if (page !== -1) {
+                                <button
+                                  (click)="onPageChange(page)">
+                                  {{ page }}
+                                </button>
+                              }
+                            </li>
+                          }
+                          <li [class.disabled]="currentPage >= getTotalPages()">
+                            <button (click)="onPageChange(currentPage + 1)"
+                              [disabled]="currentPage >= getTotalPages()">
+                              Next
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Transfer Vehicle Modal -->
+      <div
+        class="modal fade"
+        id="transferVehicleModal" data-backdrop="static" data-keyboard="false"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="transferVehicleModalLabel"
+        aria-hidden="true"
+        [ngClass]="{'show d-block': showTransferModal}"
+        >
+        <div class="modal-dialog modal-lg modal-dialog-centered " role="document">
+
+          <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header py-1">
+              <div>
+                <span class="mb-1 text-muted small">Selected vehicle</span>
+                <span class="modal-title" id="transferVehicleModalLabel">
+                  {{ selectedVehicle?.param11 || "Transfer Vehicle" }}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                class="close"
+                aria-label="Close"
+                (click)="closeTransferModal()"
+                [disabled]="transferLoading"
+                >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+
+            <!-- Modal Body -->
+            <div class="modal-body py-0">
+
+              <!-- Vehicle Details -->
+              <div class="row  rounded p-3 mb-3" style="background-color: #e7e7e7;">
+
+                <div class="col-md-4">
+                  <small class="text-muted d-block">
+                    Current customer
+                  </small>
+                  <strong class="text-value">
+                    {{ selectedVehicle?.param28 || "NA" }} <br>  {{ selectedVehicle?.param29 || "NA" }}
+                  </strong>
+
+                </div>
+
+                <div class="col-md-4">
+                  <small class="text-muted d-block">
+                    IMEI
+                  </small>
+                  <strong class="text-value">
+                    {{ selectedVehicle?.param4 || "NA" }}
+                  </strong>
+                </div>
+
+                <div class="col-md-4">
+                  <small class="text-muted d-block">
+                    Dealer
+                  </small>
+                  <strong class="text-value">
+                    {{ selectedVehicle?.param8 || "NA" }}
+                  </strong>
+                </div>
+
+              </div>
+
+
+              <!-- Search Owner -->
+              <div class="form-group">
+
+                <label>
+                  Target owner
+                </label>
+
+                <div class="input-group">
+
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">
+                      <i class="fa fa-user"></i>
+                    </span>
+                  </div>
+
+                  <input
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="searchCustomerText"
+                    placeholder="Type at least 2 characters"
+                    (input)="searchPermitholder()"
+                    [disabled]="transferLoading"
+                    />
+
+                  @if (searchingCustomer) {
+                    <div
+                      class="input-group-append"
+                      >
+                      <span class="input-group-text">
+                        <span class="spinner-border spinner-border-sm"></span>
+                      </span>
+                    </div>
+                  }
+
+                </div>
+
+              </div>
+
+
+              <!-- Customer List -->
+              @if (permitholderList.length > 0) {
+                <div
+                  class="list-group mb-3"
+                  >
+                  @for (customer of permitholderList; track trackByPermitHolder($index, customer)) {
+                    <button
+                      type="button"
+                      class="list-group-item list-group-item-action py-1"
+                      (click)="selectCustomer(customer)">
+                      <strong class="customer-name">
+                        {{ customer.param3 || "NA" }}
+                      </strong>
+                      <span class="d-block small text-muted">
+                        {{ customer.param5 || "No mobile" }}
+                        @if (customer.param4) {
+                          - {{ customer.param4 }}
+                        }
+                      </span>
+                    </button>
+                  }
+                </div>
+              }
+
+
+              <!-- Selected Customer -->
+              @if (selectedCustomer) {
+                <div
+                  class="alert alert-success"
+                  >
+                  <i class="fa fa-check-circle me-2"></i>
+                  <strong>
+                    {{ selectedCustomer.param3 }}
+                  </strong>
+                  <br>
+                    <small>
+                      {{ selectedCustomer.param5 || "Mobile not available" }}
+                    </small>
+                  </div>
+                }
+
+
+                <!-- Remark -->
+                <div class="form-group">
+
+                  <label>
+                    Transfer remark
+                  </label>
+
+                  <textarea
+                    class="form-control"
+                    rows="4"
+                    maxlength="250"
+                    [(ngModel)]="transferRemark"
+                    placeholder="Add the transfer reason or approval reference"
+                    [disabled]="transferLoading"
+                  ></textarea>
+
+                </div>
+
+              </div>
+
+
+              <!-- Modal Footer -->
+              <div class="modal-footer">
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-secondary"
+                  (click)="closeTransferModal()"
+                  [disabled]="transferLoading"
+                  >
+                  Cancel
+                </button>
+
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  (click)="requestTransfer()"
+                  [disabled]="transferLoading || !selectedCustomer">
+
+                  @if (!transferLoading) {
+                    <span>
+                      <i class="fa fa-exchange me-1"></i>
+                      Transfer Vehicle
+                    </span>
+                  }
+
+                  @if (transferLoading) {
+                    <span>
+                      <span class="spinner-border spinner-border-sm me-1"></span>
+                      Transferring
+                    </span>
+                  }
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+
+        <!-- Bootstrap Modal Backdrop -->
+        <!-- <div
+        class="modal-backdrop fade"
+
+        *ngIf="showTransferModal">
+      </div> -->
+      <!-- Confirm Transfer Modal -->
+      <div
+        class="modal fade"
+        id="confirmTransferModal"
+        data-backdrop="static" data-keyboard="false"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="confirmTransferModalLabel"
+        aria-hidden="true"
+        [ngClass]="{'show d-block': showConfirmModal}"
+        style="background-color: #0000003b;"
+        >
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header py-1">
+              <div class="confirm-icon me-2">
+                <i class="fa fa-exchange text-primary" aria-hidden="true"></i>
+              </div>
+
+              <p class="modal-title" id="confirmTransferModalLabel">
+                Confirm Transfer
+              </p>
+
+              <button
+                type="button"
+                class="close"
+                aria-label="Close"
+                (click)="cancelConfirmation()"
+                [disabled]="transferLoading"
+                >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+
+            <!-- Body -->
+            <div class="modal-body text-center">
+
+              <p style="font-size: 14px;">
+                Transfer
+                <strong>
+                  {{ selectedVehicle?.param11 || "this vehicle" }}
+                </strong>
+                from
+                <strong>
+                  {{ selectedVehicle?.param28 || "current customer" }}
+                </strong>
+                to
+                <strong>
+                  {{ selectedCustomer?.param3 || "selected owner" }}
+                </strong>
+                ?
+              </p>
+
+
+              <!-- Loader -->
+              @if (transferLoading) {
+                <div class="confirm-progress mt-3">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Processing...</span>
+                  </div>
+                </div>
+              }
+
+            </div>
+
+
+            <!-- Footer -->
+            <div class="modal-footer justify-content-center">
+
+              <button
+                type="button"
+                class="btn btn-sm btn-secondary"
+                (click)="cancelConfirmation()"
+                [disabled]="transferLoading"
+                >
+                Back
+              </button>
+
+
+              <button
+                type="button"
+                class="btn btn-sm btn-danger"
+                (click)="confirmTransfer()"
+                [disabled]="transferLoading"
+                >
+
+                @if (!transferLoading) {
+                  <span>
+                    <i class="fa fa-exchange me-1"></i>
+                    Confirm Transfer
+                  </span>
+                }
+
+                @if (transferLoading) {
+                  <span>
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                    Processing
+                  </span>
+                }
+
+              </button>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Modal Backdrop -->
+      @if (showConfirmModal) {
+        <div
+          class="modal-backdrop fade show"
+          >
+        </div>
+      }
+
+      <!-- <section class="transfer-page">
+      <div class="transfer-shell">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow">Vehicle ownership</p>
+            <h1>Transfer Vehicle</h1>
+          </div>
+          <button
+            class="ghost-btn"
+            type="button"
+            (click)="reloadData()"
+            [disabled]="loadingVehicles || transferLoading"
+            >
+            <i class="fa fa-refresh" aria-hidden="true"></i>
+            Reload
+          </button>
+        </header>
+
+        <div class="toolbar-card">
+          <div class="search-field">
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <input
+              type="text"
+              [(ngModel)]="searchText"
+              placeholder="Search vehicle no, IMEI, customer..."
+              (keyup.enter)="getSearchDetails()"
+              [disabled]="loadingVehicles"
+              />
+          </div>
+          <button
+            class="primary-btn"
+            type="button"
+            (click)="getSearchDetails()"
+            [disabled]="loadingVehicles"
+            >
+            <span *ngIf="!loadingVehicles">Search</span>
+            <span *ngIf="loadingVehicles" class="btn-loader"></span>
+          </button>
+        </div>
+
+        <div class="list-card">
+          <div class="list-header">
+            <div>
+              <h2>Available Vehicles</h2>
+              <p>
+                {{ devices.length }} record{{
+                devices.length === 1 ? "" : "s"
+                }}
+                loaded
+              </p>
+            </div>
+          </div>
+
+          <div class="skeleton-list" *ngIf="loadingVehicles">
+            <div class="skeleton-row" *ngFor="let row of [1, 2, 3, 4, 5]"></div>
+          </div>
+
+          <div class="empty-state" *ngIf="!loadingVehicles && devices.length === 0">
+            <div class="empty-icon">
+              <i class="fa fa-car" aria-hidden="true"></i>
+            </div>
+            <h3>No vehicles found</h3>
+            <p>Try another vehicle number, IMEI, or customer name.</p>
+          </div>
+
+          <div class="table-wrap" *ngIf="!loadingVehicles && devices.length > 0">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Vehicle</th>
+                  <th>IMEI</th>
+                  <th>Customer</th>
+                  <th>Dealer / Vendor</th>
+                  <th>Status</th>
+                  <th *ngIf="roleId == '10'" class="action-col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of devices; trackBy: trackByVehicle">
+                  <td data-label="#">{{ d.param1 || "NA" }}</td>
+                  <td data-label="Vehicle">
+                    <strong>{{ d.param11 || "NA" }}</strong>
+                    <br>
+                      <span>{{ d.param12 || "NA" }}</span>
+                    </td>
+                    <td data-label="IMEI">
+                      <strong>{{ d.param4 || "NA" }}</strong>
+                      <br>
+                        <span>{{ d.param5 || "NA" }}</span>
+                      </td>
+                      <td data-label="Customer">
+                        <strong>{{ d.param28 || "NA" }}</strong>
+                        <br>
+                          <span>{{ d.param29 || "NA" }}</span>
+                        </td>
+                        <td data-label="Dealer / Vendor">
+                          <strong>{{ d.param8 || "NA" }}</strong>
+                          <br>
+                            <span>{{ d.param7 || "NA" }}</span>
+                          </td>
+                          <td data-label="Status">
+                            <span
+                              class="status-pill"
+                              [class.active]="d.param25 === 'Activated'"
+                              >
+                              {{ d.param25 || "NA" }}
+                            </span>
+                          </td>
+                          <td *ngIf="roleId == '10'" data-label="Action" class="action-col">
+                            <button
+                              class="transfer-btn"
+                              type="button"
+                              (click)="openTransferModal(d)"
+                              [disabled]="transferLoading"
+                              >
+                              Transfer
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </section> -->
+
+            <!-- <div
+            *ngIf="showTransferModal"
+            class="modal-overlay"
+            (click)="closeTransferModal()"
+            >
+            <section
+              class="transfer-modal"
+              (click)="$event.stopPropagation()"
+              aria-modal="true"
+              role="dialog"
+              >
+              <header class="modal-header">
+                <div>
+                  <p class="eyebrow">Selected vehicle</p>
+                  <h2>{{ selectedVehicle?.param11 || "Transfer Vehicle" }}</h2>
+                </div>
+                <button
+                  class="icon-btn"
+                  type="button"
+                  (click)="closeTransferModal()"
+                  [disabled]="transferLoading"
+                  aria-label="Close"
+                  >
+                  <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+              </header>
+
+              <div class="vehicle-summary">
+                <div>
+                  <span>Current customer</span>
+                  <strong>{{ selectedVehicle?.param28 || "NA" }}</strong>
+                </div>
+                <div>
+                  <span>IMEI</span>
+                  <strong>{{ selectedVehicle?.param4 || "NA" }}</strong>
+                </div>
+                <div>
+                  <span>Dealer</span>
+                  <strong>{{ selectedVehicle?.param8 || "NA" }}</strong>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <label class="field full-width">
+                  <span>Target owner</span>
+                  <div class="search-field compact">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                    <input
+                      type="text"
+                      [(ngModel)]="searchCustomerText"
+                      placeholder="Type at least 2 characters"
+                      (input)="searchPermitholder()"
+                      [disabled]="transferLoading"
+                      />
+                    <span class="inline-loader" *ngIf="searchingCustomer"></span>
+                  </div>
+                </label>
+
+                <div
+                  class="customer-results full-width"
+                  *ngIf="permitholderList.length > 0"
+                  >
+                  <button
+                    type="button"
+                    class="customer-option"
+          *ngFor="
+            let customer of permitholderList;
+            trackBy: trackByPermitHolder
+          "
+                    (click)="selectCustomer(customer)"
+                    >
+                    <strong>{{ customer.param3 || "NA" }}</strong>
+                    <span
+                      >{{ customer.param5 || "No mobile" }}
+                      <ng-container *ngIf="customer.param4"
+                        >- {{ customer.param4 }}</ng-container
+                        ></span
+                        >
+                      </button>
+                    </div>
+
+                    <div class="selected-owner full-width" *ngIf="selectedCustomer">
+                      <i class="fa fa-check-circle" aria-hidden="true"></i>
+                      <div>
+                        <span>Transfer target</span>
+                        <strong>{{ selectedCustomer.param3 }}</strong>
+                        <small>{{ selectedCustomer.param5 || "Mobile not available" }}</small>
+                      </div>
+                    </div>
+
+                    <label class="field full-width">
+                      <span>Transfer remark</span>
+                      <textarea
+                        [(ngModel)]="transferRemark"
+                        rows="4"
+                        maxlength="250"
+                        placeholder="Add the transfer reason or approval reference"
+                        [disabled]="transferLoading"
+                      ></textarea>
+                    </label>
+                  </div>
+
+                  <footer class="modal-actions">
+                    <button
+                      class="secondary-btn"
+                      type="button"
+                      (click)="closeTransferModal()"
+                      [disabled]="transferLoading"
+                      >
+                      Cancel
+                    </button>
+                    <button
+                      class="primary-btn wide"
+                      type="button"
+                      (click)="requestTransfer()"
+                      [disabled]="transferLoading || !selectedCustomer"
+                      >
+                      <span *ngIf="!transferLoading">Transfer Vehicle</span>
+                      <span *ngIf="transferLoading" class="progress-label"
+                        ><span class="btn-loader"></span>Transferring</span
+                        >
+                      </button>
+                    </footer>
+                  </section>
+                </div> -->
+
+                <!-- <div *ngIf="showConfirmModal" class="confirm-overlay">
+                <section class="confirm-modal" role="alertdialog" aria-modal="true">
+                  <div class="confirm-icon">
+                    <i class="fa fa-exchange" aria-hidden="true"></i>
+                  </div>
+                  <h2>Confirm transfer</h2>
+                  <p>
+                    Transfer
+                    <strong>{{ selectedVehicle?.param11 || "this vehicle" }}</strong> from
+                    <strong>{{ selectedVehicle?.param28 || "current customer" }}</strong> to
+                    <strong>{{ selectedCustomer?.param3 || "selected owner" }}</strong
+                      >?
+                    </p>
+
+                    <div class="confirm-progress" *ngIf="transferLoading">
+                      <span></span>
+                    </div>
+
+                    <footer class="confirm-actions">
+                      <button
+                        class="secondary-btn"
+                        type="button"
+                        (click)="cancelConfirmation()"
+                        [disabled]="transferLoading"
+                        >
+                        Back
+                      </button>
+                      <button
+                        class="primary-btn danger"
+                        type="button"
+                        (click)="confirmTransfer()"
+                        [disabled]="transferLoading"
+                        >
+                        <span *ngIf="!transferLoading">Confirm Transfer</span>
+                        <span *ngIf="transferLoading" class="progress-label"
+                          ><span class="btn-loader"></span>Processing</span
+                          >
+                        </button>
+                      </footer>
+                    </section>
+                  </div> -->

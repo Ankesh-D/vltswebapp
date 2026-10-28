@@ -1,0 +1,303 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <button class="pagebtn">
+                <a routerLink="/vendor/user-creation"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add New</a>
+              </button>
+              <div class="pagetitlestyle"><span>User Details</span></div>
+            </div>
+            <div class="table-responsive">
+              <app-common-table [columns]="tableColumns" [rows]="vendorUserList" [loading]="loading"
+                [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="vendorUserCell"
+                tableClass="table table-striped app-table" tableId="devicetable"
+                tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
+                (sortChange)="sort($event)">
+              </app-common-table>
+              <ng-template #vendorUserCell let-userdetails let-column="column">
+                @switch (column.key) {
+                  @case ('param7') {
+                    {{userdetails.param7?.length > 0 ? userdetails.param7 : 'NA'}}<br>
+                    {{userdetails.param8?.length > 0 ? userdetails.param8 : 'NA'}}
+                  }
+                  @case ('location') {
+                    {{userdetails.param12?.length > 0 ? userdetails.param12 : 'NA'}}<br>
+                    {{userdetails.param11?.length > 0 ? userdetails.param11 : 'NA'}}
+                  }
+                  @case ('statusActivity') {
+                    <font style="font-weight:bold;">{{userdetails.param20?.length > 0 ? userdetails.param20 : 'NA'}}</font>
+                    <hr>
+                    <div class="btn-group btn-group-sm">
+                      @if (userdetails.param20 === 'Active') {
+                        <button type="button" title="Update User Details" (click)="editUserData(userdetails)">Edit</button>
+                      } @else {
+                        <button type="button" title="Update User Details" disabled>Edit</button>
+                      }
+                      @if (userdetails.param20 !== 'Suspend') {
+                        <button class="btnleft5" type="button" title="Delete User Details" (click)="deleteData(userdetails)">Delete</button>
+                      } @else {
+                        <button class="btnleft5" type="button" title="Delete User Details" disabled>Delete</button>
+                      }
+                      <button class="btnleft5" type="button" (click)="blockUnblockUserData(userdetails)">
+                        {{userdetails.param20 === 'Active' ? 'Block' : 'Active'}}
+                      </button>
+                      <button class="btnleft5" (click)="resetPasswordData(userdetails)">Reset Password</button>
+                    </div>
+                  }
+                  @default {
+                    {{column.value ? column.value(userdetails) : 'NA'}}
+                  }
+                }
+              </ng-template>
+                @if (totalCount > pageSize) {
+                  <div class="pagination-wrapper">
+                    <ul class="pagination" style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+                      <li [class.disabled]="currentPage === 1">
+                        <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+                      </li>
+                      @for (page of getPageNumbers(); track page) {
+                        <li [class.active]="currentPage === page">
+                          <button (click)="onPageChange(page)">{{page}}</button>
+                        </li>
+                      }
+                      <li [class.disabled]="currentPage >= getTotalPages()">
+                        <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+                      </li>
+                    </ul>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update User Modal -->
+  <div class="modal fade" id="updateUserDetails" tabindex="-1" role="dialog"
+    aria-labelledby="updateUserDetails" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content" style="width: 700px;margin-left: 100px;">
+        <div class="modal-header" style="padding: 0.5rem;">
+          <h5 class="modal-title" style="font-size: 13px;">Update</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" style="margin-top: -15px;" id="updatemodel">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label for="">Select Role: </label><label for="" class="mandetory">*</label>
+                      <select id="rolelist" class="searchable" style="width: 150px;height: 30px;">
+                        <option value="">Select</option>
+                        @for (role of roleList; track role) {
+                          <option [value]="role.param1">{{role.param2}}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label for="">User Name:</label><label for="" class="mandetory">*</label>
+                      <input class="form-control ignoresymbol_name" maxlength="260" placeholder="User Name"
+                        type="text" [(ngModel)]="editUserName" id="username" name="editUserName" autocomplete="off">
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label for="">Contact No:</label><label for="" class="mandetory">*</label>
+                      <input class="form-control acceptnumeric_nodecimal" placeholder="Contact No" type="text"
+                        [(ngModel)]="editContactNo" id="contactno" maxlength="10" name="editContactNo" autocomplete="off">
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label for="">Alternate Contact No:</label>
+                      <input class="form-control acceptnumeric_nodecimal" placeholder="Alternate Contact No" type="text"
+                        [(ngModel)]="editAlternateContactNo" id="alternatecontactno" maxlength="10" name="editAlternateContactNo" autocomplete="off">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label for="">Email ID:</label><label for="" class="mandetory">*</label>
+                      <input class="form-control" placeholder="Email ID" type="email" maxlength="50"
+                        [(ngModel)]="editEmailId" id="emailid" name="editEmailId" autocomplete="off">
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label for="">Address:</label><b for="" class="mandetory">*</b>
+                      <textarea class="form-control ignorespecialcharacter_address" placeholder="Address"
+                      maxlength="100" type="text" [(ngModel)]="editAddress" id="address" name="editAddress" autocomplete="off"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-sm-3" id="statelistdiv">
+                    <div class="form-group">
+                      <label for="">Select State:</label><label for="" class="mandetory">*</label>
+                      <select id="statename" class="form-control searchable">
+                        <option value="">Select State</option>
+                        @for (state of stateList; track state) {
+                          <option [value]="state.param1">{{state.param2}}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label for="">Select City:</label><label for="" class="mandetory">*</label>
+                      <select id="cityname" class="form-control searchable">
+                        <option value="">Select City</option>
+                        @for (city of cityList; track city) {
+                          <option [value]="city.param1">{{city.param2}}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </thead>
+              <tr>
+                <td colspan="3" class="modelbtnstyle">
+                  <button (click)="getUpdatedetails()">Submit</button>
+                  <button type="reset" data-dismiss="modal">Back</button>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete User Modal -->
+  <div class="modal fade" id="deleteUserDetails" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content" id="deletemodelcontent">
+        <div class="modal-header" id="deletemodelheader">
+          <h5 class="modal-title" id="deletemodeltitle">Delete</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <span style="font-size: 11px;">USER NAME : <font>{{deleteUserName}}</font></span><br>
+            <span style="font-size: 11px;">CONTACT NO. : <font>{{deleteContactNo}}</font></span><br>
+            <table class="table table-bordered">
+              <thead>
+                <textarea class="form-control ignoresymbol_name" id="remark" placeholder="Remarks" maxlength="100"
+                [(ngModel)]="deleteRemark" name="deleteRemark"></textarea>
+              </thead>
+              <tr>
+                <td class="modelbtnstyle">
+                  <button (click)="deleteUser()">Submit</button>
+                  <button type="reset" data-dismiss="modal">Back</button>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Block/Unblock Modal -->
+  <div class="modal fade" id="blockunblock" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content" style="width: 400px;margin-left: 200px;">
+        <div class="modal-header" style="padding: 0.5rem;">
+          <h5 class="modal-title" style="font-size: 13px;">{{activeSuspend}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" style="margin-top: -15px;">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <span style="font-size: 11px;font-weight: bold;">USER NAME : <font>{{blockUserName}}</font></span><br>
+                <span style="font-size: 11px;font-weight: bold;">STATUS : <font>{{blockStatus}}</font></span>
+                <div class="row" style="border: 1px solid #dbcbca;">
+                  <div class="col-sm-12">
+                    <div class="form-group">
+                      <label for="" style="font-size: 11px;font-weight: bold;">Remark:</label><label for="" class="mandetory">*</label>
+                      <textarea class="form-control ignorespecialcharacter_address" id="remarkforblock" placeholder="Reason"
+                      [(ngModel)]="blockRemark" name="blockRemark"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </thead>
+              <tr>
+                <td colspan="3" class="modelbtnstyle">
+                  <button (click)="blockUnblockUser()">{{activeSuspend}}</button>
+                  <button type="reset" data-dismiss="modal">Back</button>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Password Modal -->
+  <div class="modal fade" id="changepassword" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content" style="width: 443px">
+        <div class="modal-header" style="padding: 0.5rem;">
+          <h5 class="modal-title" style="font-size: 17px;">Reset Your Password Here ..</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="col-md-12 row">Username : {{resetUserName}}</div><br>
+          <div class="row">
+            <div class="col-sm-12 row" style="margin-top: -12px;">
+              <div class="form-group col-md-6">
+                <input class="form-control clearable" maxlength="30" id="currpass" placeholder="Enter Old Password"
+                  type="password" [(ngModel)]="currentPassword" name="currentPassword">
+              </div>
+              <div class="form-group col-md-6">
+                <input class="form-control clearable" maxlength="30" id="newpass" placeholder="Enter New Password"
+                  type="password" (keyup)="verifyPassword()" [(ngModel)]="newPassword" name="newPassword">
+                <span [ngStyle]="{'color': passwordMessage ? 'red' : 'green'}">{{passwordMessage}}</span><br>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12 row" style="margin-top: -12px;">
+              <div class="form-group col-md-6">
+                <input class="form-control clearable" id="renewpass" maxlength="30" placeholder="Re-Enter Password"
+                  type="password" [disabled]="isDisable" (keyup)="checkPasswordsMatch()" [(ngModel)]="reNewPassword" name="reNewPassword">
+                <span [ngStyle]="{'color': changePasswordMessage ? 'red' : 'green'}">{{changePasswordMessage}}</span><br>
+              </div>
+              <div class="form-group col-md-6">
+                <button [disabled]="isDisable" (click)="changePass()">Submit</button>
+                <button type="reset" data-dismiss="modal">Back</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading) {
+    <app-loading></app-loading>
+  }
+  @if (errorMessage) {
+    <app-error-message [message]="errorMessage"></app-error-message>
+  }

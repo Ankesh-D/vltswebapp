@@ -1,0 +1,627 @@
+<!-- <div class="content-i"> -->
+<div class="row">
+  <div class="col-lg-12">
+    <!-- <div class="content-box"> -->
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="page-header-row">
+          <!-- LEFT TITLE -->
+          <div class="page-title">Change Device</div>
+
+          <!-- RIGHT BUTTONS -->
+          <div style="display: flex; gap: 10px">
+            @if (roleId !== '12') {
+              <button
+                type="button"
+                class="add-new-btn"
+                routerLink="/device/unassign-distributor"
+                >
+                Unassign Distributor
+              </button>
+            }
+            <button
+              type="button"
+              class="add-new-btn"
+              routerLink="/device/unassign-dealer"
+              >
+              Unassign Dealer
+            </button>
+
+            <button type="button" class="add-new-btn" routerLink="/dealer/change">
+              Change Dealer
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <!-- SEARCH + CONTROLS -->
+          <form autocomplete="off" class="top-controls-row">
+            <!-- LEFT SEARCH -->
+            <div class="left-controls">
+              <span class="search-label">Search :</span>
+
+              <div class="search-box">
+                <input
+                  type="search"
+                  readonly
+                  onfocus="this.removeAttribute('readonly')"
+                  class="search-input inner"
+                  placeholder="Type here and press button...."
+                  maxlength="50"
+                  [(ngModel)]="searchText"
+                  (keyup.enter)="getSearchDetails()"
+                  name="searchby"
+                  />
+
+                <button
+                  type="button"
+                  class="search-inner-btn"
+                  (click)="getSearchDetails()"
+                  >
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                class="reload-btn"
+                (click)="reloadData()"
+                [disabled]="loading"
+                >
+                {{ loading ? "Reloading..." : "Reload" }}
+              </button>
+            </div>
+
+            <!-- RIGHT CONTROLS -->
+            <div class="right-controls">
+              <!-- DOWNLOAD -->
+              <!-- <div class="control-item">
+              <label>Download :</label>
+              <select
+                id="excelpdfdownload"
+                name="excelpdfdownload"
+                (change)="downloadfile()"
+                >
+                <option value="Select">Select</option>
+                <option value="Excel">Excel</option>
+              </select>
+            </div> -->
+
+            <!-- SHOW ROWS -->
+            <div class="control-item">
+              <label>Show Rows :</label>
+              <select
+                [(ngModel)]="pageSize"
+                (change)="onPageSizeChange($event)"
+                name="pageSize"
+                >
+                @for (size of pageSizeOptions; track size) {
+                  <option
+                    [value]="size === totalCount ? 'All' : size"
+                    >
+                    {{ size === totalCount ? "All" : size }}
+                  </option>
+                }
+              </select>
+            </div>
+
+            <!-- TOTAL RECORDS -->
+            <div class="total-records-text">
+              Total Records : {{ pageCount }} of {{ totalCount }}
+            </div>
+          </div>
+        </form>
+
+        <table
+          class="table-striped table app-table mb-1"
+          style="
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            font-size: 11px;
+          "
+          >
+          <thead>
+            <tr>
+              <th style="width: 40px">#</th>
+              <th (click)="sort('param20')" style="cursor: pointer">
+                Vehicle No.
+                <hr />
+                Chassis No.
+                @if (sortKey === 'param20') {
+                  <i
+                    class="fa"
+                  [ngClass]="{
+                    'fa-sort-asc': !reverse,
+                    'fa-sort-desc': reverse,
+                  }"
+                    aria-hidden="true"
+                  ></i>
+                }
+              </th>
+              <th (click)="sort('param6')" style="cursor: pointer">
+                Serial No.
+                <hr />
+                IMEI No.
+                @if (sortKey === 'param6') {
+                  <i
+                    class="fa"
+                  [ngClass]="{
+                    'fa-sort-asc': !reverse,
+                    'fa-sort-desc': reverse,
+                  }"
+                    aria-hidden="true"
+                  ></i>
+                }
+              </th>
+              <th (click)="sort('param7')" style="cursor: pointer">
+                ICCID No.
+                @if (sortKey === 'param7') {
+                  <i
+                    class="fa"
+                  [ngClass]="{
+                    'fa-sort-asc': !reverse,
+                    'fa-sort-desc': reverse,
+                  }"
+                    aria-hidden="true"
+                  ></i>
+                }
+              </th>
+              <th (click)="sort('param36')" style="cursor: pointer">
+                Customer Details
+                @if (sortKey === 'param36') {
+                  <i
+                    class="fa"
+                  [ngClass]="{
+                    'fa-sort-asc': !reverse,
+                    'fa-sort-desc': reverse,
+                  }"
+                    aria-hidden="true"
+                  ></i>
+                }
+              </th>
+              <th (click)="sort('param16')" style="cursor: pointer">
+                Dealer
+                @if (roleId !== '11') {
+                  <hr />
+                }
+                @if (roleId !== '11') {
+                  <span>Vendor</span>
+                }
+                @if (sortKey === 'param16') {
+                  <i
+                    class="fa"
+                  [ngClass]="{
+                    'fa-sort-asc': !reverse,
+                    'fa-sort-desc': reverse,
+                  }"
+                    aria-hidden="true"
+                  ></i>
+                }
+              </th>
+              <th (click)="sort('param27')" style="cursor: pointer">
+                Activation Status
+                @if (sortKey === 'param27') {
+                  <i
+                    class="fa"
+                  [ngClass]="{
+                    'fa-sort-asc': !reverse,
+                    'fa-sort-desc': reverse,
+                  }"
+                    aria-hidden="true"
+                  ></i>
+                }
+              </th>
+              <th (click)="sort('param34')" style="cursor: pointer">
+                Polling Status
+                @if (sortKey === 'param34') {
+                  <i
+                    class="fa"
+                  [ngClass]="{
+                    'fa-sort-asc': !reverse,
+                    'fa-sort-desc': reverse,
+                  }"
+                    aria-hidden="true"
+                  ></i>
+                }
+              </th>
+              <th class="text-center">Activity</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (deviceDetails.length === 0 && !loading) {
+              <tr>
+                <td style="font-weight: bold; text-align: center" colspan="100">
+                  NO DATA FOUND
+                </td>
+              </tr>
+            }
+            @for (device of getPaginatedData(); track device; let i = $index) {
+              <tr>
+                <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                <td>
+                  {{ device.param20 || "NA" }}
+                  <hr />
+                  {{ device.param21 || "NA" }}
+                </td>
+                <td>
+                  {{ device.param6 || "NA" }}
+                  <hr />
+                  {{ device.param5 || "NA" }}
+                </td>
+                <td>{{ device.param7 || "NA" }}</td>
+                <td>
+                  {{ device.param36 || "NA" }}
+                  <hr />
+                  {{ device.param37 || "NA" }}
+                </td>
+                <td>
+                  {{ device.param16 || "NA" }}
+                  <hr />
+                  @if (roleId !== '11') {
+                    <span>{{
+                      device.param15 || "NA"
+                    }}</span>
+                  }
+                </td>
+                <td>
+                  <span style="font-weight: bold">{{
+                    device.param27 === "Pending OTP" ? "Pending" : device.param27
+                  }}</span>
+                  @if (device.param27 === 'Activated') {
+                    <span
+                      ><hr />
+                      {{ device.param23 > 0 ? device.param23 : "NA" }}</span
+                      >
+                    }
+                  </td>
+                  <td>
+                    {{device.param34 ? device.param34 : '--' }}
+                  </td>
+                  <td class="text-center">
+                    <div>
+                      <button class="btn-edit"
+                        type="button"
+                        (click)="getDeviceDataForChange(device)">
+                        Edit
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <div class="float-end">
+            @if (totalCount > pageSize) {
+              <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+                [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+                [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+              </ngb-pagination>
+            }
+          </div>
+        </div>
+
+        <!-- <div class="app-pagination" *ngIf="getTotalPages() > 1">
+
+        <button
+          class="app-page-btn nav-btn"
+          (click)="onPageChange(currentPage - 1)"
+          [disabled]="currentPage === 1">
+          ‹ Prev
+        </button>
+
+        <ng-container *ngFor="let page of getPageNumbers()">
+
+          <span *ngIf="page === -1" class="app-page-ellipsis">…</span>
+
+          <button
+            *ngIf="page !== -1"
+            class="app-page-btn"
+            (click)="onPageChange(page)"
+            [class.active]="currentPage === page"
+            [disabled]="currentPage === page">
+            {{ page }}
+          </button>
+
+        </ng-container>
+
+        <button
+          class="app-page-btn nav-btn"
+          (click)="onPageChange(currentPage + 1)"
+          [disabled]="currentPage === getTotalPages()">
+          Next ›
+        </button>
+
+      </div> -->
+    </div>
+  </div>
+</div></div>
+
+<!-- Change Device Modal (Angular overlay, pixel-style like original) -->
+
+<!-- Edit Modal -->
+@if (showChangeModal) {
+  <div class="modal-overlay" (click)="back()">
+    <div
+      class="modal-content change-device-modal"
+      (click)="$event.stopPropagation()"
+      >
+      <div class="modal-header">
+        <h5 class="modal-title">Change Device</h5>
+        <button type="button" class="close-btn" (click)="back()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="serial-info">
+          Serial No.: <span>{{ editSerialNo }}</span>
+        </div>
+        <div class="form-row">
+          <div class="form-col">
+            <label>IMEI No.<span class="mandetory">*</span></label>
+            <ng-select
+              [items]="imeiList"
+              bindLabel="param2"
+              bindValue="param1"
+              placeholder="Select IMEI No."
+              [(ngModel)]="selectedIMEIPlain"
+              (ngModelChange)="onNewIMEIChange($event)"
+              name="newIMEI"
+              >
+            </ng-select>
+          </div>
+          <div class="form-col">
+            <label>Remark<span class="mandetory">*</span></label>
+            <textarea
+              class="form-control"
+              placeholder="Enter remark"
+              [(ngModel)]="editRemark"
+              (keyup)="checkRemark()"
+              [ngClass]="{ 'border-danger': isRemarkInvalid }"
+              >
+            </textarea>
+            @if (isRemarkInvalid) {
+              <div class="error-text">
+                Remark must be at least 10 characters.
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          class="btn-primary"
+          (click)="changeDevice()"
+          [disabled]="isRemarkInvalid || !editNewIMEI || loading"
+          >
+          {{ loading ? "Changing..." : "Submit" }}
+        </button>
+        <button class="stn-secondary" (click)="back()">Back</button>
+      </div>
+    </div>
+  </div>
+}
+
+
+
+<!-- <div *ngIf="showChangeModal" class="modal-overlay" (click)="back()">
+<div class="modal-content change-device-modal big-modal" (click)="$event.stopPropagation()">
+
+
+  <div class="modal-header">
+
+    <div class="chassis-text">
+      <h5 class="modal-title">Change Device </h5>
+      Chassis No: <strong>{{ chassisNo }}</strong>
+      &nbsp; | &nbsp;
+      Vehicle No: <strong>{{ vehicleNo }}</strong>
+    </div>
+
+    <button class="close-btn" (click)="back()">×</button>
+  </div>
+
+
+  <div class="modal-body two-column-layout">
+
+
+    <div class="column old-column">
+      <h6 class="column-title">Old Device Details</h6>
+
+      <div class="info-row">
+        <label>Vehicle No.:-</label>
+        <span class="info-value">{{ oldData?.param20 || 'NA' }}</span>
+      </div>
+
+      <div class="info-row">
+        <label>Chassis No.:-</label>
+        <span class="info-value">{{ oldData?.param21 || 'NA' }}</span>
+      </div>
+
+      <div class="info-row">
+        <label>Serial No.:-</label>
+        <span class="info-value">{{ oldData?.param6 || 'NA' }}</span>
+      </div>
+
+      <div class="info-row">
+        <label>IMEI No.:-</label>
+        <span class="info-value">{{ oldData?.param5 || 'NA' }}</span>
+      </div>
+
+      <div class="info-row">
+        <label>ICCID No.:-</label>
+        <span class="info-value">{{ oldData?.param7 || 'NA' }}</span>
+      </div>
+
+      <div class="info-row">
+        <label>Customer Details:-</label>
+        <span class="info-value">
+          {{ oldData?.param36 || 'NA' }}/ {{ oldData?.param37 || 'NA' }}
+
+        </span>
+      </div>
+
+      <div class="info-row">
+        <label>Dealer:-</label>
+        <span class="info-value">{{ oldData?.param8 || 'NA' }}</span>
+      </div>
+
+      <div class="info-row">
+        <label>Activation Status:-</label>
+        <span class="info-value status-active">
+          {{ oldData?.param27 || 'NA' }}
+        </span>
+      </div>
+
+      <div class="info-row">
+        <label>Polling Status:-</label>
+        <span class="info-value status-polling">
+          {{ oldData?.param34 || 'NA' }}
+        </span>
+      </div>
+    </div>
+
+
+    <div class="column new-column">
+      <h6 class="column-title">New Device Details</h6>
+
+
+      <div class="info-row">
+        <label>Select Type <span class="mandetory">*</span></label>
+
+        <select
+          class="form-control"
+          [(ngModel)]="selectionType"
+          (change)="onSelectionTypeChange()"
+          >
+
+          <option value="" disabled selected>Select Type</option>
+          <option value="IMEI">By IMEI</option>
+          <option value="ICCID">By ICCID</option>
+        </select>
+      </div>
+
+
+      <div *ngIf="selectionType === 'IMEI'">
+        <div class="info-row">
+          <label>Esim Provider <span class="mandetory">*</span></label>
+          <ng-select
+            [items]="m2mProviders"
+            bindLabel="param2"
+            bindValue="param2"
+            placeholder="Select Esim Provider"
+            [(ngModel)]="selectedM2M">
+          </ng-select>
+        </div>
+        <div class="info-row">
+          <label>IMEI No.<span class="mandetory">*</span></label>
+          <ng-select
+            [items]="imeiList"
+            bindLabel="param2"
+            bindValue="param1"
+            placeholder="Select IMEI No."
+            [(ngModel)]="selectedIMEIPlain"
+            (ngModelChange)="onNewIMEIChange($event)"
+            name="newIMEI"
+            >
+          </ng-select>
+        </div>
+        <div class="info-row">
+          <button
+            class="btn-secondary"
+            (click)="checkDeviceValidity()"
+            [disabled]="!imeiList || !selectedM2M">
+            Fetch IMEI
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="selectionType === 'ICCID'">
+
+
+        <div class="info-row">
+          <label>Esim Provider <span class="mandetory">*</span></label>
+          <ng-select
+            [items]="m2mProviders"
+            bindLabel="param2"
+            bindValue="param2"
+            placeholder="Select Esim Provider"
+            [(ngModel)]="selectedM2M">
+          </ng-select>
+        </div>
+
+        <div class="info-row">
+          <label>ICCID <span class="mandetory">*</span></label>
+          <input
+            class="form-control"
+            [(ngModel)]="iccid"
+            placeholder="Enter ICCID"
+            />
+        </div>
+
+
+        <div class="info-row">
+          <button
+            class="btn-secondary"
+            (click)="checkDeviceValidity()"
+            [disabled]="!iccid || !selectedM2M">
+            Fetch ICCID
+          </button>
+        </div>
+
+
+        <div *ngIf="iccidFetched" class="info-row">
+          <button (click)="sendOtp()">Send OTP</button>
+        </div>
+
+        <div *ngIf="otpSent" class="info-row">
+          <label>Enter OTP</label>
+          <input class="form-control" [(ngModel)]="otp" />
+        </div>
+
+      </div>
+
+
+
+
+
+      <div *ngIf="iccidFetched">
+        <div class="info-row">
+          <label>Mobile No</label>
+          <input
+            class="form-control"
+            [value]="oldData?.param37 || 'NA'"
+            readonly
+            />
+
+        </div>
+
+
+      </div>
+
+
+      <div *ngIf="iccidFetched" class="info-row">
+        <button (click)="sendOtp()" [disabled]="!iccidFetched">
+
+          Send OTP
+        </button>
+      </div>
+
+      <div *ngIf="otpSent" class="info-row">
+        <label>Enter OTP</label>
+        <input class="form-control" [(ngModel)]="otp" />
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal-footer">
+    <button
+      class="btn-primary"
+      (click)="submitChange()"
+      [disabled]="!otp || loading"
+      >
+      {{ loading ? 'Submitting...' : 'Submit' }}
+    </button>
+
+    <button class="stn-secondary" (click)="back()">Close</button>
+  </div>
+
+</div>
+</div>  -->

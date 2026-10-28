@@ -1,0 +1,227 @@
+<div class="content-i p-0">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box p-0">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Push Command</span>
+            <div class="p-1 mt-2">
+
+              @if (showGrid) {
+                <button class="btn btn-sm btn-secondary" (click)="resetForm()">Back</button>
+              }
+            </div>
+          </div>
+        </div>
+        @if (!showGrid) {
+          <div>
+            <div class="entrypagediv">
+              <!-- Command -->
+              <div class="form-group">
+                <label class="control-label">
+                  Device Command <span class="mandetory">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter Command"
+                  [(ngModel)]="deviceCommand"
+                  />
+              </div>
+              <!-- IMEI Section -->
+              <div class="form-group">
+                <label class="control-label">
+                  IMEI Numbers <span class="mandetory">*</span>
+                </label>
+                <div class="imei-grid">
+                  @for (imei of imeiList; track trackByIndex(i, imei); let i = $index) {
+                    <div class="imei-item">
+                      <input
+                        type="text"
+                        maxlength="15"
+                        class="form-control"
+                        placeholder="15 digit IMEI"
+                        [(ngModel)]="imeiList[i]"
+                        (input)="onImeiInput(i, $event)"
+                        (blur)="markTouched(i)"
+                        [ngClass]="{'error-input': imeiErrors[i]}"
+                        />
+                      @if (imeiList.length > 1) {
+                        <button
+                          type="button"
+                          class="btn-delete"
+                          (click)="removeImei(i)"
+                          >
+                          ✖
+                        </button>
+                      }
+                      @if (imeiTouched[i] && imeiErrors[i]) {
+                        <div class="error-text">
+                          {{ imeiErrors[i] }}
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-success mt-2"
+                  (click)="addImei()"
+                  [disabled]="imeiList.length >= 100"
+                  >
+                  + Add More
+                </button>
+                &nbsp;  &nbsp;
+                <button
+                  class="btn btn-sm btn-primary mt-2"
+                  [disabled]="isLoading"
+                  (click)="submit()">
+                  @if (isLoading) {
+                    <span>Sending...</span>
+                  }
+                  @if (!isLoading) {
+                    <span>Send Command</span>
+                  }
+                </button>
+              </div>
+              <!-- Submit -->
+              <div class="form-group">
+              </div>
+            </div>
+          </div>
+        }
+        @if (showGrid) {
+          <div class="result-grid">
+            <table class="table table-bordered mb-0">
+              <thead>
+                <tr>
+                  <th class="py-1" style="width: 50px;">#</th>
+                  <th class="py-1">IMEI</th>
+                  <th class="py-1">Command</th>
+                  <th class="py-1" style="width: 328px;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (imei of submittedImeis; track imei; let i = $index) {
+                  <tr>
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ imei }}</td>
+                    <!-- ✅ Show command instead of Queued -->
+                    <td class="text-success">{{ deviceCommand }}</td>
+                    <td class="text-center">
+                      <button class="btn btn-sm btn-primary me-2" (click)="resendCommand(imei)">Resend Command</button>
+                      <button
+                        class="btn btn-sm btn-success"
+                        [disabled]="loadingMap[i]"
+                        (click)="viewRawData(i, imei)">
+                        @if (loadingMap[i]) {
+                          <span class="spinner-border spinner-border-sm me-1"></span>
+                        }
+                        @if (!loadingMap[i]) {
+                          <span>View Raw Data</span>
+                        }
+                        @if (loadingMap[i]) {
+                          <span> &nbsp;Loading...</span>
+                        }
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            <!-- <button class="btn btn-sm btn-secondary" (click)="resetForm()">
+            Back
+          </button> -->
+        </div>
+      }
+
+
+    </div>
+  </div>
+</div>
+</div>
+@if (isModalOpen) {
+  <div class="modal-backdrop">
+    <div class="custom-modal p-0">
+      <div class="modal-header d-flex justify-content-between align-items-center p-1">
+        <span><b>Raw Data</b></span>
+        <button class="close-btn" (click)="isModalOpen = false">✖</button>
+      </div>
+      <div class="modal-body p-1" style="overflow-x: hidden;">
+        <div class="py-2">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="d-flex justify-content-end">
+                <div>
+                  <button
+                    class="reload-btn"
+                    (click)="reloadData()"
+                    [disabled]="loading">
+                    <i class="fa fa-refresh pr-1" [class.fa-spin]="loading"></i>
+                    <span>{{ loading ? "Reloading..." : "Reload" }}</span>
+                  </button>
+                </div>
+                <div>
+                  <select
+                    class="rows-select"
+                    [(ngModel)]="pageSize"
+                    (change)="onPageSizeChange(pageSize)"
+                    >
+                    @for (size of pageSizeOptions; track size) {
+                      <option
+                        [value]="size === totalCount ? 'All' : size"
+                        >
+                        {{ size === totalCount ? "All" : size }}
+                      </option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <div class="total-records-text p-1">
+                    Total Records :  {{ totalCount }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped app-table mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Date Time</th>
+                <th>Raw Packet</th>
+                <th>IP</th>
+                <th>Port</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of rawData; track item; let i = $index) {
+                <tr>
+                  <td>{{ item.param1}}</td>
+                  <td>{{ item.param3 }}</td>
+                  <td style="max-width:400px; word-break:break-all;">
+                    {{ item.param4 }}
+                  </td>
+                  <td>{{ item.param5 }}</td>
+                  <td>{{ item.param6 }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <div class="float-end">
+            @if (totalCount > pageSize) {
+              <ngb-pagination [collectionSize]="totalCount"
+                [(page)]="pageNo" [pageSize]="pageSize"
+                (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+                [ellipses]="false" [boundaryLinks]="true" size="sm"
+                class="d-flex justify-content-center mt-2 mb-1">
+              </ngb-pagination>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

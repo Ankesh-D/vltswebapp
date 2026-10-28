@@ -1,0 +1,93 @@
+<!-- Panic Alert Button (Fixed Position) -->
+<div id="panicButton" class="panic-button" (click)="toggleDetails()">
+  <div class="blink_me" [class.avatar-walert]="panicCount > 0">
+    <svg class="svg-bell" viewBox="0 0 88 72" version="1.1" xmlns="http://www.w3.org/2000/svg">
+      <g class="group-striker">
+        <circle class="outline" cx="43.998" cy="54.571" r="7.99" />
+        <circle class="fill" cx="43.998" cy="54.567" r="3.99" />
+      </g>
+      <g class="group-bell">
+        <path class="outline"
+          d="M71.5,38.184h-3.291l-6.213-21.879c-1.367-4.816-5.951-8.693-10.904-9.514C50.91,3.02,47.812,0,43.996,0c-3.812,0-6.91,3.018-7.092,6.787c-4.957,0.822-9.539,4.697-10.908,9.514l-6.211,21.883h-3.289l-4.498,15.85h19.251H36h15.994h3.963h20.041L71.5,38.184z M40.975,6.611C41.229,5.143,42.455,4,43.996,4c1.543,0,2.77,1.143,3.025,2.615L40.975,6.611z" />
+        <path style="fill:red;" class="fill"
+          d="M29.844,17.395c1.045-3.678,5.156-6.783,8.975-6.783l10.355,0.004c3.82,0,7.93,3.105,8.975,6.783l5.902,20.785H23.943L29.844,17.395z" />
+        <polygon style="fill:red;" class="fill"
+          points="19.52,42.184 68.477,42.184 70.705,50.033 17.291,50.033" />
+      </g>
+    </svg>
+  </div>
+</div>
+
+<!-- Panic Alert Slide Panel -->
+<div id="panicSlide" class="panic-slide" [class.show]="showDetails">
+  <div id="panic_alertcount" class="panic-alert-count">
+    <div class="element-wrapper" style="padding: 0px;">
+      <div class="element-box-tp" style="overflow: unset;">
+        <div style="text-align: center; font-weight: bold; text-decoration: underline; font-size: 11px;">
+          <span>PANIC ALERT</span>
+        </div>
+        <div class="fancy-selector-w opened">
+          <div class="profile-tile">
+            <table class="table-hover" style="width: 100%;">
+              <tr style="background: green; color: white">
+                <th style="padding: 2px">#</th>
+                <th style="padding: 4px;">Alert Name</th>
+                <th style="padding: 4px; text-align: center;">Count</th>
+              </tr>
+              <tr [ngStyle]="{'background': '#fcfcfc'}">
+                <td (click)="viewDetails()" style="padding: 2px; cursor: pointer;">1</td>
+                <td (click)="viewDetails()" style="cursor: pointer;">Panic Alert</td>
+                <td style="text-align: center; cursor: pointer;" 
+                  [ngStyle]="{'cursor': panicCount != 0 ? 'pointer':'initial'}"
+                  (click)="panicCount != 0 && viewDetails()">{{panicCount}}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="panic_alertdetails" class="panic-alert-details" *ngIf="showDetails">
+    <div>
+      <div class="logged-user-avatar-info">
+        <div class="logged-user-info-w">
+          <div class="logged-user-name">
+            <label style="padding: 10px; text-decoration: underline; color: black; font-size: 18px;">Panic Alert Details</label>
+            <span class="close-btn" (click)="closeDetails()">x</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="element-wrapper" style="padding: 0px;">
+        <div class="element-box-tp" style="overflow: auto; padding: 10px; background: #aacda8; margin-top: -8px; max-height: 400px;">
+          <table class="table table-striped app-table" style="font-size: 11px;">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Vehicle No.</th>
+                <th>Alert Time</th>
+                <th>Location</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="panicAlerts.length === 0">
+                <td colspan="5" style="text-align: center;">No Panic Alerts</td>
+              </tr>
+              <tr *ngFor="let alert of panicAlerts; let i = index">
+                <td>{{i + 1}}</td>
+                <td>{{alert.param11 || 'NA'}}</td>
+                <td>{{alert.param5 || 'NA'}}</td>
+                <td>{{alert.param27 || 'NA'}}, {{alert.param28 || 'NA'}}</td>
+                <td>
+                  <a routerLink="/alert/sos" [queryParams]="{vehicle: alert.param10}">View</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<div class="content-i">
+  <div class="element-box">
+    <!-- Header -->
+    <div class="pagetitleborder">
+      <div class="pagetitlestyle">
+        <span>Vendor Port Mapping</span>
+      </div>
+      <button class="pagebtn" (click)="navigateToPortEntry()">
+        <i class="fa fa-plus"></i> Port Entry
+      </button>
+    </div>
+
+    <div class="row">
+      <!-- Left Column: Form -->
+      <div class="col-md-3">
+        <div class="entrypagediv">
+          <div style="font-size: 10px; color: #666; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+            <strong>NOTE:</strong> Fields marked <span class="mandetory">*</span> are mandatory.
+          </div>
+
+          <form (ngSubmit)="saveAssignment()" #portForm="ngForm">
+            <div class="form-group">
+              <label for="vendor">Vendor Name <span class="mandetory">*</span></label>
+              <select id="vendor" class="form-control" [(ngModel)]="selectedVendor" name="vendor" required>
+                <option value="" disabled selected>Select Vendor</option>
+                @for (vendor of vendorList; track vendor) {
+                  <option [value]="vendor.param1">
+                    {{vendor.param2}}
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="portno">Port No. <span class="mandetory">*</span></label>
+              <select id="portno" class="form-control" [(ngModel)]="selectedPort" name="portno" required>
+                <option value="" disabled selected>Select Port</option>
+                @for (port of portList; track port) {
+                  <option [value]="port.param1">
+                    {{port.param2}}
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+              <button type="submit" class="btn-save" [disabled]="!portForm.form.valid || loading">
+                <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+                {{loading ? 'Saving...' : 'Save Mapping'}}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right Column: Table -->
+      <div class="col-md-9">
+        <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Search..."
+          [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="searchAssignedPorts()"
+          (reload)="reloadAssignedPorts()" [loading]="loading" [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions" [displayedCount]="assignedPorts.length" [totalRecords]="totalCount"
+          (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows" totalLabel="Total Records"
+          countSeparator="of">
+        </app-common-data-toolbar>
+
+        <app-common-table [columns]="tableColumns" [rows]="assignedPorts" [loading]="loading" maxHeight="300px"
+          [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped app-table table-sm table-bordered mb-1"
+          tableId="assigned-ports-table" (sortChange)="sort($event)">
+        </app-common-table>
+
+        <div class="d-flex justify-content-end">
+          <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+            [disabled]="loading" (pageChange)="onPageChange($event)">
+          </app-common-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success" (closed)="successMessage = null"></app-toast>
+}

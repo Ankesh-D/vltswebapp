@@ -1,0 +1,11 @@
+.dashboard-rto-select ::ng-deep .ng-select-container,
+.vendor-select ::ng-deep .ng-select-container {
+  height: 24px;
+  min-height: 24px;
+  font-size: 11px;
+  min-width: 200px;
+}
+
+::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  font-size: 12px !important;
+}

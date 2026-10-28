@@ -1,0 +1,843 @@
+<div class="content-i">
+  <div class="content-box pt-0">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="content-body">
+          <div class="container-fluid px-0">
+            <div class="card main-card">
+              <div class="card-body">
+
+                <!-- Title -->
+                <h5 class="text-center fw-bold title-text mb-1">
+                  AIS-140 / BIS 16833 Device Renewal - Search by IMEI/ Serial No.
+                </h5>
+
+                <form #searchForm="ngForm">
+                  <div class="row py-2  justify-content-center" id="imeisearch">
+                    <div class="col-md-5 col-sm-8 ">
+
+                      <div class="input-group">
+                        <input type="text" class="form-control text-center" maxlength="20"
+                          minlength="15" name="imeiNo" #searchByCtrl="ngModel"
+                          [(ngModel)]="searchBy" placeholder="Search by IMEI No./ Serial No."
+                          (keyup.enter)="onFetchClick()" autocomplete="off" required>
+                        <div class="input-group-append">
+                          <button class="btn btn-sm btn-primary" type="submit"
+                          (click)="onFetchClick()">Search</button> &nbsp;&nbsp;
+                          @if (statusDetailsFlag) {
+                            <button class="btn btn-sm btn-warning" type="button"
+                              (click)="onRefreshClick()">
+                              <i class="fa fa-refresh"></i>
+                            </button>
+                            }&nbsp;&nbsp;
+
+                          </div>
+                        </div>
+                        <div class="text-danger text-small field-error">
+                          @if (searchByCtrl.invalid && searchByCtrl.touched) {
+                            <div>
+                              Search by is required.
+                            </div>
+                          }
+                          @if (searchByCtrl.invalid && searchByCtrl.touched && (searchByCtrl.errors?.['minlength'] || searchByCtrl.errors?.['maxlength'])) {
+                            <div class="field-error mt-2"
+                              >
+                              Search by must be 15-20 characters.
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                  <div class="soft-bg rounded">
+                    <!--  -->
+                    @if (statusDetailsFlag) {
+                      <div class="row fade-in-up">
+                        <div class="col-md-12 mb-3 d-flex justify-content-between">
+                          <div class="text-muted fw-bold pt-2" style="font-size: 12px;">
+                            Note: If you want to change any information, please click on the edit
+                            button <i class="bx bx-edit"></i> in respective section.
+                          </div>
+                          <div>
+                                                <button class="mx-1" (click)="onClearClick()" style="border: 1px solid #0b58b9; background: white; color: #0b58b9; 
+                                border-radius: 4px; padding: 2px 8px; font-size: 11px; cursor: pointer; 
+                                font-weight: bold; font-size: 12px;"
+                              title="Clear Search">
+                              <i class="bx bx-arrow-out-left-circle-half"></i> Clear Search
+                            </button>
+                            <button
+                              title="Edit Device Information"
+    style="border: 1px solid #0b58b9; background: white; color: #0b58b9;
+    border-radius: 4px; padding: 2px 8px; cursor: pointer;
+    font-weight: bold; font-size: 12px; margin-right: 3px;"
+    [ngStyle]="{
+      'pointer-events': (roleId == 10 || responseData.param68 == 'true') ? 'auto' : 'none',
+      'opacity': (roleId == 10 || responseData.param68 == 'true') ? 1 : 0.5
+    }"
+                              (click)="openEditCustomerInfoModal('device')"
+                              [disabled]="!(roleId == 10 || responseData.param68 == 'true')">
+                              <i class="bx bx-edit"></i> Edit Information
+                            </button>
+                          </div>
+                        </div>
+                        <!-- 🚗 Vehicle Details -->
+                        <div class="col-md-4">
+                          <div class="info-card">
+                            <div
+                              class="info-title bg-vehicle d-flex align-items-center justify-content-between py-1">
+                              <div>
+                                <i class="bx bx-car"></i> Vehicle Details
+                              </div>
+                              <div>
+                                <!-- *ngIf="checkBackendValidity()" -->
+                              </div>
+                            </div>
+                            <div class="info-body">
+                              <p><span>Vehicle No</span> {{ vahanResponse.param10 !='' ? vahanResponse.param10 : responseData.param13 }}</p>
+                              <p><span>Chassis No</span> {{ vahanResponse.param1 !='' ? vahanResponse.param1 : responseData.param14 }}</p>
+                              <p><span>Engine No</span> {{ vahanResponse.param16 !='' ? vahanResponse.param16 : responseData.param15 }}</p>
+                              <p><span>Type</span> {{ responseData.param19 }}</p>
+                              <p><span>Customer Name</span> {{ vahanResponse.param15 !='' ? vahanResponse.param15 : responseData.param23 }}</p>
+                              <p><span>Mobile No.</span> {{ responseData.param24 }}</p>
+                              <p><span>Manufacturing Year</span> {{ vahanResponse.param12 !='' ? vahanResponse.param12 : checkMfgYear() }}</p>
+                              <p><span>Vehicle Make</span> {{ responseData.param53 !='' ? responseData.param53 : responseData.param53}}</p>
+                              <p><span>Vehicle Model</span> {{ responseData.param55 !='' ? responseData.param55 : responseData.param55}}</p>
+                              <p><span>Vehicle Class</span> {{ vahanResponse.param11 !='' ? vahanResponse.param11 : responseData.param57}}</p>
+                              <p><span>RTO</span> {{ responseData.param63 ? responseData.param63
+                            : 'N/A'}}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- 📟 Device Details -->
+                      <div class="col-md-4">
+                        <div class="info-card">
+                          <div class="info-title bg-device py-1">
+                            <div class="d-flex justify-content-between">
+                              <div>
+                                <i class="bx bx-chip"></i> Device Details
+                              </div>
+                            </div>
+                          </div>
+                          <div class="info-body">
+                            <p><span>Activation No</span> {{ responseData.param17 ||
+                            responseData.param17 == '0' ?
+                          responseData.param17 : '-' }}</p>
+                          <p><span>Activation Date</span> {{ responseData.param16 ?
+                        responseData.param16 : 'N/A' }}</p>
+                        <p><span>Serial No</span> {{ vahanResponse.param2 !='' ? vahanResponse.param2 : responseData.param5 }}</p>
+                        <p><span>IMEI No</span> {{ vahanResponse.param5 !='' ? vahanResponse.param5 : responseData.param4 }}</p>
+                        <p><span>Esim Provider</span> {{ responseData.param43 ?
+                      responseData.param43 : 'N/A' }} </p>
+                      <!-- <p><span>ESIM Code</span> {{ responseData.param42 ?
+                    responseData.param42 : 'N/A' }}</p> -->
+                    <p><span>ICCID No</span> {{ responseData.param6 ?
+                  responseData.param6 : 'N/A' }}</p>
+                  <p><span>Model Name</span> {{ responseData.param10 ?
+                responseData.param10 : 'N/A' }}</p>
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <p><span>Network 1</span> {{ responseData.param61 ?
+                  responseData.param59 : 'N/A' }}</p>
+                  <p><span>SIM 1</span> {{ responseData.param66 ?
+                responseData.param66 : 'N/A' }}</p>
+              </div>
+              <div>
+                <p><span>Network 2</span> {{ responseData.param59 ?
+              responseData.param61 : 'N/A' }}</p>
+              <p><span>SIM 2</span> {{ responseData.param67 ?
+            responseData.param67 : 'N/A' }}</p>
+          </div>
+        </div>
+        <p><span>Manufacturer</span> {{ responseData.param8 ?
+      responseData.param8 : 'N/A' }}</p>
+      <!-- <p><span>Vendor</span> {{ responseData.param8 ? responseData.param8
+    : 'N/A' }}</p> -->
+  </div>
+</div>
+</div>
+<!-- 📡 Connectivity Details -->
+<div class="col-md-4">
+  <div class="info-card">
+    <div class="info-title bg-connectivity py-1">
+      <i class="bx bx-wifi"></i> Connectivity Details
+    </div>
+    <div class="info-body">
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="label-style">Activation Compliance</div>
+        <div>
+          @if (responseData.param20 != 'activated') {
+            <button class="btn btn-sm mb-1" style="font-size: 11px;"
+              [ngClass]="passedChecks == totalChecks ? 'btn-compliance' : 'btn-danger'"
+              [disabled]="responseData.param25 =='Never Connected'"
+              type="button" (click)="openComplianceCheckModal()">
+              View  ({{passedChecks}}/{{totalChecks}})
+              <i class="fa fa-refresh"></i>
+            </button>
+          }
+          @if (responseData.param20 == 'activated') {
+            <button class="btn btn-sm btn-compliance mb-1" style="font-size: 11px;" type="button" (click)="openComplianceCheckModal()">
+              <span class="text-white">Activated</span>
+            </button>
+          }
+        </div>
+      </div>
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="label-style">SIM Validity</div>
+        <div class="d-flex align-items-center justify-content-between">
+          <span class="value-style">{{ responseData.param27 ?
+          responseData.param27 : 'N/A' }}</span>
+          <button class="btn btn-sm btn-approve ms-2"
+            [disabled]="responseData.param20=='activated'"
+          (click)="updateSimValidity()">Update</button>
+        </div>
+      </div>
+      <p><span>{{checkValidityWithin12Months() ? 'Old ': ''}}Backend Validity</span> {{ responseData.param30 }}</p>
+      <p><span>Polling Time</span> {{ responseData.param26 }}</p>
+      <div class="d-flex justify-content-between">
+        <div>
+          <span class="label-style">Status</span>
+          <span
+            class="{{ responseData.statuscolorparam1 }} ms-1 text-white status-badge">{{
+          responseData.param25 }}</span>
+        </div>
+        <div>
+          <span class="label-style">Mode : </span>
+          <span class="ms-1 status-badge text-uppercase"
+            style="font-size: 12px;">
+            {{responseData.param51 ? responseData.param51 :
+          '-'}}</span>
+        </div>
+      </div>
+      <p><span>Alert Name</span> {{ responseData.param31 }}</p>
+      <p><span>Last Alert</span> {{ responseData.param32 }}</p>
+      <!-- <p> -->
+      @if (!showActivation && (responseData.param20=='old activated' || responseData.param20=='pending otp') && (roleId == '10' || roleId == '13' || roleId=='17')) {
+        <button class="btn btn-approve" (click)="sendOTP()"
+          [disabled]="!canSendOTP() || responseData.param68 == 'false'"
+          >
+          <!-- condition earlier *ngIf="!showActivation && (roleId == '10' || roleId == '13') && checkValiditytoOpenSendOtp()" -->
+          Send OTP For Renewal
+        </button>
+      }
+      @if (responseData.param20=='activated') {
+        <div>
+          <!--condition earlier *ngIf="!checkValidityWithin12Months()" -->
+          <h5 class="fw-bold text-secondary">Backend validity is up to date and the vehicle is already activated. </h5>
+        </div>
+      }
+      @if ((responseData.param20=='old activated' || responseData.param20=='pending otp') && (roleId == '10' || roleId == '13')) {
+        <div class="text-danger mt-2" style="font-size: 12px;"
+          >
+          <!--condition earlier *ngIf="!canSendOTP()" -->
+          @for (error of getOTPValidationErrors(); track error) {
+            <div>
+              • {{ error }}
+            </div>
+          }
+        </div>
+      }
+    <!-- </p> -->
+    <div>
+      @if (showActivation) {
+        <div class="col-md-12" style="padding:10px;"
+          id="vehicleactivation">
+          <div class="row" style="padding: 10px;">
+            @if (otpResponseCode == '200') {
+              <div class="col-md-7">
+                <div class="form-group mb-0">
+                  <label class="label-style fw-bold"
+                  style="font: 12px;">OTP: </label><label
+                  for=""
+                class="mandetory text-danger">*</label>
+                <input placeholder="Enter OTP" type="text"
+                  class="form-control acceptnumeric_nodecimal"
+                  maxlength="6" id="otp" [(ngModel)]="otp"
+                  name="otp">
+              </div>
+              @if (otpTimerFlag) {
+                <p>
+                  Resend OTP with in {{ timerText }}
+                </p>
+              }
+              <button [disabled]="otpTimerFlag"
+                class="btn btn-link p-0 ms-2"
+                (click)="sendOTP()"
+                style="font-size: 12px;">
+                Resend OTP
+              </button>
+            </div>
+          }
+          <div class="col-md-5">
+            <div>
+              <button class="btn btn-sm activate-btn"
+                [disabled]="otpResponseCode != '200'"
+              (click)="activateVehicle();">Activate</button>
+            </div>
+          </div>
+          <!-- activateVehicle() updateBeforeVerifyOTP()-->
+        </div>
+      </div>
+    }
+  </div>
+</div>
+</div>
+</div>
+</div>
+}
+<div class="alert alert-info alert-dismissible fade show" role="alert"
+  style="border-left: 4px solid #0b58b9; background-color: #e7f3ff; border-radius: 4px; margin-top: 20px;">
+  <div class="d-flex">
+    <div style="flex-shrink: 0; margin-right: 12px;">
+      <i class="bx bx-info-circle"
+      style="font-size: 24px; color: #0b58b9;"></i>
+    </div>
+    <div style="flex-grow: 1;">
+      <h6 class="fw-bold text-dark mb-2" style="font-size: 14px;">
+        <i class="bx bx-note"></i> Renewal Instructions
+      </h6>
+      <ul class="mb-0" style="padding-left: 20px; font-size: 12px;">
+        <li class="text-muted mb-2">Device Polling should clear all AIS
+        Compliance Checks.</li>
+        <li class="text-muted mb-2">Fetch M2M Sim validity by clicking the
+        Update button.</li>
+        <li class="text-muted mb-2">Device Polling Mode should be TCP only.
+        </li>
+        <li class="text-muted mb-2">Update necessary details such as Mfg.
+          Year, Correct Vehicle registration Number, M2M Provider,
+        Customer Name , mobile No.etc.</li>
+
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Map Modal -->
+<div class="modal fade app-modal" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header py-0" style=" background-color:#07515a;">
+        <h5 class="modal-title py-0 float-end" id="staticBackdropLabel" style="color:white;">Map View</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="toastService.closeModal('staticBackdrop')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0">
+        <div id="mapContainer" style="width: 100%; height: 600px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--  -->
+
+<div class="modal fade app-modal" id="editCustomerInfoModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header py-0" style=" background-color:#07515a;">
+        <h5 class="modal-title py-0 float-end" id="staticBackdropLabel" style="color:white;">Edit
+        Information</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="toastService.closeModal('editCustomerInfoModal')">
+
+        </button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="container p-3">
+          <form #editForm="ngForm">
+
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Vehicle No.:<span
+                  class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="editVehicleNo"
+                    maxlength="25" #vehicleNoCtrl="ngModel" name="vehicleNo" required
+                    placeholder="Enter vehicle no." [disabled]="vahanResponse.param10!=''">
+
+                  <div class="text-danger mt-2 text-small">
+                    @if (vehicleNoCtrl.invalid && editForm.submitted) {
+                      <div>
+                        Vehicle no. is required.
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Chassis No.:<span
+                  class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="editChassisNo"
+                    maxlength="25" #chassisNoCtrl="ngModel" name="chassisNo" required
+                    placeholder="Enter chassis no." [disabled]="vahanResponse.param1!=''">
+
+                  <div class="text-danger mt-2 text-small">
+                    @if (chassisNoCtrl.invalid && editForm.submitted) {
+                      <div>
+                        Chassis no. is required.
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Engine No.:<span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="editEngineNo"
+                    maxlength="25" #EngineNoCtrl="ngModel" name="EngineNo" required
+                    placeholder="Enter Engine no." [disabled]="vahanResponse.param16!=''">
+
+                  <div class="text-danger mt-2 text-small">
+                    @if (EngineNoCtrl.invalid && editForm.submitted) {
+                      <div>
+                        Engine no. is required.
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Customer Name:<span
+                  class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="editCustomerName"
+                    #customerName="ngModel" name="customername" required
+                    placeholder="Enter customer name" [disabled]="vahanResponse.param15!=''">
+
+                  <div class="text-danger mt-2 text-small">
+                    @if (customerName.invalid && editForm.submitted) {
+                      <div>
+                        Customer name is required.
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Mobile No.:<span class="text-danger">*</span></label>
+                  <input type="text" id="customerMobile" class="form-control"
+                    [(ngModel)]="editCustomerMobile" name="customermobile" minlength="10"
+                    maxlength="10" #customerMobileCtrl="ngModel"
+                    placeholder="Enter customer mobile">
+                  <div class="text-danger mt-2 text-small">
+                    @if (customerMobileCtrl.invalid && editForm.submitted) {
+                      <div>
+                        Customer mobile no. is required.
+                      </div>
+                    }
+                    @if ((customerMobileCtrl.invalid && editForm.submitted)) {
+                      <div class="field-error mt-2"
+                        >
+                        Mobile No must be 10 digits.
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Vehicle Type:<span
+                  class="text-danger">*</span></label>
+                  <ng-select placeholder="Select Vehicle Type" [(ngModel)]="vehicleTypeObj"
+                    name="vehicleTypeObj" style="font-size: 11px;" required
+                    #vehicleTypeCtrl="ngModel"
+                    (change)="onChangeVehicleType()"
+
+                    [class.is-invalid]="vehicleTypeCtrl.invalid && (vehicleTypeCtrl.touched)">
+                    @for (type of vehicleTypeList; track type) {
+                      <ng-option [value]="type">
+                        {{type}}
+                      </ng-option>
+                    }
+                  </ng-select>
+                  @if (vehicleTypeCtrl.invalid  && editForm.submitted) {
+                    <div class="field-error mt-2 text-small text-danger"
+                      >
+                    Vehicle type is required.</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">MFG Year:<span class="text-danger">*</span></label>
+                  <ng-select placeholder="Select Mfg year" [(ngModel)]="mfgYearObj"
+                    name="mfgYearObj" style="font-size: 11px;" required
+                    #mfgYearRef="ngModel"
+                    [disabled]="vahanResponse.param12!=''"
+                    [class.is-invalid]="mfgYearRef.invalid && (mfgYearRef.touched)">
+                    @for (year of mfgYearList; track year) {
+                      <ng-option [value]="year">
+                        {{year}}
+                      </ng-option>
+                    }
+                  </ng-select>
+                  @if (mfgYearRef.invalid  && editForm.submitted) {
+                    <div class="field-error mt-2 text-small text-danger"
+                      >
+                    MFG Year is required.</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Vehicle Make:<span
+                  class="text-danger">*</span></label>
+                  <ng-select placeholder="Select vehicle make" [(ngModel)]="vehicleMakeObj"
+                    name="vmakeObj" (change)="onVehicleMakeChange(vehicleMakeObj)"
+                    style="font-size: 11px;" required #vehicleMakeCtrl="ngModel"
+                    [class.is-invalid]="vehicleMakeCtrl.invalid && (vehicleMakeCtrl.touched)">
+                    @for (item of vehicleMakeList; track item) {
+                      <ng-option [value]="item">
+                        {{item.param2}}
+                      </ng-option>
+                    }
+                  </ng-select>
+                  @if (vehicleMakeCtrl.invalid && editForm.submitted) {
+                    <div class="field-error mt-2 text-small text-danger"
+                      >
+                    Vehicle make is required.</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Vehicle Model:<span
+                  class="text-danger">*</span></label>
+                  <ng-select placeholder="Select vehicle make" [(ngModel)]="vehicleModelObj"
+                    name="vmodelObj" style="font-size: 11px;" required
+                    #vehicleModelCtrl="ngModel"
+                    [class.is-invalid]="vehicleModelCtrl.invalid && (vehicleModelCtrl.touched)"
+                    >
+                    @for (item of vehicleModelList; track item) {
+                      <ng-option [value]="item">
+                        {{item.param2}}
+                      </ng-option>
+                    }
+                  </ng-select>
+                  @if (vehicleModelCtrl.invalid && editForm.submitted) {
+                    <div class="field-error mt-2 text-small text-danger"
+                      >
+                    Vehicle model is required.</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Vehicle Class:<span
+                  class="text-danger">*</span></label>
+                  <ng-select placeholder="Select vehicle make" [(ngModel)]="vehicleClassObj"
+                    name="vclassObj" style="font-size: 11px;" required
+                    #vehicleClassCtrl="ngModel"
+                    [class.is-invalid]="vehicleClassCtrl.invalid && (vehicleClassCtrl.touched)">
+                    @for (item of vehicleClassList; track item) {
+                      <ng-option [value]="item">
+                        {{item.param2}}
+                      </ng-option>
+                    }
+                  </ng-select>
+                  @if (vehicleClassCtrl.invalid && editForm.submitted) {
+                    <div class="field-error mt-2 text-small text-danger"
+                      >
+                    Vehicle class is required.</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">RTO List:<span class="text-danger">*</span></label>
+                  <ng-select placeholder="Select RTO" [(ngModel)]="rtoObj" name="rtoObj"
+                    style="font-size: 11px;"
+                    required #rtoCtrl="ngModel"
+                    [class.is-invalid]="rtoCtrl.invalid && (rtoCtrl.touched)">
+                    @for (item of rtoList; track item) {
+                      <ng-option [value]="item">
+                        {{item.param2}}
+                      </ng-option>
+                    }
+                  </ng-select>
+                  @if (rtoCtrl.invalid && editForm.submitted) {
+                    <div class="field-error mt-2 text-small text-danger"
+                      >
+                    RTO is required.</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Esim Provider:<span
+                  class="text-danger">*</span></label>
+                  <ng-select placeholder="Select Esim Provider" [(ngModel)]="m2mProviderObj"
+                    (change)="onM2MProviderChange()" name="m2mProviderObj"
+                    style="font-size: 11px;" required #m2mProviderRef="ngModel"
+                    [class.is-invalid]="m2mProviderRef.invalid && (m2mProviderRef.touched)">
+                    @for (provider of m2mProviderList; track provider) {
+                      <ng-option [value]="provider">
+                        {{provider.param2}}
+                      </ng-option>
+                    }
+                  </ng-select>
+                  @if (m2mProviderRef.invalid && editForm.submitted) {
+                    <div class="field-error mt-2 text-small text-danger"
+                      >
+                    Esim Provider is required.</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">ICCID No.:<span class="text-danger">*</span></label>
+                  <input type="text" name="iccidno" class="form-control" #IccidNoCtrl="ngModel"
+                    maxlength="20" [(ngModel)]="editDeviceIccid" required
+                    placeholder="Enter ICCID No." [disabled]="vahanResponse.param4!=''">
+                  <div class="text-danger mt-2 text-small">
+                    @if ((IccidNoCtrl.invalid && editForm.submitted && IccidNoCtrl.errors?.['maxlength'])) {
+                      <div class="field-error mt-2"
+                        >
+                        Iccid no. should not greater than 20 character.
+                      </div>
+                    }
+
+                  </div>
+                </div>
+
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Network 1:<span class="text-danger">*</span></label>
+                  <ng-select placeholder="Select Network 1" [(ngModel)]="network1Obj"
+                    name="network1" style="font-size: 11px;" required
+                    #network1Ctrl="ngModel"
+                    [class.is-invalid]="network1Ctrl.invalid && (network1Ctrl.touched)">
+                    @for (provider of networkList; track provider) {
+                      <ng-option [value]="provider">
+                        {{provider.param2}}
+                      </ng-option>
+                    }
+                  </ng-select>
+                  @if (network1Ctrl.invalid && editForm.submitted) {
+                    <div class="field-error mt-2 text-small text-danger"
+                      >
+                    Network1 is required.</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Mobile No. 1:<span
+                  class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="editMobileNo1"
+                    (keypress)="vs.numberOnlyValidation($event)"
+                    name="mobile1" minlength="13" maxlength="13" #mobile1Ctrl="ngModel"
+                    placeholder="Enter sim1 mobile">
+                  <div>
+                    @if (mobile1Ctrl.invalid && editForm.submitted) {
+                      <div class="field-error text-danger mt-2 text-small">
+                        13 digit SIM1 mobile no. is required.
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Network 2:<span class="text-danger">*</span></label>
+                  <ng-select placeholder="Select Network 2" [(ngModel)]="network2Obj"
+                    name="network2" style="font-size: 11px;" required
+                    #network2Ctrl="ngModel"
+                    [class.is-invalid]="network2Ctrl.invalid && (network2Ctrl.touched)">
+                    @for (provider of networkList; track provider) {
+                      <ng-option [value]="provider">
+                        {{provider.param2}}
+                      </ng-option>
+                    }
+                  </ng-select>
+                  @if (network2Ctrl.invalid && (editForm.submitted)) {
+                    <div class="field-error mt-2 text-small text-danger"
+                      >
+                    Network2 is required.</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="field-label">Mobile No. 2:<span
+                  class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="editMobileNo2"
+                    (keypress)="vs.numberOnlyValidation($event)"
+                    name="mobile2" minlength="13" maxlength="13" #mobile2Ctrl="ngModel"
+                    placeholder="Enter sim2 mobile">
+                  <div >
+                    @if (mobile2Ctrl.invalid && editForm.submitted) {
+                      <div class="field-error mt-2 text-danger text-small">
+                        13 digit SIM2 mobile no. is required.
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="text-end edit-modal-actions">
+
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-warning"
+                    (click)="toastService.closeModal('editCustomerInfoModal')">
+
+                    Close
+
+                  </button>
+
+                  <button
+                    type="submit"
+                    class="btn btn-sm btn-primary"
+                    (click)="saveCustomerInfo()">
+
+                    Save
+
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap 4 Modal for Compliance Check -->
+<!-- Compliance Check Modal -->
+<div
+  class="modal fade app-modal"
+  id="complianceCheckModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="complianceCheckModalLabel"
+  aria-hidden="true">
+
+  <div class="modal-dialog compliance-modal-dialog" role="document">
+
+    <div class="modal-content compliance-modal-content">
+
+      <!-- HEADER -->
+      <div class="modal-header compliance-modal-header">
+
+        <h5
+          class="modal-title compliance-modal-title"
+          id="complianceCheckModalLabel">
+
+          Compliance Check
+
+        </h5>
+
+        <span class="badge compliance-imei-badge">
+
+          <strong>IMEI:</strong>
+          {{ responseData.param4 || 'NA' }}
+
+        </span>
+
+        <button
+          type="button"
+          class="btn-close compliance-close"
+          aria-label="Close"
+          (click)="toastService.closeModal('complianceCheckModal')">
+        </button>
+
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body compliance-modal-body">
+
+        <div class="compliance-table-wrapper">
+
+          <table class="table compliance-table">
+
+            <tbody>
+
+              @for (item of activationCheckData | keyvalue; track item) {
+                <tr
+                  >
+                  <!-- NAME -->
+                  <td class="compliance-name">
+                    {{$any(item.key) |
+                    underscoreToSpace |
+                    titlecase}}
+                  </td>
+                  <!-- STATUS -->
+                  <td class="compliance-status">
+                    <!-- SUCCESS -->
+                    @if (
+                      item.value === 'true' ||
+                      item.value === true
+                      ) {
+                      <span
+                        class="compliance-icon compliance-success">
+                        <i class="fa fa-check"></i>
+                      </span>
+                    }
+                    <!-- FAILED -->
+                    @if (
+                      item.value === 'false' ||
+                      item.value === false ||
+                      item.value == null ||
+                      item.value === '' ||
+                      item.value === undefined
+                      ) {
+                      <span
+                        class="compliance-icon compliance-failed">
+                        <i class="fa fa-times"></i>
+                      </span>
+                    }
+                  </td>
+                </tr>
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+</div>
+<!--
+<button
+  title="Edit Device Information"
+    style="border: 1px solid #0b58b9; background: white; color: #0b58b9;
+    border-radius: 4px; padding: 2px 8px; cursor: pointer;
+    font-weight: bold; font-size: 12px; margin-right: 3px;"
+    [ngStyle]="{
+      'pointer-events': (roleId == 10 || responseData.param68 == 'true') ? 'auto' : 'none',
+      'opacity': (roleId == 10 || responseData.param68 == 'true') ? 1 : 0.5
+    }"
+  (click)="openEditCustomerInfoModal('device')"
+  [disabled]="!(roleId == 10 || responseData.param68 == 'true')">
+  <i class="bx bx-edit"></i> Edit Information
+</button> -->

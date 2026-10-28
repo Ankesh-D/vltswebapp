@@ -1,0 +1,175 @@
+// Push Command Component Styles
+
+.content-i {
+  padding: 20px;
+}
+
+.content-box {
+  background: #fff;
+}
+
+.element-wrapper {
+  margin-bottom: 20px;
+}
+
+.element-box {
+  padding: 1rem;
+}
+
+.pagetitleborder {
+  border-bottom: 2px solid #0b58b9;
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+
+.control-label {
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.searchable {
+  width: 100%;
+}
+
+.form-desc {
+  margin-bottom: 15px;
+  font-size: 12px;
+}
+
+.mandetory {
+  color: red;
+}
+
+// button {
+//   background: #0b59b900;
+//   color: white;
+//   border: none;
+//   padding: 5px 15px;
+//   border-radius: 4px;
+//   cursor: pointer;
+// }
+
+// button:hover {
+//   background: #094a94;
+// }
+
+.desc {
+  margin-top: 20px;
+}
+.imei-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.btn-add {
+  margin-top: 5px;
+  background: #28a745;
+  color: white;
+}
+
+.btn-add:hover {
+  background: #218838;
+}
+
+.btn-delete {
+  background: #dc3545;
+  padding: 5px 10px;
+}
+
+.btn-delete:hover {
+  background: #c82333;
+}
+.imei-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 per row */
+  gap: 10px;
+}
+
+.imei-item {
+  position: relative;
+}
+
+.imei-item input {
+  padding-right: 30px;
+}
+
+.btn-delete {
+  position: absolute;
+  right: 5px;
+  top: 2px;
+  background: red;
+  color: white;
+  border: none;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.btn-add {
+  margin-top: 10px;
+  background: #28a745;
+}
+
+.btn-add:hover {
+  background: #218838;
+}
+
+
+.error-input {
+  border: 1px solid red !important;
+}
+
+.error-text {
+  color: red;
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+.imei-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.imei-item {
+  position: relative;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-modal {
+  background: #fff;
+  width: 80%;
+  max-height: 80%;
+  // overflow: auto;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  border: none;
+  background: rgba(255, 0, 0, 0);
+  color: red;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.table-responsive {
+  max-height: 400px;
+  overflow-y: auto;
+}

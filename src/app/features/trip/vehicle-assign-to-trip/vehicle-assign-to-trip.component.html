@@ -1,0 +1,485 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <!-- HEADER -->
+        <div class="col-md-12 pagetitleborder">
+          <div class="page-header-row">
+            <!-- TITLE -->
+            <div class="pagetitlestyle">Vehicle Assign To Trip</div>
+            <!-- ADD NEW BUTTON -->
+            <button type="button" class="add-new-btn" (click)="toggleDetails()">
+              <i
+                class="fa fa-plus mx-1"
+                [ngClass]="{
+                  'fa-plus': detailsFlag,
+                }"
+              ></i>
+              {{ detailsFlag ? " Vehicle Assign To Trip" : " Back To Details" }}
+            </button>
+            <!-- /TITLE -->
+          </div>
+        </div>
+        @if (!detailsFlag) {
+          <div class="row px-4">
+            <div class="col-md-12">
+              <form #assignmentForm="ngForm" (ngSubmit)="onSubmit()">
+                <div class="row">
+                  @if (roleId == '10') {
+                    <div class="col-sm-3">
+                      <div class="form-group">
+                        <label class="field-label"
+                          >Vendor <span class="mandetory">*</span></label
+                          >
+                          <ng-select
+                            placeholder="Select Vendor"
+                            [(ngModel)]="selectedVendor"
+                            #vendorNameCtrl="ngModel"
+                            (change)="onVendorChange()"
+                            name="vendorName"
+                            [clearable]="true"
+                            [searchable]="true"
+                            required
+                            >
+                            @for (item of vendorList; track item) {
+                              <ng-option
+                                [value]="item"
+                                >{{ item.param2 }}</ng-option
+                                >
+                              }
+                            </ng-select>
+                            @if (
+                              vendorNameCtrl.invalid &&
+                              (vendorNameCtrl.dirty || vendorNameCtrl.touched)
+                              ) {
+                              <div
+                                >
+                                @if (vendorNameCtrl.errors?.['required']) {
+                                  <small
+                                    class="text-danger"
+                                    >
+                                    Vendor is required.
+                                  </small>
+                                }
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                      <div class="col-sm-3">
+                        <div class="form-group">
+                          <label class="field-label"
+                            >Vehicle <span class="mandetory">*</span></label
+                            >
+                            <ng-select
+                              placeholder="Select Vehicle"
+                              [(ngModel)]="selectedVehicle"
+                              #vehicleNameCtrl="ngModel"
+                              name="vehicleName"
+                              [clearable]="true"
+                              [searchable]="true"
+                              [multiple]="false"
+                              []
+                              required>
+                              @for (item of vehicleList; track item) {
+                                <ng-option
+                                  [value]="item"
+                                  >{{ item.param2 }}</ng-option
+                                  >
+                                }
+                              </ng-select>
+                              @if (
+                                vehicleNameCtrl.invalid &&
+                                (vehicleNameCtrl.dirty || vehicleNameCtrl.touched)
+                                ) {
+                                <div
+                                  >
+                                  @if (vehicleNameCtrl.errors?.['required']) {
+                                    <small
+                                      class="text-danger"
+                                      >
+                                      Vehicle is required.
+                                    </small>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          </div>
+                          <div class="col-sm-3">
+                            <div class="form-group">
+                              <label class="field-label"
+                                >Trip <span class="mandetory">*</span></label
+                                >
+                                <ng-select
+                                  placeholder="Select Trip"
+                                  [(ngModel)]="selectedTrip"
+                                  #tripNameCtrl="ngModel"
+                                  name="tripName"
+                                  [clearable]="true"
+                                  [searchable]="true"
+                                  [multiple]="true"
+                                  required
+                                  >
+                                  @for (item of tripList; track item) {
+                                    <ng-option
+                                      [value]="item"
+                                      >{{ item.param3 }}</ng-option
+                                      >
+                                    }
+                                  </ng-select>
+                                  @if (
+                                    tripNameCtrl.invalid &&
+                                    (tripNameCtrl.dirty || tripNameCtrl.touched)
+                                    ) {
+                                    <div
+                                      >
+                                      @if (tripNameCtrl.errors?.['required']) {
+                                        <small
+                                          class="text-danger"
+                                          >
+                                          Trip is required.
+                                        </small>
+                                      }
+                                    </div>
+                                  }
+                                </div>
+                              </div>
+                              <div class="col-md-3">
+                                <div class="form-group">
+                                  <label class="field-label"
+                                    >Valid Upto <span class="mandetory">*</span></label
+                                    >
+                                    <input
+                                      type="text"
+                                      id="datepicker"
+                                      class="form-control"
+                                      name="date"
+                                      #validUptoCtrl="ngModel"
+                                      [(ngModel)]="validUpto"
+                                      required
+                                      />
+                                    @if (
+                                      validUptoCtrl.invalid &&
+                                      (validUptoCtrl.dirty || validUptoCtrl.touched)
+                                      ) {
+                                      <div
+                                        >
+                                        @if (validUptoCtrl.errors?.['required']) {
+                                          <small
+                                            class="text-danger"
+                                            >
+                                            Valid Upto is required.
+                                          </small>
+                                        }
+                                      </div>
+                                    }
+                                  </div>
+                                </div>
+                                <div class="col-md-12 mt-3 p-1">
+                                  <div class="float-end">
+                                    <button
+                                      type="reset"
+                                      class="btn btn-sm btn-secondary mx-1"
+                                      (click)="resetForm(assignmentForm)"
+                                      >
+                                      Reset
+                                    </button>
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                      Assign Vehicle
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      }
+                      @if (detailsFlag) {
+                        <form autocomplete="off" class="top-controls-row">
+                          <!-- LEFT : SEARCH + RELOAD -->
+                          <div class="left-controls">
+                            <div class="search-box">
+                              <input
+                                type="search"
+                                readonly
+                                onfocus="this.removeAttribute('readonly')"
+                                class="search-input inner"
+                                placeholder="Type here and press button...."
+                                maxlength="50"
+                                [(ngModel)]="vehicleAssignToTripDetailsReq.param1"
+                                (keyup.enter)="getDetails('search')"
+                                name="searchby"
+                                />
+                              <button
+                                type="button"
+                                class="search-inner-btn"
+                                (click)="getDetails('search')"
+                                >
+                                <i class="fa fa-search"></i>
+                              </button>
+                            </div>
+                            <button
+                              type="button"
+                              class="reload-btn"
+                              (click)="getDetails('init')"
+                              [disabled]="loading"
+                              >
+                              {{ loading ? "Reloading..." : "Reload" }}
+                            </button>
+                          </div>
+                          <!-- RIGHT : ROWS + TOTAL -->
+                          <div
+                            class="right-controls"
+                            style="display: flex; align-items: center; gap: 12px"
+                            >
+                            <!-- Download Dropdown -->
+                            <div style="display: flex; align-items: center; gap: 6px">
+                              <label class="total-records-text">Download:</label>
+                              <select
+                                [(ngModel)]="selectedDownloadType"
+                                (change)="onDownloadChange()"
+                                name="downloadType"
+                  style="
+                    font-size: 11px;
+                    height: 26px;
+                    padding: 0 5px;
+                    border: 1px solid #ced4da;
+                    border-radius: 3px;
+                    background-color: white;
+                    cursor: pointer;
+                  "
+                                >
+                                <option value="">Select</option>
+                                <option value="Excel">Excel</option>
+                              </select>
+                              @if (isExporting) {
+                                <span
+                                  style="font-size: 12px; color: #0b58b9"
+                                  >
+                                  <i class="fa fa-spinner fa-spin"></i>
+                                </span>
+                              }
+                            </div>
+                            <!-- Page Size -->
+                            <select
+                              class="rows-select"
+                              [(ngModel)]="pageSize"
+                              (change)="getDetails('pagesizechange')"
+                              name="pageSize"
+                              >
+                              @for (size of pageSizeOptions; track size) {
+                                <option [value]="size">
+                                  {{ size === totalCount ? totalCount : size }}
+                                </option>
+                              }
+                            </select>
+                            <!-- Total Records -->
+                            <div class="total-records-text">
+                              Total Records : {{ pageCount }} of {{ totalCount }}
+                            </div>
+                          </div>
+                        </form>
+                        <div class="table-responsive details-table">
+                          <table class="table-striped app-table table mb-1">
+                            <thead>
+                              <tr role="row">
+                                <th style="width: 35px">#</th>
+                                <th>Vehicle No.</th>
+                                <th>Trip Name</th>
+                                <th>Trip Type</th>
+                                <th>Source</th>
+                                <th>Destination</th>
+                                <th>Start Time</th>
+                                <th>End Time</th>
+                                <th>Valid Upto</th>
+                                <!-- <th>Duration</th> -->
+                                <th style="width: 100px">Action</th>
+                              </tr>
+                            </thead>
+                            @if (detailsData.length > 0) {
+                              <tbody>
+                                @for (trip of detailsData; track trip; let i = $index) {
+                                  <tr>
+                                    <td>{{ trip.param1}}</td>
+                                    <td class="text-uppercase">{{ trip.param12 }}</td>
+                                    <!-- Vehicle No. -->
+                                    <td><a
+                                      href="javascript:void(0)"
+                                      (click)="toggleTimeline(i)"
+                                      class="fw-bold text-primary"
+                                      >
+                                      {{ trip.param4 }}
+                                      <i
+                                        class="fa"
+                          [ngClass]="
+                            expandedRow === i
+                              ? 'fa-chevron-up'
+                              : 'fa-chevron-down'
+                          "
+                                        >
+                                      </i>
+                                    </a></td>
+                                    <!-- Trip Name -->
+                                    <td>{{ trip.param14 }}</td>
+                                    <td class="text-uppercase">{{ trip.param6 }}</td>
+                                    <!-- Source -->
+                                    <td class="text-uppercase">{{ trip.param8 }}</td>
+                                    <!-- Destination -->
+                                    <td>{{ trip.param9 }}</td>
+                                    <!-- Start Time -->
+                                    <td>{{ trip.param10 }}</td>
+                                    <!-- End Time -->
+                                    <td>
+                                      <div
+                                        class="fw-bold"
+                        [ngClass]="{
+                          'text-success': isMoreThanCurrentDate(trip.param13),
+                          'text-danger': !isMoreThanCurrentDate(trip.param13)
+                        }"
+                                        >
+                                        {{ formatDate(trip.param13) }} <br>
+                                        {{isMoreThanCurrentDate(trip.param13) ? '' : 'Expired'}}
+                                      </div>
+                                    </td>
+                                    <!-- Valid Upto -->
+                                    <td>
+                                      <button
+                                        type="button"
+                                        class="btn btn-sm btn-primary"
+                        style="font-size: 12px;
+    font-weight: 600;"
+                                        (click)="setData(trip); "
+                                        >
+                                        Unassign Vehicle
+                                      </button>
+                                    </td>
+                                  </tr>
+                                  @if (expandedRow === i) {
+                                    <tr>
+                                      <td colspan="11" class="bg-light">
+                                        <div class="timeline">
+                                          @for (stop of getStops(trip); track stop; let last = $last) {
+                                            <div
+                                              class="timeline-item"
+                                              >
+                                              <div class="timeline-dot"></div>
+                                              <div class="timeline-content">
+                                                <h6 class="mb-1">
+                                                  {{ stop.sequence }}. {{ stop.stopname }}
+                                                </h6>
+                                                <small class="text-muted">
+                                                  Arrival :
+                                                  <strong>{{ stop.arrival }}</strong>
+                                                  &nbsp;&nbsp;&nbsp; Departure :
+                                                  <strong>{{ stop.departure }}</strong>
+                                                  &nbsp;&nbsp;&nbsp; Distance :
+                                                  <strong>{{ stop.distance }} km</strong>
+                                                </small>
+                                              </div>
+                                            </div>
+                                          }
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  }
+                                }
+                              </tbody>
+                            }
+                            @if (detailsData.length === 0) {
+                              <tbody>
+                                <tr>
+                                  <td colspan="11" class="text-center">No records found.</td>
+                                </tr>
+                              </tbody>
+                            }
+                          </table>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Modal For Unassign Trip From Vehicle -->
+              <div
+                class="modal fade"
+                id="unassignModal"
+                tabindex="-1"
+                role="dialog"
+                aria-labelledby="unassignModalLabel"
+                aria-hidden="true"
+                >
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="unassignModalLabel">
+                        Unassign Vehicle from Trip
+                      </h5>
+                      <button
+                        type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"
+                        >
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure you want to unassign this vehicle from the trip?</p>
+                      <div class="form-group">
+                        <label for="unassignRemarks"
+                          >Remarks <span class="text-danger">*</span></label
+                          >
+                          <textarea
+                            id="unassignRemarks"
+                            class="form-control"
+                            [(ngModel)]="unassignReq.remarks"
+                            #unassignRemarksCtrl="ngModel"
+                            required
+                            minlength="5"
+                            maxlength="200"
+                            name="unassignRemarks"
+                          ></textarea>
+                          <div class="text-danger">
+                            @if (
+                              unassignRemarksCtrl.invalid &&
+                              (unassignRemarksCtrl.dirty || unassignRemarksCtrl.touched)
+                              ) {
+                              <small
+                                >
+                                @if (unassignRemarksCtrl.errors?.['required']) {
+                                  <span
+                                    >Remarks are required.</span
+                                    >
+                                  }
+                                  @if (unassignRemarksCtrl.errors?.['minlength']) {
+                                    <span
+                                      >Remarks must be at least 5 characters long.</span
+                                      >
+                                    }
+                                    @if (unassignRemarksCtrl.errors?.['maxlength']) {
+                                      <span
+                                        >Remarks cannot exceed 200 characters.</span
+                                        >
+                                      }
+                                    </small>
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">
+                                Cancel
+                              </button>
+                              <button
+                                type="submit"
+                                class="btn btn-sm btn-danger"
+                                (click)="unassignVehicle()"
+                                data-dismiss="modal"
+                                >
+                                Unassign
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>

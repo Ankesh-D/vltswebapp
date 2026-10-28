@@ -1,0 +1,16 @@
+<div class="pagination-wrapper" [ngClass]="'justify-' + align" *ngIf="forceDisplay || totalCount > pageSize">
+  <ngb-pagination
+    [collectionSize]="totalCount"
+    [page]="page"
+    [pageSize]="pageSize"
+    [disabled]="disabled"
+    (pageChange)="onPageChange($event)"
+    [maxSize]="maxSize"
+    [rotate]="rotate"
+    [ellipses]="ellipses"
+    [boundaryLinks]="boundaryLinks"
+    [size]="size"
+    class="d-flex mt-0 mb-1"
+  >
+  </ngb-pagination>
+</div>

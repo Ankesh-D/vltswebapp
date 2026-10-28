@@ -1,0 +1,589 @@
+<div class="content-box">
+  <div class="row" id="searchdiv">
+    <div class="col-lg-12">
+      <div class="element-wrapper">
+        <div class="element-box">
+          <form autocomplete="off">
+            <div class="col-md-12 pagetitleborder" style="margin-bottom:15px;">
+              <div class="pagetitlestyle"><span>Vahan Installation</span></div>
+            </div>
+
+            <div class="container">
+              <div class="stepwizard">
+                <div class="stepwizard-row setup-panel">
+                  <div class="stepwizard-step col-xs-3">
+                    <button type="button"
+                      [class.btn-success]="currentStep >= 1"
+                      [class.btn-default]="currentStep < 1"
+                      class="btn btn-circle"
+                      [disabled]="currentStep < 1">
+                      1
+                    </button>
+                    <p><small>Serial No.</small></p>
+                  </div>
+                  <div class="stepwizard-step col-xs-3">
+                    <button type="button"
+                      [class.btn-success]="currentStep >= 2"
+                      [class.btn-default]="currentStep < 2"
+                      class="btn btn-circle"
+                      [disabled]="currentStep < 2">
+                      2
+                    </button>
+                    <p><small>Vahan Details</small></p>
+                  </div>
+                  <div class="stepwizard-step col-xs-3">
+                    <button type="button"
+                      [class.btn-success]="currentStep >= 3"
+                      [class.btn-default]="currentStep < 3"
+                      class="btn btn-circle"
+                      [disabled]="currentStep < 3">
+                      3
+                    </button>
+                    <p><small>Other Details</small></p>
+                  </div>
+                </div>
+              </div>
+
+              <form role="form" id="vahandeviceentryandInstallationform" autocomplete="off">
+                <!-- Step 1: Serial No -->
+                @if (currentStep === 1) {
+                  <div class="step" id="step-1">
+                    <div class="panel-body">
+                      <div class="row justify-content-center">
+                        <div class="col-md-5">
+                          <div class="fetch-card">
+                            <div class="fetch-header">
+                              <h5>Vehicle Installation</h5>
+                              <small>Enter Device Serial Number</small>
+                            </div>
+                            <div class="form-group mt-3">
+                              <label class="fontstyle">
+                                Serial No <span class="text-danger">*</span>
+                              </label>
+                              <input
+                                class="form-control"
+                                id="serialno"
+                                placeholder="Enter Serial Number"
+                                type="text"
+                                [(ngModel)]="serialNo"
+                                maxlength="19"
+                                name="serialno"
+                                autocomplete="off">
+                            </div>
+                            <button
+                              class="btn btn-sm btn-success fetch-btn"
+                              id="fetchBtn"
+                              (click)="getDataFromVahan()"
+                              [disabled]="loading">
+                              @if (loading) {
+                                <span>
+                                  Loading...
+                                </span>
+                              }
+                              @if (!loading) {
+                                <span>
+                                  Fetch Details From Vahan
+                                </span>
+                              }
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+
+                <!-- Step 2: Vahan Details -->
+                @if (currentStep === 2) {
+                  <div class="step step-2" id="divstep2">
+                    <div class="panel-heading d-flex justify-content-between align-items-center">
+                      <h6 class="titlefontstep mb-0">
+                        <u>Vahan Details</u>
+                      </h6>
+                      <div class="badge bg-light text-dark border px-3 py-2">
+                        <strong>Device Serial No:</strong>
+                        <span>{{ deviceSerialNo || 'NA' }}</span>
+                      </div>
+                    </div>
+                    <div class="panel-body">
+                      <div class="row">
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle">IMEI No.</label>
+                          <label class="mandetory">*</label>
+                          <input
+                            maxlength="15"
+                            type="text"
+                            id="imeinovalue"
+                            class="form-control acceptnumeric_nodecimal"
+                            placeholder="IMEI NO"
+                            [(ngModel)]="imeiNo"
+                            [readonly]="!!imeiNo"
+                            name="imeiNo" />
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle">ICCID No.</label>
+                          <label class="mandetory">*</label>
+                          <input
+                            maxlength="20"
+                            type="text"
+                            id="iccidnovalue"
+                            class="form-control acceptnumeric_nodecimal"
+                            placeholder="ICCID NO"
+                            [(ngModel)]="iccidNo"
+                            [readonly]="!!iccidNo"
+                            name="iccidNo" />
+                        </div>
+                        <div class="col-md-3 form-group" id="vehdiv">
+                          <label class="control-label lablestyle">Vehicle No.</label>
+                          <!-- <label class="mandetory">*</label> -->
+                          <input
+                            maxlength="17"
+                            type="text"
+                            id="vehiclenovalue"
+                            class="form-control ignorespecialcharacter"
+                            placeholder="Vehicle No"
+                            [(ngModel)]="vehicleNo"
+                            [readonly]="vehicleNoReadonly"
+                            name="vehicleNo" />
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle">Chassis No.</label>
+                          <!-- [readonly]="!!chassisNo" -->
+                          <input
+                            maxlength="17"
+                            type="text"
+                            id="chassisnovalue"
+                            class="form-control ignorespecialcharacter"
+                            placeholder="Chassis No"
+                            [(ngModel)]="chassisNo"
+                            [readonly]="!!chassisNo"
+                            name="chassisNo" />
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle">Engine No.</label>
+                          <label class="mandetory">*</label>
+                          <input
+                            maxlength="25"
+                            type="text"
+                            id="enginenovalue"
+                            class="form-control ignorespecialcharacter"
+                            placeholder="Engine No"
+                            [(ngModel)]="engineNo"
+                            name="engineNo" />
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle">Make Name</label>
+                          <label class="mandetory">*</label>
+                          <input
+                            maxlength="150"
+                            type="text"
+                            id="makenamevalue"
+                            class="form-control"
+                            placeholder="Make Name"
+                            [(ngModel)]="makeName"
+                            name="makeName" />
+                        </div>
+                        <div class="col-md-3">
+                          <label class="lablestyle">Model Name</label>
+                          <label class="mandetory">*</label>
+                          <ng-select
+                            id="modelnamevalue"
+                            [(ngModel)]="modelName"
+                            (change)="onModelNameChange(modelName)"
+                            name="modelName"
+                            placeholder="Select Model">
+                            @for (x of deviceModelList; track x) {
+                              <ng-option [value]="x.param1">{{x.param2}}</ng-option>
+                            }
+                          </ng-select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="lablestyle">Vehicle Class</label>
+                          <label class="mandetory">*</label>
+                          <ng-select
+                            id="vehicleclassvalue"
+                            [(ngModel)]="vehicleClass"
+                            name="vehicleClass"
+                            placeholder="Select Class">
+                            @for (x of vehicleClassList; track x) {
+                              <ng-option [value]="x.param1">{{x.param2}}</ng-option>
+                            }
+                          </ng-select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle">Customer Name</label>
+                          <label class="mandetory">*</label>
+                          <input
+                            maxlength="150"
+                            type="text"
+                            id="ownernamevalue"
+                            class="form-control"
+                            placeholder="Customer Name"
+                            [(ngModel)]="customerName"
+                            name="customerName" />
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle" for="vehicletype">Vehicle Type</label>
+                          <ng-select
+                            name="vehicletype"
+                            id="vehicletypeid"
+                            [(ngModel)]="vehicleType"
+                            placeholder="Select Type"
+                            [disabled]="vahanResponseData.param12 !=''">
+                            <ng-option value="New">New</ng-option>
+                            <ng-option value="Old">Old</ng-option>
+                          </ng-select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle">Manufacture Year</label>
+                          <label class="mandetory">*</label>
+                          <ng-select placeholder="Select Mfg year" [(ngModel)]="manufactureYear"
+                            name="manufactureYear" style="font-size: 11px;" required
+                            #mfgYearRef="ngModel"
+                            [disabled]="vahanResponseData.param12!=''"
+                            [class.is-invalid]="mfgYearRef.invalid && (mfgYearRef.touched)">
+                            @for (year of mfgYearList; track year) {
+                              <ng-option [value]="year">
+                                {{year}}
+                              </ng-option>
+                            }
+                          </ng-select>
+                          <!-- <input
+                          class="form-control"
+                          placeholder="Manufacture Year"
+                          id="vahanmfgyr"
+                          [(ngModel)]="manufactureYear"
+                          name="manufactureYear" /> -->
+                        </div>
+                      </div>
+                      <button
+                        class="prev-btn back"
+                        type="button"
+                        (click)="goToStep(1)">
+                        Back
+                      </button>
+                      <button
+                        class="next-btn next"
+                        id="nextBtn"
+                        type="button"
+                        (click)="goToStep(3)">
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                }
+
+                <!-- Step 3: Other Details -->
+                @if (currentStep === 3) {
+                  <div class="step step-3" id="divstep3">
+                    <div class="panel-heading d-flex justify-content-between align-items-center">
+                      <h6 class="titlefontstep mb-0">
+                        <u>Other Details</u>
+                      </h6>
+                      <span class="badge bg-light text-dark border px-3 py-2">
+                        <strong>Device Serial No:</strong>
+                        {{ deviceSerialNo || 'NA' }}
+                      </span>
+                    </div>
+                    <div class="panel-body">
+                      <div class="row">
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle">Customer Contact No.</label>
+                          <label class="mandetory">*</label>
+                          <input
+                            maxlength="10"
+                            type="text"
+                            id="contactvalue"
+                            class="form-control acceptnumeric_nodecimal"
+                            placeholder="Contact No"
+                            [(ngModel)]="customerContactNo"
+                            name="customerContactNo" />
+                        </div>
+                        <div class="col-md-3 form-group" id="mobile1" >
+                          <label class="control-label lablestyle">Mobile No.1</label>
+                          <label class="mandetory">*</label>
+                          <input
+                            maxlength="13"
+                            type="text"
+                            id="sim1value"
+                            class="form-control acceptnumeric_nodecimal"
+                            placeholder="Mobile No.1"
+                            [(ngModel)]="mobileNo1"
+                            name="mobileNo1" />
+                        </div>
+                        <div class="col-md-3 form-group" id="mobnet1" >
+                          <label class="control-label lablestyle">Network 1</label>
+                          <label class="mandetory">*</label>
+                          <ng-select
+                            id="network1"
+                            [(ngModel)]="network1"
+                            name="network1">
+                            <ng-option value="">Sim Network 1</ng-option>
+                            @for (x of networkList; track x) {
+                              <ng-option [value]="x.param1">{{x.param2}}</ng-option>
+                            }
+                          </ng-select>
+                        </div>
+                        <div class="col-md-3 form-group" id="mobile2" >
+                          <label class="control-label lablestyle">Mobile No.2</label>
+                          <label class="mandetory">*</label>
+                          <input
+                            maxlength="13"
+                            type="text"
+                            id="sim2value"
+                            class="form-control acceptnumeric_nodecimal"
+                            placeholder="Mobile 2"
+                            [(ngModel)]="mobileNo2"
+                            name="mobileNo2" />
+                        </div>
+                        <div class="col-md-3 form-group" id="mobnet2" >
+                          <label class="lablestyle">Network 2</label>
+                          <label class="mandetory">*</label>
+                          <ng-select
+                            id="network2"
+                            [(ngModel)]="network2"
+                            name="network2">
+                            <ng-option value="">Sim Network 2</ng-option>
+                            @for (x of networkList; track x) {
+                              <ng-option [value]="x.param1">{{x.param2}}</ng-option>
+                            }
+                          </ng-select>
+                        </div>
+                        <div class="col-md-3 form-group" id="m2mid" >
+                          <label class="lablestyle">Esim Provider</label>
+                          <label class="mandetory">*</label>
+                          <ng-select
+                            id="m2mp"
+                            [(ngModel)]="m2mProvider"
+                            name="m2mProvider">
+                            <ng-option value="">Select Esim Provider</ng-option>
+                            @for (x of m2mProviderList; track x) {
+                              <ng-option [value]="x.param1">{{x.param2}}</ng-option>
+                            }
+                          </ng-select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="lablestyle">Dealer Name</label>
+                          <label class="mandetory">*</label>
+                          <ng-select
+                            id="dealernamevalue"
+                            [(ngModel)]="dealerName"
+                            name="dealerName">
+                            <ng-option value="">Select Dealer</ng-option>
+                            @for (x of dealerList; track x) {
+                              <ng-option [value]="x.param1">{{x.param2}}</ng-option>
+                            }
+                          </ng-select>
+                        </div>
+                        <div class="col-md-3 form-group selectdivewidth" id="rtodiv">
+                          <font class="control-label lablestyle">Select RTO</font>
+                          <label class="mandetory">*</label>
+                          <ng-select
+                            id="rtonamevalue"
+                            class="searchable"
+                            [(ngModel)]="rtoName"
+                            name="rtoName">
+                            <ng-option value="">Select RTO</ng-option>
+                            @for (x of rtoList; track x) {
+                              <ng-option [value]="x.param1">{{x.param2}}</ng-option>
+                            }
+                          </ng-select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle">Vehicle Make Name</label>
+                          <label class="mandetory">*</label>
+                          <ng-select
+                            id="vehiclemakenamevalue"
+                            class="searchable"
+                            [(ngModel)]="vehicleMakeName"
+                            (change)="onVehicleMakeChange(vehicleMakeName)"
+                            name="vehicleMakeName">
+                            <ng-option value="">Select Make</ng-option>
+                            @for (x of vehicleMakeList; track x) {
+                              <ng-option [value]="x.param1">{{x.param2}}</ng-option>
+                            }
+                          </ng-select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                          <label class="control-label lablestyle">Vehicle Model Name</label>
+                          <label class="mandetory">*</label>
+                          <ng-select
+                            id="vehiclemodelnamevalue"
+                            class="searchable"
+                            [(ngModel)]="vehicleModelName"
+                            name="vehicleModelName">
+                            <ng-option value="">Select Model</ng-option>
+                            @for (x of vehicleModelList; track x) {
+                              <ng-option [value]="x.param1">{{x.param2}}</ng-option>
+                            }
+                          </ng-select>
+                        </div>
+                        @if (showValidityField) {
+                          <div class="col-md-3 form-group">
+                            <label class="control-label lablestyle">
+                              Validity
+                            </label>
+                            <label class="mandetory">*</label>
+                            <ng-select
+                              id="validity"
+                              [(ngModel)]="validity"
+                              name="validity"
+                              placeholder="Select Validity">
+                              <ng-option value="1 ">1 Year</ng-option>
+                              <ng-option value="2 ">2 Year</ng-option>
+                            </ng-select>
+                          </div>
+                        }
+                      </div>
+                      <button
+                        class="prev-btn back"
+                        id="backBtn1"
+                        type="button"
+                        (click)="goToStep(2)">
+                        Back
+                      </button>
+                      <button
+                        class="btn btn-primary"
+                        type="submit"
+                        (click)="onSubmit()"
+                        [disabled]="loading">
+                        @if (loading) {
+                          <span>Submitting...</span>
+                        }
+                        @if (!loading) {
+                          <span>Submit</span>
+                        }
+                      </button>
+                    </div>
+                  </div>
+                }
+              </form>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" [type]="msgType" (closed)="errorMessage = null"></app-toast>
+}
+<!-- Override Modal -->
+@if (showOverrideModal) {
+  <div
+    class="modal fade show"
+    style="display:block;background:rgba(0,0,0,.5);"
+    >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            Vehicle Already Assigned
+          </h5>
+        </div>
+        <div class="modal-body">
+          <table class="table table-bordered override-table">
+            <tr>
+              <th>Device Sr.No</th>
+              <td>{{ overrideData?.param1 }}</td>
+            </tr>
+            <tr>
+              <th>Chassis No</th>
+              <td>{{ overrideData?.param2 }}</td>
+            </tr>
+            <tr>
+              <th>IMEI</th>
+              <td>{{ overrideData?.param3 }}</td>
+            </tr>
+            <tr>
+              <th>Vendor</th>
+              <td>{{ overrideData?.param4 }}</td>
+            </tr>
+          </table>
+          <div class="alert alert-warning">
+            <strong>Warning!</strong><br>
+            This vehicle is already assigned to another device.
+            <br><br>
+            <b>Note:</b>
+            If you click <b>Override</b>, the vehicle will be untagged from the currently assigned device and tagged to the new device being installed.
+            <br><br>
+            <!-- This action cannot be undone without administrator intervention. -->
+          </div>
+          <div class="form-group">
+            <label>
+              Reason for Override <span style="color:red">*</span>
+            </label>
+            <textarea
+              class="form-control override-reason"
+              rows="3"
+              placeholder="Enter minimum 5 words reason"
+              [(ngModel)]="overrideReason">
+            </textarea>
+            @if (overrideReason && getWordCount(overrideReason) < 5) {
+              <small class="text-danger " style="font-size: 12px"
+                >
+                Minimum 5 words required.
+              </small>
+            }
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn btn-sm btn-secondary"
+            (click)="closeOverrideModal()">
+            Cancel
+          </button>
+          <button
+            class="btn btn-sm btn-danger"
+            [disabled]="getWordCount(overrideReason) < 10"
+            (click)="onOverride()">
+            Yes, Override
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+
+<!-- Validity Confirmation Modal -->
+@if (showValidityModal) {
+  <div
+    class="modal fade show validity-modal-backdrop"
+    style="display:block;background:rgba(0,0,0,.5);"
+    >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            Confirm Validity
+          </h5>
+        </div>
+        <div class="modal-body text-center">
+          <p>
+            Do you want to proceed with
+            <strong class="text-primary">
+              {{ validity }} year
+            </strong>
+            validity?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-sm btn-secondary"
+            (click)="showValidityModal = false">
+            No
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-success"
+            (click)="confirmValiditySubmit()">
+            Yes, Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

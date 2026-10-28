@@ -1,0 +1,659 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <div class="pagetitlestyle"><span>Vehicle Installation And Activation</span></div>
+            </div>
+
+
+            <form id="vahaninstallation" autocomplete="off" class="mb-0">
+              <!-- <div class="form-desc" style="margin-bottom: 0rem;">
+              <strong>NOTE :</strong><label for="" class="mandetory">*</label> Are Mandatory Fields.
+              <label id="tacvaliditymsg" style="font-weight: 600;font-size: 13px;"></label>
+            </div> -->
+
+            <div class="row py-2 justify-content-center" id="imeisearch">
+
+              <div class="col-md-5 col-sm-8">
+
+                <label class="mb-1 boldfont d-block text-center">
+                  IMEI No. <span class="mandetory">*</span>
+                </label>
+
+                <div class="input-group">
+
+                  <input
+                    type="text"
+                    class="form-control text-center"
+                    maxlength="15"
+                    name="imeiNo"
+                    [(ngModel)]="imeiNo"
+                    placeholder="Enter 15 digit IMEI"
+                    (keyup.enter)="onFetchClick()">
+
+                  <div class="d-flex align-items-center gap-2 ms-2">
+
+                    <button
+                      class="btn btn-primary"
+                      type="button"
+                      (click)="onFetchClick()">
+                      Search
+                    </button>
+
+                    @if (imeiNo && imeiNo.length > 14) {
+                      <button
+                        class="btn btn-warning"
+                        type="button"
+                        (click)="onRefreshClick()">
+                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                      </button>
+                    }
+
+                    @if (imeiNo && imeiNo.length > 14) {
+                      <button
+                        class="btn btn-sm btn-secondary"
+                        type="button"
+                        (click)="onClearClick()">
+                        Clear
+                      </button>
+                    }
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            @if (showDetails) {
+              <div class="row" id="details" style="margin-top: 0px;">
+                <div class="col-md-12 d-flex justify-content-between align-items-center" style="font-size:14px;">
+                  <!-- <div>
+                  <strong>NOTE :</strong><label for="" class="mandetory">*</label> Are Mandatory Fields.
+                </div> -->
+                <!-- <div>
+                <button class="btn" (click)="back()" style="background: none;text-decoration: underline;">
+                  <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
+                </button>
+              </div> -->
+            </div>
+            <!-- Device Details Section -->
+            <!-- Device Details Table Design -->
+            <div class="col-md-4 details-section" style="padding: 0 10px;">
+              <div class="table-responsive">
+                <table class="table table-bordered table-sm" style="background-color: #f9f9f9;">
+                  <thead>
+                    <tr>
+                      <th colspan="2" class="text-center boldfont" style="font-size: 14px;">Device Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="boldfont">Device Mfg Name </td>
+                      <td>{{devicemfgname}}</td>
+                    </tr>
+                    <tr>
+                      <td class="boldfont">Serial No.</td>
+                      <td>{{deviceSrNo}}</td>
+                    </tr>
+                    <tr>
+                      <td class="boldfont">ICCID No.</td>
+                      <td>{{iccidNo}}</td>
+                    </tr>
+                    <tr>
+                      <td class="boldfont">IMEI No.</td>
+                      <td>{{ displayimei || 'NA' }}</td>
+                    </tr>
+                    <tr>
+                      <td class="boldfont">Model Code</td>
+                      <td>{{modelCode}}</td>
+                    </tr>
+                    <tr>
+                      <td class="boldfont">Esim Provider</td>
+                      <td>{{m2mProvider}}</td>
+                    </tr>
+                    <tr>
+                      <td class="boldfont">Mobile No. 1</td>
+                      <td>{{simNo1}}</td>
+                    </tr>
+                    <tr>
+                      <td class="boldfont">Network 1</td>
+                      <td>{{simNetwork1}}</td>
+                    </tr>
+                    <tr>
+                      <td class="boldfont">Validity</td>
+                      <td>
+                        <span>{{simValidity1 && simValidity1 !== 'NA' ? simValidity1 : 'NA'}}</span>
+                        <label style="color:red; display:block; font-size:11px;">{{errorMsg1}}</label>
+                        <button class="btn btn-sm btn-primary"
+                          style="margin-top: 3px; padding: 3px 8px; font-size: 11px;"
+                        (click)="updateSimValidity();">Update</button>
+                      </td>
+                    </tr>
+                    <!-- <tr>
+                    <td class="boldfont">IMSI Primary</td>
+                    <td>{{imsiPrimaryNo}}</td>
+                  </tr> -->
+                  <tr>
+                    <td class="boldfont">Mobile No. 2</td>
+                    <td>{{simNo2}}</td>
+                  </tr>
+                  <tr>
+                    <td class="boldfont">Network 2</td>
+                    <td>{{simNetwork2}}</td>
+                  </tr>
+                  <!-- <tr>
+                  <td class="boldfont">Validity</td>
+                  <td>
+                    <span>{{simValidity2 && simValidity2 !== 'NA' ? simValidity2 : 'NA'}}</span>
+                    <label style="color:red; display:block; font-size:11px;">{{errorMsg2}}</label>
+                  </td>
+                </tr> -->
+                <!-- <tr>
+                <td class="boldfont">IMSI Secondary</td>
+                <td>{{imsiSecondaryNo}}</td>
+              </tr> -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Vehicle Details Section (if already assigned) -->
+      @if (deviceDetails && deviceDetails.param47 === 'Assigned') {
+        <div class="col-md-4 details-section" style="padding: 0 10px;" id="vehicledetails"
+          >
+          <div class="table-responsive">
+            <table class="table table-bordered table-sm" style="background-color: #f9f9f9;">
+              <thead>
+                <tr>
+                  <th colspan="2" class="text-center boldfont" style="font-size: 14px;">Vehicle Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="boldfont">Vehicle Type</td>
+                  <td>{{vehicleType}}</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Vehicle No.</td>
+                  <td>{{vehicleNo}}</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Chassis No.</td>
+                  <td>{{chassisNo}}</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Engine No.</td>
+                  <td>{{engineNo}}</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Make</td>
+                  <td>{{vehMake}}</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Model</td>
+                  <td>{{vehModel}}</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Class</td>
+                  <td>{{vehClass}}</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Customer Details</td>
+                  <td>{{customerName}} ({{mobileNo}})</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Dealer</td>
+                  <td>{{dealerName}}</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">RTO</td>
+                  <td>{{rtoName}}</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Manufacture Year</td>
+                  <td>{{mfgYear}}</td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Assign Date</td>
+                  <td>{{assignDate}}</td>
+                </tr>
+                @if (Certificate_Validity != '0') {
+                  <tr>
+                    <td class="boldfont">Certificate Validity</td>
+                    <td>{{ Certificate_Validity }} YEARS</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+      @if (deviceDetails && deviceDetails.param47 === 'Assigned') {
+        <div class="col-md-4 details-section" style="padding: 0 10px;" id="vehicleactivation"
+          >
+          <div class="table-responsive">
+            <table class="table table-bordered table-sm" style="background-color: #f9f9f9;">
+              <thead>
+                <tr>
+                  <th colspan="2" class="text-center boldfont" style="font-size: 14px;">AIS Compliance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="boldfont">Activation Compliance</td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-info compliance-btn"
+                      type="button"
+                      (click)="openComplianceModal()">
+                      View ({{passedChecks}}/{{totalChecks}})
+                    </button>
+                    @if (passedChecks < totalChecks) {
+                      <button
+                        class="   btn btn-warning"
+                        type="button"
+                        style="margin-left: 5px; color: #fff;background-color:#f39c12; border-color: #f39c12;"
+                        (click)="refreshComplianceCheck()">
+                        Refresh<i class="fa fa-refresh"></i>
+                      </button>
+                    }
+                  </td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Mode</td>
+                  <td>
+                            <span class="status-text" [ngClass]="{
+    'text-success': isModeAllowed(),
+    'text-danger': !isModeAllowed()
+  }">
+                      {{ getDeviceMode() || 'NA' }}
+                    </span>
+                    @if (!isModeAllowed()) {
+                      <div class="text-danger small">
+                        {{ getModeErrorMessage() }}
+                      </div>
+                    }
+                    <!-- <div class="text-danger small" *ngIf="getDeviceMode() === 'HTTP'">HTTP not allowed</div> -->
+                  </td>
+                </tr>
+                <tr>
+                  <td class="boldfont">GPS Status</td>
+                  <td>
+                            <span class="status-text" [ngClass]="{
+    'text-success':
+      isGpsValid() &&
+      pollingStatus !== 'Never Received' &&
+      pollingStatus !== 'Not Received',
+
+    'text-danger':
+      !isGpsValid() ||
+      pollingStatus === 'Never Received' ||
+      pollingStatus === 'Not Received'
+  }">
+                      {{ getGpsStatusText() }}
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Polling Status</td>
+                  <td>
+                    <span class="status-text"
+                      [ngClass]="{'text-success': pollingStatus === 'Received', 'text-danger': pollingStatus !== 'Received'}">
+                      {{ pollingStatus === 'Received' ? 'Received' : (pollingStatus || 'Never Received') }}
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="boldfont">Polling Time</td>
+                  <td>
+                    <span
+                      [ngClass]="{'text-success': isRecentTime(pollingTime), 'text-danger': !isRecentTime(pollingTime)}">
+                      {{ formatDateTime(pollingTime) }}
+                    </span>
+                  </td>
+                </tr>
+                @if (isGpsValid()) {
+                  <tr>
+                    <td class="boldfont">Last Panic Event Time</td>
+                    <td>
+                      <span
+      [ngClass]="{
+        'text-success': isRecentTime(lastAlertTime),
+        'text-danger': !isRecentTime(lastAlertTime)
+      }">
+                        {{ formatDateTime(lastAlertTime) }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+                @if (isGpsValid()) {
+                  <tr>
+                    <td class="boldfont">Panic Location</td>
+                    <td>
+                      <span class="text-success">
+                        Location Valid ({{ getPanicLatitude() }}, {{ getPanicLongitude() }})
+                      </span>
+                    </td>
+                  </tr>
+                }
+                @if (resStatus !== 'true') {
+                  <tr>
+                    <td class="boldfont">Activation Status</td>
+                    <td class="text-danger">{{ outputMessage || 'Device not valid for activation' }}</td>
+                  </tr>
+                }
+                <!-- <tr *ngIf="!isSimValidityEligible()">
+                <td class="boldfont">SIM Validity</td>
+                <span *ngIf="resStatus === 'false'">
+                  {{ outputMessage }}
+                </span>
+                <!-- <td class="text-danger">
+                SIM validity should be minimum
+                {{
+                (deviceDetails?.param28 || '').trim().toUpperCase() === 'OLD'
+                ? '1 Year'
+                : '2 Years'
+                }}
+                from current date.
+              </td> -->
+            <!-- </tr> -->
+            @if (!activationCheckFlag) {
+              <tr>
+                <td class="boldfont">OTP Status</td>
+                <td class="text-danger">Compliance pending or failed</td>
+              </tr>
+            }
+            @if (activationCheckFlag && !canShowOtpButton()) {
+              <tr>
+                <td class="boldfont">OTP Status</td>
+                <td class="text-danger">OTP not allowed</td>
+              </tr>
+            }
+            @if (canShowOtpButton()) {
+              <tr>
+                <td class="boldfont">OTP</td>
+                <td>
+                  <div class="otp-inline">
+                    @if (!otpSent) {
+                      <button class="btn btn-primary btn-sm" type="button"
+                      (click)="sendOTP()">Send OTP</button>
+                    }
+                    @if (otpSent) {
+                      <input type="text" class="form-control otp-input" maxlength="6" name="otp"
+                        [(ngModel)]="otp" placeholder="Enter OTP">
+                    }
+                    @if (otpSent) {
+                      <button class="btn btn-sm btn-success btn-sm" type="button"
+                      (click)="verifyOtp()">Verify</button>
+                    }
+                  </div>
+                  @if (otpSent) {
+                    <div class="text-danger small mt-1">OTP expires in 20 minutes.</div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+  <!-- Vehicle Installation Form -->
+  @if (deviceDetails && deviceDetails.param47 === 'Not Assigned') {
+    <div class="col-md-8" id="vehicleinstall"
+      >
+      <form #vehicleForm="ngForm" novalidate>
+        <div class="row" style="padding: 10px;">
+          <div class="col-md-12"
+            style="text-align: center;font-size: 12px;border-bottom: 1px solid darkgrey;">
+            <label class="boldfont">Vehicle Installation</label>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label>Vehicle Type <span class="mandetory">*</span></label>
+              <ng-select [items]="vehicleTypes" bindLabel="label" bindValue="value"
+                [(ngModel)]="installationVehicleType" (change)="onVehicleTypeChange()" name="vehicleType"
+                placeholder="Select Vehicle Type" [clearable]="false" class="w-100">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-sm-4" id="vehdiv" >
+            <div class="form-group">
+              <label for="">Vehicle No.<span class="mandetory">*</span></label>
+              <input id="vehicleno" class="form-control ignorespecialcharacter_nospace" maxlength="10"
+                placeholder="Vehicle No" type="text" [(ngModel)]="installationVehicleNo" name="vehicleNo">
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="">Chassis No.<span class="mandetory">*</span></label>
+              <input id="chassisno" class="form-control ignorespecialcharacter_nospace" maxlength="17"
+                placeholder="Chassis No" type="text" [(ngModel)]="installationChassisNo" name="chassisNo">
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="">Engine No.<span class="mandetory">*</span></label>
+              <input class="form-control ignorespecialcharacter_nospace" maxlength="25"
+                placeholder="Engine No" type="text" id="engineno" [(ngModel)]="installationEngineNo"
+                name="engineNo">
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="">Customer Name<span class="mandetory">*</span></label>
+              <input class="form-control ignorespecialcharacter_space" id="customername"
+                placeholder="Customer Name" type="text" maxlength="50"
+                [(ngModel)]="installationCustomerName" name="customerName">
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="">Mobile No.<span class="mandetory">*</span></label>
+              <input class="form-control acceptnumeric_nodecimal" id="mobileno" maxlength="10"
+                placeholder="Contact No" type="text" maxlength="10" [(ngModel)]="installationMobileNo"
+                name="mobileNo">
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label>Vehicle Make <span class="mandetory">*</span></label>
+              <ng-select [items]="vehicleMakeList" bindLabel="param2" bindValue="param1"
+                [(ngModel)]="installationVehicleMake" (change)="onVehicleMakeChange()" name="vehicleMake"
+                placeholder="Select Vehicle Make" [clearable]="false" class="w-100">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label>Vehicle Model <span class="mandetory">*</span></label>
+              <ng-select [items]="vehicleModelList" bindLabel="param2" bindValue="param1"
+                [(ngModel)]="installationVehicleModel" name="vehicleModel"
+                placeholder="Select Vehicle Model" [clearable]="false" class="w-100">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label>Vehicle Class <span class="mandetory">*</span></label>
+              <ng-select [items]="vehicleClassList" bindLabel="param2" bindValue="param1"
+                [(ngModel)]="installationVehicleClass" name="vehicleClass"
+                placeholder="Select Vehicle Class" [clearable]="false" class="w-100">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-sm-4" style="display:none;">
+            <div class="form-group">
+              <label for="">State<span class="mandetory">*</span></label>
+              <select id="statecode" class="searchable" style="width:180px;height: 40px;font-size: 11px;"
+                [(ngModel)]="installationStateCode" name="stateCode">
+                @for (x of stateList; track x) {
+                  <option [value]="x.param3">{{x.param2}}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label>RTO <span class="mandetory">*</span></label>
+              <ng-select [(ngModel)]="installationRTO" name="rto" placeholder="Select RTO"
+                [clearable]="false" class="w-100">
+                @for (item of rtoList; track item) {
+                  <ng-option [value]="item.param2">
+                    {{ item.param4 }} - {{ item.param3 }}
+                  </ng-option>
+                }
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label>Dealer <span class="mandetory">*</span></label>
+              <ng-select [items]="dealerList" bindLabel="param2" bindValue="param1"
+                [(ngModel)]="installationDealer" name="dealer" placeholder="Select Dealer"
+                [clearable]="false" class="w-100">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label>Manufacture Year <span class="mandetory">*</span></label>
+              <ng-select [items]="yearList" bindLabel="param2" bindValue="param1"
+                [(ngModel)]="installationMfgYear" name="mfgYear" placeholder="Select Manufacture Year"
+                [clearable]="false" class="w-100">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="form-buttons-w">
+              <label style="color:red;">{{allowErrorMsg}}</label><br>
+              <button class="btn btn-sm btn-primary"
+              style="margin-top: 3px; padding: 3px 8px; font-size: 11px; " (click)="vehicleInstallation()">Install</button>
+              <!-- [disabled]="errorMsg1 !== '' || allowErrorMsg !== ''" -->
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  }
+</div>
+}
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Bootstrap 4 Modal for Compliance Check -->
+<!-- Compliance Check Modal - Bootstrap 5 -->
+@if (isComplianceModalOpen) {
+  <div
+    class="modal fade show"
+    id="complianceCheckModal"
+    tabindex="-1"
+    aria-modal="true"
+    role="dialog"
+    style="display: block;"
+    >
+    <div class="modal-dialog modal-lg compliance-modal-dialog">
+      <div class="modal-content compliance-modal-content">
+        <div class="modal-header compliance-modal-header">
+          <div class="d-flex align-items-center">
+            <h5 class="modal-title compliance-title mb-0">
+              Compliance Check
+            </h5>
+            <span class="compliance-imei">
+              <strong>IMEI:</strong>
+              {{ displayimei || 'NA' }}
+            </span>
+          </div>
+          <button
+            type="button"
+            class="btn-close compliance-close"
+            aria-label="Close"
+            (click)="closeComplianceModal()">
+          </button>
+        </div>
+        <div class="modal-body compliance-modal-body">
+          <div class="compliance-table-wrapper">
+            <table class="table compliance-table">
+              <tbody>
+                @for (item of activationCheckData | keyvalue; track item) {
+                  <tr>
+                    <td class="compliance-name">
+                      {{ $any(item.key) | underscoreToSpace | titlecase }}
+                    </td>
+                    <td class="compliance-result">
+                      @if (item.value === 'true' || item.value === true) {
+                        <span
+                          class="compliance-pass">
+                          ✓
+                        </span>
+                      }
+                      @if (
+                        item.value === 'false' ||
+                        item.value === false ||
+                        item.value == null ||
+                        item.value === '' ||
+                        item.value === undefined
+                        ) {
+                        <span
+                          class="compliance-fail">
+                          ×
+                        </span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Backdrop -->
+@if (isComplianceModalOpen) {
+  <div
+    class="modal-backdrop fade show">
+  </div>
+}
+<!-- <div class="col-md-12 mt-3" *ngIf="liveData.length > 0">
+<div class="table-responsive">
+  <table class="table table-bordered table-sm">
+    <thead>
+      <tr>
+        <th>Vehicle No</th>
+        <th>IMEI</th>
+        <th>Chassis No</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th>Speed</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of liveData">
+        <td>{{item.vehicleno}}</td>
+        <td>{{item.imeino}}</td>
+        <td>{{item.chassisno}}</td>
+        <td>{{item.latitude}}</td>
+        <td>{{item.longitude}}</td>
+        <td>{{item.speed}}</td>
+        <td>{{item.alertdate}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div> -->
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" [type]="msgType" (closed)="errorMessage = null"></app-toast>
+}

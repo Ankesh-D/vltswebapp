@@ -1,0 +1,263 @@
+/* =========================
+   PAGE WRAPPER
+========================= */
+.content-i {
+  background: #f6f8fb;
+}
+
+.content-box {
+  padding: 15px;
+}
+
+.element-wrapper {
+  margin-bottom: 15px;
+}
+
+.element-box {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================
+   TITLE BAR
+========================= */
+.pagetitleborder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid #4caf50;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+/* ADD NEW BUTTON */
+.pagebtn {
+  position: absolute;
+  left: 0;
+  background: #4caf50;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.pagebtn a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.pagebtn i {
+  font-size: 12px;
+}
+
+/* =========================
+   TABLE
+========================= */
+.table-responsive {
+  margin-top: 10px;
+}
+
+#devicetable {
+  font-size: 11px;
+}
+
+#devicetable thead {
+  background: #c8e4b2;
+}
+
+#devicetable th {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px;
+  text-align: left;
+  border: 1px solid #d3a130;
+  cursor: pointer;
+}
+
+#devicetable td {
+  font-size: 11px;
+  padding: 4px;
+  border: 1px solid #d3a130;
+  vertical-align: middle;
+}
+
+#devicetable tbody tr:nth-child(odd) {
+  background: #e5f3d6;
+}
+
+#devicetable tbody tr:nth-child(even) {
+  background: #f7ffef;
+}
+
+/* =========================
+   SORT ICON
+========================= */
+.sorting {
+  margin-left: 5px;
+}
+
+.sorting_asc::after {
+  content: "▲";
+  font-size: 9px;
+}
+
+.sorting_desc::after {
+  content: "▼";
+  font-size: 9px;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+.btn-group button {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #999;
+  background: #f1f1f1;
+  cursor: pointer;
+}
+
+.btn-group button:hover:not([disabled]) {
+  background: #4caf50;
+  color: #fff;
+}
+
+.btn-group button[disabled] {
+  background: #e0e0e0;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.btnleft5 {
+  margin-left: 5px;
+}
+
+/* =========================
+   PAGINATION
+========================= */
+.pagination-wrapper {
+  margin-top: 12px;
+}
+
+.pagination button {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid #999;
+  background: #fff;
+}
+
+.pagination li.active button {
+  background: #4caf50;
+  color: #fff;
+}
+
+.pagination li.disabled button {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* =========================
+   MODALS (COMMON)
+========================= */
+.modal-content {
+  border-radius: 6px;
+}
+
+.modal-header {
+  background: #e8f5e9;
+  border-bottom: 1px solid #ccc;
+}
+
+.modal-title {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.modal-body {
+  font-size: 11px;
+}
+
+.modal-body label {
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.modal-body textarea,
+.modal-body input,
+.modal-body select {
+  font-size: 11px;
+  height: 28px;
+}
+
+/* =========================
+   MODAL BUTTONS
+========================= */
+.modelbtnstyle {
+  text-align: center;
+}
+
+.modelbtnstyle button {
+  font-size: 11px;
+  padding: 4px 14px;
+  margin: 5px;
+  border-radius: 4px;
+  border: none;
+  background: #4caf50;
+  color: #fff;
+}
+
+.modelbtnstyle button:hover {
+  background: #43a047;
+}
+
+.modelbtnstyle button[type="reset"] {
+  background: #9e9e9e;
+}
+
+/* =========================
+   DELETE / BLOCK MODAL
+========================= */
+#deletemodelheader,
+#deletemodelcontent {
+  background: #fff3e0;
+}
+
+#deletemodeltitle {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* =========================
+   RESET PASSWORD
+========================= */
+#changepassword input {
+  margin-bottom: 5px;
+}
+
+#changepassword span {
+  font-size: 11px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 992px) {
+  .pagetitleborder {
+    flex-direction: column;
+  }
+
+  .pagebtn {
+    position: relative;
+    margin-bottom: 6px;
+  }
+
+  #devicetable {
+    font-size: 10px;
+  }
+}

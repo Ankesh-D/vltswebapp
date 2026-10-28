@@ -1,0 +1,31 @@
+.dashboard-rto-select ::ng-deep .ng-select-container,
+.vendor-select ::ng-deep .ng-select-container {
+  height: 24px;
+  min-height: 24px;
+  font-size: 11px;
+  min-width: 200px;
+}
+
+::ng-deep .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  font-size: 12px !important;
+}
+.modal-title  {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.table-scrolled {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.table-scrolled thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #fff; /* or your green header color */
+}
+.vendor-details-table thead th {
+    
+    background: #a6d6a6; /* or your green header color */
+}

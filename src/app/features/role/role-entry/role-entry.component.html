@@ -1,0 +1,71 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <button class="pagebtn">
+                <a routerLink="/role"><i class="fa fa-plus"></i>&nbsp;&nbsp;Details</a>
+              </button>
+              <div class="pagetitlestyle"><span>Role Entry</span></div>
+            </div>
+
+            <form id="roleentryform" autocomplete="off">
+              <div class="form-desc">
+                <strong>NOTE :</strong><label class="mandetory">*</label> Are Mandatory Fields.
+              </div>
+
+              <div class="entrypagediv">
+                <div class="row">
+                  <!-- Role Name -->
+                  <div class="col-sm-2">
+                    <div class="form-group">
+                      <label for="">Role Name:</label><label for="" class="mandetory">*</label>
+                      <input
+                        type="text"
+                        name="rolename"
+                        id="rolename"
+                        placeholder="Role Name"
+                        class="form-control ignorespecialcharacter_space"
+                        maxlength="50"
+                        [(ngModel)]="roleName"
+                        [class.error]="getFieldError('roleName')"
+                        autocomplete="off">
+                    </div>
+                  </div>
+
+                  <!-- Role Description -->
+                  <div class="col-sm-2">
+                    <div class="form-group">
+                      <label for="">Role Description:</label><label for="" class="mandetory">*</label>
+                      <textarea
+                        id="roledescription"
+                        class="form-control ignorespecialcharacter_address"
+                        placeholder="Role Description"
+                        [(ngModel)]="roleDescription"
+                        [class.error]="getFieldError('roleDescription')"
+                        name="roledescription"
+                      autocomplete="off"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-buttons-w">
+                <button type="button" (click)="roleEntry()" [disabled]="loading">
+                  @if (!loading) {
+                    <span>Submit</span>
+                  }
+                  @if (loading) {
+                    <span>Submitting...</span>
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

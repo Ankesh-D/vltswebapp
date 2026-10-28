@@ -1,0 +1,433 @@
+<style>
+  /* main container */
+  .compact-timepicker {
+  width: 95px !important;
+  display: inline-flex !important;
+  align-items: center;
+}
+
+.compact-timepicker ::ng-deep input.form-control {
+width: 32px !important;
+height: 24px !important;
+padding: 0 !important;
+font-size: 12px !important;
+text-align: center;
+}
+
+
+/* remove table spacing */
+.compact-timepicker ::ng-deep table {
+margin: 0 !important;
+}
+
+.compact-timepicker ::ng-deep td {
+padding: 0 !important;
+}
+
+/* hour and minute input */
+.compact-timepicker ::ng-deep input.form-control {
+width: 28px !important;
+height: 22px !important;
+padding: 0 !important;
+font-size: 11px !important;
+text-align: center;
+}
+
+/* VERY IMPORTANT: fix AM PM column */
+.compact-timepicker ::ng-deep td:last-child {
+min-width: 55px !important;
+width: 55px !important;
+}
+
+/* AM PM input */
+.compact-timepicker ::ng-deep td:last-child input {
+width: 55px !important;
+font-size: 12px !important;
+font-weight: 600 !important;
+text-align: center !important;
+}
+
+/* spinner buttons compact */
+.compact-timepicker ::ng-deep button {
+padding: 0 !important;
+font-size: 8px !important;
+height: 16px !important;
+margin-left: -1.2rem;
+}
+
+::ng-deep .md-drppicker {
+top: -4rem !important;
+left: -4rem !important;
+right: auto !important;
+}
+
+::ng-deep .md-drppicker .btn {
+position: relative;
+overflow: hidden;
+border-width: 0;
+outline: none;
+padding: 0 6px;
+cursor: pointer;
+border-radius: 2px;
+box-shadow: 0 1px 4px #0009 !important;
+background-color: #1a1e30 !important;
+color: #ecf0f1 !important;
+font-size: 12px;
+transition: background-color .4s;
+height: auto;
+text-transform: uppercase;
+line-height: 15px;
+border: none !important;
+}
+</style>
+
+<div class="content-i">
+  <div class="content-box mt-3">
+    <div class="element-wrapper">
+      <!-- Home Button (when from dashboard) -->
+      <!-- <button *ngIf="dash === 'dashboard'" style="background: #2bdc16;border-color: #2bdc16;" class="btn btn-primary returnbtn">
+      <i class="fa fa-angle-double-left" style="width: 20px;"></i>
+      <a style="float: right;" (click)="goHome()" style="cursor: pointer;">Home</a>
+    </button>	 -->
+
+    <div class="element-box">
+      <div class="col-md-12 pagetitleborder">
+        <div class="pagetitlestyle"><span>{{isAssetStatus ? 'Track Vehicles' : 'Assets Details'}}</span></div>
+      </div>
+
+      <!-- Error Message Display -->
+      @if (errorMessage) {
+        <div class="alert alert-warning"
+          style="margin: 10px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
+          <strong>Warning:</strong> {{errorMessage}}
+          <button type="button" class="close" (click)="errorMessage = ''"
+          style="float: right; background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+        </div>
+      }
+
+      <form autocomplete="off">
+        <div class="col-md-12" style="top: 10px;">
+
+          <!-- Filter Dropdowns (only for Asset Status) -->
+          @if (isAssetStatus) {
+            <div class="d-flex justify-content-start mt-2 gap-2" id="livdas">
+              @if (roleId != '19') {
+                <div class="form-group asset-select-filter">
+                  <ng-select id="districtFilter" [items]="rtoList" bindLabel="param2" bindValue="param1" appendTo="body"
+                    placeholder="Select RTO" [ngModel]="rtoFilter || null" (ngModelChange)="rtoFilter=$event"
+                    (change)="onRTOFilterChange()" name="districtFilter" [clearable]="true" style=" font-size: 12px;">
+                  </ng-select>
+                </div>
+              }
+              <div class="form-group asset-select-filter">
+                <ng-select id="searchfitler" appendTo="body" [ngModel]="statusFilter || null" (ngModelChange)="statusFilter=$event || ''"
+                  (change)="onStatusFilterChange()" name="searchfitler" placeholder="Search By" [clearable]="true"
+                  style=" font-size: 12px;">
+                  <ng-option value="Connected" selected >Received</ng-option>
+                  <ng-option value="Not Connected">Not Received</ng-option>
+                  <ng-option value="Running">Running</ng-option>
+                  <ng-option value="Stop">Stop</ng-option>
+                  <ng-option value="Idle">Idle</ng-option>
+                  <ng-option value="Overspeed">Overspeed</ng-option>
+                  <ng-option value="Panic">Panic</ng-option>
+                </ng-select>
+              </div>
+              <div class="form-group asset-select-filter vehicle-class-filter">
+                <ng-select id="searchfitlervehicle" [items]="vehicleClassList" bindLabel="param2" bindValue="param1" appendTo="body"
+                  placeholder="Search By Vehicle Class" [ngModel]="vehicleClassFilter || null"
+                  (ngModelChange)="vehicleClassFilter=$event" (change)="onVehicleClassFilterChange($event)"
+                  name="searchfitlervehicle" [clearable]="true" style=" font-size: 12px;">
+                </ng-select>
+              </div>
+              <div class="filter-group">
+                <label for="vehicleTypeFilter">Vehicle</label>
+                <select id="vehicleTypeFilter" [(ngModel)]="vehicleTypeFilter" (ngModelChange)="onVehicleOrGpsChange()"
+                  name="vehicleTypeFilter">
+                  <option [ngValue]="''">All</option>
+                  <option [ngValue]="'new'">New</option>
+                  <option [ngValue]="'old'">Old</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="gpsFilter">GPS</label>
+                <select id="gpsFilter" [(ngModel)]="gpsFilter" (ngModelChange)="onVehicleOrGpsChange()"
+                  name="gpsFilter">
+                  <option [ngValue]="''">All</option>
+                  <option [ngValue]="'valid'">Valid</option>
+                  <option [ngValue]="'invalid'">Invalid</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="modeFilter">Mode</label>
+                <select id="modeFilter" [(ngModel)]="modeFilter" (ngModelChange)="onVehicleOrModeChange()"
+                  name="modeFilter">
+                  <option [ngValue]="'All'">All</option>
+                  <option [ngValue]="'HTTP'">HTTP</option>
+                  <option [ngValue]="'TCP'">TCP</option>
+                </select>
+              </div>
+              <div class="activation-toggle" aria-label="Asset activation status" style=" display: none;">
+                <button type="button" class="activation-toggle-btn"
+                  [class.active]="activationFilter === 'activated'"
+                  (click)="onActivationFilterChange('activated')">
+                  <i class="fa fa-check-circle" aria-hidden="true"></i>
+                  <span>Activated</span>
+                </button>
+                <button type="button" class="activation-toggle-btn"
+                  [class.active]="activationFilter === 'notactivated'"
+                  (click)="onActivationFilterChange('notactivated')">
+                  <i class="fa fa-power-off" aria-hidden="true"></i>
+                  <span>Not-Activated</span>
+                </button>
+              </div>
+              <div class="asset-home-button">
+                <button type="button" (click)="goToAdminDashboard()" class="btn" title="Go to Home">
+                  <i class="fa fa-home"></i>
+                </button>
+              </div>
+            </div>
+          }
+
+          <!-- Search and Pagination Controls -->
+          <div class="vehicle-filter-toolbar">
+            <div class="filter-group search-group">
+              <span class="filter-label">Search</span>
+              <div class="search-control">
+                <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="tabletitlesearch"
+                  id="searchby" placeholder="Type here..." autocomplete="disabled" maxlength="50"
+                  [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby">
+                <button id="searchbtn" type="button" (click)="getSearchDetails()" title="Search">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" class="toolbar-btn reload-btn" (click)="reloadData()" [disabled]="loading">
+              <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+              <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+            </button>
+
+            <div class="filter-group">
+              <label for="reloadinterval">Reload</label>
+              <select [(ngModel)]="reloadInterval" (change)="onChangeInterval(reloadInterval)"
+                name="reloadinterval" id="reloadinterval">
+                @for (interval of reloadObj; track interval) {
+                  <option [value]="interval.param2">{{interval.param1}}</option>
+                }
+              </select>
+            </div>
+
+            <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+              [showPageSize]="false" [showTotal]="false" [exportLoading]="isExporting"
+              (excelExport)="exportToExcel()"></app-common-data-toolbar>
+
+            <div class="filter-group">
+              <label for="pageSize">Rows</label>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize" id="pageSize">
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size === totalCount ? 'All' : size">
+                    {{size === totalCount ? 'All' : size}}
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="total-pill">
+              Total: {{pageCount}} / {{totalCount}}
+            </div>
+
+            <span class="vehicle-note">**Note : Click on imei number for live track on map</span>
+          </div>
+
+          <!-- Note about clicking vehicle number -->
+
+          <!-- Asset Status Table -->
+          <table class="table table-striped app-table mb-0" style="border-top: 1px solid black; border-bottom: 1px solid black;"
+            id="assetstatustable">
+            <thead>
+              <tr>
+                <th style="width: 20px;">#</th>
+                <th style="cursor: pointer;" (click)="sort('param10')">
+                  Vehicle/<br>Chassis No.
+                  <span class="sorting"
+                  [ngClass]="{'sorting_desc':reverse && sortKey=='param10','sorting_asc':!reverse && sortKey=='param10'}"></span>
+                </th>
+                <th style="cursor: pointer;" (click)="sort('param5')">
+                  Serial No.
+                  <hr>IMEI No.
+                    <span class="sorting"
+                    [ngClass]="{'sorting_desc':reverse && sortKey=='param5','sorting_asc':!reverse && sortKey=='param5'}"></span>
+                  </th>
+                  <th style="cursor: pointer;" (click)="sort('param6')">
+                    ICCID No.
+                    <span class="sorting"
+                    [ngClass]="{'sorting_desc':reverse && sortKey=='param6','sorting_asc':!reverse && sortKey=='param6'}"></span>
+                  </th>
+                  <th style="cursor: pointer;" (click)="sort('param18')">
+                    Customer Details
+                    <span class="sorting"
+                    [ngClass]="{'sorting_desc':reverse && sortKey=='param18','sorting_asc':!reverse && sortKey=='param18'}"></span>
+                  </th>
+                  <th style="cursor: pointer;" (click)="sort('param8')">
+                    Vendor
+                  </th>
+                  <th style="cursor: pointer;" (click)="sort('param22')">
+                    Polling<br>Datetime
+                    <span class="sorting"
+                    [ngClass]="{'sorting_desc':reverse && sortKey=='param22','sorting_asc':!reverse && sortKey=='param22'}"></span>
+                  </th>
+                  <th style="cursor: pointer; width: 110px;" (click)="sort('param25')">
+                    Latitude
+                    <hr>Longitude
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc':reverse && sortKey=='param25','sorting_asc':!reverse && sortKey=='param25'}"></span>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sort('param29')">
+                      Speed(Km/hrs)
+                      <hr>Ignition
+                        <span class="sorting"
+                        [ngClass]="{'sorting_desc':reverse && sortKey=='param29','sorting_asc':!reverse && sortKey=='param29'}"></span>
+                      </th>
+
+                      <th style="cursor: pointer;" (click)="sort('param33')">Location</th>
+
+                      <th>Polling Status
+                        <hr>GPS Status
+                        </th>
+                        <th>Mode</th>
+                        <!-- <th>Last Panic</th> -->
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @if (vehicles.length == 0) {
+                        <tr>
+                          <td colspan="100" style="font-weight: bold; text-align: center;">NO DATA FOUND</td>
+                        </tr>
+                      }
+                      @for (vehicle of vehicles; track vehicle) {
+                        <tr>
+                          <td>
+                            <font>{{hasLength(vehicle.param1) ? vehicle.param1 : 'NA'}}</font>
+                          </td>
+                          <td>
+                            <font>
+                              {{hasLength(vehicle.param10) ? vehicle.param10 : 'NA'}}
+                            </font>
+                          </td>
+                          <td>
+                            <font>{{hasLength(vehicle.param5) ? vehicle.param5 : 'NA'}}</font><br>
+                            <div (click)="(gpsFilter === 'valid' || vehicle.param28 === 'Valid') ? trackVehicle(vehicle) : null"
+                              [style.color]="(gpsFilter === 'valid' || vehicle.param28 === 'Valid') ? 'darkblue' : '#555'"
+                              [style.text-decoration]="(gpsFilter === 'valid' || vehicle.param28 === 'Valid') ? 'underline' : 'none'"
+                              [style.cursor]="(gpsFilter === 'valid' || vehicle.param28 === 'Valid') ? 'pointer' : 'default'">
+                              <font>{{hasLength(vehicle.param4) ? vehicle.param4 : 'NA'}}</font>
+                            </div>
+                          </td>
+                          <td>
+                            <font>{{hasLength(vehicle.param6) ? vehicle.param6 : 'NA'}}</font>
+                          </td>
+                          <td>
+                            <font>{{hasLength(vehicle.param18) ? vehicle.param18 : 'NA'}}</font><br>
+                            <font>{{hasLength(vehicle.param19) ? vehicle.param19 : 'NA'}}</font>
+                          </td>
+                          <td>
+                            <font>{{hasLength(vehicle.param8) ? vehicle.param8 : 'NA'}}</font>
+                          </td>
+                          <td>
+                            <font>{{hasLength(vehicle.param22) ? vehicle.param22 : 'NA'}}</font>
+                          </td>
+                          <td>
+                            <font>{{hasLength(vehicle.param25) ? vehicle.param25 : 'NA'}}</font><br>
+                            <font>{{hasLength(vehicle.param26) ? vehicle.param26 : 'NA'}}</font>
+                          </td>
+                          <td class="changehead2">
+                            <font>{{hasLength(vehicle.param27) ? vehicle.param27 : '0'}}</font><br>
+                            <font>{{hasLength(vehicle.param29) ? vehicle.param29 : 'NA'}}</font>
+                          </td>
+                          <td>
+                            <font>{{hasLength(vehicle.param33) ? vehicle.param33 : 'NA'}}</font>
+                          </td>
+                          <td>
+                            <font>{{vehicle.param21 == 'Connected' ? 'Received' : (vehicle.param21 == 'Not Connected' ? 'Not
+                            Received' : (vehicle.param21 == 'Never Connected' ? 'Never Received' : 'NA'))}}</font><br>
+                            <font>{{hasLength(vehicle.param28) ? vehicle.param28 : 'NA'}}</font>
+                          </td>
+                          <td>
+                            {{hasLength(vehicle.param20) ? vehicle.param20 : 'NA'}}
+                          </td>
+                          <!-- <td>
+                          <div *ngIf="vehicle.param30 && vehicle.param30 !== '---'">
+                            <div id="alertdettrackonmap" (click)="trackVehicle(vehicle)" style="cursor: pointer; text-decoration: underline;">
+                              <img title="Track On Map"
+                                src="assets/images/mapimages/alertimage/panic.gif"
+                                alt="Panic Alert"
+                                height="20px" width="20px"
+                                style="cursor: pointer; text-align: center"
+                                onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iOCIgZmlsbD0icmVkIi8+PC9zdmc+'" /><br>
+                                {{hasLength(vehicle.param30) ? vehicle.param30 : 'NA'}}
+                              </div>
+                            </div>
+                          </td> -->
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+
+                  <!-- Pagination Controls -->
+                  <div class="float-end">
+                    @if (totalCount > pageCount) {
+                      <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+                        [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+                        [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+                    </ngb-pagination>
+                  }
+                </div>
+                <!-- <div class="row">
+                <div class="col-md-12">
+                  <div *ngIf="totalCount > 0" style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                    <button *ngIf="currentPage > 1" (click)="onPageChange(currentPage - 1)" [disabled]="loading"
+                      style="border: 1px solid #0b58b9; background: white; color: #0b58b9; padding: 5px 10px; margin: 0 2px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                      Previous
+                    </button>
+
+                    <ng-container *ngFor="let page of getPageNumbers()">
+                      <span *ngIf="page === -1" style="margin: 0 5px; color: #0b58b9; align-self: center;">...</span>
+                      <button *ngIf="page !== -1" (click)="onPageChange(page)"
+                        [disabled]="loading || page === currentPage"
+                        [style.background]="page === currentPage ? '#0b58b9' : 'white'"
+                        [style.color]="page === currentPage ? 'white' : '#0b58b9'"
+                        style="border: 1px solid #0b58b9; padding: 5px 10px; margin: 0 2px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                        {{page}}
+                      </button>
+                    </ng-container>
+
+                    <button *ngIf="currentPage < getTotalPages()" (click)="onPageChange(currentPage + 1)"
+                      [disabled]="loading"
+                      style="border: 1px solid #0b58b9; background: white; color: #0b58b9; padding: 5px 10px; margin: 0 2px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div> -->
+            </div>
+          </form>
+          <br>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vehicle Tracking Modal -->
+    <app-leaflet-track-modal
+      [visible]="showTrackModal"
+      [trackingId]="selectedVehicleNo"
+      trackingLabel="IMEI No"
+      headerTint="#a6b1a6"
+      [selectedItem]="selectedVehicle"
+      (closed)="closeModal()">
+    </app-leaflet-track-modal>
+
+
+    @if (errorMessage) {
+      <app-toast [message]="errorMessage" [type]="errorType" (closed)="errorMessage = null"></app-toast>
+    }

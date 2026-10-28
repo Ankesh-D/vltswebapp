@@ -1,0 +1,238 @@
+<div class="content-i">
+
+  <div class="content-box pt-0">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="content-body">
+          <div class="container-fluid px-0">
+            <div class="card main-card">
+              <div class="card-body p-2">
+                <div class="col-md-12 pagetitleborder">
+                  <div class="pagetitlestyle mb-2"><span>Out of Office Hours Ussage Report</span>
+                </div>
+              </div>
+              <div class="top-controls-row">
+                <!-- LEFT SIDE -->
+                <div class="left-controls pb-2">
+                  <!-- 🔍 SEARCH BOX -->
+                  <div class="search-box">
+                    <input
+                      type="search"
+                      class="search-input inner"
+                      placeholder="Search Here..."
+                      maxlength="50"
+                      [(ngModel)]="searchText"
+                      (keyup.enter)="getSearchDetails()"
+                      />
+
+                    <button class="search-inner-btn" (click)="getSearchDetails()">
+                      <i class="fa fa-search"></i>
+                    </button>
+                  </div>
+
+                  <!-- 🔄 RELOAD BUTTON -->
+                  <button
+                    class="reload-btn"
+                    (click)="reloadData()"
+                    [disabled]="loading">
+                    <i class="fa fa-refresh pr-1" [class.fa-spin]="loading"></i>
+                    <span>{{ loading ? "Reloading..." : "Reload" }}</span>
+                  </button>
+                </div>
+                <div>
+                  <div style="width: 200px; margin-right: 10px;">
+                    <input
+                      class="form-control form-control-sm text-center"
+                      type="text"
+                      name="date"
+                      id="datepicker"
+                      required
+                      placeholder="Select Date"
+                    /></div>
+                  </div>
+                  <!-- CENTER SECTION -->
+                  <div class="d-flex justify-content-">
+
+
+
+                    <!-- RIGHT SIDE -->
+                    <div class="right-controls">
+                      <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                        [showPageSize]="false" [showTotal]="false" (excelExport)="downloadExcel()">
+                      </app-common-data-toolbar>
+                      <!-- <div class="total-records-text">Show Rows :</div> -->
+                      <!-- ROWS SELECT -->
+                      <!-- <select
+                      class="rows-select"
+                      [(ngModel)]="pageSize"
+                      (change)="onPageSizeChange(pageSize)"
+                      >
+                    <option
+                      *ngFor="let size of pageSizeOptions"
+                      [value]="size === totalCount ? 'All' : size"
+                      >
+                      {{ size === totalCount ? "All" : size }}
+                    </option>
+                  </select> -->
+
+                  <!-- TOTAL RECORD TEXT {{ pageCount }} of -->
+                  <div class="total-records-text">
+                    Total Records :  {{ totalCount }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="table-responsive status-table">
+                <ng-template #reportTableRows let-rows>
+@for (v of rows; track v; let i = $index) {
+                      <tr>
+                        <td class="text-end p-2">{{v.param1 }}</td> <!-- rowno -->
+                        <td class="p-2">
+                          <span class="fw-bold">{{ v.param3 == "" ? "-" : v.param3 }}</span>  <!--rolename-->
+                          ({{ v.param9=='' ? '' : v.param9 }}) <!--username-->
+                        </td>
+                        <!-- <td class="p-2">{{ v.param5 == '' ? '-' : v.param5 }}</td> --> <!--login date-->
+                        <td class="p-2">{{ v.param5 == '' ? '-' : v.param5 }}</td> <!--login time-->
+                        <td class="p-2">{{ v.param6 == '' ? '-' : v.param6 }}</td> <!--logout time-->
+                        <td class="p-2 text-end">{{ v.param7 == '' ? '-' : v.param7 }}</td> <!--usage duration-->
+                        <td class="p-2 text-end">{{ v.param10=='' ? '-' : v.param10 }}</td> <!--out of office hours usage-->
+                      </tr>
+                    }
+
+                    @if (listLoaded && (!detailData || detailData.length === 0)) {
+                      <tr>
+                        <td colspan="10" class="text-center">
+                          NO DATA FOUND
+                        </td>
+                      </tr>
+                    }
+</ng-template>
+<app-common-table [columns]="tableColumns" [rows]="detailData" [loading]="!listLoaded && detailData.length === 0" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table table-striped app-table small-table"></app-common-table>
+                <!-- Pagination Controls -->
+                <div class="float-end">
+                  @if (totalCount > pageSize) {
+                    <ngb-pagination [collectionSize]="totalCount"
+                      [(page)]="pageCount" [pageSize]="pageSize"
+                      (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+                      [ellipses]="false" [boundaryLinks]="true" size="sm"
+                      class="d-flex justify-content-center mt-2 mb-1">
+                    </ngb-pagination>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- <div *ngIf="showDetailsModal">
+<div class="modal-backdrop fade show"></div>
+<div class="modal fade show d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-content">
+        <div class="modal-header py-2">
+
+          <div class="d-flex align-items-center justify-content-between w-100">
+
+            <h5 class="modal-title mb-0">
+              Vendor Details - <span class="text-primary">{{ selectedVendorName }}</span>
+            </h5>
+
+            <div class="d-flex align-items-center">
+
+              <div class="input-group input-group-sm me-2" style="width:250px;">
+                <input type="text" class="form-control" placeholder="Search vendor details..."
+                  [(ngModel)]="searchText" (input)="filterData()">
+              </div>
+              <div>
+                <span style="font-size: 12px; font-weight: 600;">Total Record : {{ detailModalTotalCount }}</span>
+              </div>
+
+              <button type="button" class="close ms-2" aria-label="Close"
+                (click)="closeVendorDetails()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-body p-1">
+        <div *ngIf="detailModalLoading" class="text-center py-3">Loading...</div>
+
+        <div *ngIf="!detailModalLoading && detailModalData.length === 0" class="text-center py-3">
+          No data found.
+        </div>
+
+        <div *ngIf="!detailModalLoading && detailModalData.length > 0" class="table-scrolled">
+
+          <table class="table table-striped app-table table-sm mb-0 vendor-details-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Vendor Name</th>
+                <th>IMEI No.</th>
+                <th>ICCID No.</th>
+                <th>Device Unique No</th>
+                <th>Vehicle No</th>
+                <th>Chassis No</th>
+                <th>RTO Code</th>
+                <th>Installed Date</th>
+                <th>Activation Date</th>
+                <th>Validity Date</th>
+                <th>Vehicle Status</th>
+                <th>Last Polling</th>
+                <th>MVI Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let detail of filteredData; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ detail.param3 }}</td>
+                <td>{{ detail.param4 }}</td>
+                <td>{{ detail.param5 }}</td>
+                <td>{{ detail.param6 }}</td>
+                <td>{{ detail.param7 }}</td>
+                <td>{{ detail.param8 }}</td>
+                <td>{{ detail.param9 }}</td>
+                <td>{{ detail.param10 }}</td>
+                <td>{{ detail.param11 }}</td>
+                <td>{{ detail.param12 }}</td>
+                <td>{{ detail.param13 }}</td>
+                <td>{{ detail.param14 }}</td>
+                <td>
+                                        <div class="fw-bold" [ngClass]="{
+                           'text-success': detail.param15 != 'pending',
+                           'text-danger': detail.param15 == 'pending'
+                         }">
+                    {{ detail.param15 }}
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="float-end">
+            <ngb-pagination
+              [collectionSize]="detailModalTotalCount" [(page)]="detailModalPageCount"
+              [pageSize]="detailModalPageSize" (pageChange)="onModalPageChange($event)" [maxSize]="5"
+              [rotate]="true" [ellipses]="false" [boundaryLinks]="true" size="sm"
+              class="d-flex justify-content-center mt-2 mb-1">
+            </ngb-pagination>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div> -->

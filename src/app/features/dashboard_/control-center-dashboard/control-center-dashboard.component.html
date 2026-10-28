@@ -1,0 +1,306 @@
+<main class="panic-dashboard">
+	<header class="page-header">
+		<div>
+			<h1 class="dashboard-title">{{ sessionsPage ? (sessionWidget || 'Panic session details') : 'Panic overview' }} <span class="eyebrow">(<i class="fa fa-shield"
+						aria-hidden="true"></i> CONTROL CENTER)</span></h1>
+		</div>
+		<div class="header-actions"><span class="updated-time" *ngIf="lastUpdated">Summary updated {{ lastUpdated |
+				date:'HH:mm:ss' }}</span>
+			<div *ngIf="!sessionsPage" class="chart-tabs" role="group" aria-label="Panic count graphs">
+				<button type="button" class="chart-tab" [class.active]="activeChartTab === 'class'"
+					[attr.aria-pressed]="activeChartTab === 'class'" (click)="setActiveChartTab('class')"><i
+						class="fa fa-bar-chart" aria-hidden="true"></i> Vehicle Class Wise</button>
+				<button type="button" class="chart-tab" [class.active]="activeChartTab === 'rto'"
+					[attr.aria-pressed]="activeChartTab === 'rto'" (click)="setActiveChartTab('rto')"><i
+						class="fa fa-map-marker" aria-hidden="true"></i> RTO Wise</button>
+			</div><button *ngIf="activeChartTab !== 'dashboard'" type="button" class="dashboard-return"
+				(click)="showDashboard()"><i class="fa fa-home" aria-hidden="true"></i> Dashboard</button>
+			<a *ngIf="sessionsPage" routerLink="/ControlCenterDashboard" class="map-link"><i class="fa fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
+			<a routerLink="/currentdayschange" class="map-link"><i class="fa fa-list-alt" aria-hidden="true"></i>
+				Alert Analysis</a><button type="button" class="refresh-button" [disabled]="loading"
+				(click)="refresh()"><i class="fa fa-refresh" [class.spinning]="loading" aria-hidden="true"></i>
+				Refresh</button>
+		</div>
+	</header>
+	<p *ngIf="activeChartTab === 'dashboard' && countsError" class="api-error" role="alert">{{ countsError }} <span
+			*ngIf="lastUpdated">Showing the
+			previous summary.</span></p>
+	<section *ngIf="!sessionsPage && activeChartTab === 'dashboard'" class="metric-grid" aria-label="Panic session summary">
+		<article class="metric-card metric-total" role="link" tabindex="0"
+			(click)="openSessionWorklist('Total panic sessions', totalSessions)" (keydown.enter)="openSessionWorklist('Total panic sessions', totalSessions)"
+			(keydown.space)="$event.preventDefault(); openSessionWorklist('Total panic sessions', totalSessions)">
+			<div class="metric-top"><span class="metric-icon"><i class="fa fa-bell" aria-hidden="true"></i></span><span
+					class="metric-label">Total panic sessions</span></div>
+			<strong>{{ countsLoading ? '…' : (totalSessions === null ? '—' : (totalSessions | number)) }}</strong><span
+				class="metric-note">All session statuses</span>
+		</article>
+		<article class="metric-card metric-open" role="link" tabindex="0"
+			(click)="openSessionWorklist('Open panic sessions', openSessions)" (keydown.enter)="openSessionWorklist('Open panic sessions', openSessions)"
+			(keydown.space)="$event.preventDefault(); openSessionWorklist('Open panic sessions', openSessions)">
+			<div class="metric-top"><span class="metric-icon"><i class="fa fa-exclamation-circle"
+						aria-hidden="true"></i></span><span class="metric-label">Open panic sessions</span></div>
+			<strong>{{ countsLoading ? '…' : (openSessions === null ? '—' : (openSessions | number)) }}</strong><span
+				class="metric-note">Awaiting resolution</span>
+		</article>
+		<article class="metric-card metric-auto" role="link" tabindex="0"
+			(click)="openSessionWorklist('Auto closed panic', autoClosedSessions)" (keydown.enter)="openSessionWorklist('Auto closed panic', autoClosedSessions)"
+			(keydown.space)="$event.preventDefault(); openSessionWorklist('Auto closed panic', autoClosedSessions)">
+			<div class="metric-top"><span class="metric-icon"><i class="fa fa-check-circle"
+						aria-hidden="true"></i></span><span class="metric-label">Auto closed panic</span></div>
+			<strong>{{ countsLoading ? '…' : (autoClosedSessions === null ? '—' : (autoClosedSessions | number))
+				}}</strong><span class="metric-note">Closed automatically</span>
+		</article>
+		<article class="metric-card metric-tampered" role="link" tabindex="0"
+			(click)="openSessionWorklist('Tampered panic sessions', tamperedSessions)" (keydown.enter)="openSessionWorklist('Tampered panic sessions', tamperedSessions)"
+			(keydown.space)="$event.preventDefault(); openSessionWorklist('Tampered panic sessions', tamperedSessions)">
+			<div class="metric-top"><span class="metric-icon"><i class="fa fa-shield"
+						aria-hidden="true"></i></span><span class="metric-label">Tampered panic sessions</span></div>
+			<strong>{{ countsLoading ? '…' : (tamperedSessions === null ? '—' : (tamperedSessions | number))
+				}}</strong><span class="metric-note">Tamper signal detected</span>
+		</article>
+		<article class="metric-card metric-operator" role="link" tabindex="0"
+			(click)="openSessionWorklist('Closed by operators', operatorClosedSessions)" (keydown.enter)="openSessionWorklist('Closed by operators', operatorClosedSessions)"
+			(keydown.space)="$event.preventDefault(); openSessionWorklist('Closed by operators', operatorClosedSessions)">
+			<div class="metric-top"><span class="metric-icon"><i class="fa fa-user" aria-hidden="true"></i></span><span
+					class="metric-label">Closed by operators</span></div>
+			<strong>{{ countsLoading ? '…' : (operatorClosedSessions === null ? '—' : (operatorClosedSessions | number))
+				}}</strong><span class="metric-note">Manually resolved</span>
+		</article>
+		<article class="metric-card metric-erss" role="link" tabindex="0"
+			(click)="openSessionWorklist('Push to ERSS', pushedToErssSessions)" (keydown.enter)="openSessionWorklist('Push to ERSS', pushedToErssSessions)"
+			(keydown.space)="$event.preventDefault(); openSessionWorklist('Push to ERSS', pushedToErssSessions)">
+			<div class="metric-top"><span class="metric-icon"><i class="fa fa-paper-plane"
+						aria-hidden="true"></i></span><span class="metric-label">Push to ERSS</span></div>
+			<strong>{{ countsLoading ? '…' : (pushedToErssSessions === null ? '—' : (pushedToErssSessions | number))
+				}}</strong><span class="metric-note">Dispatched to ERSS</span>
+		</article>
+
+	</section>
+	<section *ngIf="!sessionsPage && activeChartTab === 'dashboard'" class="alert-count-section" aria-label="Alert counts">
+		<div class="alert-count-heading">
+			<!-- <div><p class="section-kicker">ALERT BREAKDOWN</p><h2>Alert counts</h2></div> -->
+			<p *ngIf="alertWidgetsError" class="alert-widget-error" role="alert">{{ alertWidgetsError }}</p>
+		</div>
+		<div class="alert-count-viewport" role="region" aria-label="Alert type counts" tabindex="0"
+			(pointerdown)="startAlertMarqueeDrag($event)" (pointermove)="moveAlertMarquee($event)"
+			(pointerup)="endAlertMarqueeDrag()" (pointercancel)="endAlertMarqueeDrag()"
+			[class.dragging]="isDraggingAlertMarquee">
+			<div class="alert-count-track" [class.is-dragging]="isDraggingAlertMarquee"
+				[style.animation-delay.ms]="alertMarqueeDelay"
+				[style.transform]="isDraggingAlertMarquee ? 'translateX(' + alertMarqueeOffset + 'px)' : null">
+				<div class="alert-count-group">
+					<article *ngFor="let item of alertTypeCounts" class="alert-count-card" [ngClass]="item.tone">
+						<span class="alert-count-icon"><i class="fa" [ngClass]="item.icon"
+								aria-hidden="true"></i></span>
+						<span class="alert-count-name">{{ item.label }}</span>
+						<strong>{{ alertWidgetsLoading ? '…' : (item.count === null ? '—' : (item.count | number))
+							}}</strong>
+					</article>
+				</div>
+				<div class="alert-count-group" aria-hidden="true">
+					<article *ngFor="let item of alertTypeCounts" class="alert-count-card" [ngClass]="item.tone">
+						<span class="alert-count-icon"><i class="fa" [ngClass]="item.icon"
+								aria-hidden="true"></i></span>
+						<span class="alert-count-name">{{ item.label }}</span>
+						<strong>{{ alertWidgetsLoading ? '…' : (item.count === null ? '—' : (item.count | number))
+							}}</strong>
+					</article>
+				</div>
+			</div>
+		</div>
+	</section>
+
+
+	<button *ngIf="expandedChart" type="button" class="chart-backdrop" aria-label="Close expanded chart"
+		(click)="expandedChart = null"></button>
+	<section *ngIf="activeChartTab !== 'dashboard'" id="chart-tab-panel" role="tabpanel"
+		[attr.aria-label]="activeChartTab === 'class' ? 'Vehicle class wise panic counts' : 'RTO wise panic counts'"
+		class="chart-grid single-chart-grid" aria-label="Panic session breakdowns">
+		<article *ngIf="activeChartTab === 'class'" class="panel chart-panel class-panel"
+			[class.expanded]="expandedChart === 'class'" [cdkTrapFocus]="expandedChart === 'class'"
+			[cdkTrapFocusAutoCapture]="expandedChart === 'class'">
+			<div class="panel-heading">
+				<div>
+					<p class="section-kicker"><i class="fa fa-bar-chart" aria-hidden="true"></i> VEHICLE MIX</p>
+					<h2>Vehicle class wise panic counts</h2>
+				</div><span class="chart-badge">{{ classLoading ? 'Loading…' : (classError ? 'Unavailable' :
+					vehicleClassCounts.length + ' classes') }}</span><button type="button" class="chart-expand"
+					(click)="expandedChart = expandedChart === 'class' ? null : 'class'"
+					[attr.aria-label]="expandedChart === 'class' ? 'Close full vehicle class chart' : 'Expand vehicle class chart'"><i
+						class="fa" [class.fa-expand]="expandedChart !== 'class'"
+						[class.fa-times]="expandedChart === 'class'" aria-hidden="true"></i></button>
+			</div>
+			<p *ngIf="classLoading" class="chart-state" role="status">Loading vehicle classes…</p>
+			<p *ngIf="classError" class="api-error" role="alert">{{ classError }}</p>
+			@if (!classLoading && !classError) {
+			@if (vehicleClassCounts.length > 0) {
+			<div class="class-chart-caption"><span>Highest panic count first</span><strong>{{ classTotal | number }}
+					total sessions</strong></div>
+			<div class="class-column-chart">
+				<div class="column-viewport" aria-label="All vehicle class panic counts">
+					<div class="column-series"
+						[style.grid-template-columns]="'repeat(' + vehicleClassCounts.length + ', minmax(0, 1fr))'">
+						@for (item of vehicleClassCounts; track $index) {
+						<button type="button" class="class-column" (click)="selectChart('class', item.label)"
+							[title]="item.label + ': ' + item.count + ' panic sessions'">
+							<div class="column-zone">
+								<strong class="class-count" [style.bottom]="'calc(' + item.percent + '% + 4px)'">{{
+									item.count | number }}</strong>
+								<span class="column-fill" [style.background]="item.color"
+									[style.height.%]="item.percent" [style.animation-delay.ms]="$index * 35"></span>
+							</div>
+							<span class="class-name">{{ item.label }}</span>
+						</button>
+						}
+					</div>
+				</div>
+			</div>
+
+			} @else { <p class="chart-state">No vehicle class panic counts available.</p> }
+			}
+		</article>
+		<article *ngIf="activeChartTab === 'rto'" class="panel chart-panel rto-panel"
+			[class.expanded]="expandedChart === 'rto'" [cdkTrapFocus]="expandedChart === 'rto'"
+			[cdkTrapFocusAutoCapture]="expandedChart === 'rto'">
+			<div class="panel-heading">
+				<div>
+					<p class="section-kicker"><i class="fa fa-map-marker" aria-hidden="true"></i> REGIONAL ACTIVITY</p>
+					<h2>RTO wise panic counts</h2>
+				</div><span class="chart-badge">{{ rtoLoading ? 'Loading…' : (rtoError ? 'Unavailable' : (rtoTotal |
+					number) + ' sessions') }}</span><button type="button" class="chart-expand"
+					(click)="expandedChart = expandedChart === 'rto' ? null : 'rto'"
+					[attr.aria-label]="expandedChart === 'rto' ? 'Close full RTO chart' : 'Expand RTO chart'"><i
+						class="fa" [class.fa-expand]="expandedChart !== 'rto'"
+						[class.fa-times]="expandedChart === 'rto'" aria-hidden="true"></i></button>
+			</div>
+
+			<div class="rto-chart-caption"><span><i class="fa fa-bar-chart" aria-hidden="true"></i> Bar height = panic
+					count</span><span>{{ rtoCounts.length }} RTOs</span></div>
+			<app-rto-column-chart [items]="rtoCounts" [period]="rtoPeriod" [loading]="rtoLoading" [error]="rtoError"
+				(periodChange)="changeRtoPeriod($event)" (selected)="selectChart('rto', $event)"></app-rto-column-chart>
+
+		</article>
+	</section>
+
+	<section *ngIf="activeChartTab === 'dashboard'" class="panel sessions-panel">
+		<div class="table-heading">
+			<div>
+				<p class="section-kicker">LIVE WORKLIST</p>
+				<h2>{{ sessionWidget || 'Open panic session details' }}</h2>
+			</div>
+			<form class="session-search" (ngSubmit)="searchSessions()">
+				<label class="search-box">
+					<span class="search-icon" aria-hidden="true"><i class="fa fa-search"></i></span>
+					<input type="search" [(ngModel)]="searchTerm" name="sessionSearch"
+						placeholder="Search Vehicle No., IMEI, RTO" aria-label="Search panic sessions">
+				</label><button type="submit" class="search-submit" [disabled]="sessionsLoading"><i class="fa"
+						[class.fa-search]="!sessionsLoading" [class.fa-spinner]="sessionsLoading"
+						[class.spinning]="sessionsLoading" aria-hidden="true"></i> {{ sessionsLoading ? 'Searching…' :
+					'Search' }}</button>
+			</form>
+		</div>
+
+		<div class="grid-filters">
+			<button type="button" class="map-link" (click)="loadSessions()" [disabled]="sessionsLoading"><i class="fa fa-refresh" [class.spinning]="sessionsLoading" aria-hidden="true"></i> Refresh</button>
+			<label><i class="fa fa-industry" aria-hidden="true"></i> Vendor <select [(ngModel)]="filterVendor"
+					(ngModelChange)="searchSessions()" [disabled]="sessionsLoading || !vendorOptions.length">
+					<option value="">{{ vendorOptions.length ? 'All vendors' : 'Vendor details unavailable' }}</option>
+					<option *ngFor="let vendor of vendorOptions" [value]="vendor.id">{{ vendor.name }}</option>
+				</select></label>
+			<label><i class="fa fa-building-o" aria-hidden="true"></i> RTO <select [ngModel]="filterRto"
+					(ngModelChange)="onRtoChange($event)" [disabled]="sessionsLoading">
+					<option value="">All RTOs</option>
+					<option *ngFor="let item of rtoList" [value]="item.param1">{{ item.param2 }}</option>
+				</select></label>
+			<label><i class="fa fa-bus" aria-hidden="true"></i> Vehicle class <select [ngModel]="filterClass"
+					(ngModelChange)="onClassChange($event)" [disabled]="sessionsLoading">
+					<option value="">All classes</option>
+					<option *ngFor="let item of vehicleClassCounts" [value]="item.label">{{ item.label }}</option>
+				</select></label>
+			<button type="button" class="map-link" *ngIf="hasFilters" (click)="clearFilters()"
+				[disabled]="sessionsLoading">Clear filters</button>
+			<button type="button" class="map-link" (click)="plotMatching()"
+				[disabled]="sessionsLoading || !matchingSessions.length"><i class="fa fa-map-marker"
+					aria-hidden="true"></i> {{ hasFilters ? 'Map matching vehicles' : 'Map this page' }}</button>
+			<span *ngIf="hasFilters" class="filter-note">{{ sessionTotal ?? '…' }} matching sessions</span>
+		</div>
+		<p *ngIf="sessionsPage && classError" class="api-error" role="alert">{{ classError }}</p>
+		<p *ngIf="sessionsError" class="api-error" role="alert">{{ sessionsError }} <button type="button"
+				class="map-link" (click)="loadSessions()">Retry</button></p>
+		<div class="table-scroll" [attr.aria-busy]="sessionsLoading">
+			<table>
+				<thead>
+					<tr>
+						<th>Vehicle / chassis no.</th>
+						<th>Vendor
+							<hr />IMEI no.
+						</th>
+						<th>RTO
+							<hr />Vehicle class
+						</th>
+
+						<th>Vehicle owner details</th>
+						<th>Last panic event time</th>
+						<th>Last panic event location</th>
+						<th>Action</th>
+						<th>View on map</th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (session of sessions; track $index) {
+					<tr>
+						<td><strong class="vehicle-number">{{ session.vehicleNumber || '—' }}</strong><span
+								class="secondary-cell">{{ session.chassisNumber || '—' }}</span></td>
+						<td>{{ session.vendorName || 'Not provided' }}
+							<hr />{{ session.imeiNumber || '—' }}
+						</td>
+
+						<td>{{ session.rto }}
+							<hr />{{ session.vehicleClass }}
+						</td>
+
+						<td><strong>{{ session.ownerName }}</strong><a class="secondary-cell">{{ session.ownerPhone
+								}}</a></td>
+						<td><span class="event-time">{{ session.lastEventTime }}</span><span class="status-pill"
+								[class.status-open]="session.status === 'Open'"><b>{{ session.status }}</b></span></td>
+						<td>{{ session.lastEventLocation }}</td>
+						<td><button type="button" class="action-link" (click)="actionSession = session"><i
+									class="fa fa-phone" aria-hidden="true"></i> Action on alert</button></td>
+						<td><button type="button" class="map-link" (click)="openMap(session)"
+								[attr.aria-label]="'View panic session ' + session.sessionId + ' on map'"><i
+									class="fa fa-map-marker" aria-hidden="true"></i> Map</button></td>
+					</tr>
+					} @empty {
+					<tr>
+						<td class="empty-state" colspan="10">{{ sessionsLoading ? 'Loading panic sessions…' :
+							(sessionsError ? 'Panic sessions could not be loaded.' : 'No panic sessions found.') }}</td>
+					</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+		<footer class="table-footer">
+			<span>{{ sessionRangeStart }}–{{ sessionRangeEnd }} <ng-container *ngIf="sessionTotal !== null">of {{
+					sessionTotal }}</ng-container> sessions</span>
+			<div class="session-pagination"><label>Rows <select [(ngModel)]="pageSize"
+						(ngModelChange)="changePageSize()" [disabled]="sessionsLoading" aria-label="Sessions per page">
+						<option *ngIf="![20, 50, 100].includes(pageSize)" [ngValue]="pageSize">{{ pageSize }} (series)
+						</option>
+						<option [ngValue]="20">20</option>
+						<option [ngValue]="50">50</option>
+						<option [ngValue]="100">100</option>
+					</select></label><button type="button" class="map-link"
+					[disabled]="sessionsLoading || currentPage === 1"
+					(click)="changePage(-1)">Previous</button><span>Page {{ currentPage }}<ng-container *ngIf="sessionPageCount !== null"> of {{ sessionPageCount }}</ng-container></span><button type="button"
+					class="map-link" [disabled]="sessionsLoading || !hasNextPage" (click)="changePage(1)">Next</button>
+			</div>
+		</footer>
+	</section>
+</main>
+
+<app-panic-session-map *ngIf="selectedSession" [session]="selectedSession" [sessions]="plottedSessions"
+	[actionDialogOpen]="!!actionSession" (closed)="selectedSession = null"
+	(resolveRequested)="actionSession = $event"></app-panic-session-map>
+
+<app-panic-action *ngIf="actionSession" [session]="actionSession" (resolved)="loadSessions()"
+	(closed)="actionSession = null"></app-panic-action>

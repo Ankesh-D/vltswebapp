@@ -1,0 +1,33 @@
+@use '../bulk-device-entry/bulk-device-entry.component' as *;
+
+.element-wrapper {
+    padding-bottom: 0rem;
+}
+
+.element-box,
+.invoice-w,
+.big-error-w {
+    padding: 1.5rem 2rem;
+    margin-bottom: 1rem;
+}
+
+.pagetitleborder {
+    border-bottom: 2px solid lightgrey;
+}
+
+.form-desc {
+    color: red;
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+    font-size: .9rem;
+    font-size: 10px;
+    display: block;
+    font-style: italic;
+}
+
+
+label {
+    margin-bottom: 4px;
+    font-weight: bold;
+    color: #646403;
+}

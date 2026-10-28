@@ -1,0 +1,151 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle">Route Details</div>
+          <button class="pagebtn" (click)="navigateToMapTracking()">
+            <i class="fa fa-plus"></i>
+            <span>Create Route (Map)</span>
+          </button>
+        </div>
+
+        <!-- Search and Pagination Controls -->
+        <form autocomplete="off" class="modern-controls-form">
+          <div class="modern-toolbar">
+            <!-- Left Section: Search & Actions -->
+            <div class="toolbar-left">
+              <div class="search-container-v3">
+                <input
+                  type="search"
+                  readonly
+                  onfocus="this.removeAttribute('readonly');"
+                  id="searchby"
+                  placeholder="Search routes by name or ID..."
+                  autocomplete="off"
+                  maxlength="50"
+                  [(ngModel)]="searchText"
+                  (keyup.enter)="getSearchDetails()"
+                  name="searchby">
+                <button type="button" class="search-action-btn" (click)="getSearchDetails()" title="Click to Search">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+              <button type="button" class="btn-action-premium btn-reload" (click)="reloadData()" [disabled]="loading">
+                <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-refresh'"></i>
+                <span>{{ loading ? 'Syncing...' : 'Reload' }}</span>
+              </button>
+            </div>
+
+            <!-- Right Section: Filters & Stats -->
+            <div class="toolbar-right">
+              <div class="filter-group-modern">
+                <select name="excelpdfdownload" id="excelpdfdownload" class="premium-select">
+                  <option value="Select">Export Data</option>
+                  <option value="Excel">Excel Spreadsheet</option>
+                </select>
+
+                <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize" class="premium-select">
+                  @for (size of pageSizeOptions; track size) {
+                    <option [value]="size === totalCount ? 'All' : size">
+                      {{size === totalCount ? 'All' : size}}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <div class="metric-badge d-flex align-items-center justify-content-center">
+                <span class="metric-label">Total Routes</span>
+                <span class="metric-value">{{totalCount}}</span>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <app-common-table [columns]="tableColumns" [rows]="routes" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped app-table"
+          (sortChange)="sort($event)">
+        </app-common-table>
+
+        <!-- Pagination Controls -->
+        @if (totalCount > 0) {
+          <div class="app-pagination">
+            <button type="button" class="app-page-btn" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
+              <i class="fa fa-angle-left"></i> Previous
+            </button>
+            @for (page of getPageNumbers(); track page) {
+              <button type="button" class="app-page-btn" [class.active]="currentPage === page" (click)="onPageChange(page)">
+                {{page}}
+              </button>
+            }
+            <button type="button" class="app-page-btn" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">
+              Next <i class="fa fa-angle-right"></i>
+            </button>
+          </div>
+        }
+
+        @if (errorMessage) {
+          <div class="alert alert-danger" style="margin-top: 10px;">
+            {{errorMessage}}
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+@if (showEditModal) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Route</h5>
+        <button type="button" class="close" (click)="closeEditModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Note:</strong> Route path editing should be done through the Map Tracking interface.</p>
+        <div class="form-group">
+          <label>Route Name:</label>
+          <input type="text" class="form-control" [(ngModel)]="editRouteName" name="editRouteName" disabled>
+        </div>
+        <div class="form-group">
+          <label>Speed (km/hr):</label>
+          <input type="text" class="form-control" [(ngModel)]="editSpeed" name="editSpeed" disabled>
+        </div>
+        <div class="form-group">
+          <label>Remark:</label><label class="mandetory">*</label>
+          <textarea class="form-control" [(ngModel)]="editRemark" name="editRemark" rows="3" minlength="10" required></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="closeEditModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submitEdit()" [disabled]="editRemark.length < 10">Update</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Modal -->
+@if (showDeleteModal) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Route</h5>
+        <button type="button" class="close" (click)="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete route: <strong>{{selectedRoute?.param3}}</strong>?</p>
+        <div class="form-group">
+          <label>Remark:</label><label class="mandetory">*</label>
+          <textarea class="form-control" [(ngModel)]="deleteRemark" name="deleteRemark" rows="3" minlength="10" required></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-sm btn-danger" (click)="submitDelete()" [disabled]="loading || deleteRemark.length < 10">
+          {{loading ? 'Deleting...' : 'Delete'}}
+        </button>
+      </div>
+    </div>
+  </div>
+}

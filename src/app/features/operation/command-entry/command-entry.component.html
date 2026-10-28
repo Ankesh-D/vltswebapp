@@ -1,0 +1,108 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <button class="pagebtn">
+            <a routerLink="/commanddetails"><i class="fa fa-plus"></i>&nbsp;&nbsp;Details</a>
+          </button>
+          <div class="pagetitlestyle"><span>Insert Command</span></div>
+        </div>
+        <div class="col-md-12">
+          <form class="form-horizontal" role="form" name="sendCommandForm" id="commandform" autocomplete="off">
+            <div class="form-desc">
+              <strong>NOTE :</strong><label for="" class="mandetory">*</label> Are Mandatory Fields.
+            </div>
+            <div class="entrypagediv">
+              <div class="row">
+                @if (roleId !== '11') {
+                  <div class="col-md-2" id="complist">
+                    <label class="col-md-12 control-label">
+                      <font color="black">Select Vendor:</font>
+                    </label>
+                    <select class="searchable" id="companyid" [(ngModel)]="selectedVendor"
+                      (change)="onVendorChange()" name="vendor">
+                      @if (companyList.length > 1) {
+                        <option value="">Select Vendor</option>
+                      }
+                      @for (item of companyList; track item) {
+                        <option [value]="item.param1">{{item.param2}}</option>
+                      }
+                    </select>
+                  </div>
+                }
+                <div class="col-md-2">
+                  <label class="col-md-12 control-label">
+                    <font color="black">Select Model:</font>
+                  </label>
+                  <select class="searchable" id="modelid" [(ngModel)]="selectedModel"
+                    (change)="onModelChange()" name="model">
+                    @if (deviceModelList.length > 1) {
+                      <option value="">Select Model</option>
+                    }
+                    @for (x of deviceModelList; track x) {
+                      <option [value]="x.param1">
+                        {{x.param3}} - {{x.param4}}
+                      </option>
+                    }
+                  </select>
+                  @if (docUrl !== 'Protocol Document Not Available.') {
+                    <label id="linkid"
+                      data-target="#documentvieiwer" data-toggle="modal" (click)="displayPDF(docUrl)"
+                    data-content="View Documents" style="color: #0c6aec;cursor: pointer;">{{docUrl}}</label>
+                  }
+                  @if (docUrl === 'Protocol Document Not Available.') {
+                    <label>{{docUrl}}</label>
+                  }
+                </div>
+                <div class="col-md-2">
+                  <label class="col-md-12 control-label">
+                    <font color="black">Command Name:</font>
+                  </label>
+                  <input type="text" class="form-control ignoresymbol_name"
+                    placeholder="Enter Command Name" autocomplete="off"
+                    id="commandName" maxlength="20" [(ngModel)]="commandName" name="commandName">
+                </div>
+                <div class="col-md-2">
+                  <label class="col-md-12 control-label">
+                    <font color="black">Command :</font>
+                  </label>
+                  <textarea class="form-control" maxlength="100"
+                  placeholder="Enter Command" id="command" [(ngModel)]="command" name="command"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="form-buttons-w">
+              <button (click)="insertDeviceCommand()">Submit</button>
+            </div>
+          </form>
+        </div>
+        <div class="hr hr8 hr-double"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="documentvieiwer" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="false" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content" style="margin-left:-165px;margin-right: -233px;width: 900px;height:469px;">
+      <div class="modal-header" style="padding: 0.3rem;border-bottom: 4px solid #0c04a7;background: #fffffff5;">
+        <span class="modal-title" id="exampleModalLongTitle" style="font-size: 14px;font-weight: bold;margin-left: 25pc;">View Protocol Certificate</span>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12" style="height: 400px;border: 2px dashed grey;padding: 1px;border-radius: 8px;">
+          <object id='noprev' style=" width: 100%;" style="display: none;width: 100%;">
+            <embed id='noprevpro' src="resources/appimages/nopreview.png" style=" width: 100%;height: 100%;display: none;">
+          </object>
+          <object id='procertdiv' type='application/pdf' style="display: none; width: 100%; height: 100%;">
+            <embed id='myPdfpro' type='application/pdf' style="width: 100%; height: 100%; margin-top: -390px;">
+          </object>
+        </div>
+        <br>
+        </div>
+      </div>
+    </div>
+  </div>

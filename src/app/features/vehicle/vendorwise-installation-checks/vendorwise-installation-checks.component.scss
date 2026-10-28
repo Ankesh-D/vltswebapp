@@ -1,0 +1,20 @@
+.checkdiv {
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+/* Thin scrollbar for Webkit browsers */
+.checkdiv::-webkit-scrollbar {
+    width: 6px;
+}
+
+.checkdiv::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+/* Thin scrollbar for Firefox */
+.checkdiv {
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
+}

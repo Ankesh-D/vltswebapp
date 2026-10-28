@@ -1,0 +1,31 @@
+<div class="period-filters" role="group" aria-label="RTO chart time period">
+  @for (option of periods; track option.value) {
+    <button type="button" [class.active]="period === option.value" [attr.aria-pressed]="period === option.value" [title]="option.description" (click)="changePeriod(option.value)">{{ option.label }}</button>
+  }
+</div>
+@if (loading) { <p class="chart-message" role="status">Loading RTO counts…</p> }
+@else if (error) { <p class="chart-message chart-error" role="alert">{{ error }}</p> }
+@else if (!items.length) { <p class="chart-message" role="status">No RTO panic sessions for this period.</p> }
+@else {
+<svg class="column-canvas" [attr.viewBox]="'0 0 ' + width + ' ' + height" role="group" aria-label="All RTO panic counts in a single row. Bar height shows panic count.">
+  @for (tick of ticks; track $index) {
+    <line x1="32" [attr.x2]="width - 12" [attr.y1]="tick.y" [attr.y2]="tick.y" class="grid-line"/>
+    <text x="27" [attr.y]="tick.y + 3" text-anchor="end" class="axis-label">{{ tick.count | number:'1.0-0' }}</text>
+  }
+  @for (column of columns; track $index) {
+    <g class="rto-column" tabindex="0" role="button" [attr.aria-label]="column.label + ': ' + column.count + ' panic sessions. View open sessions and map.'" [attr.transform]="'translate(' + column.x + ',' + column.y + ')'" (mouseenter)="hovered = column" (mouseleave)="hovered = null" (focus)="hovered = column" (blur)="hovered = null" (click)="activate($event, column)" (keydown.enter)="activate($event, column)" (keydown.space)="activate($event, column)">
+      <title>{{ column.label }}: {{ column.count | number }} panic sessions ({{ column.share | number:'1.0-1' }}%)</title>
+      <rect class="bar-hit" [attr.x]="-column.barWidth / 2 - 2" [attr.y]="-height + 72" [attr.width]="column.barWidth + 4" [attr.height]="height - 52" fill="transparent"/>
+      <rect class="rto-bar" [attr.x]="-column.barWidth / 2" [attr.y]="-column.barHeight" [attr.width]="column.barWidth" [attr.height]="column.barHeight" rx="2" [attr.fill]="column.color" [style.animation-delay.ms]="$index * 12"/>
+      <text *ngIf="column.barWidth >= 13" class="column-count" [attr.y]="-column.barHeight - 6" text-anchor="middle">{{ column.count | number }}</text>
+      <text *ngIf="column.showLabel" class="column-label" transform="translate(2,12) rotate(-65)" text-anchor="end">{{ column.code }}</text>
+    </g>
+  }
+</svg>
+<div *ngIf="hovered" class="column-tooltip" role="tooltip" [style.left.px]="tooltipLeft" [style.top.px]="tooltipTop + 44">
+  <strong><i class="fa fa-map-marker" aria-hidden="true"></i> {{ hovered.label }}</strong>
+  <span><b>{{ hovered.count | number }}</b> panic sessions <em>{{ hovered.share | number:'1.0-1' }}% of total</em></span>
+  
+</div>
+
+}

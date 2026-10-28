@@ -1,0 +1,236 @@
+<div class="container-fluid py-2">
+  <section class="card border-0 shadow-sm">
+    <div class="card-body p-2">
+      <div class="page-header-row">
+        <h1 class="pagetitlestyle mb-0">Customer Details</h1>
+      </div>
+
+      <app-common-data-toolbar variant="device" searchPlaceholder="Type here..." [showExcel]="true"
+        [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
+        (reload)="reloadData()" [loading]="loading" [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
+        (pageSizeChange)="onPageSizeChange($event)" (excelExport)="downloadExcel()" pageSizeLabel="Show Rows"
+        totalLabel="Total Records" countSeparator="of">
+      </app-common-data-toolbar>
+
+      <ng-template #customerCell let-customer let-column="column">
+        @if (column.key === 'activity') {
+          <div class="vendor-actions">
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="openEditModal(customer)">
+              <i class="fa fa-pencil" aria-hidden="true"></i> Edit
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="openDeleteModal(customer)">
+              <i class="fa fa-trash" aria-hidden="true"></i> Delete
+            </button>
+          </div>
+        } @else {
+          {{ customer[column.key] || '-' }}
+        }
+      </ng-template>
+
+      <app-common-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
+        [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="customerCell"
+        tableClass="table table-striped app-table table-sm table-bordered mb-1" tableId="customer-table"
+        (sortChange)="sort($event)">
+      </app-common-table>
+
+      <div class="d-flex justify-content-end">
+        <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+          [disabled]="loading" (pageChange)="onPageChange($event)">
+        </app-common-pagination>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Edit Customer Modal (Angular overlay) -->
+@if (showEditModal) {
+  <div class="modal-overlay update-customer-modal" (click)="back()">
+    <div class="modal-content app-modal customer-edit-dialog" role="dialog" aria-modal="true"
+      aria-labelledby="customer-edit-title" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="modal-title" id="customer-edit-title">Update Customer</h5>
+        <button type="button" class="btn-close" (click)="back()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="customer-edit-fields">
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="form-label">Holder Name:<span class="text-danger">*</span></label>
+                <input class="form-control ignoresymbol_name"
+                  id="holdername"
+                  maxlength="50"
+                  [(ngModel)]="editHolderName"
+                  placeholder="Holder name"
+                  name="holderName">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="form-label">Holder Type:</label>
+                <input class="form-control ignoresymbol_name"
+                  id="holdertype"
+                  maxlength="50"
+                  [(ngModel)]="editHolderType"
+                  placeholder="Holder type"
+                  name="holderType">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="form-label">Email ID:</label>
+                <input class="form-control"
+                  id="email" maxlength="50"
+                  [(ngModel)]="editEmailId"
+                  (keyup)="validateEmail()"
+                  name="emailId"
+                  type="text"
+                  placeholder="Email ID"
+                  [ngClass]="{'border-danger': isEmailInvalid, 'border-success': !isEmailInvalid && editEmailId.length > 0}">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label class="form-label">Mobile No.:<span class="text-danger">*</span></label>
+                <input class="form-control acceptnumeric_nodecimal"
+                  id="mob" maxlength="10"
+                  [(ngModel)]="editMobileNo"
+                  (keyup)="checkMobileNumber()"
+                  name="mobileNo"
+                  placeholder="Mobile number"
+                  [ngClass]="{'border-danger': isMobileInvalid, 'border-success': !isMobileInvalid && editMobileNo.length === 10}">
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label class="form-label">Alternate Mobile No.:</label>
+                <input class="form-control acceptnumeric_nodecimal"
+                  id="altmob" maxlength="10"
+                  [(ngModel)]="editAlternateMobileNo"
+                  (keyup)="checkAlternateMobileNumber()"
+                  name="altMobileNo"
+                  placeholder="Alternate mobile number"
+                  [ngClass]="{'border-danger': isAltMobileInvalid, 'border-success': !isAltMobileInvalid && editAlternateMobileNo.length === 10}">
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label class="form-label">State</label>
+                <ng-select [(ngModel)]="stateObj" id="statelist" name="statelist"
+                  placeholder="Select State" required #statelistCtrl="ngModel" (change)="onStateChange()">
+                  @for (item of statelist; track item) {
+                    <ng-option [value]="item">{{item.param2}}</ng-option>
+                  }
+                </ng-select>
+                <!-- <ng-select [items]="statelist" bindLabel="param2" bindValue="param1"
+                placeholder="Select State" [(ngModel)]="selectedStateId"
+                (change)="selectedCityId=null;  onStateChange()">
+              </ng-select> -->
+            </div>
+            <!-- <div class="form-group">
+            <label class="form-label">Address:</label>
+            <input class="form-control ignorespecialcharacter_address"
+              id="address" maxlength="50"
+              [(ngModel)]="editAddress"
+              name="address"
+              placeholder="Address">
+          </div> -->
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <!-- <label class="form-label">City:</label>
+            <input class="form-control ignoresymbol_name" id="city" maxlength="50" [(ngModel)]="editCity" name="city"> -->
+            <label class="form-label">City</label>
+            <ng-select [(ngModel)]="cityObj" id="citylist" name="citylist"
+              placeholder="Select City" required #citylistCtrl="ngModel">
+              @for (item of citylist; track item) {
+                <ng-option [value]="item">{{item.param2}}</ng-option>
+              }
+            </ng-select>
+            <!-- <ng-select [items]="citylist" bindLabel="param2" bindValue="param1"
+            placeholder="Select City" [(ngModel)]="selectedCityId" (change)="onCityChange()">
+          </ng-select> -->
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <label class="form-label">Pin Code:</label>
+          <input class="form-control acceptnumeric_nodecimal" id="pin" maxlength="6" [(ngModel)]="editPinCode"
+            name="pinCode">
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label class="form-label">Remark:<span class="text-danger">*</span></label>
+          <textarea class="form-control ignorespecialcharacter_address" id="updateremark" placeholder="Reason"
+            [(ngModel)]="editRemark" (keyup)="checkEditRemark()" name="remark"
+          [ngClass]="{'border-danger': isEditRemarkInvalid, 'border-success': !isEditRemarkInvalid && editRemark.length >= 10}"></textarea>
+          @if (isEditRemarkInvalid) {
+            <div class="field-error">
+              Remark must be at least 10 characters.
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer modal-actions">
+  <button type="button" class="btn btn-primary" (click)="updateCustomer()">
+    {{loading ? 'Updating...' : 'Submit'}}
+  </button>
+  <button type="button" class="btn btn-outline-secondary" (click)="back()">Back</button>
+</div>
+</div>
+</div>
+}
+
+<!-- Delete Customer Modal (Angular overlay) -->
+@if (showDeleteModal) {
+  <div class="modal-overlay update-customer-modal" (click)="back()">
+    <div class="modal-content app-modal customer-delete-dialog" role="dialog" aria-modal="true"
+      aria-labelledby="customer-delete-title" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="modal-title" id="customer-delete-title">Delete Customer</h5>
+        <button type="button" class="btn-close" (click)="back()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <p class="form-label">Customer Name: <strong>{{deleteHolderName}}</strong></p>
+            <textarea class="form-control ignoresymbol_name" id="deleteremarks" placeholder="Remark"
+              maxlength="50" [(ngModel)]="deleteRemark"
+              (keyup)="checkDeleteRemark()" name="deleteRemark"
+            [ngClass]="{'border-danger': isDeleteRemarkInvalid, 'border-success': !isDeleteRemarkInvalid && deleteRemark.length >= 10}"></textarea>
+            @if (isDeleteRemarkInvalid) {
+              <div class="field-error">
+                Remark must be at least 10 characters.
+              </div>
+            }
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-sm-12 modal-actions">
+            <button type="button" class="btn btn-danger" (click)="deleteCustomer()" [disabled]="isDeleteRemarkInvalid || loading">
+              {{loading ? 'Deleting...' : 'Submit'}}
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="back()">Back</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success"
+  (closed)="successMessage = null"></app-toast>
+}

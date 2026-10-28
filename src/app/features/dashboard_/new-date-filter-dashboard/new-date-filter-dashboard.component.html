@@ -1,0 +1,515 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <div class="pagetitlestyle"><span>Date Filter Dashboard</span></div>
+            </div>
+            
+            <!-- Dashboard Counts Widgets -->
+            <div class="row">
+              <div class="row col-md-12" style="padding: 10px;box-shadow: 0px 0px 7px 1px lightgrey;">
+                <div class="col-md-1"></div>
+                
+                <!-- Vendor Widget -->
+                <div class="col-md-2">
+                  <div class="maindivstyle">
+                    <div class="col-md-12 countstyle">
+                      <div class="d-flex">
+                        <div class="flex-grow-1 total-div">
+                          <span>{{counts.vendorTotal}}</span>
+                          <div class="totaltitle">Total</div>
+                        </div>
+                        <div class="workingtitle" style="min-width: 0;">
+                          <span class="workingcount">{{counts.vendorActive}}</span>
+                          <div class="workingcolor">Working</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="titlestyle"><span>Vendor</span></div>
+                  </div>
+                </div>
+                
+                <!-- Dealer Widget -->
+                <div class="col-md-2">
+                  <div class="maindivstyle">
+                    <div class="col-md-12 countstyle">
+                      <div class="d-flex">
+                        <div class="flex-grow-1 total-div">
+                          <span>{{counts.dealerTotal}}</span>
+                          <div class="totaltitle">Total</div>
+                        </div>
+                        <div class="workingtitle" style="min-width: 0;">
+                          <span class="workingcount">{{counts.dealerActive}}</span>
+                          <div class="workingcolor">Working</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="titlestyle"><span>Dealer</span></div>
+                  </div>
+                </div>
+                
+                <!-- RTO Widget -->
+                <div class="col-md-2">
+                  <div class="maindivstyle">
+                    <div class="col-md-12 countstyle">
+                      <div class="d-flex">
+                        <div class="flex-grow-1 total-div">
+                          <span>{{counts.rtoTotal}}</span>
+                          <div class="totaltitle">Total</div>
+                        </div>
+                        <div class="workingtitle" style="min-width: 0;">
+                          <span class="workingcount">{{counts.rtoActive}}</span>
+                          <div class="workingcolor">Working</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="titlestyle"><span>RTO</span></div>
+                  </div>
+                </div>
+                
+                <!-- Devices Widget -->
+                <div class="col-md-2">
+                  <div class="maindivstyle">
+                    <div class="col-md-12 countstyle">
+                      <div class="d-flex">
+                        <div class="flex-grow-1 total-div">
+                          <span>{{counts.devicesTotal}}</span>
+                          <div class="totaltitle">Total</div>
+                        </div>
+                        <div class="workingtitle" style="min-width: 0;">
+                          <span class="workingcount">{{counts.totalInstalled}}</span>
+                          <div class="workingcolor">Installed</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="titlestyle"><span>Devices</span></div>
+                  </div>
+                </div>
+                
+                <!-- Vehicles Widget -->
+                <div class="col-md-2">
+                  <div class="maindivstyle">
+                    <div class="col-md-12 countstyle">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div class="vehicle-count-box text-center" style="flex:1; margin-right: 6px; background: #ffeace; border-radius: 6px; padding: 5px;" (click)="navigateToVehicle('Old')">
+                          <span style="font-size: 22px; font-weight: 600;">{{counts.oldVehicle}}</span>
+                          <div class="totaltitle" style="font-size: 12px; margin-top: 4px;text-decoration: underline;">Old</div>
+                        </div>
+                        <div class="vehicle-count-box text-center" style="flex:1; margin-left: 6px; background: #cbfbfb; border-radius: 6px; padding: 5px;" (click)="navigateToVehicle('New')">
+                          <span class="workingcount" style="font-size: 22px; font-weight: 600;">{{counts.newVehicle}}</span>
+                          <div class="workingcolor" style="font-size: 12px; text-decoration: underline; margin-top: 4px;">New</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="titlestyle"><span>Vehicles</span></div>
+                  </div>
+                </div>
+                
+                <div class="col-md-1"></div>
+              </div>
+              
+              <!-- Date Filter Section -->
+              <div class="row col-md-12" style="padding: 10px 28px 0px 10px;">
+                <div class="col-md-3">
+                  <div class="" style="width: 300px;">
+                    <label for="datefilter" class="control-label" style="font-weight: bold;font-size: 11px;">
+                      <font>Date Filter: </font>
+                    </label>
+                    <select id="datefilter" class="form-control" style="width: 200px;font-size: 11px;font-weight: 500;height:25px;"
+                      [(ngModel)]="dateFilterType" (change)="onDateFilterChange()">
+                      <option value="today">Today's</option>
+                      <option value="last4hrs">Last 4 Hours</option>
+                      <option value="yesterday">Yesterday</option>
+                      <option value="last7days">Last 7 days</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <!-- Custom Date Inputs -->
+                <div class="col-md-9 customedatediv" style="display:none;">
+                  <div class="d-flex justify-content-start mt-3">
+                    <div class="mt-2">
+                      <label class="small dblabel" for="customdate">Custom Date:</label>
+                        <input type="text"
+                         ngxDaterangepickerMd
+                         [maxDate]="today"
+                         [locale]="{ format: 'DD-MMM-YYYY' }"
+                         class="date-input"
+                         [(ngModel)]="selectedDateRange"
+                         (applyDaterangepicker)="onDateRangeChange($event)" />
+                    </div>
+                    <!-- <div class="d-flex mt-3" style="position: relative;">
+                      <span>
+                        <label class="small dblabel" for="fromdate">From Date:</label>
+                      </span>
+                      <span>
+                        <input class="datepick form-control" type="text" id="fromdate" style="height: 25px;font-size: 11px;" autocomplete="off"/>
+                      </span>
+                    </div>
+                    <div class="d-flex mt-3 ml-4">
+                      <span>
+                        <label class="small dblabel" for="todate">To Date:</label>
+                      </span>
+                      <span>
+                        <input class="datepick form-control" type="text" id="todate" style="height: 25px;font-size: 11px;" autocomplete="off"/>
+                      </span>
+                    </div> -->
+                    <div class="form-group customedatediv">
+                      <button class="btn btn-sm btn-success view-btn" 
+                      style="cursor: pointer;padding: 7px;
+    margin: 0px 4px;" (click)="viewDetails()">View</button>
+                    </div>
+                  </div>
+
+                </div>
+                
+                <!-- <div class="form-group col-xs-2 col-md-1" style="display:none;" id="fromtimediv">
+                  <div class="form-group" style="width: 96px;">
+                    <label for="fromtime">From Time:<b style="color: Red; font-weight: normal;">*</b></label>
+                    <input class="form-control timepicker1" id="fromtime" [(ngModel)]="fromTime" />
+                  </div>
+                </div> -->
+                
+                
+                <!-- <div class="form-group col-xs-2 col-md-1" style="display:none;margin-left: -80px;" id="totimediv">
+                  <div class="form-group" style="width: 96px;">
+                    <label for="totime">To Time:<b style="color: Red; font-weight: normal;">*</b></label>
+                    <input class="form-control timepicker2" id="totime" [(ngModel)]="toTime" />
+                  </div>
+                </div> -->
+                
+              </div>
+              
+              <!-- Charts Section -->
+              <div class="row col-md-12" style="padding:10px;">
+                <div class="col-md-12 chart-section-title">
+                  {{detailstitle}} 
+                  [{{dateFilterType === 'custom' && selectedDateRange ? (selectedDateRange.startDate.format('DD-MMM-YYYY') + ' to ' + selectedDateRange.endDate.format('DD-MMM-YYYY')) : dateFilterType}}]
+                </div>
+                
+                <!-- Vendor Status Chart -->
+                <div class="col-md-6 chart-card"   [ngClass]="showClasswiseSection ? 'col-md-6 chart-card' : 'col-md-12 chart-card'">
+                  <div class="chart-header">Vendor Status</div>
+                  <div id="statisticsgraph" [ngStyle]="mfgdata.length == 0 ? {'display': ''}: {'display': 'none'}" style="padding:20px; text-align: center;">
+                    <span style="color: red;font-weight: bold; text-align: center;">NO DATA FOUND</span>
+                  </div>
+                  <div [ngStyle]="mfgdata.length === 0 ? {'display': 'none'} : {}"   id="VendorStatus" class="chart-container"></div>
+                </div>
+                
+                <!-- Vehicle Classwise Alerts Chart -->
+                <div class="col-md-6 chart-card"  *ngIf="showClasswiseSection">
+                  <div class="chart-header">Vehicle Classwise Alerts</div>
+                 <div *ngIf="classwiseAlerts.length === 0" style="padding:20px; text-align:center;">
+  <span style="color:red; font-weight:bold;">NO DATA FOUND</span>
+</div>
+
+<div *ngIf="classwiseAlerts.length > 0" id="VehicleClasswiseAlerts" class="chart-container"></div>
+                </div>
+              </div>
+              
+              <!-- RTO Status Chart -->
+              <div class="row col-md-12" style="padding: 0 10px 10px 10px;">
+                <div class="col-md-12 chart-card">
+                  <div class="chart-header">RTO Status</div>
+                  <div id="statisticsgraph" [ngStyle]="rtowisedevicedetails.length == 0 ? {'display': ''}: {'display': 'none'}" style="padding:20px; text-align: center;">
+                    <span style="color: red;font-weight: bold; text-align: center;">NO DATA FOUND</span>
+                  </div>
+                  <div [ngStyle]="rtowisedevicedetails.length === 0 ? {'display': 'none'} : {}" id="RTOStatus" class="chart-container chart-container--tall"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+ <div *ngIf="showTrackModal" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" style=" width: 95%; " (click)="$event.stopPropagation()">
+      <div class="modal-header" style="background: #b5e5b5;">
+        <h6 style="font-size: 14px; margin: 0;">Vehicle Details</h6>
+        <button type="button" class="btn btn-sm" (click)="closeModal()"
+          style="color: #fff; background: #db0000; height: 30px; width: 30px; font-weight: bold; cursor: pointer; border: none; padding: 0;">x</button>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <form autocomplete="off">
+          <div class="col-md-12" style="top: 10px;">
+            <!-- Search and Pagination Controls -->
+            <div style="width: 100%; padding: 10px 0px 10px 0px;">
+              <table style="width: 100%;">
+                <tbody class="bg-body">
+                  <tr>
+                    <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                      <font style="font-weight: bold;">Search : </font>
+                    </td>
+                    <td>
+                      <div style="display: flex; align-items: center;">
+                        <div
+                          style="display: flex; align-items: center; border: 1px solid #0b58b9; border-radius: 4px; overflow: hidden; background: white;">
+                          <input type="search" readonly onfocus="this.removeAttribute('readonly');"
+                            class="tabletitlesearch" id="searchby" placeholder="Type here..."
+                            style="border: none; height: 24px; width: 180px; padding: 0 8px; outline: none; font-size: 11px;"
+                            autocomplete="disabled" maxlength="50" [(ngModel)]="searchText"
+                            (keyup.enter)="getSearchDetails()" name="searchby">
+                          <button id="searchbtn" (click)="getSearchDetails()"
+                            style="background: #0b58b9; color: white; border: none; height: 24px; width: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa fa-search" style="font-size: 12px;"></i>
+                          </button>
+                        </div>
+
+                        <button (click)="reloadData()" [disabled]="loading"
+                          style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+                          <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
+                          <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+                        </button>
+
+                      </div>
+                    </td>
+                    <td>
+
+                      <div style="display: flex; align-items: center; justify-content: flex-end; font-size: 11px;">
+
+                        <div style="display: flex; align-items: center; margin-right: 15px;">
+                          <label for="excelpdfdownload"
+                            style="margin: 0 5px 0 0; font-weight: bold; color: #333;">Download:</label>
+                          <select name="excelpdfdownload" [(ngModel)]="selectedDownloadType" (change)="onDownloadChange()"
+                            style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; color: #333; outline: none; background: white;">
+
+                            <option value="">Select</option>
+                            <!-- <option value="Excel">Excel</option> -->
+                              <option value="">Excel</option>
+
+                          </select>
+                          <span *ngIf="isExporting" style="margin-left:8px; font-size:11px; color:#0b58b9;">
+                            Generating...
+                          </span>
+                        </div>
+
+                        <div style="display: flex; align-items: center; margin-right: 15px;">
+                          <label style="margin: 0 5px 0 0; font-weight: bold; color: #333;">Show Rows:</label>
+                          <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize"
+                            style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; color: #333; outline: none; background: white;">
+                            <option *ngFor="let size of pageSizeOptions" [value]="size === totalCount ? 'All' : size">
+                              {{size === totalCount ? 'All' : size}}
+                            </option>
+                          </select>
+                        </div>
+
+                        <div style="font-weight: bold; color: #0b58b9; padding-right: 5px;">
+                          Total Records : {{pageCount}} of {{totalCount}}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+        <div class="table-responsive" style=" height: 465px; overflow-y: auto; overflow-x: hidden;">
+          <table class="table-striped app-table table"
+            style="border-top: 1px solid black; border-bottom: 1px solid black;margin-left: 0px;" id="devicetable">
+            <thead class="device-thead">
+              <tr>
+                <th style="width:35px;">#</th>
+
+                <th (click)="sort('param5')" class="sortable">
+                  Chassis No.
+                  <hr style="margin: 1px 0;">
+                  Vehicle No.
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param5',
+                      'sorting_asc': !reverse && sortKey=='param5'}">
+                  </span>
+                </th>
+
+                <th (click)="sort('param7')" class="sortable">
+                  Engine No
+                </th>
+
+                <th (click)="sort('param8')" class="sortable">
+                  Serial No.
+                  <hr style="margin: 1px 0;">
+                  IMEI No.
+                  <hr style="margin: 1px 0;">ICCID No.
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param8',
+                      'sorting_asc': !reverse && sortKey=='param8'}">
+                  </span>
+                </th>
+
+                <th (click)="sort('param9')" class="sortable">
+                  Vehicle Type
+                  <hr style="margin: 1px 0;">
+                  Vehicle Class
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param9',
+                      'sorting_asc': !reverse && sortKey=='param9'}">
+                  </span>
+                </th>
+
+                <th style="width:130px;" (click)="sort('param50')" class="sortable">
+                  Make
+                  <hr style="margin: 1px 0;">Model
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param50',
+                      'sorting_asc': !reverse && sortKey=='param50'}">
+                  </span>
+                </th>
+
+                <th style="width:160px;" (click)="sort('param16')" class="sortable">
+                  Installation date
+
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param16',
+                      'sorting_asc': !reverse && sortKey=='param16'}">
+                  </span>
+                </th>
+
+                <th (click)="sort('param47')" class="sortable">
+                  Customer Details
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param47',
+                      'sorting_asc': !reverse && sortKey=='param47'}">
+                  </span>
+                </th>
+
+                <th (click)="sort('param34')" class="sortable">
+                  Dealer
+                  <hr style="margin: 1px 0;"> (Vendor)
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param34',
+                      'sorting_asc': !reverse && sortKey=='param34'}">
+                  </span>
+                </th>
+
+                <th (click)="sort('param48')" class="sortable">
+                  RTO Name
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param48',
+                      'sorting_asc': !reverse && sortKey=='param48'}">
+                  </span>
+                </th>
+                <th (click)="sort('param48')" class="sortable">
+                  Activation Status
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param48',
+                      'sorting_asc': !reverse && sortKey=='param48'}">
+                  </span>
+                </th>
+                <th (click)="sort('param48')" class="sortable">
+                  Polling Status
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param48',
+                      'sorting_asc': !reverse && sortKey=='param48'}">
+                  </span>
+                </th>
+
+                <!-- <th>Download Receipt</th> -->
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- NO DATA -->
+              <tr *ngIf="totalCount === 0">
+                <td colspan="12" style="text-align:center;font-weight:bold;">
+                  NO DATA FOUND
+                </td>
+              </tr>
+
+              <!-- DATA ROWS -->
+              <tr *ngFor="let d of vehicledet">
+                <td>{{ d['param1'] || 'NA' }}</td>
+
+                <td>
+                  {{ d['param12'] || 'NA' }}<br>
+                  {{ d['param11'] || 'NA' }}
+                </td>
+
+                <td>
+                  {{ d['param13'] || 'NA' }}
+
+                </td>
+
+                <td>
+                  {{ d['param5'] || 'NA' }}<br>
+                  {{ d['param4'] || 'NA' }}<br>{{ d['param6'] || 'NA' }}
+                </td>
+
+                <td>
+                  {{ d['param19'] || 'NA' }}<br>
+                  {{ d['param42'] || 'NA' }}
+                </td>
+                <!-- param50make ka hay ab filal pata nhi  -->
+                <td>
+                  {{ d['param40'] || 'NA' }}<br>
+                  {{ d['param41'] || 'NA' }}
+                </td>
+
+                <td>
+                  {{ d['param43'] || 'NA' }}
+                </td>
+
+                <td>
+                  {{ d['param28'] || 'NA' }}<br>
+                  {{ d['param29'] || 'NA' }}
+                </td>
+
+                <td>
+                  {{ d['param8'] || 'NA' }}<br>
+                  ({{ d['param7'] || 'NA' }})
+                </td>
+
+                <td>
+                  {{ d['param18'] || 'NA' }}
+                </td>
+
+                <!-- ✅ Activation Status -->
+                <td>
+                  <span [ngClass]="{'badge badge-success': d['param25'] === 'Activated', 'badge badge-warning': d['param25'] === 'Pending' || d['param25'] === 'Pending OTP'}" 
+                        [style.background-color]="d['param25'] === 'Pending' ? 'orange' : (d['param25'] === 'Pending OTP' ? 'yellow' : '')" 
+                        [style.color]="d['param25'] === 'Pending' ? 'white' : (d['param25'] === 'Pending OTP' ? 'black' : '')"
+                        [style.font-size]="(d['param25'] === 'Activated' || d['param25'] === 'Pending' || d['param25'] === 'Pending OTP') ? '11px' : ''">
+                    {{ d['param25'] || 'NA' }}
+                  </span><br>
+                  {{ d['param14'] || 'NA' }}
+                </td>
+
+                <!-- ✅ Polling Status -->
+                <td>
+                  {{ d['param45'] || 'NA' }}
+                </td>
+
+              </tr>
+            </tbody>
+
+
+
+          </table>
+
+          <!-- Pagination Controls -->
+          <div class="row">
+            <div class="col-md-12">
+              <div *ngIf="totalCount > 0" style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                <button *ngIf="currentPage > 1" (click)="onPageChange(currentPage - 1)" [disabled]="loading"
+                  style="border: 1px solid #0b58b9; background: white; color: #0b58b9; padding: 5px 10px; margin: 0 2px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                  Previous
+                </button>
+
+                <ng-container *ngFor="let page of getPageNumbers()">
+                  <span *ngIf="page === -1" style="margin: 0 5px; color: #0b58b9; align-self: center;">...</span>
+                  <button *ngIf="page !== -1" (click)="onPageChange(page)" [disabled]="loading || page === currentPage"
+                    [style.background]="page === currentPage ? '#0b58b9' : 'white'"
+                    [style.color]="page === currentPage ? 'white' : '#0b58b9'"
+                    style="border: 1px solid #0b58b9; padding: 5px 10px; margin: 0 2px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                    {{page}}
+                  </button>
+                </ng-container>
+
+                <button *ngIf="currentPage < getTotalPages()" (click)="onPageChange(currentPage + 1)" [disabled]="loading"
+                  style="border: 1px solid #0b58b9; background: white; color: #0b58b9; padding: 5px 10px; margin: 0 2px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>

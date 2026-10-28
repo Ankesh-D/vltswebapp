@@ -1,0 +1,66 @@
+/* Page-specific responsive layout and open animation; shared form styling lives in _theme.scss. */
+.vendor-entry-page,
+.vendor-entry-page .content-box,
+.vendor-entry-page .element-wrapper,
+.vendor-entry-page .element-box,
+.vendor-entry-form {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.vendor-entry-page { overflow-x: clip; }
+.vendor-entry-form .row { max-width: 100%; }
+.vendor-entry-form .form-control,
+.vendor-entry-form .ng-select { max-width: 100%; min-width: 0; }
+
+.vendor-entry-page .element-box { animation: vendor-form-enter .32s ease-out both; }
+.vendor-entry-form { animation: vendor-form-content-enter .38s .04s ease-out both; }
+.vendor-entry-form .entrypagediv { animation: vendor-section-enter .35s ease-out both; }
+.vendor-entry-form .entrypagediv:nth-of-type(2) { animation-delay: .07s; }
+.vendor-entry-form .form-desc { margin-bottom: 5px !important; color: var(--app-text-muted) !important; font-size: 10px !important; }
+.vendor-entry-heading { width: 100%; padding: 2px 0 8px; margin: 0 0 8px; }
+
+.input-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .form-control-sm { padding-right: 30px !important; }
+}
+
+.icon-btn {
+  position: absolute;
+  right: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #718096;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.mandetory { color: var(--app-danger); font-weight: normal; }
+
+@keyframes vendor-form-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes vendor-form-content-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes vendor-section-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vendor-entry-page .element-box,
+  .vendor-entry-form,
+  .vendor-entry-form .entrypagediv { animation: none; }
+}
+@media (max-width: 575px) {
+  .vendor-entry-page .element-box { padding: 8px; }
+}

@@ -1,0 +1,176 @@
+<div class="map-backdrop">
+  <section class="map-dialog" role="dialog" aria-modal="true" aria-labelledby="panic-map-title" [cdkTrapFocus]="!actionDialogOpen" [cdkTrapFocusAutoCapture]="true">
+    <header class="modal-header">
+      <div class="modal-title"><span class="title-icon"><i class="fa fa-map-marker" aria-hidden="true"></i></span><div><h2 id="panic-map-title">{{ session.vehicleNumber || session.chassisNumber || 'Panic session' }}</h2>@if (!vehicleTracking) {
+      <span>Panic session {{ session.sessionId || '—' }} <b>Open</b></span>
+      }@if (vehicleTracking) {
+      <span>Vehicle tracking <b>{{ liveActive ? 'Live' : 'History' }}</b></span>
+    }</div></div>
+    <button type="button" class="close-button" aria-label="Close vehicle map" (click)="closed.emit()" cdkFocusInitial><i class="fa fa-times" aria-hidden="true"></i></button>
+  </header>
+  <div class="map-body">
+    <app-leaflet-map (mapReady)="initializeMap($event)"></app-leaflet-map>
+    <div class="map-toolbar">@if (sessions.length > 1) {
+      <button type="button" (click)="fitSessions()"><i class="fa fa-car" aria-hidden="true"></i> All {{ sessions.length }} vehicles</button>
+    }
+    @if (vehicleTracking) {
+      <button type="button" (click)="resumeLive()"><i class="fa fa-crosshairs" aria-hidden="true"></i> Live tracking</button>
+    }
+    <button type="button" (click)="fitTrack()" title="Fit full history track"><i class="fa fa-expand" aria-hidden="true"></i> Fit track</button>
+    @if (!vehicleTracking) {
+      <button type="button" (click)="focusPanic()" title="Locate the last panic event"><img src="assets/mapimages/alertimage/panic.png" alt=""> Panic</button>
+    }
+    <button type="button" (click)="loadHistory()" [disabled]="loading"><i class="fa fa-refresh" [class.spinning]="loading" aria-hidden="true"></i> Refresh to now</button>
+    <button type="button" (click)="isLayerSwitcherOpen = !isLayerSwitcherOpen" [attr.aria-expanded]="isLayerSwitcherOpen" aria-controls="panic-map-layers"><i class="fa fa-map" aria-hidden="true"></i> Layers</button>
+  </div>
+  @if (isLayerSwitcherOpen) {
+    <section class="layer-panel" id="panic-map-layers" aria-label="Map layers">
+      <header><span><i class="fa fa-map" aria-hidden="true"></i> Map Layers</span><button type="button" aria-label="Close map layers" (click)="isLayerSwitcherOpen = false"><i class="fa fa-times" aria-hidden="true"></i></button></header>
+      <div class="layer-options">
+        <app-map-layer-options [active]="activeMapStyle" (selected)="changeMapStyle($event)"></app-map-layer-options>
+      </div>
+      <label class="police-toggle"><input type="checkbox" [(ngModel)]="showPoliceStations" (change)="togglePoliceStations()"> <i class="fa fa-shield" aria-hidden="true"></i> Police Stations @if (policeLoading) {
+      <small>Loading…</small>
+    }</label>
+    @if (layerMessage) {
+      <p class="layer-message" role="status">{{ layerMessage }}</p>
+    }
+  </section>
+}
+@if (loading || historyMessage || mapMessage) {
+  <div class="map-notice" role="status">
+    @if (loading) {
+      <span><i class="fa fa-spinner spinning" aria-hidden="true"></i> Loading history {{ completedDays }} / {{ requestedDays }} days…</span>
+    }
+    @if (!loading && historyMessage) {
+      <span>{{ historyMessage }}</span>
+    }
+    @if (mapMessage) {
+      <span>{{ mapMessage }}</span>
+    }
+  </div>
+}
+<div class="map-legend">@if (!vehicleTracking) {
+  <span><img src="assets/mapimages/alertimage/panic.png" alt=""> Panic</span>
+  }<span><i class="legend-start"></i> Start</span><span><i class="legend-end"></i> Latest</span><span><i class="legend-route"></i> History</span><span><i class="legend-live"></i> Live trail</span></div>
+  <aside class="info-panel" [class.vehicle-panel]="activeTab === 'vehicle'" [class.collapsed]="panelCollapsed" [class.calendar-open]="calendarOpen">
+    <button type="button" class="panel-toggle" (click)="panelCollapsed = !panelCollapsed" [attr.aria-expanded]="!panelCollapsed" aria-controls="panic-map-panel">
+      <span class="panel-vehicle"><i class="fa fa-car" aria-hidden="true"></i><span>{{ session.vehicleNumber || session.chassisNumber || 'Vehicle details' }}<small>{{ session.vehicleClass || 'Vehicle class unavailable' }}</small></span></span><i class="fa" [class.fa-chevron-down]="!panelCollapsed" [class.fa-chevron-up]="panelCollapsed" aria-hidden="true"></i>
+    </button>
+    @if (!panelCollapsed) {
+      <div id="panic-map-panel">
+        @if (liveActive) {
+          <div class="live-summary"><span><i class="fa fa-circle" aria-hidden="true"></i> Live tracking</span><strong>{{ livePoint?.speed ?? '—' }} km/h</strong><span>{{ livePoint ? (livePoint.time | date:'HH:mm:ss':'+0530') : 'Connecting…' }}</span></div>
+          }@if (liveMessage) {
+          <p class="live-message" role="status">{{ liveMessage }}</p>
+        }
+        <div class="panel-tabs" role="tablist" aria-label="Panic session information">
+          <button type="button" role="tab" id="panic-vehicle-tab" aria-controls="panic-vehicle-details" [attr.aria-selected]="activeTab === 'vehicle'" [class.active]="activeTab === 'vehicle'" (click)="selectTab('vehicle')"><i class="fa fa-id-card-o" aria-hidden="true"></i> Vehicle</button>
+          <button type="button" role="tab" id="panic-history-tab" aria-controls="panic-history-details" [attr.aria-selected]="activeTab === 'history'" [class.active]="activeTab === 'history'" (click)="selectTab('history')"><i class="fa fa-history" aria-hidden="true"></i> History <span>{{ points.length }}</span></button>
+        </div>
+        <div class="panel-scroll" [class.calendar-open]="calendarOpen">
+          @if (activeTab === 'vehicle') {
+            <dl id="panic-vehicle-details" role="tabpanel" aria-labelledby="panic-vehicle-tab" class="info-list">
+              <div><dt><i class="fa fa-car" aria-hidden="true"></i> Vehicle</dt><dd>{{ session.vehicleNumber || '—' }}</dd></div>
+              <div><dt><i class="fa fa-barcode" aria-hidden="true"></i> Chassis</dt><dd>{{ session.chassisNumber || '—' }}</dd></div>
+              <div><dt><i class="fa fa-microchip" aria-hidden="true"></i> IMEI</dt><dd>{{ session.imeiNumber || '—' }}</dd></div>
+              @if (vehicleTracking) {
+                <div><dt><i class="fa fa-barcode" aria-hidden="true"></i> Serial no.</dt><dd>{{ session.deviceSerialNo || '—' }}</dd></div>
+              }
+              @if (vehicleTracking) {
+                <div><dt><i class="fa fa-credit-card" aria-hidden="true"></i> ICCID</dt><dd>{{ session.iccid || '—' }}</dd></div>
+              }
+              <div><dt><i class="fa fa-bus" aria-hidden="true"></i> Class</dt><dd>{{ session.vehicleClass || '—' }}</dd></div>
+              <div><dt><i class="fa fa-building-o" aria-hidden="true"></i> RTO</dt><dd>{{ session.rto || '—' }}</dd></div>
+              <div><dt><i class="fa fa-industry" aria-hidden="true"></i> Vendor</dt><dd>{{ session.vendorName || 'Not provided' }}</dd></div>
+              @if (vehicleTracking) {
+                <div><dt><i class="fa fa-car" aria-hidden="true"></i> Model</dt><dd>{{ session.modelName || '—' }}</dd></div>
+              }
+              @if (vehicleTracking) {
+                <div><dt><i class="fa fa-key" aria-hidden="true"></i> Ignition</dt><dd>{{ liveIgnition }}</dd></div>
+              }
+              @if (vehicleTracking) {
+                <div><dt><i class="fa fa-signal" aria-hidden="true"></i> GPS</dt><dd>{{ liveGpsStatus }}</dd></div>
+              }
+              <div><dt><i class="fa fa-user" aria-hidden="true"></i> Owner</dt><dd>{{ session.ownerName || '—' }}</dd></div>
+              <div><dt><i class="fa fa-phone" aria-hidden="true"></i> Contact</dt><dd>@if (contactPhone) {
+              <a [href]="'tel:' + contactPhone">{{ session.ownerPhone }}</a>
+            } @else {
+              —
+            }</dd></div>
+            <div><dt><i class="fa fa-clock-o" aria-hidden="true"></i> {{ vehicleTracking ? 'Last update' : 'Last panic' }}</dt><dd>{{ session.lastEventTime || '—' }}</dd></div>
+            <div><dt><i class="fa fa-map-marker" aria-hidden="true"></i> Location</dt><dd>{{ session.lastEventLocation || '—' }}</dd></div>
+            <div class="coordinates-detail"><dt><i class="fa fa-crosshairs" aria-hidden="true"></i> Coordinates</dt><dd>{{ session.latitude ?? '—' }}, {{ session.longitude ?? '—' }}</dd></div>
+          </dl>
+        }
+        @if (activeTab === 'history') {
+          <div id="panic-history-details" role="tabpanel" aria-labelledby="panic-history-tab" class="history-content">
+            <form class="history-filter" (ngSubmit)="generateHistory()">
+              <h3><i class="fa fa-history" aria-hidden="true"></i> Plot history track <small>IST</small></h3>
+              <div class="date-time-row"><div class="date-picker-wrapper"><i class="fa fa-calendar date-icon" aria-hidden="true"></i><input id="panic-history-date" type="text" ngxDaterangepickerMd [singleDatePicker]="true" [drops]="'up'" [opens]="'left'" [locale]="{ format: 'DD-MMM-YYYY' }" [maxDate]="latestHistoryDate" [autoApply]="true" class="form-control" name="historyDate" placeholder="Select Date" [(ngModel)]="historyDate" [disabled]="loading" (click)="calendarOpen = true" (datesUpdated)="calendarOpen = false" aria-label="History date" required></div></div>
+              <div class="time-row">
+                <div class="time-picker-wrapper"><label>From time</label><timepicker [(ngModel)]="fromTime" name="fromTime" [showMeridian]="true" [showSpinners]="false" [hourStep]="1" [minuteStep]="1" [disabled]="loading"></timepicker></div>
+                <span class="time-separator">to</span>
+                <div class="time-picker-wrapper"><label>To time</label><timepicker [(ngModel)]="toTime" name="toTime" [showMeridian]="true" [showSpinners]="false" [hourStep]="1" [minuteStep]="1" [disabled]="loading"></timepicker></div>
+              </div>
+              @if (filterError) {
+                <p class="filter-error" role="alert">{{ filterError }}</p>
+              }
+              <button type="submit" class="generate-history-button" [disabled]="loading"><i class="fa" [class.fa-history]="!loading" [class.fa-spinner]="loading" [class.spinning]="loading" aria-hidden="true"></i> {{ loading ? 'Generating…' : 'Generate history' }}</button>
+            </form>
+            @if (rangeStart) {
+              <div class="range-card"><span><i class="fa fa-clock-o" aria-hidden="true"></i> {{ rangeMode === 'session' ? (vehicleTracking ? 'Today → now' : 'Last panic → now') : 'Selected date / time' }} <small>IST</small></span><strong>{{ rangeStart ? (rangeStart | date:'dd MMM yyyy, HH:mm:ss':'+0530') : 'Invalid event time' }}</strong><span class="range-arrow">↓</span><strong>{{ rangeEnd | date:'dd MMM yyyy, HH:mm:ss':'+0530' }}</strong></div>
+            }
+            <div class="history-stats"><span><b>{{ points.length }}</b> points</span><span><b>{{ currentPoint?.speed ?? '—' }}</b> km/h</span></div>
+            <div class="point-time"><i class="fa fa-map-pin" aria-hidden="true"></i> {{ currentPoint ? (currentPoint.time | date:'dd MMM, HH:mm:ss':'+0530') : 'No recorded position' }}</div>
+            <div class="playback-controls">
+              <button type="button" [disabled]="points.length < 2 || loading" (click)="playing ? pause() : play()" [attr.aria-label]="playing ? 'Pause playback' : 'Play history'"><i class="fa" [class.fa-play]="!playing" [class.fa-pause]="playing" aria-hidden="true"></i></button>
+              <button type="button" [disabled]="!points.length || loading" (click)="seek(0)" aria-label="Reset history"><i class="fa fa-step-backward" aria-hidden="true"></i></button>
+              <input type="range" min="0" [max]="points.length ? points.length - 1 : 0" [value]="playbackIndex" [disabled]="points.length < 2 || loading" (input)="onSeek($event)" aria-label="History playback position">
+              <select [(ngModel)]="playbackSpeed" (ngModelChange)="changeSpeed()" aria-label="Playback speed"><option [ngValue]="1">1×</option><option [ngValue]="5">5×</option><option [ngValue]="10">10×</option></select>
+            </div>
+            <p class="history-help">Choose a date and time range, then generate history. “Refresh to now” restores {{ vehicleTracking ? 'today’s' : 'the last panic → now' }} track.</p>
+          </div>
+        }
+      </div>
+      @if (!vehicleTracking) {
+        <footer class="panel-actions">
+          <button
+            type="button"
+            class="erss-button"
+            [disabled]="erssSubmitting"
+            (click)="pushToErss()"
+            title="Push panic session to ERSS">
+            <i
+              class="fa"
+              [class.fa-paper-plane]="!erssSubmitting"
+              [class.fa-spinner]="erssSubmitting"
+              [class.spinning]="erssSubmitting"
+              aria-hidden="true">
+            </i>
+            {{ erssSubmitting ? 'Sending...' : 'Push to ERSS' }}
+          </button>
+          <button
+            type="button"
+            class="close-panic-button"
+            (click)="pause(); resolveRequested.emit(session)">
+            <i class="fa fa-check-circle" aria-hidden="true"></i>
+            Close panic
+          </button>
+          @if (erssMessage) {
+            <p
+              class="erss-message"
+              [class.erss-success]="erssMessageType === 'success'"
+              [class.erss-error]="erssMessageType === 'error'"
+              role="status">
+              {{ erssMessage }}
+            </p>
+          }
+        </footer>
+      }
+    </div>
+  }
+</aside>
+</div>
+</section>
+</div>

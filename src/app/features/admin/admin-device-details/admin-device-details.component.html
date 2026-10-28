@@ -1,0 +1,133 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="element-wrapper">
+          <button style="background: #2bdc16;border-color: #2bdc16;" class="btn btn-primary returnbtn">
+            <i class="fa fa-angle-double-left" style="width: 20px;"></i>
+            <a routerLink="/AdminDashboard" style="float: right;">Home</a>
+          </button>
+          <br>
+            <div class="element-box">
+              <div class="col-md-12 pagetitleborder">
+                <div class="pagetitlestyle"><span>{{getDisplayFilterType()}} Device Details</span></div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="table-responsive">
+                    <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
+                      <table style="width: 100%;">
+                        <tbody class="bg-body">
+                          <tr>
+                            <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                              <font style="font-weight: bold;">Search : </font>
+                            </td>
+                            <td>
+                              <div class="">
+                                <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="tabletitlesearch"
+                                  id="searchby" placeholder="Type here and press button...." style="border: 1px solid #0b58b9; height: 25px; width: 200px;"
+                                  autocomplete="disabled" maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby">
+                                &nbsp;&nbsp;
+                                <button class="" id="searchbtn" style="cursor: pointer;" (click)="getSearchDetails()">
+                                  <i class="fa fa-search"></i>
+                                </button>
+                                &nbsp;&nbsp;
+                                <button>
+                                  @if (!loading) {
+                                    <span id="notspin" style="font-size: 11px; cursor: pointer; margin-top: 6px;"
+                                    title="Reload" (click)="reloadData()">Reload</span>
+                                  }
+                                  @if (loading) {
+                                    <span id="spin" style="font-size: 11px; cursor: pointer; display: inline; margin-top: 6px;">Reloading...</span>
+                                  }
+                                </button>
+                              </div>
+                            </td>
+                            <td>
+                              <table style="float: right;">
+                                <tbody>
+                                  <tr>
+                                    <td>
+                                      <label style="color: #0e0e0e;">Show Rows : </label>
+                                    </td>
+                                    <td>
+                                      <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize" style="font-size: 10px; height: 23px;">
+                                        @for (size of pageSizeOptions; track size) {
+                                          <option [value]="size === totalCount ? 'All' : size">
+                                            {{size === totalCount ? 'All' : size}}
+                                          </option>
+                                        }
+                                      </select>
+                                    </td>
+                                    <td style="padding-right: 9px;">
+                                      <div style="text-align: right; font-weight: bold; margin-left: 25px;">
+                                        <font class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</font>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </form>
+
+                    <ng-template #adminDeviceHeader let-column>
+                      @if (column.key === 'param8') {
+                        Dealer
+                        @if (roleId !== '11') { <hr><span>Vendor</span> }
+                      } @else {
+                        {{column.label}}
+                      }
+                    </ng-template>
+                    <ng-template #deviceCell let-data let-column="column">
+                      @switch (column.key) {
+                        @case ('param5') { {{data.param5 || 'NA'}}<br>{{data.param4 || 'NA'}} }
+                        @case ('param6') { {{data.param6 || 'NA'}}<br>{{data.param56 || 'NA'}} }
+                        @case ('param28') { {{data.param28 || 'NA'}}<br>{{data.param29 || 'NA'}} }
+                        @case ('param8') {
+                          {{data.param8 || 'NA'}}<br>
+                          @if (roleId !== '11') { {{data.param7 || 'NA'}} }
+                        }
+                        @case ('param26') {
+                          <span style="font-weight: bold;">{{data.param26 === 'Pending OTP' ? 'Pending' : data.param26}}</span><br>
+                          @if (data.param26 === 'Activated') { {{data.param14 || 'NA'}} }
+                        }
+                        @default { {{data[column.key] || 'NA'}} }
+                      }
+                    </ng-template>
+                    <app-common-table [columns]="tableColumns" [rows]="deviceDetails" [loading]="loading"
+                      [headerTemplate]="adminDeviceHeader" [cellTemplate]="deviceCell" [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
+                      tableClass="table table-striped app-table" tableId="devicetable"
+                      tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
+                      emptyMessage="NO DATA FOUND">
+                    </app-common-table>
+                </div>
+
+                @if (getTotalPages() > 1) {
+                  <div class="pagination-wrapper">
+                    <ul class="pagination" style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+                      <li [class.disabled]="currentPage === 1">
+                        <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+                      </li>
+                      @for (page of getPageNumbers(); track page) {
+                        <li [class.active]="currentPage === page">
+                          <button (click)="onPageChange(page)">{{page}}</button>
+                        </li>
+                      }
+                      <li [class.disabled]="currentPage >= getTotalPages()">
+                        <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+                      </li>
+                    </ul>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

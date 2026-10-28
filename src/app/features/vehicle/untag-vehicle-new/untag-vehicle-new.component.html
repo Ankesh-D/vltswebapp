@@ -1,0 +1,467 @@
+<div class="content-box">
+  <div class="element-wrapper">
+    <div class="element-box">
+
+      <div class="col-md-12 pagetitleborder"
+        style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="pagetitlestyle"><span>{{pageTitle}}</span></div>
+        <div class="modern-nav-group">
+          <a class="nav-pill-item pointer" [ngClass]="{'active': tabTitle=='alldevice'}"
+            (click)="tabTitle='alldevice'; pageTitle='All Devices'; searchByType='TotalDevice'; getDetails(1);" style=" z-index: 99 !important;">
+            <i class="fa fa-calendar"></i><span>All Devices</span>
+          </a>
+          <a class="nav-pill-item pointer" [ngClass]="{'active': tabTitle=='requested'}"
+            (click)="tabTitle='requested'; pageTitle='Requested Details'; searchByType='pendingrequest'; getDetails(1)" style=" z-index: 99 !important;">
+            <i class="fa fa-user"></i><span>Requested Device Details</span>
+          </a>
+          @if (roleId=='10' || roleId=='64') {
+            <a class="nav-pill-item pointer" [ngClass]="{'active': tabTitle=='untaggedRequest'}"
+              (click)="tabTitle='untaggedRequest'; pageTitle='Untagged Requests Details'; togglefun()" style=" z-index: 99 !important;">
+              <i class="fa fa-user"></i><span>Untagged Requests Details</span>
+            </a>
+          }
+        </div>
+      </div>
+
+      @if (!toggleFlag) {
+        <div class="table-responsive">
+          <form autocomplete="off" class="top-controls-row">
+            <!-- LEFT SIDE -->
+            <div class="left-controls">
+              <label class="topbar-label">Search :</label>
+              <div class="search-box">
+                <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input inner"
+                  id="searchby" placeholder="Type here and press button...." autocomplete="off" maxlength="50"
+                  [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" />
+                <button class="search-inner-btn" (click)="getSearchDetails()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+              <!-- RELOAD -->
+              <button class="reload-btn" (click)="reloadData()">
+                @if (!loading) {
+                  <span>Reload</span>
+                }
+                @if (loading) {
+                  <span>Reloading...</span>
+                }
+              </button>
+            </div>
+            <!-- RIGHT SIDE -->
+            <div class="right-controls">
+              <div class="total-records-text">Show Rows :</div>
+              <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size === totalCount ? totalCount : size">
+                    {{ size === totalCount ? totalCount : size }}
+                  </option>
+                }
+              </select>
+              <div class="total-records-text">
+                Total Records : {{pageCount}} of {{totalCount}}
+              </div>
+            </div>
+          </form>
+          <table class="table table-striped app-table mb-1"
+            style="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>
+                  IMEI
+                  <hr class="my-0">
+                  Serial No
+                  <hr class="my-0">
+                  ICCID
+                </th>
+                <th>
+                  Vendor
+                  <hr class="my-0">
+                  Dealer
+                </th>
+                <th>
+                  Vehicle No
+                  <hr class="my-0">
+                  Chassis
+                  <hr class="my-0"> Engine
+                </th>
+                <th>
+                  Type
+                  <hr class="my-0">
+                  Model
+                  <hr class="my-0"> Make
+                </th>
+                <th>
+                  Customer
+                  <hr class="my-0">
+                  Mobile
+                </th>
+                <th>
+                  RTO
+                </th>
+                <th>
+                  Activation
+                  <hr class="my-0">
+                  Validity
+                </th>
+                <th>
+                  Polling
+                  <hr class="my-0">
+                  Last Time
+                </th>
+                <th>Status
+                  <hr class="my-0">
+                  Action Status
+                </th>
+                @if (roleId==10||roleId==64) {
+                  <th>
+                    MVI Approval Status
+                    <hr class="my-0">
+                    Approved By
+                    <hr class="my-0">
+                    Approved On
+                  </th>
+                }
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (dataDetails.length === 0 && !loading) {
+                <tr>
+                  <td style="font-weight: bold; text-align: center;" colspan="100">NO DATA FOUND</td>
+                </tr>
+              }
+              @for (d of dataDetails; track d) {
+                <tr>
+                  <!-- Sr -->
+                  <td>{{d.param1}}</td>
+                  <!-- IMEI + Serial + ICCID -->
+                  <td>
+                    {{ d.param5 }}<br>
+                    {{ d.param6 }} <br>
+                    {{ d.param7 }}
+                  </td>
+                  <!-- Vendor -->
+                  <td>
+                    {{ d.param15 }}
+                    <br>
+                      {{ d.param16 }}
+                    </td>
+                    <!-- Vehicle -->
+                    <td>
+                      {{ d.param20 }}<br>
+                      {{ d.param21 }} <br> {{ d.param22 }}
+                    </td>
+                    <!-- Type -->
+                    <td>
+                      {{ d.param65 }}<br>
+                      {{ d.param53 }} <br> {{ d.param52 }}
+                    </td>
+                    <!-- Customer -->
+                    <td>
+                      {{ d.param37 }}<br>
+                      {{ d.param38 }}
+                    </td>
+                    <!-- RTO -->
+                    <td>
+                      {{ d.param27 }}
+                    </td>
+                    <!-- Dates -->
+                    <td>
+                      {{ d.param23 }}<br>
+                      {{ d.param54 }}
+                    </td>
+                    <!-- Polling -->
+                    <td>
+                  <span [ngClass]="{
+              'text-success': d.param48 === 'Received',
+              'text-warning': d.param48 === 'Not Received',
+              'text-danger': d.param48 === 'Never Received'||d.param48 === 'Never Received..'
+            }">
+                        {{ d.param48 || 'Never Received' }}
+                      </span>
+                      <br>
+                        {{ d.param60 }}
+                      </td>
+                      <td>
+                        <span
+                        [ngClass]="{'text-danger': d.param34=='Pending OTP', 'text-success': d.param34=='Activated'}">{{d.param34}}</span>
+                        <hr class="my-0">
+                        <span
+                        [ngClass]="{'text-danger': d.param71=='Rejected', 'text-success': d.param71=='Approved', 'text-warning': d.param71=='Pending'}">{{d.param71}}</span>
+                      </td>
+                      <!-- mvi verificaltion addded  -->
+                      @if (roleId==10||roleId==64) {
+                        <td >
+                          <div style="margin: 0px; padding: 0px;"
+            [ngClass]="{
+              'text-warning': d.param74 === 'Pending',
+              'text-success': d.param74 === 'Verified',
+              'text-danger': d.param74 === 'Rejected'
+            }"
+                            >
+                            {{ d.param74 || 'NA' }}
+                          </div>
+                          {{ d.param75||"-" }} <br>
+                          {{ d. param76||"-" }}
+                        </td>
+                      }
+                      <!-- Action -->
+                      <td>
+                        @if (d.param34=='Pending OTP') {
+                          <button class="btn btn-danger btn-sm" (click)="setdataData(d)">
+                            <i class="fa fa-trash"></i>
+                          </button>
+                        }
+                        @if (d.param34=='Activated') {
+                          <button class="btn btn-danger btn-sm" (click)="untagDevice(d)">
+                            <i class="fa fa-trash"></i>
+                          </button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              <!-- Pagination -->
+              <div class="float-end">
+                @if (totalCount > pageSize) {
+                  <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+                    [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+                    [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+                  </ngb-pagination>
+                }
+              </div>
+              <!-- <div class="custom-pagination" style="display:flex;justify-content: end;"
+              *ngIf="totalCount > pageSize || currentPage > 1">
+              <button class="pg-btn" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
+                Prev
+              </button>
+              <span *ngIf="currentPage > 3" class="pg-dots">...</span>
+              <button *ngIf="currentPage > 2" class="pg-num" (click)="onPageChange(currentPage - 1)">
+                {{ currentPage - 1 }}
+              </button>
+              <button class="pg-num active">
+                {{ currentPage }}
+              </button>
+              <button *ngIf="currentPage < getTotalPages() - 1" class="pg-num" (click)="onPageChange(currentPage + 1)">
+                {{ currentPage + 1 }}
+              </button>
+              <span *ngIf="currentPage < getTotalPages() - 2" class="pg-dots">...</span>
+              <button class="pg-num" (click)="onPageChange(currentPage)">
+                {{ getTotalPages() }}
+              </button>
+              <button class="pg-btn" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === getTotalPages()">
+                Next
+              </button>
+            </div> -->
+          </div>
+        }
+        @if (toggleFlag) {
+          <app-untag-request-details></app-untag-request-details>
+        }
+
+      </div>
+    </div>
+  </div>
+  <!-- 🔥 UNTAG MODAL -->
+  <div class="modal fade" [class.show]="showUntagModal" [style.display]="showUntagModal ? 'block' : 'none'"
+    (click)="showUntagModal && closeUntagModal()">
+    <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-header modal-header-style py-2">
+          <h5 class="modal-title">
+            <i class="fa fa-exclamation-triangle"></i> Untag Device
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeUntagModal()"
+          [disabled]="isSubmitting"></button>
+        </div>
+        <form #requestForm="ngForm">
+          <div class="modal-body">
+            <div class="alert alert-warning">
+              @if (requestedFor!='') {
+                <strong>Warning!</strong>
+              }
+              @if (requestStatus=='Pending') {
+                <div>
+                  @if (requestedFor=='untag') {
+                    <span>
+                      Initializes request to <b>untagged</b> the device
+                    </span>
+                  }
+                  @if (requestedFor=='delete') {
+                    <span>
+                      Initializes request to <b>delete</b> the device
+                    </span>
+                  }
+                </div>
+              }
+              <br>
+                @if (requestedFor!='') {
+                  <strong>Reason For {{requestedFor}}</strong>
+                }
+                @if (requestStatus=='Pending') {
+                  <div>
+                    @if (requestedFor=='untag') {
+                      <span>
+                        {{requestData.param12 ? requestData.param12 : ''}}
+                      </span>
+                    }
+                  </div>
+                }
+
+                <strong>IMEI: {{ selectedDeviceImei || 'N/A' }}</strong><br>
+                <small>(Device ID: {{ selectedDeviceId }})</small>
+              </div>
+              @if ((requestStatus=='Pending' || requestStatus=='Rejected') && (roleId=='10' || roleId=='64')) {
+                <div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="status" id="approve" value="Approved"
+                      [(ngModel)]="status">
+                    <label class="form-check-label" for="approve">
+                      Approve
+                    </label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="status" id="reject" value="Rejected"
+                      [(ngModel)]="status">
+                    <label class="form-check-label" for="reject">
+                      Reject
+                    </label>
+                  </div>
+                </div>
+              }
+              <div class="form-group">
+                <label for="remarks" class="form-label"><strong>Remarks <span class="text-danger">*</span></strong></label>
+                <textarea id="remarks" class="form-control form-control-lg" rows="4"
+                  placeholder="Enter reason for untagging this device..." [(ngModel)]="untagRemarks" name="remarks"
+                  #remarkCtrl="ngModel" [disabled]="isSubmitting" required minlength="5" maxlength="500"
+                  [class.is-invalid]="remarkCtrl.invalid && (remarkCtrl.dirty || remarkCtrl.touched)">
+                </textarea>
+                <small class="text-muted">{{ untagRemarks.length }}/500 characters</small>
+                @if (remarkCtrl.invalid && (remarkCtrl.dirty || remarkCtrl.touched)) {
+                  <div class="invalid-feedback d-block"
+                    >
+                    @if (remarkCtrl.errors?.['required']) {
+                      <span>Remarks are required</span>
+                    }
+                    @if (remarkCtrl.errors?.['minlength']) {
+                      <span>Remarks must be at least 5 characters</span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-sm btn-secondary" (click)="closeUntagModal()" [disabled]="isSubmitting">
+                Cancel
+              </button>
+              <!-- untag or delete if Pending OTP by vendor or any other role-->
+              @if (activationStatus=='Pending OTP') {
+                <button type="submit" class="btn btn-sm btn-danger"
+                  (click)="performOperation('untag'); untagOperation()"
+                  [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                  @if (!isSubmitting) {
+                    <span>
+                      <i class="fa fa-check"></i> Confirm Untag
+                    </span>
+                  }
+                  @if (isSubmitting) {
+                    <span>
+                      <i class="fa fa-spinner fa-spin"></i> Processing...
+                    </span>
+                  }
+                </button>
+              }
+              @if (activationStatus=='Pending OTP') {
+                <button type="submit" class="btn btn-sm btn-danger"
+                  (click)="performOperation('delete'); deleteOperation()"
+                  [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                  @if (!isSubmitting) {
+                    <span>
+                      <i class="fa fa-check"></i> Confirm Delete
+                    </span>
+                  }
+                  @if (isSubmitting) {
+                    <span>
+                      <i class="fa fa-spinner fa-spin"></i> Processing...
+                    </span>
+                  }
+                </button>
+              }
+
+              <!-- send request by vendor if activation status Activated -->
+              @if (activationStatus=='Activated' && (roleId=='11' || roleId=='61' || roleId=='13')) {
+                <button type="submit"
+                  class="btn btn-sm btn-danger" (click)="requestType='untag'; performOperation('untag');"
+                  [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                  @if (!isSubmitting) {
+                    <span>
+                      <i class="fa fa-check"></i> Request For Untag
+                    </span>
+                  }
+                  @if (isSubmitting) {
+                    <span>
+                      <i class="fa fa-spinner fa-spin"></i> Processing...
+                    </span>
+                  }
+                </button>
+              }
+              @if (activationStatus=='Activated' && (roleId=='11' || roleId=='61' || roleId=='13')) {
+                <button type="submit"
+                  class="btn btn-sm btn-danger" (click)="requestType='delete'; performOperation('delete')"
+                  [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                  @if (!isSubmitting) {
+                    <span>
+                      <i class="fa fa-check"></i> Request For Delete
+                    </span>
+                  }
+                  @if (isSubmitting) {
+                    <span>
+                      <i class="fa fa-spinner fa-spin"></i> Processing...
+                    </span>
+                  }
+                </button>
+              }
+
+              @if (activationStatus=='Activated' && (roleId=='10' || roleId=='64')) {
+                <button type="submit" class="btn btn-sm btn-danger"
+                  (click)="requestType='untag'; performOperation('untag');"
+                  [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                  @if (!isSubmitting) {
+                    <span>
+                      <i class="fa fa-check"></i> Confirm Untag
+                    </span>
+                  }
+                  @if (isSubmitting) {
+                    <span>
+                      <i class="fa fa-spinner fa-spin"></i> Processing...
+                    </span>
+                  }
+                </button>
+              }
+              @if (activationStatus=='Activated' && (roleId=='10' || roleId=='64')) {
+                <button type="submit" class="btn btn-sm btn-danger"
+                  (click)="requestType='delete'; performOperation('delete')"
+                  [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                  @if (!isSubmitting) {
+                    <span>
+                      <i class="fa fa-check"></i> Confirm Delete
+                    </span>
+                  }
+                  @if (isSubmitting) {
+                    <span>
+                      <i class="fa fa-spinner fa-spin"></i> Processing...
+                    </span>
+                  }
+                </button>
+              }
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Backdrop -->
+    <div class="modal-backdrop fade" [class.show]="showUntagModal" [style.display]="showUntagModal ? 'block' : 'none'">
+    </div>

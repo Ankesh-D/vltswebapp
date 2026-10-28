@@ -1,0 +1,81 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          @if (roleId !== '13') {
+            <button class="pagebtn">
+              <a routerLink="/operation/send-health-status"><i class="fa fa-plus"></i>&nbsp;&nbsp;Send Health Status</a>
+            </button>
+          }
+          <div class="pagetitlestyle"><span>Check Health Acknowledge</span></div>
+        </div>
+
+        <div class="col-sm-12">
+          <div class="row" style="margin-top:10px;">
+            <div class="col-sm-2">
+              <label for="name" class="control-label">Select Vendor:</label><label class="mandetory">*</label>
+              <select class="searchable" id="companyCode" [(ngModel)]="selectedVendor" name="vendor">
+                <option value="">Select Vendor</option>
+                @for (item of vendorList; track item) {
+                  <option [value]="item.param1">{{item.param2}}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-sm-2">
+              <label for="name" class="control-label">Select IMEI No.:</label><label class="mandetory">*</label>
+              <select class="searchable" id="deviceCode" [(ngModel)]="selectedIMEI" name="device">
+                <option value="">Select IMEI No.</option>
+                @for (item of deviceList; track item) {
+                  <option [value]="item.param2">{{item.param2}}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-sm-2">
+              <label for="name" class="control-label">Select Date:</label> <label class="mandetory">*</label>
+              <input class="form-control datepick" type="text" id="daterawdata" [(ngModel)]="selectedDate" name="date">
+            </div>
+
+            <div class="col-sm-1">
+              <button type="button" style="margin-top:20px;" (click)="checkHealthDetails()" [disabled]="loading">
+                {{loading ? 'Loading...' : 'View'}}
+              </button>
+            </div>
+          </div>
+
+          @if (checkDetails.length > 0) {
+            <div style="margin-top: 20px;">
+              <div style="text-align: right; font-weight: bold; margin-left: 25px;">
+                <font class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</font>
+              </div>
+              <ng-template #healthAckCell let-dev let-column="column">
+                @switch (column.key) {
+                  @case ('packetHeader') { {{dev.param3 || 'NA'}}<br>{{dev.param4 || 'NA'}}<br>{{dev.param5 || 'NA'}} }
+                  @case ('alert') { {{dev.param6 || 'NA'}} }
+                  @case ('coordinates') { {{dev.param7 || 'NA'}}<br>{{dev.param8 || 'NA'}} }
+                  @case ('smsDate') { {{dev.param10 || 'NA'}} }
+                  @case ('heading') { {{dev.param13 || 'NA'}} }
+                  @case ('speed') { {{dev.param14 || 'NA'}} }
+                  @case ('signal') { {{dev.param15 || 'NA'}} }
+                  @case ('network') { {{dev.param22 || 'NA'}}<br>{{dev.param16 || 'NA'}}<br>{{dev.param17 || 'NA'}} }
+                  @case ('ignition') { {{dev.param18 || 'NA'}}<br>{{dev.param9 || 'NA'}} }
+                  @case ('vehicleMode') { {{dev.param20 || 'NA'}} }
+                  @case ('rawString') { {{dev.param21 || 'NA'}} }
+                  @default { {{dev[column.key] || 'NA'}} }
+                }
+              </ng-template>
+              <app-common-table [columns]="tableColumns" [rows]="checkDetails" [loading]="loading"
+                [cellTemplate]="healthAckCell" [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
+                tableClass="table table-striped app-table"
+                tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
+                emptyMessage="NO DATA FOUND">
+              </app-common-table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

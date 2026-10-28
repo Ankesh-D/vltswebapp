@@ -1,0 +1,34 @@
+@use '../../../shared/styles/compact-admin-page' as compact;
+
+.password {
+  position: relative;
+}
+.password i {
+  position: absolute;
+  top: 30px;
+  right: 10px;
+  cursor: pointer;
+  color: #666;
+}
+label {
+  margin-bottom: 0px; 
+  font-size: 12px;
+  font-weight: 600;
+}
+::ng-deep .select2-container--default .select2-selection--single {
+  height: 32px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+::ng-deep .ng-dropdown-panel.ng-select-bottom {
+  font-size: 12px;
+}
+::ng-deep .ng-select-container {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+::ng-deep .ng-select .ng-select-container {
+  min-height: 32px;
+}
+@include compact.compact-admin-page;

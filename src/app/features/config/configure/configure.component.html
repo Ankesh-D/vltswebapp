@@ -1,0 +1,264 @@
+
+
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="pagetitleborder">
+              <div class="page-actions">
+                <button class="pagebtn">
+                  <a routerLink="/alert/management"><i class="fa fa-plus"></i>&nbsp;&nbsp;Alert Management</a>
+                </button>
+                <button class="pagebtn">
+                  <a routerLink="/config/details"><i class="fa fa-plus"></i>&nbsp;&nbsp;Details</a>
+                </button>
+              </div>
+              <div class="pagetitlestyle"><span>Configure</span></div>
+            </div>
+            <form>
+              <div class="form-desc" style="font-size: 11px; color: #777; margin-bottom: 15px;">
+                <strong>NOTE :</strong><span class="text-danger">*</span> Are Mandatory Fields.
+              </div>
+
+              <div class="entrypagediv">
+                <div class="row">
+                  <div class="form-group col-sm-6 col-md-3 col-lg-2">
+                    <label for="searchfilter">Select : <span class="text-danger">*</span></label>
+                    <ng-select id="searchfilter" class="compact-select" [(ngModel)]="searchFilter"
+                      name="searchFilter" placeholder="Select" style=" font-size: 11px;"
+                      (change)="onSearchFilterChange()" >
+                      <ng-option value="">Select</ng-option>
+                      <ng-option value="Vendor">Vendor</ng-option>
+                      <ng-option value="RTO">RTO</ng-option>
+                      <ng-option value="Customer">Customer</ng-option>
+                    </ng-select>
+                  </div>
+
+                  @if (searchFilter === 'Vendor') {
+                    <div class="form-group col-sm-6 col-md-3 col-lg-2" id="vendordiv">
+                      <label for="selectcomplist">Search By Vendor <span class="text-danger">*</span></label>
+                      <ng-select class="compact-select" id="selectcomplist" [(ngModel)]="selectedVendor" name="vendor"
+                        placeholder="Search By Vendor"  style=" font-size: 11px;" >
+                        <ng-option value="">Search By Vendor</ng-option>
+                        @for (item of vendorList; track item) {
+                          <ng-option [value]="item.param1">{{item.param2}}</ng-option>
+                        }
+                      </ng-select>
+                    </div>
+                  }
+
+                  @if (searchFilter === 'RTO') {
+                    <div class="form-group col-sm-6 col-md-3 col-lg-2" id="rto">
+                      <label for="selectrtolist">Search By RTO <span class="text-danger">*</span></label>
+                      <ng-select class="compact-select" id="selectrtolist" [(ngModel)]="selectedRTO" name="rto"
+                        placeholder="Select By RTO"  style=" font-size: 11px;" >
+                        <ng-option value="">Select By RTO</ng-option>
+                        @for (item of rtoList; track item) {
+                          <ng-option [value]="item.param1">{{item.param2}}</ng-option>
+                        }
+                      </ng-select>
+                    </div>
+                  }
+
+                  @if (searchFilter === 'Customer') {
+                    <div class="form-group col-sm-6 col-md-3 col-lg-2" id="customerdiv" style="position: relative;">
+                      <label for="searchcont">Contact Number <span class="text-danger">*</span></label>
+                      <input type="text" id="searchcont" placeholder="Enter Contact No"
+                        [(ngModel)]="searchContact" (blur)="findRegisterContact()" maxlength="10"
+                        class="form-control acceptnumeric_nodecimal" name="searchContact">
+                      <button type="button" class="btn-search-icon" (click)="findRegisterContact()">
+                        <i class="fa fa-search" style="cursor:pointer;"></i>
+                      </button>
+                    </div>
+                  }
+
+                  <div class="form-group col-sm-6 col-md-3 col-lg-2">
+                    <label for="selectalertlist">Select Alert Type: <span class="text-danger">*</span></label>
+                    <ng-select class="compact-select" id="selectalertlist" [(ngModel)]="selectedAlertType"
+                      name="alertType" placeholder="Select Alert Type" style=" font-size: 11px;" >
+                      <ng-option value="">Select Alert Type</ng-option>
+                      <ng-option value="All">All</ng-option>
+                      @for (item of alertTypeList; track item) {
+                        <ng-option [value]="item.param1">{{item.param2}}</ng-option>
+                      }
+                    </ng-select>
+                  </div>
+
+                  <div class="form-group col-sm-6 col-md-3 col-lg-2" id="selectspeed" [style.display]="selectedAlertType === '17' ? 'block' : 'none'">
+                    <label for="speed">Select Vehicle Speed: <span class="text-danger">*</span></label>
+                    <ng-select class="compact-select" id="speed" [(ngModel)]="selectedSpeed" name="speed"
+                      placeholder="Select Vehicle Speed" [searchable]="false" style=" font-size: 11px;" >
+                      <ng-option value="">Select Vehicle Speed</ng-option>
+                      <ng-option value="30">30</ng-option>
+                      <ng-option value="40">40</ng-option>
+                      <ng-option value="50">50</ng-option>
+                      <ng-option value="60">60</ng-option>
+                      <ng-option value="70">70</ng-option>
+                      <ng-option value="80">80</ng-option>
+                      <ng-option value="90">90</ng-option>
+                      <ng-option value="100">100</ng-option>
+                    </ng-select>
+                  </div>
+
+                  @if (searchFilter === 'Vendor' || searchFilter === 'RTO') {
+                    <div class="form-group col-sm-6 col-md-3 col-lg-2" id="sendviadiv">
+                      <label for="sendvia">Select Send Via: <span class="text-danger">*</span></label>
+                      <ng-select id="sendvia" class="compact-select" [(ngModel)]="sendVia" name="sendVia"
+                        placeholder="Select Send Via" style=" font-size: 11px;" >
+                        <ng-option value="">Select Send Via</ng-option>
+                        <ng-option value="SMS">SMS</ng-option>
+                        <ng-option value="Email">Email</ng-option>
+                      </ng-select>
+                    </div>
+                  }
+
+                  @if (sendVia === 'SMS') {
+                    <div class="form-group col-sm-6 col-md-3 col-lg-2" id="addcontactdiv"
+                      style="position: relative; font-size: 11px;">
+                      <label for="addcontact">Add Contact No. <span class="text-danger">*</span></label>
+                      <input type="text" id="addcontact" placeholder="Enter Contact No"
+                        [(ngModel)]="addContact" (blur)="addContactNumber()" maxlength="10"
+                        class="form-control acceptnumeric_nodecimal" name="addContact">
+                      <button type="button" class="btn-search-icon" (click)="addContactNumber()">
+                        <i class="fa fa-plus-circle" style="cursor:pointer;"></i>
+                      </button>
+                    </div>
+                  }
+
+                  @if (sendVia === 'Email') {
+                    <div class="form-group col-sm-6 col-md-3 col-lg-2" id="addemaildiv" style="position: relative;">
+                      <label for="addemail">Add Email Id. <span class="text-danger">*</span></label>
+                      <input type="text" id="addemail" placeholder="Enter Email Id"
+                        [(ngModel)]="addEmail" (blur)="addEmailId()" maxlength="50"
+                        class="form-control" name="addEmail" style=" font-size: 11px;">
+                      <button type="button" class="btn-search-icon" (click)="addEmailId()">
+                        <i class="fa fa-plus-circle" style="cursor:pointer;"></i>
+                      </button>
+                    </div>
+                  }
+
+                  <div class="form-group col-sm-6 col-md-3 col-lg-2">
+                    <label for="daytype">Select Day List: <span class="text-danger">*</span></label>
+                    <ng-select id="daytype" class="compact-select" [(ngModel)]="dayType" name="dayType"
+                      placeholder="Select Day List" style=" font-size: 11px;" >
+                      <ng-option value="">Select Day List</ng-option>
+                      <ng-option value="Daily">Daily</ng-option>
+                      <ng-option value="Weekly">Weekly</ng-option>
+                      <ng-option value="Monthly">Monthly</ng-option>
+                      <ng-option value="Custom">Custom</ng-option>
+                    </ng-select>
+                  </div>
+
+                  @if (dayType === 'Monthly') {
+                    <div class="form-group col-sm-6 col-md-3 col-lg-2" id="monthdatediv">
+                      <label for="monthdate">Select Date <span class="text-danger">*</span></label>
+                      <ng-select id="monthdate" class="compact-select" [(ngModel)]="selectedMonthDate"
+                        name="monthDate" placeholder="Select" style=" font-size: 11px;">
+                        <ng-option value="">Select</ng-option>
+                        @for (date of datesForMonth; track date) {
+                          <ng-option [value]="date">{{date}}</ng-option>
+                        }
+                      </ng-select>
+                    </div>
+                  }
+
+                  @if (dayType === 'Custom') {
+                    <div class="form-group col-sm-12 col-md-6 col-lg-4" id="customdatediv">
+                      <label>Select Days</label>
+                      <div class="custom-checkbox-group">
+                        @for (day of ['SUN','MON','TUE','WED','THU','FRI','SAT']; track day) {
+                          <div>
+                            <input [id]="day.toLowerCase()" type="checkbox" [value]="day" [checked]="isDaySelected(day)" (click)="toggleDay(day)">
+                            <label [for]="day.toLowerCase()">{{day}}</label>&nbsp;&nbsp;
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="row" style="margin-top: 15px;">
+                  @if (showRegisteredContact) {
+                    <div class="col-sm-12 col-md-4" id="regcontactdetails">
+                      <div class="alert alert-info" style="font-size: 12px; padding: 10px;">
+                        <i class="fa fa-info-circle"></i> SMS will send on register contact no. <strong>{{registeredContact}}</strong>
+                      </div>
+                    </div>
+                  }
+
+                  @if (contactRows.length > 0) {
+                    <div class="col-sm-12 col-md-4" id="contacttable">
+                      <div class="table-responsive">
+                        <table class="table table-striped app-table table-hover" id="contacttableid">
+                          <thead>
+                            <tr>
+                              <th>Contact No.</th>
+                              <th style="width: 50px; text-align: center;">Remove</th>
+                            </tr>
+                          </thead>
+                          <tbody id="addedcontacts">
+                            @for (contact of contactRows; track contact) {
+                              <tr>
+                                <td>{{contact}}</td>
+                                <td style="text-align: center;">
+                                  <i class="fa fa-trash" style="color:#e74c3c; cursor:pointer;" (click)="removeContact(contact)"></i>
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  }
+
+                  @if (emailRows.length > 0) {
+                    <div class="col-sm-12 col-md-4" id="emailtable">
+                      <div class="table-responsive">
+                        <table class="table table-striped app-table table-hover" id="emailtableid">
+                          <thead>
+                            <tr>
+                              <th>Email Id.</th>
+                              <th style="width: 50px; text-align: center;">Remove</th>
+                            </tr>
+                          </thead>
+                          <tbody id="addedemails">
+                            @for (email of emailRows; track email) {
+                              <tr>
+                                <td>{{email}}</td>
+                                <td style="text-align: center;">
+                                  <i class="fa fa-trash" style="color:#e74c3c; cursor:pointer;" (click)="removeEmail(email)"></i>
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </form>
+
+            <div class="form-buttons-w" style="text-align: center; margin-top: 20px;">
+              <button (click)="configureEntry()" [disabled]="loading" class="btn-submit">
+                @if (!loading) {
+                  <i class="fa fa-check"></i>
+                  } {{loading ? 'Submitting...' : 'Submit'}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  @if (errorMessage) {
+    <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+  }
+  @if (successMessage) {
+    <app-toast [message]="successMessage" type="success" (closed)="successMessage = null"></app-toast>
+  }

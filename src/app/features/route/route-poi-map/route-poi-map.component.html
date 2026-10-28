@@ -1,0 +1,296 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <!-- <button class="pagebtn">
+              <a routerLink="/route/poi-map"><i class="fa fa-plus"></i>&nbsp;&nbsp;POI Vehicle Mapping</a>
+            </button> -->
+            <button class="pagebtn">
+              <a routerLink="/route/routevehicle-map"><i class="fa fa-plus"></i>&nbsp;&nbsp;Route Vehicle Mapping</a>
+            </button>
+            <div class="pagetitlestyle">
+              <span>Route POI Mapping</span>
+            </div>
+          </div>
+
+          <!-- Assign Route to POI Form -->
+          <form name="DealerassignInsert">
+            <div class="form-desc">
+              <strong>NOTE :</strong><label class="mandetory">*</label> Are Mandatory Fields.
+            </div>
+            <div class="row entrypagediv align-items-end">
+              <div class="col-sm-4 col-md-4 col-lg-3">
+                <div class="form-group">
+                  <label>Select Route <span class="mandetory">*</span></label>
+                  <ng-select
+                    [items]="routeList"
+                    bindLabel="param2"
+                    bindValue="param1"
+                    [(ngModel)]="selectedRouteId"
+                    name="route"
+                    placeholder="Select Route"
+                    [clearable]="false"
+                    class="w-100">
+                  </ng-select>
+                </div>
+              </div>
+
+              <div class="col-sm-4 col-md-4 col-lg-3">
+                <div class="form-group">
+                  <label>Select POI <span class="mandetory">*</span></label>
+                  <ng-select
+                    [items]="poiList"
+                    bindValue="param1"
+                    [(ngModel)]="selectedPOIId"
+                    name="poi"
+                    placeholder="Select POI"
+                    [clearable]="false"
+                    class="w-100">
+                    <!-- Display param2 or param3 depending on availability -->
+                    <ng-template ng-option-tmp let-item="item">
+                      {{item.param2 || item.param3}}
+                    </ng-template>
+                    <ng-template ng-label-tmp let-item="item">
+                      {{item.param2 || item.param3}}
+                    </ng-template>
+                  </ng-select>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-block"
+                  (click)="assignRouteToPOI()"
+                  [disabled]="loading">
+                  <i class="fa fa-check-circle"></i> {{loading ? 'Assigning...' : 'Assign'}}
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Unmap Route from POI Table -->
+          <div class="table-responsive">
+            <div id="routeassigntable">
+              <div class="unmap-title">
+                <span>Unmap Route from POI</span>
+              </div>
+
+              <!-- Search and Pagination Controls -->
+              <div class="search-controls">
+                <div class="left-controls">
+                  <span class="search-label">Search :</span>
+                  <div class="search-box">
+                    <input
+                      type="search"
+                      readonly
+                      onfocus="this.removeAttribute('readonly');"
+                      class="search-input inner"
+                      id="searchby"
+                      placeholder="Type here..."
+                      autocomplete="off"
+                      maxlength="50"
+                      [(ngModel)]="searchText"
+                      (keyup.enter)="getSearchDetails()"
+                      name="searchby">
+                    <button class="search-inner-btn" (click)="getSearchDetails()" title="Search">
+                      <i class="fa fa-search"></i>
+                    </button>
+                  </div>
+                  <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading">
+                    <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+                    <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+                  </button>
+                </div>
+                <div class="controls-right">
+                  <div class="control-group">
+                    <label class="control-label" for="excelpdfdownload">Download :</label>
+                    <select name="excelpdfdownload" id="excelpdfdownload" class="control-select">
+                      <option value="Select">Select</option>
+                      <option value="Excel" id="downloadexcel">Excel</option>
+                    </select>
+                  </div>
+                  <div class="control-group">
+                    <span class="control-label-bold">Show Rows :</span>
+                    <select
+                      [(ngModel)]="pageSize"
+                      (change)="onPageSizeChange($event)"
+                      name="pageSize"
+                      class="control-select">
+                      @for (size of pageSizeOptions; track size) {
+                        <option [value]="size === totalCount ? 'All' : size">
+                          {{size === totalCount ? 'All' : size}}
+                        </option>
+                      }
+                    </select>
+                  </div>
+                  <div class="total-records">
+                    <span>Total Records : {{pageCount}} of {{totalCount}}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="table table-striped">
+                <table class="table table-striped app-table route-poi-table" width="100%" cellspacing="0">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th (click)="sort('param7')" style="cursor: pointer;">
+                        Route Name
+                        @if (sortKey === 'param7') {
+                          <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                        }
+                      </th>
+                      <th (click)="sort('param6')" style="cursor: pointer;">
+                        POI
+                        @if (sortKey === 'param6') {
+                          <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                        }
+                      </th>
+                      <th>Activity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @if (routePOIMappings.length === 0 && !loading) {
+                      <tr>
+                        <td colspan="100" style="font-weight: bold; text-align: center;">NO DATA FOUND</td>
+                      </tr>
+                    }
+                    @for (mapping of routePOIMappings; track mapping; let i = $index) {
+                      <tr >
+                        <td>{{mapping.param1 || (i + 1)}}</td>
+                        <td>{{mapping.param7 || 'NA'}}</td>
+                        <td>{{mapping.param6 || 'NA'}}</td>
+                        <td>
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            title="Unmap Route From POI"
+                            (click)="openUnassignModal(mapping)">
+                            <i class="fa fa-chain-broken"></i>
+                            <span>Unmap</span>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Controls -->
+              @if (totalCount > 0) {
+                <div class="app-pagination">
+                  <button
+                    type="button"
+                    class="app-page-btn nav-btn"
+                    (click)="onPageChange(currentPage - 1)"
+                    [disabled]="currentPage === 1">
+                    <i class="fa fa-angle-left"></i> Previous
+                  </button>
+                  @for (page of getPageNumbers(); track page) {
+                    @if (page === -1) {
+                      <span class="app-page-ellipsis">...</span>
+                    }
+                    @if (page !== -1) {
+                      <button
+                        type="button"
+                        class="app-page-btn"
+                        [class.active]="currentPage === page"
+                        (click)="onPageChange(page)"
+                        [disabled]="page === currentPage">
+                        {{page}}
+                      </button>
+                    }
+                  }
+                  <button
+                    type="button"
+                    class="app-page-btn nav-btn"
+                    (click)="onPageChange(currentPage + 1)"
+                    [disabled]="currentPage >= getTotalPages()">
+                    Next <i class="fa fa-angle-right"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (errorMessage) {
+            <div class="alert alert-danger" style="margin-top: 10px;">
+              {{errorMessage}}
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Unmap Modal -->
+@if (showUnassignModal) {
+  <div class="modal-overlay" (click)="closeUnassignModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 450px; border-radius: 12px; border: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+      <div class="modal-header" style="background: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+        <h5 class="modal-title" style="color: #d9534f; font-weight: bold; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+          <i class="fa fa-chain-broken"></i> Unmap Route from POI
+        </h5>
+        <button type="button" class="close" (click)="closeUnassignModal()" style="font-size: 24px; opacity: 0.5; border: none; background: transparent;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <div style="background: #fff5f5; border: 1px dashed #feb2b2; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+          <div style="margin-bottom: 10px; display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 11px; font-weight: bold; color: #6c798d; text-transform: uppercase; width: 80px;">Route:</span>
+            <span style="font-size: 13px; font-weight: 600; color: #2d3748;">{{selectedMapping?.param7 || 'NA'}}</span>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 8px;">
+            <span style="font-size: 11px; font-weight: bold; color: #6c798d; text-transform: uppercase; width: 80px;">POI:</span>
+            <span style="font-size: 13px; font-weight: 600; color: #2d3748;">{{selectedMapping?.param6 || 'NA'}}</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label style="font-size: 12px; font-weight: bold; color: #6c798d; margin-bottom: 8px; display: block;">
+            Remark <span class="mandetory" style="color: #e53e3e;">*</span>
+          </label>
+          <textarea
+            id="remark"
+            class="form-control"
+            [(ngModel)]="unassignRemark"
+            (keyup)="validateRemark()"
+            name="remark"
+            rows="3"
+            style="font-size: 12px; border-radius: 6px; border-color: #e2e8f0; resize: none; transition: all 0.2s;"
+            [style.border-color]="!validateRemark() && unassignRemark.length > 0 ? '#e53e3e' : '#e2e8f0'"
+          placeholder="Please explain why you are unmapping (min 10 chars)..."></textarea>
+          @if (unassignRemark.length > 0 && !validateRemark()) {
+            <small style="color: #e53e3e; font-size: 10px; margin-top: 5px; display: block;">
+              <i class="fa fa-info-circle"></i> Need at least {{10 - unassignRemark.length}} more characters.
+            </small>
+          }
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid #eee; padding: 15px 20px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn btn-light" (click)="closeUnassignModal()" style="font-size: 12px; font-weight: bold; padding: 8px 20px; border-radius: 6px; border: 1px solid #e2e8f0;">Back</button>
+        <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          (click)="unmapRouteFromPOI()"
+          [disabled]="loading || !validateRemark()"
+          style="font-size: 12px; font-weight: bold; padding: 8px 20px; border-radius: 6px; box-shadow: 0 4px 6px rgba(217, 83, 79, 0.2);">
+          {{loading ? 'Processing...' : 'Unmap'}}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success"
+  (closed)="successMessage = null"></app-toast>
+}

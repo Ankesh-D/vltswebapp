@@ -1,0 +1,264 @@
+<div class="content-i vehicle-group-page">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box vehicle-group-shell">
+            <div class="page-header-card">
+              <div class="page-title-block">
+                <div class="page-icon">
+                  <i class="fa fa-car" aria-hidden="true"></i>
+                </div>
+                <div class="page-title-copy">
+                  <h2 class="page-title">New Vehicle Group</h2>
+                  <p class="page-subtitle">Create, search and manage vehicle groups in one compact workspace.</p>
+                </div>
+              </div>
+
+              <div class="page-actions">
+                <a class="header-action-btn secondary" routerLink="/VehicleToGroupMapping">
+                  <i class="fa fa-random" aria-hidden="true"></i>
+                  <span>Vehicle to Group Mapping</span>
+                </a>
+                <a class="header-action-btn primary" routerLink="/VehicleToGroupMappingDetails">
+                  <i class="fa fa-list-alt" aria-hidden="true"></i>
+                  <span>Mapping Details</span>
+                </a>
+              </div>
+            </div>
+
+            <form id="vehGrpCreation" autocomplete="off" class="entry-form-card">
+              <div class="form-note">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <span><strong>Note:</strong> <label class="mandetory">*</label> fields are mandatory.</span>
+              </div>
+
+              <div class="entry-grid">
+                <div class="field-card">
+                  <label for="groupname" class="control-label">Group Name <span class="mandetory">*</span></label>
+                  <div class="input-with-icon">
+                    <i class="fa fa-tag" aria-hidden="true"></i>
+                    <input id="groupname" type="text" class="form-control ignorespecialcharacter"
+                      placeholder="Enter vehicle group name" title="Ignore Special Characters"
+                      [(ngModel)]="groupName" (keyup)="validate()" name="groupName" autofocus
+                      maxlength="50" minlength="3" required>
+                  </div>
+                </div>
+
+                <div class="field-card field-card-wide">
+                  <label for="discription" class="control-label">Group Description <span class="mandetory">*</span></label>
+                  <div class="input-with-icon textarea-wrap">
+                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                    <textarea class="form-control" [(ngModel)]="description" (keyup)="checkDescription()"
+                      placeholder="Write a short description" id="discription" name="description"
+                    maxlength="500" minlength="3" style=" overflow: hidden;"></textarea>
+                  </div>
+                </div>
+
+                <div class="submit-card">
+                  <button class="submit-btn" type="button" (click)="createVehicleGroup()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    <span>Submit</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <div class="table-card">
+              <div class="table-toolbar">
+                <div class="table-heading">
+                  <i class="fa fa-table" aria-hidden="true"></i>
+                  <span>Vehicle Group Details</span>
+                </div>
+
+                <div class="table-controls">
+                  <div class="toolbar-input search-box">
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Search group, description, date..."
+                      [(ngModel)]="searchTerm"
+                      name="searchTerm">
+                    @if (searchTerm) {
+                      <button type="button" class="clear-btn" (click)="clearSearch()">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                      </button>
+                    }
+                  </div>
+
+                  <div class="toolbar-input select-box">
+                    <i class="fa fa-filter" aria-hidden="true"></i>
+                    <select class="form-control" [(ngModel)]="pageSize" name="pageSize" (change)="onPageSizeChange()">
+                      <option [ngValue]="10">10 / page</option>
+                      <option [ngValue]="20">20 / page</option>
+                      <option [ngValue]="50">50 / page</option>
+                      <option [ngValue]="100">100 / page</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="table-responsive modern-table-wrap">
+                <table class="table table-striped app-table mb-0">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th (click)="sort('param3')" class="sortable-header">
+                        <span>Group Name</span>
+                        @if (sortKey === 'param3') {
+                          <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                        }
+                      </th>
+                      <th (click)="sort('param4')" class="sortable-header">
+                        <span>Create Date</span>
+                        @if (sortKey === 'param4') {
+                          <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                        }
+                      </th>
+                      <th (click)="sort('param6')" class="sortable-header">
+                        <span>Description</span>
+                        @if (sortKey === 'param6') {
+                          <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                        }
+                      </th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @if (filteredVehicleGroupList.length === 0 && !loading) {
+                      <tr>
+                        <td colspan="5" class="no-data-cell">No data found</td>
+                      </tr>
+                    }
+                    @for (dev of filteredVehicleGroupList; track dev) {
+                      <tr>
+                        <td>{{dev.param1?.length > 0 ? dev.param1 : 'NA'}}</td>
+                        <td>
+                          <div class="cell-primary">{{dev.param3?.length > 0 ? dev.param3 : 'NA'}}</div>
+                        </td>
+                        <td>{{dev.param4?.length > 0 ? dev.param4 : 'NA'}}</td>
+                        <td>
+                          <div class="description-cell">{{dev.param6?.length > 0 ? dev.param6 : 'NA'}}</div>
+                        </td>
+                        <td style=" width: 130px;">
+                          <div class="action-buttons">
+                            <button type="button" class="table-action edit" (click)="displayvehiclegrpDetail(dev)">
+                              <i class="fa fa-pencil" aria-hidden="true"></i>
+                              <span>Edit</span>
+                            </button>
+                            <button type="button" class="table-action delete" (click)="deleteData(dev)">
+                              <i class="fa fa-trash" aria-hidden="true"></i>
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="table-footer">
+                <div class="result-count">
+                  Showing <strong>{{filteredVehicleGroupList.length}}</strong> of <strong>{{totalCount}}</strong> records
+                </div>
+
+                @if (totalCount > pageSize) {
+                  <div class="pagination-wrapper">
+                    <ul class="pagination modern-pagination">
+                      <li [class.disabled]="currentPage === 1">
+                        <button (click)="getVehicleGroupDetails(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+                      </li>
+                      @for (page of getPageNumbers(); track page) {
+                        <li [class.active]="currentPage === page">
+                          <button (click)="getVehicleGroupDetails(page)">{{page}}</button>
+                        </li>
+                      }
+                      <li [class.disabled]="currentPage >= getTotalPages()">
+                        <button (click)="getVehicleGroupDetails(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+                      </li>
+                    </ul>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editvehiclegroupmodal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalCenterTitle" aria-hidden="true"
+  data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content vg-modal">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Vehicle Group</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="updatevehiclegrpform">
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label for="updategroupName">Group Name <span class="mandetory">*</span></label>
+                <input type="text" id="updategroupName" [(ngModel)]="editGroupName" class="form-control ignorespecialcharacter" name="editGroupName">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label for="updatediscription">Description <span class="mandetory">*</span></label>
+                <input type="text" id="updatediscription" [(ngModel)]="editDescription" class="form-control" placeholder="Description" name="editDescription">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label for="updateremark">Remark <span class="mandetory">*</span></label>
+                <textarea class="form-control" id="updateremark" [(ngModel)]="editRemark" placeholder="Remark" name="editRemark"></textarea>
+              </div>
+            </div>
+          </div>
+          <div id="updatemodelheaderbutton" class="modal-action-row">
+            <button class="modal-btn primary" (click)="updateGroupDetails()">Submit</button>
+            <button class="modal-btn secondary" type="reset" data-dismiss="modal">Back</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cancelmodel" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content vg-modal" id="deletemodelcontent">
+      <div class="modal-header" id="deletemodelheader">
+        <h5 class="modal-title" id="deletemodeltitle">Delete Vehicle Group</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body delete-modal-body">
+        <span class="delete-label">Group Name: <strong>{{deleteGroupName}}</strong></span>
+        <textarea class="form-control ignoresymbol_name" id="deleteremark" placeholder="Enter delete remark" maxlength="50"
+        (keyup)="validRemark()" [(ngModel)]="deleteRemark" name="deleteRemark"></textarea>
+        <div id="updatemodelheaderbutton" class="modal-action-row">
+          <button class="modal-btn danger" (click)="deleteModelDetails()">Submit</button>
+          <button class="modal-btn secondary" type="reset" data-dismiss="modal">Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (loading) {
+  <app-loading></app-loading>
+}
+@if (errorMessage) {
+  <app-error-message [message]="errorMessage"></app-error-message>
+}

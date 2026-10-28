@@ -1,0 +1,97 @@
+/* Background overlay */
+.modal-overlay{
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.45);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  backdrop-filter: blur(2px);
+}
+
+/* Modal box */
+.custom-modal{
+  width:420px;
+  background:var(--app-surface);
+  border:1px solid var(--app-border);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(0,0,0,0.35);
+  animation: modalFade 0.25s ease;
+}
+
+/* Header */
+.modal-header{
+  background:var(--app-primary);
+  color:var(--app-surface);
+  font-weight:600;
+  padding:12px;
+  text-align:center;
+  font-size:18px;
+  letter-spacing:0.5px;
+}
+
+/* Body text */
+.modal-body{
+  padding:25px 20px;
+  text-align:center;
+  color:#555;
+  font-size:15px;
+  line-height:1.4;
+}
+
+/* Footer buttons */
+.modal-footer{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  padding:15px 20px 20px;
+}
+
+/* Buttons */
+.btn{
+  min-width:95px;
+  padding:7px 14px;
+  border-radius:4px;
+  border:1px solid var(--app-border);
+  background:var(--app-surface);
+  cursor:pointer;
+  font-size:14px;
+  transition:all 0.2s ease;
+}
+
+/* Cancel button */
+.cancel-btn{
+  background:var(--app-surface-subtle);
+}
+
+.cancel-btn:hover{
+  background:var(--app-border);
+}
+
+/* OK button */
+.ok-btn{
+  background:var(--app-primary);
+  color:var(--app-surface);
+  border:1px solid var(--app-primary);
+}
+
+.ok-btn:hover{
+  background:var(--app-primary-hover);
+}
+
+/* Modal animation */
+@keyframes modalFade{
+  from{
+    transform:scale(0.9);
+    opacity:0;
+  }
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+}

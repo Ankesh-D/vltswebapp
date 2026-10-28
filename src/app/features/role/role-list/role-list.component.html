@@ -1,0 +1,264 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <button class="pagebtn" style="margin-right: 10px;">
+            <a routerLink="/role/entry"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add New</a>
+          </button>
+          <div class="pagetitlestyle"><span>Role Details</span></div>
+        </div>
+
+        <!-- Search and Pagination Controls -->
+        <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
+          <table style="width: 100%;">
+            <tbody class="bg-body">
+              <tr>
+                <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                  <font style="font-weight: bold;">Search : </font>
+                </td>
+                <td>
+                  <div class="">
+                    <input
+                      type="search"
+                      readonly
+                      onfocus="this.removeAttribute('readonly');"
+                      class="tabletitlesearch"
+                      id="searchby"
+                      placeholder="Type here and press button...."
+                      style="border: 1px solid #0b58b9; height: 25px; width: 200px;"
+                      autocomplete="disabled"
+                      maxlength="50"
+                      [(ngModel)]="searchText"
+                      (keyup.enter)="getSearchDetails()"
+                      name="searchby">
+                    &nbsp;&nbsp;
+                    <button class="" id="searchbtn" style="cursor: pointer;" (click)="getSearchDetails()">
+                      <i class="fa fa-search"></i>
+                    </button>
+                    &nbsp;&nbsp;
+                    <button>
+                      @if (!loading) {
+                        <span id="notspin"
+                          style="font-size: 11px; cursor: pointer; margin-top: 6px;"
+                          title="Reload"
+                        (click)="reloadData()">Reload</span>
+                      }
+                      @if (loading) {
+                        <span id="spin"
+                        style="font-size: 11px; cursor: pointer; display: inline; margin-top: 6px;">Reloading...</span>
+                      }
+                    </button>
+                  </div>
+                </td>
+                <td>
+                  <table style="float: right;">
+                    <tbody>
+                      <tr>
+                        <td>
+                          <div>
+                            <label class="control-label" for="excelpdfdownload" style="color: #0e0e0e;">Download :</label>
+                            <select class="" name="excelpdfdownload" id="excelpdfdownload" style="height: 23px;">
+                              <option value="Select">Select</option>
+                              <!-- <option value="Excel" id="downloadexcel">Excel</option> -->
+                              <option value="">Excel</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td>
+                          <div style="width: 70px; margin-left: 25px; font-weight: bold; color: #0e0e0e;">
+                            <font><b>Show Rows : </b></font>
+                          </div>
+                        </td>
+                        <td>
+                          <select
+                            [(ngModel)]="pageSize"
+                            (change)="onPageSizeChange(pageSize)"
+                            name="pageSize"
+                            style="font-size: 10px; height: 23px;">
+                            @for (size of pageSizeOptions; track size) {
+                              <option [value]="size === totalCount ? 'All' : size">
+                                {{size === totalCount ? 'All' : size}}
+                              </option>
+                            }
+                          </select>
+                        </td>
+                        <td style="padding-right: 9px;">
+                          <div style="text-align: right; font-weight: bold; margin-left: 25px;">
+                            <font class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</font>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+
+        <div class="table-responsive">
+          <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+            <div class="col-sm-12">
+              <app-common-table [columns]="tableColumns" [rows]="getPaginatedRoles()" [loading]="loading"
+                [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="roleListCell"
+                tableClass="table table-striped app-table" tableId="devicetable"
+                tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
+                (sortChange)="sort($event)">
+              </app-common-table>
+              <ng-template #roleListCell let-role let-column="column">
+                @if (column.key === 'actions') {
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" (click)="openEditModal(role)">Edit</button>
+                    &nbsp;
+                    <button type="button" (click)="openDeleteModal(role)">Delete</button>
+                  </div>
+                } @else {
+                  {{column.value ? column.value(role) : 'NA'}}
+                }
+              </ng-template>
+
+              <!-- Pagination Controls -->
+              @if (totalCount > 0) {
+                <div class="pagination-wrapper" style="text-align: center; margin-top: 10px;">
+                  <ul class="pagination" style="display: inline-flex; list-style: none; padding: 0;">
+                    <li [class.disabled]="currentPage === 1">
+                      <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+                    </li>
+                    @for (page of getPageNumbers(); track page; let i = $index) {
+                      <li
+                        [class.active]="currentPage === (i + 1)">
+                        <button (click)="onPageChange(i + 1)">{{i + 1}}</button>
+                      </li>
+                    }
+                    <li [class.disabled]="currentPage >= getTotalPages()">
+                      <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+                    </li>
+                  </ul>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Role Modal -->
+@if (showEditModal) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()" style="width: 700px;">
+      <div class="modal-header">
+        <h5 class="modal-title">Update</h5>
+        <button type="button" class="close" (click)="closeEditModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="" style="font-size: 11px; font-weight: bold;">Role Name:</label><label for="" class="mandetory">*</label>
+                    <input
+                      type="text"
+                      name="rolename"
+                      id="rolename"
+                      placeholder="Role Name"
+                      class="form-control ignorespecialcharacter_space"
+                      maxlength="50"
+                      [(ngModel)]="editRoleName">
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="" style="font-size: 11px; font-weight: bold;">Role Description:</label><label for="" class="mandetory">*</label>
+                    <textarea
+                      id="roledescription"
+                      class="form-control ignorespecialcharacter_address"
+                      placeholder="Role Description"
+                      maxlength="100"
+                    [(ngModel)]="editRoleDescription"></textarea>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="" style="font-size: 11px; font-weight: bold;">Remark:</label><label for="" class="mandetory">*</label>
+                    <textarea
+                      class="form-control ignoresymbol_name"
+                      id="remark"
+                      placeholder="Remark"
+                      maxlength="100"
+                      [(ngModel)]="editRemark"
+                      (keyup)="validateEditRemark()"
+                    [style.border]="isIncorrect ? '1px solid red' : '1px solid green'"></textarea>
+                  </div>
+                </div>
+              </div>
+            </thead>
+            <tr style="display: none">
+              <td colspan="3"></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" [disabled]="isIncorrect || loading" (click)="updateRole()">
+          @if (!loading) {
+            <span>Submit</span>
+          }
+          @if (loading) {
+            <span>Submitting...</span>
+          }
+        </button>
+        <button type="button" (click)="closeEditModal()">Back</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Role Modal -->
+@if (showDeleteModal) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete</h5>
+        <button type="button" class="close" (click)="closeDeleteModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <span style="font-size: 11px;">Role Name : <font>{{selectedRole?.param3 || 'NA'}}</font></span><br>
+          <table class="table table-bordered">
+            <thead>
+              <textarea
+                class="form-control ignoresymbol_name"
+                id="deleteremark"
+                placeholder="Remark"
+                style="background: white; color: black;"
+                maxlength="50"
+                [(ngModel)]="deleteRemark"
+                (keyup)="validateDeleteRemark()"
+              [style.border]="isIncorrect ? '1px solid red' : '1px solid green'"></textarea>
+            </thead>
+            <div style="text-align: center; margin-top: 10px;">
+              <button type="button" [disabled]="isIncorrect || loading" (click)="deleteRole()">
+                @if (!loading) {
+                  <span>Submit</span>
+                }
+                @if (loading) {
+                  <span>Submitting...</span>
+                }
+              </button>
+              <button type="button" (click)="closeDeleteModal()">Back</button>
+            </div>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+}

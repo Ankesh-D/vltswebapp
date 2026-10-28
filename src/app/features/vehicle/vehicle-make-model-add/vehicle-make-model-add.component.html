@@ -1,0 +1,333 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div
+            class="pagetitlestyle"
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+            >
+            <span>Vehicle Make & Model insertion</span>
+            <!-- <button class="btn btn-secondary btn-add" *ngIf="showGrid" (click)="resetForm()">
+            Back
+          </button> -->
+        </div>
+      </div>
+      <div class="custom-tabs">
+        <!-- Tab Header -->
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [class.active]="activeTab === 'make'"
+              (click)="setTab('make')"
+              >
+              Make
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [class.active]="activeTab === 'model'"
+              (click)="setTab('model')"
+              >
+              Model
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [class.active]="activeTab === 'class'"
+              (click)="setTab('class')"
+              >
+              Class
+            </a>
+          </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-body">
+          <!-- MAKE -->
+          <!-- MAKE TAB -->
+          @if (activeTab === 'make') {
+            <div>
+              <div class="header-row">
+                <h3>Vehicle Make List</h3>
+                <button class="btn-add" (click)="addMake()">+ Add</button>
+              </div>
+              <div class="table-wrapper">
+                <table class="table table-bordered table-sm">
+                  <thead>
+                    <tr>
+                      <th>Sr.No</th>
+                      <th>Make Name</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (item of makeList; track item; let i = $index) {
+                      <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ item.param2 }}</td>
+                        <td>
+                          <button class="btn-edit" (click)="editMake(item)">
+                            Edit
+                          </button>
+                          <button class="btn-delete" (click)="openDeleteModal('make', item)">Delete</button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table></div>
+              </div>
+            }
+
+            <!-- MODEL -->
+            @if (activeTab === 'model') {
+              <div>
+                <!-- SELECT MAKE -->
+                <div class="form-group"><div class="header-row">
+                  <label class="header-row">Select Make</label>
+                  <button class="btn-add" (click)="addModel()">+ Add</button></div>
+                  <select class="form-control" (change)="onMakeChange($event)">
+                    <option value="">Select Make</option>
+                    @for (m of makeList; track m) {
+                      <option [value]="m.param1">
+                        {{ m.param2 }}
+                      </option>
+                    }
+                  </select>
+                </div>
+                <!-- TABLE -->
+                @if (modelList.length > 0) {
+                  <div>
+                    <div class="header-row">
+                      <h3>Vehicle Model List</h3>
+                      <!-- <button class="btn-add" (click)="addModel()">+ Add</button> -->
+                    </div>
+                    <div class="table-wrapper">
+                      <table class="table table-bordered table-sm">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Model Name</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (item of modelList; track item; let i = $index) {
+                            <tr>
+                              <td>{{ i + 1 }}</td>
+                              <td>{{ item.param2 }}</td>
+                              <td>
+                                <button class="btn-edit" (click)="editModel(item)">Edit</button>
+                                <button class="btn-delete" (click)="openDeleteModal('model', item)">Delete</button>
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table></div>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- CLASS -->
+              @if (activeTab === 'class') {
+                <div>
+                  <div class="header-row">
+                    <h3>Vehicle Class List</h3>
+                    <button class="btn-add" (click)="addClass()">+ Add</button>
+                  </div>
+                  <div class="table-wrapper">
+                    <table class="table table-bordered table-sm">
+                      <thead>
+                        <tr>
+                          <th>Sr.No</th>
+                          <th>Class Name</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (item of classList; track item; let i = $index) {
+                          <tr>
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ item.param2 }}</td>
+                            <td>
+                              <button class="btn-edit" (click)="editClass(item)">Edit</button>
+                              <button class="btn-delete" (click)="openDeleteModal('class', item)">Delete</button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========EDIT MODEL ======== -->
+
+  <!-- EDIT / ADD MODAL -->
+  @if (showEditModal) {
+    <div class="modal-backdrop">
+      <div class="modal-content change-device-modal">
+        <div class="modal-header">
+          <h3>{{ isEditMode ? 'Edit Vehicle Make' : 'Add Vehicle Make' }}</h3>
+          <button class="close-btn" (click)="closeModal()">X</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Make Name</label>
+            <input
+              class="form-control"
+              [(ngModel)]="selectedMake.param2" />
+          </div>
+          <div class="form-group">
+            <label>Remark</label>
+            <input
+              class="form-control"
+              [(ngModel)]="remark" />
+          </div>
+          <button (click)="saveMake()">
+            {{ isEditMode ? 'Update' : 'Add' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+
+
+  <!-- MODEL ADD / EDIT MODAL -->
+  @if (showModelModal) {
+    <div class="modal-backdrop">
+      <div class="modal-content change-device-modal">
+        <div class="modal-header">
+          <h3>{{ isModelEdit ? 'Edit Vehicle Model' : 'Add Vehicle Model' }}</h3>
+          <button class="close-btn" (click)="closeModelModal()">X</button>
+        </div>
+        <div class="modal-body">
+          <!-- MAKE (MANDATORY) -->
+          <div class="form-group">
+            <label>Select Make <span class="mandetory">*</span></label>
+            <select class="form-control" [(ngModel)]="selectedModel.param3">
+              <option value="">Select Make</option>
+              @for (m of makeList; track m) {
+                <option [value]="m.param1">
+                  {{ m.param2 }}
+                </option>
+              }
+            </select>
+          </div>
+          <!-- MODEL NAME -->
+          <div class="form-group">
+            <label>Model Name <span class="mandetory">*</span></label>
+            <input
+              class="form-control"
+              [(ngModel)]="selectedModel.param4" />
+          </div>
+          <!-- YEAR -->
+          <div class="form-group">
+            <label>Year <span class="mandetory">*</span></label>
+            <input
+              class="form-control"
+              [(ngModel)]="selectedModel.param2" />
+          </div>
+          <!-- CLASS -->
+          <div class="form-group">
+            <label>Select Class</label>
+            <select class="form-control" [(ngModel)]="selectedModel.param5">
+              <option value="">Select Class</option>
+              @for (c of classList; track c) {
+                <option [value]="c.param1">
+                  {{ c.param2 }}
+                </option>
+              }
+            </select>
+          </div>
+          <button (click)="saveModel()">
+            {{ isModelEdit ? 'Update' : 'Add' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+
+  <!-- CLASS ADD / EDIT MODAL -->
+  @if (showClassModal) {
+    <div class="modal-backdrop">
+      <div class="custom-modal">
+        <div class="modal-header">
+          <h3>{{ isClassEdit ? 'Edit Vehicle Class' : 'Add Vehicle Class' }}</h3>
+          <button class="close-btn" (click)="closeClassModal()">X</button>
+        </div>
+        <div class="modal-body">
+          <!-- CLASS NAME -->
+          <div class="form-group">
+            <label>Class Name <span class="mandetory">*</span></label>
+            <input class="form-control" [(ngModel)]="selectedClass.param2" />
+          </div>
+          <!-- DESCRIPTION -->
+          <div class="form-group">
+            <label>Description</label>
+            <input class="form-control" [(ngModel)]="selectedClass.param4" />
+          </div>
+          <!-- REMARK -->
+          <div class="form-group">
+            <label>Remark</label>
+            <input class="form-control" [(ngModel)]="selectedClass.param5" />
+          </div>
+          <button (click)="saveClass()">
+            {{ isClassEdit ? 'Update' : 'Add' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- COMMON DELETE MODAL -->
+  @if (showDeleteModal) {
+    <div class="modal-overlay" (click)="closeDeleteModal()">
+      <div class="modal-content change-device-modal" (click)="$event.stopPropagation()">
+        <!-- HEADER -->
+        <div class="modal-header">
+          <h5 class="modal-title">Delete</h5>
+          <button class="close-btn" (click)="closeDeleteModal()">×</button>
+        </div>
+        <!-- BODY -->
+        <div class="modal-body">
+          <div class="serial-info">
+            Name: <span>{{ deleteItemName }}</span>
+          </div>
+          <div class="form-row">
+            <div class="form-col">
+              <label>Remark <span class="mandetory">*</span></label>
+              <textarea
+                class="form-control"
+                [(ngModel)]="deleteRemark"
+                placeholder="Enter remark"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <!-- FOOTER -->
+        <div class="modal-footer">
+          <button class="btn-primary" (click)="submitDelete()">Submit</button>
+          <button class="stn-secondary" (click)="closeDeleteModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  }

@@ -1,0 +1,72 @@
+.content-i {
+  padding: 20px;
+  min-height: 100vh;   /* 🔥 IMPORTANT */
+  width: 100%;
+  background-color: #fff;
+}
+.pagetitleborder {
+  border-bottom: 2px solid #4CAF50;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+
+.form-desc {
+  margin-bottom: 15px;
+  font-size: 12px;
+}
+
+.mandetory {
+  color: red;
+  font-weight: normal;
+}
+
+.boldfont {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.padding5 {
+  padding: 5px 0;
+}
+.element-box {
+  min-height: auto;
+}
+
+.text-danger {
+  color: red;
+}
+.form-group label {
+  font-size: 11px;
+  font-weight: bolder;
+  margin-bottom: 2px;
+}
+::ng-deep .select2-container--default .select2-selection--single {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+::ng-deep .ng-dropdown-panel.ng-select-bottom {
+  font-size: 12px;
+}
+::ng-deep .ng-select-container {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+
+

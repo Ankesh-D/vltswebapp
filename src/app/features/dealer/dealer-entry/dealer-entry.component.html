@@ -1,0 +1,238 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder d-flex justify-content-between align-items-center">
+              <div class="pagetitlestyle"><span>Dealer Entry</span></div>
+              <button class="btn btn-sm btn-outline-primary" type="button" (click)="goBack()"
+                style="font-size: 11px; border-radius: 4px; padding: 4px 14px; font-weight: 600;">
+                <i class="fa fa-arrow-left"></i> Back
+              </button>
+            </div>
+
+            <form id="DealerEntryForm" #dealerForm="ngForm" autocomplete="off" (ngSubmit)="submitDealer()">
+              <div class="form-desc" style="font-size: 11px; margin-bottom: 6px; color: #666;">
+                <strong>NOTE :</strong><span class="mandetory">*</span> Are Mandatory Fields.
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="entrypagediv">
+                    <div class="row">
+                      <!-- Vendor Selection -->
+                      @if (roleId == '10') {
+                        <div class="col-sm-3">
+                          <div class="form-group">
+                            <label class="field-label">Select Vendor:<span class="mandetory">*</span></label>
+                            <ng-select [items]="vendorlist" bindLabel="param2" bindValue="param1"
+                              placeholder="Select Vendor" [(ngModel)]="vendorId" name="vendorId"
+                              (change)="onVendorChange()"
+                              [class.is-invalid]="(vendorIdRef.invalid && (vendorIdRef.touched || submitted))"
+                            #vendorIdRef="ngModel" required style="font-size: 11px;"></ng-select>
+                            @if ((vendorIdRef.invalid && (vendorIdRef.touched || submitted))) {
+                              <div class="field-error">
+                                Vendor is required.
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                      <!-- Distributor Selection -->
+                      @if (roleId != '12') {
+                        <div class="col-sm-3">
+                          <div class="form-group">
+                            <label class="field-label">Select Distributor:<span class="mandetory">*</span></label>
+                            <ng-select [items]="distributorList" bindLabel="param2" bindValue="param1"
+                              placeholder="Select Distributor" [(ngModel)]="distributorId" name="distributorId"
+                              [class.is-invalid]="(distributorIdRef.invalid && (distributorIdRef.touched || submitted))"
+                            #distributorIdRef="ngModel" required style="font-size: 11px;"></ng-select>
+                            @if ((distributorIdRef.invalid && (distributorIdRef.touched || submitted))) {
+                              <div class="field-error"
+                                >
+                                Distributor is required.
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+
+                      <!-- Dealer Name -->
+                      <div class="col-sm-3">
+                        <div class="form-group">
+                          <label class="field-label">Dealer Name:<span class="mandetory">*</span></label>
+                          <input class="form-control form-control-sm shadow-sm"
+                            [class.is-invalid]="(dealerNameRef.invalid && (dealerNameRef.touched || submitted))"
+                            maxlength="60" placeholder="Dealer Name" type="text" [(ngModel)]="dealerName"
+                            name="dealerName" #dealerNameRef="ngModel" required autocomplete="off">
+                          @if ((dealerNameRef.invalid && (dealerNameRef.touched || submitted))) {
+                            <div class="field-error"
+                              >
+                              Dealer Name is required.
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Contact Person -->
+                      <div class="col-sm-3">
+                        <div class="form-group">
+                          <label class="field-label">Contact Person:<span class="mandetory">*</span></label>
+                          <input class="form-control form-control-sm shadow-sm"
+                            [class.is-invalid]="(contactPersonRef.invalid && (contactPersonRef.touched || submitted))"
+                            maxlength="60" placeholder="Contact Person" type="text" [(ngModel)]="contactPerson"
+                            name="contactPerson" #contactPersonRef="ngModel" required autocomplete="off">
+                          @if ((contactPersonRef.invalid && (contactPersonRef.touched || submitted))) {
+                            <div class="field-error"
+                              >
+                              Contact Person is required.
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Mobile No -->
+                      <div class="col-sm-3">
+                        <div class="form-group">
+                          <label class="field-label">Mobile No:<span class="mandetory">*</span></label>
+                          <input class="form-control form-control-sm shadow-sm"
+                            [class.is-invalid]="(mobileNoRef.invalid && (mobileNoRef.touched || submitted))"
+                            placeholder="Mobile No" type="text" [(ngModel)]="mobileNo" name="mobileNo"
+                            #mobileNoRef="ngModel" maxlength="10" pattern="[0-9]{10}" required
+                            (input)="allowOnlyNumbers($event, 'mobileNo')" autocomplete="off">
+                          @if ((mobileNoRef.invalid && (mobileNoRef.touched || submitted))) {
+                            <div class="field-error">
+                              Mobile No must be 10 digits.
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Alternate Mobile No -->
+                      <div class="col-sm-3">
+                        <div class="form-group">
+                          <label class="field-label">Alternate No:</label>
+                          <input class="form-control form-control-sm shadow-sm"
+                            [class.is-invalid]="(alternateMobilenoRef.invalid && alternateMobilenoRef.touched)"
+                            placeholder="Alternate Mobile No" type="text" [(ngModel)]="alternateMobileNo"
+                            name="alternateMobileNo" #alternateMobilenoRef="ngModel" maxlength="10"
+                            (input)="allowOnlyNumbers($event, 'alternateMobileNo')" autocomplete="off">
+                          @if ((alternateMobilenoRef.invalid && alternateMobilenoRef.touched)) {
+                            <div class="field-error"
+                              >
+                              Alternate Mobile No must be 10 digits.
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Email Id -->
+                      <div class="col-sm-3">
+                        <div class="form-group">
+                          <label class="field-label">Email Id:<span class="mandetory">*</span></label>
+                          <input class="form-control form-control-sm shadow-sm"
+                            [class.is-invalid]="(emailIdRef.invalid && (emailIdRef.touched || submitted))"
+                            placeholder="Email Id" type="email" [(ngModel)]="emailId" name="emailId"
+                            #emailIdRef="ngModel" required email autocomplete="off">
+                          @if ((emailIdRef.invalid && (emailIdRef.touched || submitted))) {
+                            <div class="field-error">
+                              @if (emailIdRef.errors?.['required']) {
+                                <span>Email Id is required.</span>
+                              }
+                              @if (emailIdRef.errors?.['email']) {
+                                <span>Please enter a valid email address.</span>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Address -->
+                      <div class="col-sm-3">
+                        <div class="form-group">
+                          <label class="field-label">Address:<span class="mandetory">*</span></label>
+                          <textarea class="form-control form-control-sm shadow-sm"
+                            [class.is-invalid]="(addressRef.invalid && (addressRef.touched || submitted))"
+                            placeholder="Address" maxlength="80" [(ngModel)]="address" name="address"
+                            #addressRef="ngModel" required autocomplete="off"
+                          style="resize: none; height: 28px;"></textarea>
+                          @if ((addressRef.invalid && (addressRef.touched || submitted))) {
+                            <div class="field-error">
+                              Address is required.
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- State -->
+                      <div class="col-sm-3">
+                        <div class="form-group">
+                          <label class="field-label">State:<span class="mandetory">*</span></label>
+                          <ng-select [items]="statelist" bindLabel="param2" bindValue="param1"
+                            placeholder="Select State" [(ngModel)]="selectedStateId" (change)="onStateChange()"
+                            name="selectedStateId" #selectedStateIdRef="ngModel" required
+                            [class.is-invalid]="(selectedStateIdRef.invalid && (selectedStateIdRef.touched || submitted))"
+                          style="font-size: 11px;"></ng-select>
+                          @if ((selectedStateIdRef.invalid && (selectedStateIdRef.touched || submitted))) {
+                            <div class="field-error"
+                              >
+                              State is required.
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- City -->
+                      <div class="col-sm-3">
+                        <div class="form-group">
+                          <label class="field-label">City:<span class="mandetory">*</span></label>
+                          <ng-select [items]="citylist" bindLabel="param2" bindValue="param1" placeholder="Select City"
+                            [(ngModel)]="selectedCityId" (change)="onCityChange()" name="selectedCityId"
+                            #selectedCityIdRef="ngModel" required
+                            [class.is-invalid]="(selectedCityIdRef.invalid && (selectedCityIdRef.touched || submitted))"
+                          style="font-size: 11px;"></ng-select>
+                          @if ((selectedCityIdRef.invalid && (selectedCityIdRef.touched || submitted))) {
+                            <div class="field-error"
+                              >
+                              City is required.
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-buttons-w text-center" style="margin-top: 15px;">
+                    <button type="submit" [disabled]="loading" class="btn btn-primary shadow-sm"
+                      style="font-size: 12px; padding: 6px 30px; font-weight: bold; border-radius: 20px; transition: all 0.3s ease; background: #0b58b9; border: none;">
+                      <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-check'"
+                      style="margin-right: 5px;"></i>
+                      @if (!loading) {
+                        <span>Submit</span>
+                      }
+                      @if (loading) {
+                        <span>Submitting...</span>
+                      }
+                    </button>
+                    <button type="button" (click)="resetForm()" [disabled]="loading"
+                      class="btn btn-secondary shadow-sm ms-2"
+                      style="font-size: 12px; padding: 6px 30px; font-weight: bold; border-radius: 20px; transition: all 0.3s ease; background: #6c757d; border: none;">
+                      <i class="fa fa-redo" style="margin-right: 5px;"></i>
+                      <span>Reset</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    @if (errorMessage) {
+      <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+    }
+    @if (successMessage) {
+      <app-toast [message]="successMessage" type="success"
+      (closed)="successMessage = null"></app-toast>
+    }

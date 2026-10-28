@@ -1,0 +1,46 @@
+<section class="panel sessions-panel">
+  <div class="table-heading">
+    <div><p class="section-kicker">SESSION DETAILS</p><h2>Push to ERSS</h2></div>
+    <form class="session-search" (ngSubmit)="searchRows()">
+      <label class="search-box"><span class="search-icon" aria-hidden="true"><i class="fa fa-search"></i></span><input type="search" name="erssSearch" [(ngModel)]="search" placeholder="Search Vehicle No., IMEI, RTO" aria-label="Search ERSS sessions" /></label>
+      <button type="submit" class="search-submit" [disabled]="loading"><i class="fa" [class.fa-search]="!loading" [class.fa-spinner]="loading" [class.spinning]="loading" aria-hidden="true"></i> {{ loading ? 'Searching…' : 'Search' }}</button>
+    </form>
+  </div>
+  <div class="grid-filters"><button type="button" class="map-link" (click)="load()" [disabled]="loading"><i class="fa fa-refresh" [class.spinning]="loading" aria-hidden="true"></i> Refresh</button><span>Total records: {{ total === null ? 'Unavailable' : (total | number) }}</span></div>
+  @if (error) {
+    <p class="api-error" role="alert">{{ error }} <button type="button" class="map-link" (click)="load()">Retry</button></p>
+  }
+  <div class="table-scroll" tabindex="0" role="region" aria-label="ERSS session details table" [attr.aria-busy]="loading">
+    <table>
+      <thead><tr><th scope="col">Vehicle / chassis no.</th><th scope="col">Vendor<hr />IMEI no.</th><th scope="col">RTO<hr />Vehicle class</th><th scope="col">Vehicle owner details</th><th scope="col">Last panic event time</th><th scope="col">Last panic event location</th><th scope="col">Push time</th><th scope="col">Push response</th><th scope="col">Session ID</th><th scope="col">Latitude / longitude</th><th scope="col">Device model / serial no.</th><th scope="col">ICCID</th><th scope="col">Mobile 1 / network</th><th scope="col">Mobile 2 / network</th><th scope="col">Activation date</th><th scope="col">Valid upto</th><th scope="col">Dealer</th></tr></thead>
+      <tbody>
+        @for (row of rows; track row) {
+          <tr>
+            <td><strong class="vehicle-number">{{ row[1] || '—' }}</strong><span class="secondary-cell">{{ row[2] || '—' }}</span></td>
+            <td>{{ row[12] || 'Not provided' }}<hr />{{ row[3] || '—' }}</td>
+            <td>{{ row[5] || '—' }}<hr />{{ row[4] || '—' }}</td>
+            <td><strong>{{ row[6] || '—' }}</strong><span class="secondary-cell">{{ row[7] || '—' }}</span></td>
+            <td><span class="event-time">{{ row[8] || '—' }}</span></td><td>{{ row[9] || '—' }}</td>
+            <td><span class="event-time">{{ row[23] || '—' }}</span></td><td>{{ row[24] || '—' }}</td><td>{{ row[0] || '—' }}</td>
+            <td>{{ row[10] || '—' }}<span class="secondary-cell">{{ row[11] || '—' }}</span></td>
+            <td>{{ row[13] || '—' }}<span class="secondary-cell">{{ row[14] || '—' }}</span></td><td>{{ row[15] || '—' }}</td>
+            <td>{{ row[16] || '—' }}<span class="secondary-cell">{{ row[17] || '—' }}</span></td>
+            <td>{{ row[18] || '—' }}<span class="secondary-cell">{{ row[19] || '—' }}</span></td>
+            <td>{{ row[20] || '—' }}</td><td>{{ row[21] || '—' }}</td><td>{{ row[22] || '—' }}</td>
+          </tr>
+        }
+        @if (!rows.length) {
+          <tr><td class="empty-state" colspan="17">{{ loading ? 'Loading ERSS sessions…' : (error ? 'ERSS sessions could not be loaded.' : 'No ERSS sessions found.') }}</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <footer class="table-footer">
+    <span>{{ rangeStart }}–{{ rangeEnd }}@if (total !== null) {
+      of {{ total }}
+    } sessions</span>
+    <div class="session-pagination"><label>Rows <select name="erssPageSize" [(ngModel)]="pageSize" (ngModelChange)="changePageSize()" [disabled]="loading" aria-label="ERSS sessions per page"><option [ngValue]="20">20</option><option [ngValue]="50">50</option><option [ngValue]="100">100</option></select></label><button type="button" class="map-link" (click)="changePage(-1)" [disabled]="loading || page === 1">Previous</button><span>Page {{ page }}@if (pages !== null) {
+    of {{ pages }}
+    }</span><button type="button" class="map-link" (click)="changePage(1)" [disabled]="loading || !hasNext">Next</button></div>
+  </footer>
+</section>

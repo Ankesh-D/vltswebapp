@@ -1,0 +1,742 @@
+
+
+<div class="content-i">
+
+  <div class="content-box pt-0">
+
+    <div class="element-wrapper">
+
+      <div class="element-box">
+
+        <div class="content-body">
+
+          <div class="container-fluid px-0">
+
+            <div class="card main-card">
+
+              <div class="card-body">
+
+                <!-- ================= PAGE TITLE ================= -->
+
+                <div class="col-md-12 pagetitleborder">
+
+                  <div class="pagetitlestyle">
+
+                    <span>User Wise Activation Report</span>
+
+                  </div>
+
+                </div>
+
+
+                <!-- ================= FILTER SECTION ================= -->
+
+                <div class="row mt-3">
+
+<!-- FROM DATE -->
+<div class="col-sm-3 form-group">
+  <label>
+    From Date
+    <span class="text-danger">*</span>
+  </label>
+
+  <input
+    type="date"
+    class="form-control"
+    [(ngModel)]="fromDate">
+</div>
+
+
+<!-- TO DATE -->
+<div class="col-sm-3 form-group">
+  <label>
+    To Date
+    <span class="text-danger">*</span>
+  </label>
+
+  <input
+    type="date"
+    class="form-control"
+    [(ngModel)]="toDate">
+</div>
+                  <!-- SELECT ROLE -->
+
+                  <div class="col-sm-3 form-group">
+
+                    <label>
+                      Select Role
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="roleList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select Role"
+                      [(ngModel)]="selectedRole"
+                      (change)="onRoleChange($event)"
+                      [clearable]="true">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- SELECT COMPANY -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.company">
+
+                    <label>
+                      Select Company
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="companyList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select Company"
+                      [(ngModel)]="selectedOwnerId"
+                      (change)="onOwnerChange()">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- SELECT DEALER -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.dealer">
+
+                    <label>
+                      Select Dealer
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="dealerList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select Dealer"
+                      [(ngModel)]="selectedOwnerId"
+                      (change)="onOwnerChange()">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- SELECT STATE -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.rto">
+
+                    <label>
+                      Select State
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="rtoList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select State"
+                      [(ngModel)]="selectedRto"
+                      (change)="onRtoChange($event)">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- SELECT SUB RTO -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.subrto">
+
+                    <label>
+                      Select RTO
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="subRtoList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select RTO"
+                      [(ngModel)]="selectedOwnerId"
+                      (change)="onOwnerChange()">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- SELECT M2M -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.m2m">
+
+                    <label>
+                      Select M2M Provider
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="m2mProviderList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select M2M Provider"
+                      [(ngModel)]="selectedOwnerId"
+                      (change)="onOwnerChange()">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- CERTIFIED AUTHORITY -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.certifiedauth">
+
+                    <label>
+                      {{ visibility.certLabel }}
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="certifiedAuthorityList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select"
+                      [(ngModel)]="selectedOwnerId"
+                      (change)="onOwnerChange()">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- POLICE -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.police">
+
+                    <label>
+                      Select Police
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="policeList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select Police"
+                      [(ngModel)]="selectedOwnerId"
+                      (change)="onOwnerChange()">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- CITY POLICE -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.citypolice">
+
+                    <label>
+                      Select City Police
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="cityPoliceList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select City Police"
+                      [(ngModel)]="selectedOwnerId"
+                      (change)="onOwnerChange()">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- LEGAL METROLOGY -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.legalmetro">
+
+                    <label>
+                      Select Legal Metrology
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="legalMetroList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select Legal Metrology"
+                      [(ngModel)]="selectedOwnerId"
+                      (change)="onOwnerChange()">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- CUSTOMER -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.customer">
+
+                    <label>
+                      Select Customer
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="customerList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select Customer"
+                      [(ngModel)]="selectedOwnerId"
+                      (change)="onOwnerChange()">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- PMC -->
+
+                  <div
+                    class="col-sm-3 form-group"
+                    *ngIf="visibility.pmc">
+
+                    <label>
+                      Select PMC
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="pmcList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select PMC"
+                      [(ngModel)]="selectedOwnerId"
+                      (change)="onOwnerChange()">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- SELECT MULTIPLE USERS -->
+
+                  <div class="col-sm-3 form-group">
+
+                    <label>
+                      Select Users
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <ng-select
+                      [items]="userList"
+                      bindLabel="param2"
+                      bindValue="param1"
+                      placeholder="Select Users"
+                      [(ngModel)]="selectedUsers"
+                      [multiple]="true"
+                      [closeOnSelect]="false"
+                      [clearable]="true"
+                      [disabled]="!selectedRole">
+
+                    </ng-select>
+
+                  </div>
+
+
+                  <!-- ADD -->
+
+                  <div class="col-sm-2 form-group d-flex align-items-end">
+
+                    <button
+                      type="button"
+                      class="btn btn-primary w-100"
+                      (click)="addSelection()"
+                      [disabled]="!isAddEnabled()">
+
+                      ADD
+
+                    </button>
+
+                  </div>
+
+                </div>
+
+
+                <!-- ================= ADDED ROLE USER TABLE ================= -->
+
+                <div
+                  class="row mt-4"
+                  *ngIf="addedSelections.length > 0">
+
+                  <div class="col-md-12">
+
+                    <div class="table-responsive">
+
+                      <table class="table table-bordered table-striped">
+
+                        <thead>
+
+                          <tr>
+
+                            <th>#</th>
+
+                            <th>Role</th>
+
+                            <th>Owner</th>
+
+                            <th>Selected Users</th>
+
+                            <th>Action</th>
+
+                          </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                          <tr
+                            *ngFor="
+                              let item of addedSelections;
+                              let i = index
+                            ">
+
+                            <td>{{ i + 1 }}</td>
+
+                            <td>{{ item.roleName }}</td>
+
+                            <td>{{ item.ownerName || 'NA' }}</td>
+
+                            <td>
+
+                              <span
+                                class="badge badge-primary me-1 mb-1"
+                                *ngFor="let user of item.users">
+
+                                {{ user.param2 }}
+
+                              </span>
+
+                            </td>
+
+                            <td>
+
+                              <button
+                                type="button"
+                                class="btn btn-danger btn-sm"
+                                (click)="removeSelection(i)">
+
+                                Remove
+
+                              </button>
+
+                            </td>
+
+                          </tr>
+
+                        </tbody>
+
+                      </table>
+
+                    </div>
+
+
+                    <!-- SUBMIT -->
+
+                    <div class="text-end mt-3">
+
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-success"
+                        (click)="submitReport()">
+
+                        Submit
+
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <!-- ================= REPORT TABLE ================= -->
+<div
+  class="row mt-4"
+  *ngIf="showReport">
+
+  <div class="col-md-12">
+
+    <div class="table-responsive">
+
+      <table class="table table-bordered table-striped table-sm">
+
+        <thead>
+
+          <tr>
+
+            <th>#</th>
+
+            <th>Device Details</th>
+
+            <th>Vehicle Details</th>
+
+            <th>Activated By</th>
+
+            <th>Activation Date</th>
+
+            <th>MVI Approved</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+
+          <!-- NO DATA -->
+
+          <tr *ngIf="reportData.length === 0">
+
+            <td
+              colspan="6"
+              class="text-center fw-bold">
+
+              NO DATA FOUND
+
+            </td>
+
+          </tr>
+
+
+          <!-- REPORT DATA -->
+
+          <tr
+            *ngFor="
+              let item of reportData;
+              let i = index
+            ">
+
+            <!-- SR NO -->
+
+            <td>
+
+              {{
+                ((currentPage - 1) * itemsPerPage)
+                + i
+                + 1
+              }}
+
+            </td>
+
+
+            <!-- DEVICE DETAILS -->
+
+            <td>
+
+              <div>
+
+                <strong>IMEI:</strong>
+
+                {{ item.param2 || 'NA' }}
+
+              </div>
+
+
+              <div>
+
+                <strong>Unique No:</strong>
+
+                {{ item.param3 || 'NA' }}
+
+              </div>
+
+
+              <div>
+
+                <strong>ICCID:</strong>
+
+                {{ item.param4 || 'NA' }}
+
+              </div>
+
+
+              <div>
+
+                <strong>Vendor:</strong>
+
+                {{ item.param5 || 'NA' }}
+
+              </div>
+
+            </td>
+
+
+            <!-- VEHICLE DETAILS -->
+
+            <td>
+
+              <div>
+
+                <strong>Vehicle No:</strong>
+
+                {{ item.param7 || 'NA' }}
+
+              </div>
+
+
+              <div>
+
+                <strong>Chassis No:</strong>
+
+                {{ item.param8 || 'NA' }}
+
+              </div>
+
+
+              <div>
+
+                <strong>Customer:</strong>
+
+                {{ item.param9 || 'NA' }}
+
+              </div>
+
+
+              <div>
+
+                <strong>Customer Mobile:</strong>
+
+                {{ item.param10 || 'NA' }}
+
+              </div>
+
+
+              <div>
+
+                <strong>MFG Year:</strong>
+
+                {{ item.param11 || 'NA' }}
+
+              </div>
+
+            </td>
+
+
+            <!-- ACTIVATED BY -->
+
+            <td>
+
+              {{ item.param17 || 'NA' }}
+
+            </td>
+
+
+            <!-- ACTIVATION DATE -->
+
+            <td>
+
+              {{ item.param13 || 'NA' }}
+
+            </td>
+
+
+            <!-- MVI APPROVAL -->
+
+            <td>
+
+
+              <span
+                class="badge badge-success"
+                *ngIf="
+                  item.param15 === '1' ||
+                  item.param15 === 'Approved' ||
+                  item.param15 === 'APPROVED'
+                ">
+
+                Approved
+
+              </span>
+
+
+              <span
+                class="badge badge-danger"
+                *ngIf="
+                  item.param15 !== '1' &&
+                  item.param15 !== 'Approved' &&
+                  item.param15 !== 'APPROVED'
+                ">
+
+                Not Approved
+
+              </span>
+
+
+              <div
+                class="small mt-1"
+                *ngIf="item.param16">
+
+                {{ item.param16 }}
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

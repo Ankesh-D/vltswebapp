@@ -1,0 +1,282 @@
+<div class="content-i vehicle-mapping-details-page">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box details-shell">
+            <div class="page-header-card">
+              <div class="page-title-block">
+                <div class="page-icon">
+                  <i class="fa fa-sitemap" aria-hidden="true"></i>
+                </div>
+                <div class="page-title-copy">
+                  <h2 class="page-title">Vehicle to Group Mapping Details</h2>
+                  <p class="page-subtitle">Review group-wise mapped vehicles, remove assignments, and manage records from one compact workspace.</p>
+                </div>
+              </div>
+
+              <div class="page-actions">
+                <a class="header-action-btn secondary" routerLink="/vehicle-group/mapping">
+                  <i class="fa fa-random" aria-hidden="true"></i>
+                  <span>Vehicle Mapping</span>
+                </a>
+                <a class="header-action-btn primary" routerLink="/vehicle-group/entry">
+                  <i class="fa fa-car" aria-hidden="true"></i>
+                  <span>New Vehicle Group</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="table-card">
+              <div class="table-heading">
+                <div class="table-heading-copy">
+                  <i class="fa fa-table" aria-hidden="true"></i>
+                  <span>Mapping Overview</span>
+                </div>
+              </div>
+
+              <div class="table-responsive modern-table-wrap">
+                <table class="table table-striped app-table mb-0">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th (click)="sort('param3')" class="sortable-header">
+                        <span>Group Name</span>
+                        @if (sortKey === 'param3') {
+                          <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                        }
+                      </th>
+                      <th (click)="sort('param4')" class="sortable-header">
+                        <span>Vehicle Count</span>
+                        @if (sortKey === 'param4') {
+                          <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                        }
+                      </th>
+                      <th (click)="sort('param6')" class="sortable-header">
+                        <span>Created Date</span>
+                        @if (sortKey === 'param6') {
+                          <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                        }
+                      </th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @if (mappingList.length === 0 && !loading) {
+                      <tr>
+                        <td colspan="5" class="no-data-cell">
+                          <i class="fa fa-inbox" aria-hidden="true"></i>
+                          <span>No data found</span>
+                        </td>
+                      </tr>
+                    }
+                    @for (dev of mappingList; track dev) {
+                      <tr class="data-row">
+                        <td>
+                          <span class="serial-badge">{{ dev.param1?.length > 0 ? dev.param1 : 'NA' }}</span>
+                        </td>
+                        <td>
+                          <button type="button" class="link-chip" (click)="vehListByGrp(dev)">
+                            <i class="fa fa-eye" aria-hidden="true"></i>
+                            <span>{{ dev.param3?.length > 0 ? dev.param3 : 'NA' }}</span>
+                          </button>
+                        </td>
+                        <td>
+                          <span class="metric-badge">
+                            <i class="fa fa-truck" aria-hidden="true"></i>
+                            <span>{{ dev.param4?.length > 0 ? dev.param4 : 'NA' }}</span>
+                          </span>
+                        </td>
+                        <td>
+                          <span class="date-text">{{ dev.param5?.length > 0 ? dev.param5 : 'NA' }}</span>
+                        </td>
+                        <td>
+                          <button type="button" class="table-action delete" (click)="deleteVehicleGrp(dev)">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                            <span>Delete</span>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              @if (totalCount > 0) {
+                <div class="table-footer">
+                  <div class="result-count">
+                    Showing <strong>{{ mappingList.length }}</strong> record(s) on current page
+                  </div>
+                  @if (totalCount > pageSize) {
+                    <div class="pagination-wrapper">
+                      <ul class="pagination modern-pagination">
+                        <li [class.disabled]="currentPage === 1">
+                          <button (click)="getVehicleGroupMappingDetails(currentPage - 1)" [disabled]="currentPage === 1">
+                            <i class="fa fa-angle-left" aria-hidden="true"></i>
+                            <span>Previous</span>
+                          </button>
+                        </li>
+                        @for (page of getPageNumbers(); track page) {
+                          <li [class.active]="currentPage === page">
+                            <button (click)="getVehicleGroupMappingDetails(page)">{{ page }}</button>
+                          </li>
+                        }
+                        <li [class.disabled]="currentPage >= getTotalPages()">
+                          <button (click)="getVehicleGroupMappingDetails(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">
+                            <span>Next</span>
+                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="VehicleNO" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered vehicle-list-modal-dialog" role="document">
+    <div class="modal-content details-modal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-title-icon">
+            <i class="fa fa-truck" aria-hidden="true"></i>
+          </div>
+          <div>
+            <h5 class="modal-title">Vehicle List by Group</h5>
+            <p class="modal-subtitle">Group: {{ selectedGroupName || 'Selected Group' }}</p>
+          </div>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeBtn">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-top-banner">
+          <div class="banner-copy">
+            <span class="banner-eyebrow">Mapped Vehicles</span>
+            <span class="banner-heading">Choose vehicles you want to remove from this group</span>
+          </div>
+          <div class="banner-count">
+            <i class="fa fa-list" aria-hidden="true"></i>
+            <span>{{ selectedVehicles.length }}</span>
+          </div>
+        </div>
+
+        <div class="modal-info-strip">
+          <div class="modal-info-pill">
+            <i class="fa fa-object-group" aria-hidden="true"></i>
+            <span>{{ selectedGroupName || 'Selected Group' }}</span>
+          </div>
+          <div class="modal-info-pill">
+            <i class="fa fa-truck" aria-hidden="true"></i>
+            <span>{{ selectedVehicles.length }} vehicle(s)</span>
+          </div>
+        </div>
+
+        @if (vehicleListError) {
+          <div class="modal-error-banner">
+            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+            <span>{{ vehicleListError }}</span>
+          </div>
+        }
+
+        @if (selectedVehicles.length > 0) {
+          <div class="vehicle-checklist">
+            @for (x of selectedVehicles; track x) {
+              <label class="vehicle-check-card" [for]="x.param2">
+                <span class="check-input-wrap">
+                  <input type="checkbox" [id]="x.param2" name="name"
+                    (click)="uncheckValue(x)" [value]="x.param2" [(ngModel)]="x.Selected" />
+                </span>
+                <span class="vehicle-mini-icon">
+                  <i class="fa fa-truck" aria-hidden="true"></i>
+                </span>
+                <span class="vehicle-check-copy">
+                  <span class="vehicle-name">{{ x.param3 || 'NA' }}</span>
+                  <span class="vehicle-id">ID: {{ x.param2 || 'No ID' }}</span>
+                </span>
+              </label>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <i class="fa fa-inbox" aria-hidden="true"></i>
+            <span>No mapped vehicles found</span>
+          </div>
+        }
+
+
+        <div class="modal-action-row">
+          <button class="modal-btn danger" (click)="removeVeh()" data-dismiss="modal">
+            <i class="fa fa-unlink" aria-hidden="true"></i>
+            <span>Remove Selected</span>
+          </button>
+          <button class="modal-btn secondary" type="reset" data-dismiss="modal" id="backBtn">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            <span>Back</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cancelmodel" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered delete-modal-dialog" role="document">
+    <div class="modal-content details-modal delete-modal">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-title-icon danger">
+            <i class="fa fa-trash" aria-hidden="true"></i>
+          </div>
+          <div>
+            <h5 class="modal-title">Delete Mapping</h5>
+            <p class="modal-subtitle">Remove this group mapping after adding a remark.</p>
+          </div>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-summary">
+          <span class="delete-label">Group Name</span>
+          <span class="delete-value">{{ deleteGroupName || 'NA' }}</span>
+        </div>
+
+        <div class="form-group compact-form-group">
+          <label for="deleteremark">Remark <span class="mandetory">*</span></label>
+          <textarea class="form-control ignoresymbol_name" id="deleteremark" placeholder="Enter deletion remark"
+          maxlength="50" (keyup)="validRemark()" [(ngModel)]="deleteRemark" name="deleteRemark"></textarea>
+        </div>
+
+        <div class="modal-action-row">
+          <button class="modal-btn primary" (click)="deleteVehicleGrpDetails()">
+            <i class="fa fa-check" aria-hidden="true"></i>
+            <span>Submit</span>
+          </button>
+          <button class="modal-btn secondary" type="reset" data-dismiss="modal">
+            <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            <span>Back</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (loading) {
+  <app-loading></app-loading>
+}
+@if (errorMessage) {
+  <app-error-message [message]="errorMessage"></app-error-message>
+}

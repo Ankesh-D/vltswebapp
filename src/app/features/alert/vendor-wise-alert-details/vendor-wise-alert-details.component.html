@@ -1,0 +1,189 @@
+<div class="content-i">
+  <style>
+    .high-alert-row {
+    background-color: #ffac3f !important;
+  }
+  /* Make text bold for highlighted rows for better readability */
+  .high-alert-row td {
+  font-weight: 700;
+}
+</style>
+<div class="content-box pt-0">
+  <div class="element-wrapper">
+    <div class="element-box">
+      <div class="content-body">
+        <div class="container-fluid px-0">
+          <div class="card main-card">
+            <div class="card-body">
+              <div class="col-md-12 pagetitleborder">
+                <div class="pagetitlestyle"><span>Vendor-Wise Exeptional Alerts Details</span></div>
+              </div>
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0px; padding: 0 10px;">
+                <!-- Left Side: Search and Reload -->
+                <div style="display: flex; align-items: center;">
+                  <span style="font-weight: bold; font-size: 12px; margin-right: 10px;">Search
+                  :</span>
+                  <ng-select class="vendor-select" [items]="vendorlist" bindLabel="param2"
+                    bindValue="param1" [(ngModel)]="selectedVendorFilter"
+                    (change)="onVendorFilterChange($event)" placeholder="All">
+                  </ng-select>
+
+
+
+                  <button class="mx-2" (click)="reloadData()"
+                    style="background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+                    <i class="fa fa-refresh" [class.fa-spin]="!listLoaded"
+                    style="margin-right: 5px;"></i>
+                    @if (listLoaded) {
+                      <span>Reload</span>
+                    }
+                    @if (!listLoaded) {
+                      <span>Reloading...</span>
+                    }
+                  </button>
+                  <!-- <input
+                  ngxDaterangepickerMd
+                  [(ngModel)]="selectedRange"
+                  (datesUpdated)="onDateApply($event)"
+                  [showDropdowns]="true"
+                  [alwaysShowCalendars]="true"
+                  [autoApply]="false"
+                  [locale]="{ format: 'DD-MMM-YYYY' }"
+
+                  class="form-control"
+                  style="font-size:12px"
+                  /> -->
+                  <input
+                    type="text"
+                    id="datepicker"
+                    class="form-control"
+                    name="date"
+                    />
+
+                  <!-- <select [(ngModel)]="alertType" (change)="onAlertTypeChange()"
+                  style="height: 26px; font-size: 11px; margin-left: 10px; border: 1px solid #0b58b9; border-radius: 4px;">
+
+                  <option value="">All</option>
+                  <option value="new">New</option>
+                  <option value="old">Old</option>
+
+                </select> -->
+
+              </div>
+
+              <!-- Right Side: Download, Page Size, Count -->
+              <div style="display: flex; align-items: center; font-size: 11px;">
+                <div class="toggle-container modern-toggle mx-2">
+                  <button class="toggle-option" [class.active]="vehicleType === 'NEW'"
+                    (click)="onChangeVehicleType('NEW')">
+                    NEW
+                  </button>
+                  <button class="toggle-option" [class.active]="vehicleType === 'OLD'"
+                    (click)="onChangeVehicleType('OLD')">
+                    OLD
+                  </button>
+                </div>
+                <!-- <div style="display: flex; align-items: center; margin-right: 15px;">
+                <label for="excelpdfdownload" style="margin: 0 5px 0 0; font-weight: bold; color: #333;">Download:</label>
+                <select name="excelpdfdownload" id="excelpdfdownload"
+                  style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; color: #333; outline: none; background: white;">
+                  <option value="Select">Select</option>
+                  <option value="Excel">Excel</option>
+                  <option style="display: none" value="Pdf" id="exportpdf">Pdf</option>
+                </select>
+              </div> -->
+
+              <div style="display: flex; align-items: center; margin-right: 15px;">
+                <label style="margin: 0 5px 0 0; font-weight: bold;">Show Rows:</label>
+
+                <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)"
+                  style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px;">
+
+                  @for (size of pageSizeOptions; track size) {
+                    <option [value]="size">
+                      {{ size }}
+                    </option>
+                  }
+
+                </select>
+              </div>
+
+              <div style="font-weight: bold; color: #0b58b9;">
+                Total Records : {{ totalCount }}
+              </div>
+            </div>
+          </div>
+          <!-- "vendorname": "APM KINGSTRACK INDIA PVT LTD",
+          "vendorid": "30016",
+          "over_speed_count": "8",
+          "harsh_brake_count": "0",
+          "tempared_count": "0",
+          "sos_count": "0",
+          "zero_lat_long_count": "46" -->
+          <div class="table-responsive status-table">
+            <table class="table table-striped app-table small-table">
+              <thead>
+                <tr>
+                  <th class="green py-1 text-center">#</th>
+                  <th class="green py-1 text-center">Vendor Name</th>
+                  <th class="green py-1 text-center">Over Speed</th>
+                  <th class="green py-1 text-center">Harsh Brake</th>
+                  <th class="green py-1 text-center">Tempered</th>
+                  <th class="green py-1 text-center">SOS</th>
+                  <th class="green py-1 text-center">Zero Lat Long</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                @for (v of detailData; track v; let i = $index) {
+                  <tr
+                    [ngClass]="{'high-alert-row': checkAlertCount(v)}">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ v.param3 }}</td> <!--vendor name-->
+                    <td class="text-end px-2">{{ v.param4 }}</td> <!--total devices-->
+                    <td class="text-end px-2">{{ v.param5 }}</td> <!--received-->
+                    <td class="text-end px-2">{{ v.param6 }}</td> <!--not received-->
+                    <td class="text-end px-2">{{ v.param7 }}</td> <!--never received-->
+                    <td class="text-end px-2">{{ v.param8 }}</td> <!--mode HTTP-->
+                  </tr>
+                }
+
+                @if (!listLoaded) {
+                  <tr>
+                    <td colspan="12" class="text-center">Loading...</td>
+                  </tr>
+                }
+
+                @if (listLoaded && detailData.length === 0) {
+                  <tr>
+                    <td colspan="12" class="text-center">NO DATA FOUND</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            <!-- <div style="display:flex; justify-content: center; margin-top:10px; gap:10px;">
+
+            <button (click)="pageCount = pageCount - 1; getDetails()"
+              [disabled]="pageCount === 1">
+              Prev
+            </button>
+
+            <span style="font-weight:bold;">
+              Page {{ pageCount }}
+            </span>
+
+            <button (click)="pageCount = pageCount + 1; getDetails()"
+              [disabled]="detailData.length < pageSize">
+              Next
+            </button>
+
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>

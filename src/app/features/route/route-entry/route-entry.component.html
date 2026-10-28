@@ -1,0 +1,330 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle"><i class="fa fa-google-wallet" aria-hidden="true"></i>&nbsp;&nbsp;Route Details
+        </div>
+      </div>
+      <div class="row">
+        <!-- Left Side: Route Form and Details -->
+        <div class="col-md-4">
+          <div class="card" style=" border: 1px solid rgb(0 0 0 / 34%)!important;">
+            <div class="card-body" style="     padding: 0.2rem;">
+              <div class="row">
+                <nav class="navbar col-12 navbar-expand pt-0 pb-1">
+                  <div class="collapse navbar-collapse">
+                    <div style="width: 200px;">
+                      <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search"
+                          style="border: 1px solid #878a8a; font-size: 10px;"
+                          [(ngModel)]="routedetailsReq.searchParameter" (keydown.enter)="searchData()">
+                        <div class="input-group-append">
+                          <button class="btn btn-sm btn-primary" type="button" (click)="searchData()"
+                            style="padding: 0px 7px;"><i class="fa fa-search" style="font-size: 10px;"></i></button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <ul class="navbar-nav ">
+                        <li class="nav-item mx-2">
+                          <button class="btn btn-link btn-sm" type="button" (click)="refreshdata()"
+                            tooltip="Refresh"><span class="fa fa-refresh" style="font-size: 15px;"></span></button>
+                          </li>
+                          <li class="nav-item mx-2"><button type="button" class="btn p-0" [disabled]="totalcount==0"
+                            (click)="exportPdfExcel('pdf')"><i class="fa fa-file-pdf-o"
+                          style="font-size: 14px; color: red;"></i></button></li>
+                          <li class="nav-item mx-2"><button type="button" class="btn p-0" [disabled]="totalcount==0"
+                            (click)="exportPdfExcel('excel')"><i class="fa fa-file-excel-o"
+                          style="font-size: 14px; color: blue;"></i></button></li>
+                          <li class="nav-item pt-1" style="color:black; font-size: 10px;"><span class="me-1"> Total
+                          : {{totalcount}} </span></li>
+                        </ul>
+                      </div>
+                    </nav>
+                  </div>
+                  <div class="gridTable" style="height: 180px; overflow-x: hidden;">
+                    <table class="table table-hover table-striped app-table">
+                      <thead>
+                        <tr>
+                          <th> # </th>
+                          <th> Route Name </th>
+                          <th> Description </th>
+                          <th style="color: black;width: 30px;"> View </th>
+                          <th style="color: black;width: 30px;"> Delete </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (item of routeData; track item) {
+                          <tr>
+                            <td>{{item.param1}}</td>
+                            <td>{{item.param3}}</td>
+                            <td>{{item.param9}}</td>
+                            <td class="actionbody"><i class="fa fa-eye text-dark" style="cursor: pointer;"
+                            (click)="setData(item)"></i></td>
+                            <td class="actionbody"><i class="fa fa-trash text-danger" style="cursor: pointer;"
+                            (click)="openDeleteModal(item)"></i></td>
+                          </tr>
+                        }
+                        @if (routeData.length == 0) {
+                          <tr>
+                            <td colspan="7" class="text-center"> No Records Found ! </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="card-header" style=" padding: 0.1rem 1.25rem; font-size: 13px;"><b>Route Entry</b></div>
+                <div class="card-body" style="background-color: rgb(208 215 208); padding: 0.5rem;">
+                  <form novalidate #routeForm="ngForm" autocomplete="off">
+                    <div class="row">
+                      <div class="col-md-12">
+                      <div class="form-group" tooltip="Enter Route Name" [ngClass]="{
+                            'has-danger': nameCtrl.invalid && submitted,
+                            'has-success': nameCtrl.valid && (nameCtrl.dirty || nameCtrl.touched) }">
+                          <input name="routename" class="form-control form-control-sm" placeholder="Enter Route Name"
+                            [(ngModel)]="routeEntry.routeName" required minlength="3" maxlength="100" #nameCtrl="ngModel"
+                            (keypress)="cs.addressValidation($event)"
+                            (focusout)="toUpdate==true && cs.pageActivities(receivedData.param2,routeEntry.routeName, 'Route master', 'Route Name', $event.type, toUpdate)">
+                          @if (nameCtrl.invalid && nameCtrl.touched) {
+                            <span class="small text-danger">
+                              @if (nameCtrl.errors?.['required']) {
+                                <span>Please Enter Route Name</span>
+                              }
+                              @if (nameCtrl.errors?.['minlength']) {
+                                <span>Route Name Should Be 3 to 100 characters.</span>
+                              }
+                            </span>
+                          }
+                        </div>
+                      </div>
+
+                      <div class="col-md-12">
+                        <div class="row">
+                          <div class="col-md-6">
+                          <div class="form-group" tooltip="Enter Source POI" [ngClass]="{
+                                'has-danger': sourceCtrl.invalid && submitted,
+                                'has-success': sourceCtrl.valid && (sourceCtrl.dirty || sourceCtrl.touched) }">
+                              <ng-select name="source" placeholder="Select Source POI" [(ngModel)]="sourcePOIObj"
+                                [searchable]="true" [clearable]="true" [required]="!toUpdate" #sourceCtrl="ngModel"
+                                (change)="selectSourcePOI();toUpdate==true && cs.pageActivities(receivedData.param13, $safeNavigationMigration($event?.param3), 'Route master', ' Source POI', 'change', toUpdate)">
+                                @for (item of poiData; track item) {
+                                  <ng-option [value]="item">
+                                    <span [title]="item.param3"> {{item.param3 | titlecase}}</span>
+                                  </ng-option>
+                                }
+                              </ng-select>
+                              @if (sourceCtrl.invalid && sourceCtrl.touched) {
+                                <span class="small text-danger">
+                                  @if (sourceCtrl.errors?.['required']) {
+                                    <span>Please Select Source POI</span>
+                                  }
+                                </span>
+                              }
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group" tooltip="Enter Destination POI"
+                            [ngClass]="{
+                                'has-danger': destinationCtrl.invalid && submitted,
+                                'has-success': destinationCtrl.valid && (destinationCtrl.dirty || destinationCtrl.touched) }">
+                              <ng-select name="destination" placeholder="Select Destination POI" [searchable]="true"
+                                [clearable]="true" [(ngModel)]="destinationPOIObj" [required]="!toUpdate"
+                                #destinationCtrl="ngModel"
+                                (change)="selectDestinationPOI();toUpdate==true && cs.pageActivities(receivedData.param14, $safeNavigationMigration($event?.param3), 'Route master', ' Destination POI', 'change', toUpdate)">
+                                @for (item of poiData; track item) {
+                                  <ng-option [value]="item" [disabled]="isDestinationPoiDisabled(item)"
+                                    >
+                                    <span [title]="item.param3"> {{item.param3 | titlecase}}</span>
+                                  </ng-option>
+                                }
+                              </ng-select>
+                              @if (destinationCtrl.invalid && destinationCtrl.touched) {
+                                <span class="small text-danger">
+                                  @if (destinationCtrl.errors?.['required']) {
+                                    <span>Please Select Destination POI</span>
+                                  }
+                                </span>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-12">
+                        <div class="form-group" tooltip="Enter Description"
+                        [ngClass]="{
+                            'has-danger': descriptionCtrl.invalid && submitted,
+                            'has-success': descriptionCtrl.valid && (descriptionCtrl.dirty || descriptionCtrl.touched) }">
+                          <input type="text" name="description" class="form-control"
+                            [(ngModel)]="routeEntry.routeDescription" placeholder="Enter Description" required
+                            minlength="3" maxlength="100" #descriptionCtrl="ngModel"
+                            (focusout)="toUpdate==true && cs.pageActivities(receivedData.param10, routeEntry.routeDescription, 'Route master', 'Description', $event.type, toUpdate)">
+                          @if (descriptionCtrl.invalid && descriptionCtrl.touched) {
+                            <span class="small text-danger">
+                              @if (descriptionCtrl.errors?.['required']) {
+                                <span>Please Enter Description</span>
+                              }
+                            </span>
+                          }
+                        </div>
+                      </div>
+
+                      <div class="col-md-12 text-dark gridTable" style="max-height: 150px;overflow: auto;">
+                        <div class="route-coordinate-header">
+                          <span class="fw-bold">Route Coordinates : </span>
+                          <span class="route-distance">Total Distance: {{ totalRouteDistance }}</span>
+                        </div>
+                        <table class="table table-sm text-dark app-table">
+                          <tr>
+                            <th class="text-dark small">Longitude</th>
+                            <th class="text-dark small">Latitude</th>
+                          </tr>
+                          @for (item of poiArr; track item) {
+                            <tr>
+                              <td class="small"> {{item[0]}} </td>
+                              <td class="small"> {{item[1]}} </td>
+                            </tr>
+                          }
+                        </table>
+                      </div>
+
+                      <div class="col-md-12" [ngStyle]="{'display':toUpdate ? '':'none'}">
+                      <div class="form-group" tooltip="Enter Remark" [ngClass]="{
+                            'has-danger': remarkCtrl.invalid && submitted,
+                            'has-success': remarkCtrl.valid && (remarkCtrl.dirty || remarkCtrl.touched) }">
+                          <input type="text" name="updateremark" class="form-control" [(ngModel)]="routeEntry.remarks"
+                            placeholder="Enter Remark" [required]="toUpdate" minlength="3" maxlength="50"
+                            #remarkCtrl="ngModel">
+                          @if ((remarkCtrl.invalid && remarkCtrl.touched && remarkCtrl.dirty) || submitted) {
+                            <span class="small text-danger"
+                              >
+                              @if (remarkCtrl.errors?.['required']) {
+                                <span>Please Enter Remark</span>
+                              }
+                            </span>
+                          }
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <div class="d-flex justify-content-end align-items-center">
+                          <button type="button" class="btn btn-primary btn-sm me-2 shadow-sm" (click)="selectRoute()">
+                            <i class="fa fa-pencil me-1"></i> Draw Route
+                          </button>
+
+                          @if (!toUpdate) {
+                            <button type="button" class="btn btn-sm btn-success btn-sm me-2 shadow-sm"
+                              (click)="insertRoute(routeForm)">
+                              <i class="fa fa-save me-1"></i> Submit
+                            </button>
+                          }
+
+                          @if (toUpdate) {
+                            <button type="button" class="btn btn-warning btn-sm me-2 shadow-sm"
+                              (click)="updateRoute(routeForm)">
+                              <i class="fa fa-check-circle me-1"></i> Update
+                            </button>
+                          }
+
+                          <button type="button" class="btn btn-secondary btn-sm shadow-sm" (click)="resetForm()">
+                            <i class="fa fa-refresh me-1"></i> Reset
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+
+                </div>
+              </div>
+            </div>
+            <!-- Right Side: Map Interface -->
+            <div class="col-md-8" style=" border: 2px solid #c7c7c7;">
+            <app-leaflet-map mapId="routeMap" [mapStyles]="{
+                height: '100%',
+                'min-height': '510px',
+                position: 'relative',
+                'z-index': '1'
+              }" (mapReady)="onMapReady($event)">
+                <div class="route-layer-control">
+                  <button type="button" class="layers-btn" (click)="toggleLayers()" [class.active]="isLayersVisible">
+                    <i class="fa fa-map-o" aria-hidden="true"></i>
+                    <span>Layers</span>
+                    <i class="fa fa-angle-down" aria-hidden="true"></i>
+                  </button>
+
+                  @if (isLayersVisible) {
+                    <div class="layers-dropdown">
+                      <div class="layers-header">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                        <span>Map Layers</span>
+                        <button type="button" class="layer-close" (click)="toggleLayers()"
+                        aria-label="Close">&times;</button>
+                      </div>
+                      <div class="layers-body">
+                        <app-map-layer-options [active]="currentStyle" (selected)="changeMapStyle($event)"></app-map-layer-options>
+                        <label class="layer-item police-layer" for="Police_Stations">
+                          <input type="checkbox" id="Police_Stations" name="Police_Stations"
+                            [(ngModel)]="showPoliceStations" (change)="togglePoliceStations()">
+                          <span class="layer-swatch police"></span>
+                          <span>Police Stations</span>
+                        </label>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </app-leaflet-map>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+
+
+  @if (showDeleteModal) {
+    <div class="modal fade show" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+      aria-hidden="false" [style.display]="'block'">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteModalLabel">Delete Route</h5>
+            <button type="button" class="close" aria-label="Close" (click)="closeDeleteModal()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete route: <strong>{{selectedRoute?.param3}}</strong>?</p>
+            <div class="form-group">
+              <label><b>Remark:</b></label><label class="mandetory">*</label>
+              <textarea class="form-control" [(ngModel)]="deleteRemark" name="deleteRemark" rows="3" minlength="10"
+              required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-secondary" (click)="closeDeleteModal()">Cancel</button>
+            <button type="button" class="btn btn-sm btn-danger" (click)="deleteRoute()"
+              [disabled]="loading || !deleteRemark || deleteRemark.length < 10">
+              {{loading ? 'Deleting...' : 'Delete'}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  <!-- Backdrop -->
+  @if (showDeleteModal) {
+    <div class="modal-backdrop fade show" (click)="closeDeleteModal()"></div>
+  }
+  @if (errorMessage) {
+    <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+  }
+  @if (successMessage) {
+    <app-toast [message]="successMessage" type="success"
+    (closed)="successMessage = null"></app-toast>
+  }

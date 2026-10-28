@@ -1,0 +1,423 @@
+<div class="container-fluid py-2">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-2">
+
+      <!-- Home Button (when type is dashboard) -->
+      @if (type === 'dashboard') {
+        <button class="btn btn-sm btn-success btn-sm mb-2" (click)="goHome()">
+          <i class="fa fa-angle-double-left me-1"></i> Home
+        </button>
+      }
+
+      <!-- Page Title Row -->
+      <div class="page-header-row d-flex justify-content-between align-items-center">
+        <div>
+          <div class="pagetitlestyle">Vendor Details</div>
+        </div>
+        @if (roleId!='17' && roleId!='18' && roleId!='19') {
+          @if (type !== 'dashboard') {
+            <a routerLink="/VendorDetails/entry" class="btn btn-primary btn-sm header-btn">
+              <i class="fa fa-plus me-1"></i> Add New
+            </a>
+          }
+        }
+      </div>
+
+      <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here..."
+        [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
+        (reload)="reloadData()" [loading]="loading" [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
+        (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows" totalLabel="Total Records"
+        countSeparator="of">
+      </app-common-data-toolbar>
+      <app-data-table
+        [columns]="tableColumns"
+        [rows]="getPaginatedVendors()"
+        [loading]="loading"
+        [sortKey]="sortKey"
+        [reverse]="reverse"
+        tableClass="table table-striped table-sm table-bordered mb-1"
+        tableId="devicetable"
+        (sort)="sort($event)"
+        (cellClick)="onVendorCellClick($event)"
+      ></app-data-table>
+      
+      <div class="float-end">
+        <app-pagination
+        [totalCount]="totalCount"
+        [page]="currentPage"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)"
+      ></app-pagination>
+      </div>
+
+</div>
+</div>
+</div>
+
+<!-- Edit Modal (Bootstrap 4 jQuery) -->
+<div class="modal fade app-modal" id="vendorEditModal" tabindex="-1" role="dialog"
+  data-backdrop="static" data-keyboard="false" aria-labelledby="vendorEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="vendorEditModalLabel">
+          Update Vendor
+        </h5>
+
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="closeEditModal()">
+        </button>
+      </div>
+      <form #editForm="ngForm" (ngSubmit)="editVendorData()">
+        <div class="modal-body py-3 px-3">
+          <div class="row">
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">Vendor Name:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm shadow-sm" maxlength="150" placeholder="Vendor Name" type="text"
+                  [(ngModel)]="vendorName" name="vendorName" autocomplete="off"
+                  (input)="allowAlphaNumericSpace($event)"
+                  required #vendorNameRef="ngModel"
+                  [class.is-invalid]="vendorNameRef.invalid && (vendorNameRef.touched || submittedEdit)">
+                @if (vendorNameRef.invalid && (vendorNameRef.touched || submittedEdit)) {
+                  <div class="field-error">Vendor name is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">MFG Code:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm shadow-sm" placeholder="Manufacturer Code" type="text"
+                  [(ngModel)]="mfgCode" name="mfgCode" minlength="2" maxlength="15" autocomplete="off"
+                  (input)="onAlphaNumericInput($event, 'mfgCode')"
+                  required #mfgCodeRef="ngModel"
+                  [class.is-invalid]="mfgCodeRef.invalid && (mfgCodeRef.touched || submittedEdit)">
+                @if (mfgCodeRef.invalid && (mfgCodeRef.touched || submittedEdit)) {
+                  <div class="field-error">MFG Code is required (2-4 alphanumeric characters).</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">CIN No.:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm shadow-sm" placeholder="CIN No" type="text"
+                  [(ngModel)]="cinNumber" name="cinNumber" maxlength="21" autocomplete="off"
+                  (input)="onAlphaNumericInput($event, 'cinNumber')"
+                  required #cinRef="ngModel"
+                  [class.is-invalid]="cinRef.invalid && (cinRef.touched || submittedEdit)">
+                @if (cinRef.invalid && (cinRef.touched || submittedEdit)) {
+                  <div class="field-error">CIN No. is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">GST No.:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm shadow-sm" maxlength="15" placeholder="GST No" type="text"
+                  [(ngModel)]="gstNo" name="gstNo" autocomplete="off"
+                  (input)="onAlphaNumericInput($event, 'gstNo')"
+                  required #gstRef="ngModel"
+                  [class.is-invalid]="gstRef.invalid && (gstRef.touched || submittedEdit)">
+                @if (gstRef.invalid && (gstRef.touched || submittedEdit)) {
+                  <div class="field-error">GST No. is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">Address:<span class="text-danger">*</span></label>
+                <textarea class="form-control form-control-sm shadow-sm" placeholder="Registration Address" maxlength="100"
+                  [(ngModel)]="address" name="address" autocomplete="off" style="resize: none;"
+                  required #addressRef="ngModel"
+                [class.is-invalid]="addressRef.invalid && (addressRef.touched || submittedEdit)"></textarea>
+                @if (addressRef.invalid && (addressRef.touched || submittedEdit)) {
+                  <div class="field-error">Address is required (max 100 characters).</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">Contact No.:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm shadow-sm" placeholder="Contact No" type="text"
+                  [(ngModel)]="contactNo" name="contactNo" maxlength="10" autocomplete="off"
+                  (input)="allowOnlyNumbers($event, 'contactNo')"
+                  required minlength="10" #contactNoRef="ngModel"
+                  [class.is-invalid]="contactNoRef.invalid && (contactNoRef.touched || submittedEdit)">
+                @if (contactNoRef.invalid && (contactNoRef.touched || submittedEdit)) {
+                  <div class="field-error">Valid 10-digit contact no. is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">PAN No.:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm bg-light" maxlength="10" placeholder="PAN No" type="text"
+                  [(ngModel)]="panno" name="panno" readonly autocomplete="off"
+                  title="PAN No. cannot be changed">
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">Email ID:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm shadow-sm" placeholder="Email ID" type="email"
+                  [(ngModel)]="emailId" name="emailId" autocomplete="off" (keyup)="validateEmail()"
+                  required email #emailRef="ngModel"
+                  [class.is-invalid]="emailRef.invalid && (emailRef.touched || submittedEdit)">
+                @if (emailRef.invalid && (emailRef.touched || submittedEdit)) {
+                  <div class="field-error">Valid email is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">State:<span class="text-danger">*</span></label>
+                <ng-select [items]="statelist" bindLabel="param2" bindValue="param2" placeholder="Select State"
+                  [(ngModel)]="stateName" (change)="onStateChange()" name="stateName" [clearable]="true"
+                  [searchable]="true" style="font-size: 11px;"
+                  required #stateRef="ngModel"
+                  [class.is-invalid]="stateRef.invalid && (stateRef.touched || submittedEdit)">
+                </ng-select>
+                @if (stateRef.invalid && (stateRef.touched || submittedEdit)) {
+                  <div class="field-error">State is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">City:<span class="text-danger">*</span></label>
+                <ng-select [items]="citylist" bindLabel="param2" bindValue="param2" placeholder="Select City"
+                  [(ngModel)]="cityName" name="cityName" [clearable]="true" [searchable]="true"
+                  style="font-size: 11px;"
+                  required #cityRef="ngModel"
+                  [class.is-invalid]="cityRef.invalid && (cityRef.touched || submittedEdit)">
+                </ng-select>
+                @if (cityRef.invalid && (cityRef.touched || submittedEdit)) {
+                  <div class="field-error">City is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">Pincode:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm shadow-sm" placeholder="Pincode" type="text" maxlength="6"
+                  (input)="allowOnlyNumbers($event, 'pincode')" [(ngModel)]="pincode" name="pincode"
+                  autocomplete="off" required pattern="^[0-9]{6}$" #pincodeRef="ngModel"
+                  [class.is-invalid]="pincodeRef.invalid && (pincodeRef.touched || submittedEdit)">
+                @if (pincodeRef.invalid && (pincodeRef.touched || submittedEdit)) {
+                  <div class="field-error">Valid 6-digit pincode is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">Contact Person:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm shadow-sm" maxlength="50" placeholder="Contact Person" type="text"
+                  [(ngModel)]="contactPerson" name="contactPerson" autocomplete="off"
+                  required #contactPersonRef="ngModel"
+                  [class.is-invalid]="contactPersonRef.invalid && (contactPersonRef.touched || submittedEdit)">
+                @if (contactPersonRef.invalid && (contactPersonRef.touched || submittedEdit)) {
+                  <div class="field-error">Contact person is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">Mobile No.:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm shadow-sm"
+                  [class.is-invalid]="(mobileNoRef.invalid && (mobileNoRef.touched || submittedEdit)) || getFieldError('mobileNo')"
+                  maxlength="10" placeholder="Mobile No." type="text"
+                  [(ngModel)]="mobileNo" name="mobileNo" autocomplete="off"
+                  (input)="allowOnlyNumbers($event, 'mobileNo')" (blur)="validateMobileNo()"
+                  required minlength="10" #mobileNoRef="ngModel">
+                @if ((mobileNoRef.invalid && (mobileNoRef.touched || submittedEdit)) || getFieldError('mobileNo')) {
+                  <div class="field-error">Valid 10-digit mobile no. is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group">
+                <label class="field-label">Contact Person Email:<span class="text-danger">*</span></label>
+                <input class="form-control form-control-sm shadow-sm"
+                  [class.is-invalid]="(cpEmailRef.invalid && (cpEmailRef.touched || submittedEdit)) || getFieldError('contactpersonemail')"
+                  placeholder="Email Id" type="email" [(ngModel)]="contactpersonemail" name="contactpersonemail"
+                  (keyup)="validateContactPersonEmail()" autocomplete="off"
+                  required email #cpEmailRef="ngModel">
+                @if ((cpEmailRef.invalid && (cpEmailRef.touched || submittedEdit)) || getFieldError('contactpersonemail')) {
+                  <div class="field-error">Valid email is required.</div>
+                }
+                @if (contactPersonEmailMessage) {
+                  <div class="field-error">{{contactPersonEmailMessage}}</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label class="field-label">Remark:<span class="text-danger">*</span></label>
+                <textarea class="form-control form-control-sm shadow-sm" placeholder="Remark (min 10 chars)" maxlength="100"
+                  [(ngModel)]="updateRemark" name="updateRemark"
+                  style="min-height: 50px; resize: vertical;"
+                  required minlength="10" #updateRemarkRef="ngModel"
+                [class.is-invalid]="updateRemarkRef.invalid && (updateRemarkRef.touched || submittedEdit)"></textarea>
+                @if (updateRemarkRef.invalid && (updateRemarkRef.touched || submittedEdit)) {
+                  <div class="field-error">Remark is required (min 10 characters).</div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center py-1" style="background: #f7f7f7;">
+          <button type="submit" [disabled]="loading" class="btn btn-primary btn-sm px-4">
+            <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-check'" style="margin-right: 4px;"></i>
+            @if (!loading) {
+              <span>Submit</span>
+            }
+            @if (loading) {
+              <span>Saving...</span>
+            }
+          </button>
+          <button type="button" (click)="closeEditModal()" class="btn btn-secondary btn-sm px-4">
+            <i class="fa fa-times me-1"></i> Back
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal (Bootstrap 4 jQuery) -->
+<div class="modal fade" id="vendorDeleteModal" tabindex="-1" role="dialog"
+  data-backdrop="static" data-keyboard="false" aria-labelledby="vendorDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header py-2 px-3" style="background: #f8d3d3;">
+        <h5 class="modal-title text-danger" style="font-size: 14px; font-weight: 600;">Delete Vendor</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="closeDeleteModal()">
+        </button>
+      </div>
+      <form #deleteForm="ngForm" (ngSubmit)="deleteVendorData()">
+        <div class="modal-body">
+          <p class="mb-2" style="font-size: 12px;">
+            <strong>Vendor Name:</strong>
+            <span class="text-primary fw-bold ms-1">{{vendorName}}</span>
+          </p>
+          <div class="form-group mb-0">
+            <label class="field-label">Remark:<span class="text-danger">*</span></label>
+            <textarea class="form-control form-control-sm shadow-sm" placeholder="Enter reason for deletion (min 10 chars)..."
+              maxlength="100" [(ngModel)]="remarkForDelete" name="remarkForDelete"
+              style="min-height: 60px; resize: none;"
+              required minlength="10" #delRemarkRef="ngModel"
+            [class.is-invalid]="delRemarkRef.invalid && (delRemarkRef.touched || submittedDelete)"></textarea>
+            @if (delRemarkRef.invalid && (delRemarkRef.touched || submittedDelete)) {
+              <div class="field-error">Remark is required (min 10 characters).</div>
+            }
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center" style="background: #f7f7f7;">
+          <button type="submit" [disabled]="loading" class="btn btn-danger btn-sm px-4">
+            <i class="fa fa-trash me-1"></i> Delete
+          </button>
+          <button type="button" (click)="closeDeleteModal()" class="btn btn-primary btn-sm px-4">
+            <i class="fa fa-times me-1"></i> Back
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Block/Unblock Modal (Bootstrap 4 jQuery) -->
+<div class="modal fade app-modal" id="vendorBlockModal" tabindex="-1" role="dialog"
+  data-backdrop="static" data-keyboard="false" aria-labelledby="vendorBlockModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header py-2 px-3" style="background: #fff3cd;">
+        <h5 class="modal-title" style="font-size: 13px; font-weight: 700; color: #856404;">
+          <i class="fa me-1" [ngClass]="activeSuspend === 'Block' ? 'fa-ban' : 'fa-check-circle'"></i>
+          {{activeSuspend}} Vendor
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="closeBlockModal()">
+        </button>
+      </div>
+      <form #blockForm="ngForm" (ngSubmit)="blockUnblockDetails()">
+        <div class="modal-body">
+          <p class="border-bottom pb-2 mb-2" style="font-size: 12px;">
+            <strong>Vendor Name:</strong>
+            <span class="text-primary fw-bold ms-1">{{vendorName}}</span>
+          </p>
+          <div class="form-group mb-0">
+            <label class="field-label" style="color: #555;">
+              Remark:<span class="text-danger">*</span>
+            </label>
+            <textarea class="form-control form-control-sm shadow-sm" placeholder="Enter reason (min 10 chars)..."
+              maxlength="100" [(ngModel)]="remarkForBlock" name="remarkForBlock"
+              style="min-height: 70px; resize: none;"
+              required minlength="10" #blockRemarkRef="ngModel"
+            [class.is-invalid]="blockRemarkRef.invalid && (blockRemarkRef.touched || submittedBlock)"></textarea>
+            @if (blockRemarkRef.invalid && (blockRemarkRef.touched || submittedBlock)) {
+              <div class="field-error">Remark is required (min 10 characters).</div>
+            }
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center" style="background: #f8f9fa;">
+          <button type="submit" [disabled]="loading" class="btn btn-sm px-4"
+            [class.btn-warning]="activeSuspend === 'Block'"
+            [class.btn-success]="activeSuspend !== 'Block'">
+            <i class="fa me-1" [ngClass]="activeSuspend === 'Block' ? 'fa-ban' : 'fa-check'"></i>
+            {{activeSuspend}}
+          </button>
+          <button type="button" (click)="closeBlockModal()" class="btn btn-dark btn-sm px-4">
+            <i class="fa fa-times me-1"></i> Back
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Approve Modal (Bootstrap 4 jQuery) -->
+<div class="modal fade" id="vendorApproveModal" tabindex="-1" role="dialog"
+  data-backdrop="static" data-keyboard="false" aria-labelledby="vendorApproveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 280px;">
+    <div class="modal-content">
+      <div class="modal-header py-2 px-3">
+        <h5 class="modal-title" style="font-size: 13px;">Approve</h5>
+        <button type="button" class="close" (click)="closeApproveModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body py-2 px-3">
+        <p class="mb-0" style="font-size: 11px; font-weight: bold;">
+          Vendor Name: <span style="color:#ef6e47;">{{vendorName}}</span>
+        </p>
+      </div>
+      <div class="modal-footer justify-content-center py-2">
+        <button class="btn btn-sm btn-success btn-sm" (click)="vendorApprove()">Approve</button>
+        <button class="btn btn-secondary btn-sm" type="reset" (click)="closeApproveModal()">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (errorMessage && vendors.length > 0) {
+  <app-toast
+    [message]="errorMessage"
+    type="error"
+    (closed)="errorMessage = null">
+  </app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success"
+  (closed)="successMessage = null"></app-toast>
+}

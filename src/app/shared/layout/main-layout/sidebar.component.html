@@ -1,0 +1,113 @@
+@if (mobileOpen) {
+  <button type="button" class="nav-backdrop" aria-label="Close navigation" (click)="closeMobile.emit()"></button>
+}
+<aside id="application-sidebar" class="menu-w" [class.collapsed]="collapsed"
+  [class.expanded]="desktopExpanded || mobileOpen || activeSubMenu !== null" [class.open]="mobileOpen"
+  aria-label="Main navigation" (pointerenter)="onSidebarPointerEnter($event)"
+  (pointerleave)="onSidebarPointerLeave()" (focusin)="onSidebarFocusIn()" (focusout)="onSidebarFocusOut($event)">
+  <div class="sidebar-brand">
+    @if (logoSrc) {
+      <img [src]="logoSrc" alt="">
+    }
+    <span class="brand-label">Navigation</span>
+    <button type="button" class="mobile-close" aria-label="Close navigation" (click)="closeMobile.emit()">
+      <i class="fa fa-times" aria-hidden="true"></i>
+    </button>
+  </div>
+  <nav class="sidebar-nav" aria-label="Application" (scroll)="onMenuScroll()">
+    <ul class="main-menu">
+      @for (item of items; track item.id) {
+        <li class="nav-item" [class.active]="menuActive(item)" [attr.data-menu-id]="item.id"
+          (pointerenter)="onRootItemPointerEnter(item, $event)" (focusin)="onRootItemFocus(item, $event)">
+          @if (directRoute(item); as route) {
+            <a class="nav-link" [routerLink]="route"
+              [class.active]="routeActive(route)"
+              [attr.aria-current]="routeActive(route) ? 'page' : null"
+              [attr.title]="item.label" [attr.aria-label]="item.label" (click)="onNavigation()">
+              <i class="fa nav-icon" [ngClass]="iconFor(item.label)" aria-hidden="true"></i>
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+          } @else if (item.children?.length) {
+            <button type="button" class="nav-link menu-toggle" [class.active]="menuActive(item)"
+              [attr.aria-expanded]="isMenuExpanded(item)" [attr.aria-haspopup]="true"
+              [attr.aria-controls]="'submenu-' + item.id" [attr.title]="item.label"
+              [attr.aria-label]="item.label" (click)="toggleSubMenu(item, $event)">
+              <i class="fa nav-icon" [ngClass]="iconFor(item.label)" aria-hidden="true"></i>
+              <span class="nav-label">{{ item.label }}</span>
+              <i class="fa fa-angle-down nav-chevron" aria-hidden="true"></i>
+            </button>
+            @if (mobileOpen && isMenuExpanded(item)) {
+              <section class="sub-menu mobile-flyout" [id]="'submenu-' + item.id"
+                [attr.aria-label]="item.label + ' submenu'">
+                <div class="submenu-heading">{{ item.label }}</div>
+                <ul class="submenu-tree">
+                  <ng-container *ngTemplateOutlet="submenuItems; context: { $implicit: item.children, depth: 0 }"></ng-container>
+                </ul>
+              </section>
+            }
+          } @else {
+            <span class="nav-link disabled" [attr.title]="item.label" [attr.aria-label]="item.label">
+              <i class="fa nav-icon" [ngClass]="iconFor(item.label)" aria-hidden="true"></i>
+              <span class="nav-label">{{ item.label }}</span>
+            </span>
+          }
+        </li>
+      }
+    </ul>
+  </nav>
+  @if (!mobileOpen && activeSubMenuItem) {
+    <section #submenuPanel class="sub-menu submenu-flyout" [style.top.px]="submenuTop"
+      [style.max-height.px]="submenuMaxHeight"
+      [id]="'submenu-' + activeSubMenuItem.id" [attr.aria-label]="activeSubMenuItem.label + ' submenu'"
+      (scroll)="onMenuScroll()">
+      <div class="submenu-heading">{{ activeSubMenuItem.label }}</div>
+      <ul class="submenu-tree">
+        <ng-container *ngTemplateOutlet="submenuItems; context: { $implicit: activeSubMenuItem.children, depth: 0 }"></ng-container>
+      </ul>
+    </section>
+  }
+  @if (!mobileOpen && activeNestedSubMenuItem) {
+    <section #nestedPanel class="sub-menu nested-flyout"
+      [style.top.px]="nestedSubmenuTop" [style.left.px]="nestedSubmenuLeft"
+      [style.max-height.px]="nestedSubmenuMaxHeight"
+      [id]="'nested-' + activeNestedSubMenuItem.id"
+      [attr.aria-label]="activeNestedSubMenuItem.label + ' submenu'" (scroll)="onMenuScroll()">
+      <div class="submenu-heading">{{ activeNestedSubMenuItem.label }}</div>
+      <ul class="submenu-tree">
+        <ng-container *ngTemplateOutlet="submenuItems; context: { $implicit: activeNestedSubMenuItem.children, depth: 1 }"></ng-container>
+      </ul>
+    </section>
+  }
+</aside>
+
+<ng-template #submenuItems let-menuItems let-depth="depth">
+  @for (submenu of menuItems; track submenu.id) {
+    <li class="submenu-item" [class.active]="menuActive(submenu)" [style.--menu-depth]="depth">
+      @if (submenu.children?.length) {
+        <button type="button" class="nav-link sub-link nested-toggle"
+          [attr.data-submenu-id]="submenu.id"
+          [attr.aria-expanded]="isNestedExpanded(submenu)"
+          [attr.aria-controls]="'nested-' + submenu.id"
+          (pointerenter)="onNestedPointerEnter(submenu, $event)"
+          (focusin)="onNestedFocus(submenu, $event)"
+          (click)="toggleNested(submenu, $event)">
+          <i class="fa fa-angle-right sub-icon nested-chevron" aria-hidden="true"></i>
+          <span class="nav-label">{{ submenu.label }}</span>
+        </button>
+        @if (mobileOpen && isNestedExpanded(submenu)) {
+          <ul class="nested-menu" [id]="'nested-' + submenu.id">
+            <ng-container *ngTemplateOutlet="submenuItems; context: { $implicit: submenu.children, depth: depth + 1 }"></ng-container>
+          </ul>
+        }
+      } @else if (submenu.route) {
+        <a class="nav-link sub-link" [routerLink]="submenu.route"
+          [class.active]="routeActive(submenu.route)"
+          [attr.aria-current]="routeActive(submenu.route) ? 'page' : null"
+          [attr.title]="submenu.label" (click)="onNavigation()">
+          <i class="fa fa-circle sub-icon" aria-hidden="true"></i>
+          <span class="nav-label">{{ submenu.label }}</span>
+        </a>
+      }
+    </li>
+  }
+</ng-template>

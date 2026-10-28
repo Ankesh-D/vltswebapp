@@ -1,0 +1,220 @@
+<div class="container-fluid">
+  <!-- ================= Header ================= -->
+
+  <div class="pagetitleborder">
+    <div class="page-header-row">
+      <div class="pagetitlestyle">RAW DATA DETAILS</div>
+    </div>
+  </div>
+
+  <!-- ================= Filter ================= -->
+
+  <div class="filter-section">
+    <div class="filter-row">
+      <div class="filter-field">
+        <label class="filter-label"> IMEI <span class="req">*</span> </label>
+
+        <input
+          type="text"
+          class="filter-input"
+          [(ngModel)]="imei"
+          name="imei"
+          maxlength="15"
+          placeholder="Enter IMEI"
+          />
+      </div>
+
+      <div class="filter-field">
+        <label class="filter-label">
+          Date <span class="text-danger">*</span>
+        </label>
+
+        <input
+          type="text"
+          class="filter-input"
+          ngxDaterangepickerMd
+          [(ngModel)]="selectedDate"
+          [singleDatePicker]="true"
+          [showDropdowns]="true"
+          [autoApply]="true"
+          [linkedCalendars]="false"
+          [isInvalidDate]="isInvalidDate"
+          [locale]="{
+            format: 'DD-MMM-YYYY',
+          }"
+          placeholder="Select Date"
+          />
+      </div>
+      <div class="filter-field filter-action">
+        <button
+          type="button"
+          class="header-btn search-btn"
+          (click)="searchRawData()"
+          [disabled]="loading"
+          >
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm">
+            </span>
+          }
+
+          Search
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= Packet Tabs ================= -->
+
+  <div class="px-2 pt-1">
+    <ul class="nav nav-tabs">
+      @for (tab of packetTabs; track tab) {
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            href="javascript:void(0)"
+            [class.active]="packetType == tab.value"
+            (click)="changeTab(tab.value)"
+            >
+            {{ tab.label }}
+          </a>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <!-- ================= Table ================= -->
+
+  <div class="table-section">
+    <div class="top-controls-row">
+      <div class="left-controls">
+        <!--
+        <div class="control-item">
+
+          <label>Show</label>
+
+          <select
+            [(ngModel)]="pageSize"
+            name="pageSize"
+            (change)="searchRawData(1)">
+
+            <option [value]="10">10</option>
+            <option [value]="25">25</option>
+            <option [value]="50">50</option>
+            <option [value]="100">100</option>
+
+          </select>
+
+        </div> -->
+      </div>
+
+      <div class="right-controls">
+        <div class="control-item">
+          <label>Show</label>
+
+          <select
+            [(ngModel)]="pageSize"
+            name="pageSize"
+            (change)="searchRawData(1)"
+            >
+            <option [value]="10">10</option>
+            <option [value]="25">25</option>
+            <option [value]="50">50</option>
+            <option [value]="100">100</option>
+          </select>
+        </div>
+        <div class="total-records-text">
+          Total Records :
+          <strong>{{ pagecount }} of {{totalCount}}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-striped app-table">
+        <thead class="rd-thead">
+          <tr>
+            <th>Sr No</th>
+            <th>Raw String</th>
+            <!-- <th>Server Polling Time</th> -->
+            <th>Device IP</th>
+            <th>Port</th>
+            <!-- <th>Packet Type</th> -->
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (item of rawData; track item; let i = $index) {
+            <tr>
+              <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+              <td class="raw-string-cell">
+                {{ item.param4 }}
+              </td>
+              <!-- <td>
+              {{ item.param3 }}
+            </td> -->
+            <td>
+              {{ item.param5 }}
+            </td>
+            <td>
+              {{ item.param6 }}
+            </td>
+            <!-- <td>
+            {{ item.param7 }}
+          </td> -->
+        </tr>
+      }
+
+      @if (rawData.length == 0) {
+        <tr>
+          <td colspan="6" class="text-center py-2">No Data Found</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<!-- ================= Pagination ================= -->
+
+@if (totalCount > pagecount || page > 1) {
+  <div class="custom-pagination"style="display:flex;justify-content: end;">
+    <button class="pg-btn"
+      (click)="changePage(page - 1)"
+      [disabled]="page === 1">
+      Prev
+    </button>
+    @if (page > 3) {
+      <span class="pg-dots">...</span>
+    }
+    @if (page > 2) {
+      <button
+        class="pg-num"
+        (click)="changePage(page - 1)">
+        {{ page - 1 }}
+      </button>
+    }
+    <button class="pg-num active">
+      {{ page }}
+    </button>
+    @if (page < totalPages - 1) {
+      <button
+        class="pg-num"
+        (click)="changePage(page + 1)">
+        {{ page + 1 }}
+      </button>
+    }
+    @if (page < totalPages - 2) {
+      <span class="pg-dots">...</span>
+    }
+    <button class="pg-num"
+      (click)="changePage(totalPages)">
+      {{ totalPages }}
+    </button>
+    <button class="pg-btn"
+      (click)="changePage(page + 1)"
+      [disabled]="page === totalPages">
+      Next
+    </button>
+  </div>
+}
+</div>
+</div>

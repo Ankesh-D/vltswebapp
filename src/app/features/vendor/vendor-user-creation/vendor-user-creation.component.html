@@ -1,0 +1,224 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <button class="pagebtn">
+                <a routerLink="/vendor/user-details"><i class="fa fa-plus"></i>&nbsp;&nbsp;Details</a>
+              </button>
+              <div class="pagetitlestyle">
+                <span>User and Login Creation</span>
+              </div>
+            </div>
+
+            <form id="CompanyUserCreationForm" autocomplete="off">
+              <div class="form-desc">
+                <strong>NOTE :<label for="" class="mandetory">*</label> Are Mandatory Fields.</strong>
+              </div>
+
+              <div class="entrypagediv">
+                <div class="row" style="display: flex;">
+                  <div class="col-sm-2">
+                    <div class="form-group">
+                      <label for=""> Select Role: </label>
+                      <label for="" class="mandetory">*</label>
+                      <ng-select
+                        [items]="roleList"
+                        bindLabel="param4"
+                        bindValue="param1"
+                        placeholder="Select"
+                        [(ngModel)]="selectedRole"
+                        id="rolelist"
+                        (change)="onRoleChange()"
+                        style="width: 300px;"
+                        name="role"
+                        [searchable]="true">
+                      </ng-select>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-2" id="isdealerselected" *ngIf="showUserForm">
+                    <div class="form-group">
+                      <label for=""> Select Dealer: </label>
+                      <label for="" class="mandetory">*</label>
+                      <ng-select
+                        [items]="dealerList"
+                        bindLabel="param2"
+                        bindValue="param1"
+                        placeholder="Select"
+                        [(ngModel)]="selectedDealer"
+                        (change)="onDealerChange()"
+                        id="dealerlist"
+                        style="width: 300px;"
+                        name="dealer"
+                        [searchable]="true">
+                      </ng-select>
+                    </div>
+                  </div>
+                  
+                  <div class="col-sm-5 dealer-info" id="isdealer" *ngIf="showDealerInfo">
+                    <table style="width: 70%;">
+                      <tr>
+                        <th>Dealer name</th>
+                        <td>: {{dealerInfo?.dealername}}</td>
+                      </tr>
+                      <tr>
+                        <th>Contact Person</th>
+                        <td>: {{dealerInfo?.contactperson}}</td>
+                      </tr>
+                      <tr>
+                        <th>Mobile No</th>
+                        <td>: {{dealerInfo?.mobileno}}</td>
+                      </tr>
+                      <tr>
+                        <th>Alternate No</th>
+                        <td>: {{dealerInfo?.alternateno}}</td>
+                      </tr>
+                      <tr>
+                        <th>Email Id</th>
+                        <td>: {{dealerInfo?.emailid}}</td>
+                      </tr>
+                      <tr>
+                        <th>Address</th>
+                        <td>: {{dealerInfo?.address}}</td>
+                      </tr>
+                      <tr>
+                        <th>City</th>
+                        <td>: {{dealerInfo?.city}}</td>
+                      </tr>
+                      <tr>
+                        <th>State</th>
+                        <td>: {{dealerInfo?.state}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="col-md-12" id="isuser" *ngIf="showUserForm">
+                  <div class="row" style="display: flex;">
+                    <div class="col-sm-2">
+                      <div class="form-group">
+                        <label for="">User Name:</label>
+                        <label for="" class="mandetory">*</label>
+                        <input class="form-control ignoresymbol_name" maxlength="250" placeholder="User Name" type="text"
+                          (blur)="blurExpression()" [(ngModel)]="userName" id="username" name="userName" autocomplete="off">
+                      </div>
+                    </div>
+                    <div class="col-sm-2">
+                      <div class="form-group">
+                        <label for="">Contact No:</label>
+                        <label for="" class="mandetory">*</label>
+                        <input class="form-control acceptnumeric_nodecimal" (blur)="blurExpression()" placeholder="Contact No"
+                          type="text" [(ngModel)]="contactNo" id="contactno" maxlength="10" name="contactNo" autocomplete="off">
+                      </div>
+                    </div>
+                    <div class="col-sm-2">
+                      <div class="form-group">
+                        <label for="">Alternate Contact No:</label>
+                        <input class="form-control acceptnumeric_nodecimal" (blur)="blurExpression()"
+                          placeholder="Alternate Contact No" type="text" (keyup)="checkAlternumber()"
+                          [(ngModel)]="alternateContactNo" id="alternatecontactno" maxlength="10" name="alternateContactNo" autocomplete="off">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row" style="display: flex;">
+                    <div class="col-sm-2" style="display: none;">
+                      <div class="form-group">
+                        <label for="">Email ID:</label>
+                        <label for="" class="mandetory">*</label>
+                        <input class="form-control" (blur)="blurExpression()" placeholder="Email ID" type="email"
+                          maxlength="50" [(ngModel)]="emailId" (keyup)="validateMail()" id="emailid" name="emailId" autocomplete="off">
+                      </div>
+                    </div>
+                    <div class="col-sm-2">
+                      <div class="form-group">
+                        <label for="">Address:</label>
+                        <b for="" class="mandetory">*</b>
+                        <textarea class="form-control ignorespecialcharacter_address" placeholder="Address"
+                          (blur)="blurExpression()" maxlength="100" type="text" [(ngModel)]="address" id="address" name="address" autocomplete="off"></textarea>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-2">
+                      <div class="form-group">
+                        <label for="">Select State:</label>
+                        <label for="" class="mandetory">*</label>
+                        <select id="statelist" class="form-control searchable">
+                          <option value="">Select State</option>
+                          <option *ngFor="let state of stateList" [value]="state.param1">{{state.param2}}</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-2">
+                      <div class="form-group">
+                        <label for="">Select City:</label>
+                        <label for="" class="mandetory">*</label>
+                        <select id="cityname" class="form-control searchable">
+                          <option value="">Select City</option>
+                          <option *ngFor="let city of cityList" [value]="city.param1">{{city.param2}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <br><br>
+
+                <div class="row col-md-12" id="islogin" style="display: flex;" *ngIf="showLoginForm">
+                  <div class="col-sm-2">
+                    <div class="form-group">
+                      <label for="">Login Name:</label>
+                      <label for="" class="mandetory">*</label>
+                      <input class="form-control accept_loginName" placeholder="Login Name" type="text"
+                        [(ngModel)]="loginName" id="loginname" maxlength="50" (blur)="blurExpression()" name="loginName" autocomplete="nope">
+                    </div>
+                  </div>
+                  <div class="col-sm-2">
+                    <div class="form-group">
+                      <label for="">Password:</label>
+                      <label for="" class="mandetory">*</label>
+                      <input class="form-control" placeholder="password" type="password" (keyup)="verifyPassword()"
+                        maxlength="50" [(ngModel)]="password" (blur)="blurExpression()" id="password" name="password">
+                      <span [ngStyle]="{'color': passwordMessage ? 'red' : 'green'}">{{passwordMessage}}</span>
+                    </div>
+                  </div>
+                  <div class="col-sm-2">
+                    <div class="form-group">
+                      <label for="">Re-Enter Password:</label>
+                      <label for="" class="mandetory">*</label>
+                      <input class="form-control" placeholder="Re-Enter Password" type="password"
+                        [(ngModel)]="confirmPassword" [disabled]="isDisable" (keyup)="checkPasswordsMatch()" maxlength="50"
+                        (blur)="blurExpression()" id="confirmpassword" name="confirmPassword">
+                      <span [ngStyle]="{'color': confirmPasswordMessage ? 'red' : 'green'}">{{confirmPasswordMessage}}</span><br>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-buttons-w">
+                <button (click)="submit()">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.dealer-info {
+  position: absolute;
+  right: 60px;
+  padding: 10px;
+  border: 2px solid green;
+  background: #c6ffbd;
+}
+</style>
+
+<app-loading *ngIf="loading"></app-loading>
+<app-error-message *ngIf="errorMessage" [message]="errorMessage"></app-error-message>

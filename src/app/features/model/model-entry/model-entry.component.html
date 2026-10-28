@@ -1,0 +1,768 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder d-flex justify-content-between align-items-center">
+              <div class="pagetitlestyle">
+                <span>Model Entry</span>
+              </div>
+              <button class="btn btn-sm btn-primary shadow-sm" routerLink="/model"
+                style="font-size: 11px; padding: 4px 12px; border-radius: 4px">
+                <i class="fa fa-list me-1"></i> Details
+              </button>
+            </div>
+
+            <form id="modelentrydata" autocomplete="off" #modelEntryForm="ngForm" (ngSubmit)="insertModelData()"
+              novalidate style="padding: 5px; background-color: #dadad4">
+              <div class="form-desc" style="
+                  font-size: 11px;
+                  margin-bottom: 5px;
+                  color: #666;
+                  padding-left: 5px;
+                ">
+                <strong>NOTE :</strong><label class="mandetory" style="color: red">*</label> Are
+                Mandatory Fields.
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="entrypagediv" style="
+                      background: #fff;
+                      padding: 10px;
+                      border-radius: 5px;
+                      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+                    ">
+                    <div class="row">
+                      <!-- Select Vendor (conditional) -->
+                      @if (roleId != '11') {
+                        <div class="col">
+                          <div class="form-group" style="margin-bottom: 5px">
+                          <label style="
+                              font-size: 11px;
+                              font-weight: bold;
+                              margin-bottom: 2px;
+                            ">Select Vendor:<span class="mandetory" style="color: red">*</span></label>
+                              <ng-select [items]="vendorList" bindLabel="param2" bindValue="param1"
+                                placeholder="Select Vendor" [ngModel]="selectedVendorId || null"
+                                (ngModelChange)="selectedVendorId = $event" name="vendorId"
+                                #vendorSelectCtrl="ngModel" [clearable]="false"
+                                [searchable]="true" required>
+                              </ng-select>
+                              @if (vendorSelectCtrl.invalid && (vendorSelectCtrl.touched || modelEntryForm.submitted)) {
+                                <div class="field-error">
+                                  @if (vendorSelectCtrl.errors?.['required']) {
+                                    <div>
+                                      Vendor is required.
+                                    </div>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          </div>
+                        }
+
+                        <!-- Model Name -->
+                        <div class="col">
+                          <div class="form-group" style="margin-bottom: 5px">
+                          <label style="
+                              font-size: 11px;
+                              font-weight: bold;
+                              margin-bottom: 2px;
+                            ">Model Name:<span class="mandetory" style="color: red">*</span></label>
+                              <input class="form-control shadow-sm" placeholder="Model Name" type="text"
+                                [(ngModel)]="modelName" name="modelName" #modelNameCtrl="ngModel"
+                                (keyup)="allowAlphaNumericSpace($event)" minlength="4" maxlength="50" required />
+                              @if (modelNameCtrl.invalid && (modelNameCtrl.touched || modelEntryForm.submitted)) {
+                                <div class="field-error">
+                                  @if (modelNameCtrl.errors?.['required']) {
+                                    <div>
+                                      Model Name is required.
+                                    </div>
+                                  }
+                                  @if (modelNameCtrl.errors?.['minlength']) {
+                                    <div>
+                                      Model Name must be at least 4 characters.
+                                    </div>
+                                  }
+                                  @if (modelNameCtrl.errors?.['maxlength']) {
+                                    <div>
+                                      Model Name cannot exceed 50 characters.
+                                    </div>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Model Code -->
+                          <div class="col">
+                            <div class="form-group" style="margin-bottom: 5px">
+                          <label style="
+                              font-size: 11px;
+                              font-weight: bold;
+                              margin-bottom: 2px;
+                            ">Model Code:<span class="mandetory" style="color: red">*</span></label>
+                          <input class="form-control shadow-sm" style="
+                              font-size: 11px;
+                              height: 28px;
+                              padding: 2px 8px;
+                              border-radius: 3px;
+                              transition: all 0.3s ease;
+                            "  
+                                  minlength="2"
+                                  maxlength="2" (keyup)="validateModelCode()"
+                                  placeholder="Model code" type="text" id="modelcode" [(ngModel)]="modelCode" name="modelCode"
+                                  #modelCodeCtrl="ngModel" required
+                                  title="any 2 alphanumeric Character allow ,no special character"
+                                  (input)="onMfgCodeInput($event)" />
+                                @if (modelCodeCtrl.invalid && (modelCodeCtrl.touched || modelEntryForm.submitted)) {
+                                  <div class="field-error">
+                                    @if (modelCodeCtrl.errors?.['required']) {
+                                      <div>
+                                        Model Code is required.
+                                      </div>
+                                    }
+                                    @if (modelCodeCtrl.errors?.['minlength']) {
+                                      <div>
+                                        Model Code must be at least 2 characters.
+                                      </div>
+                                    }
+                                    @if (modelCodeCtrl.errors?.['maxlength']) {
+                                      <div>
+                                        Model Code cannot exceed 2 characters.
+                                      </div>
+                                    }
+                                  </div>
+                                }
+                              </div>
+                            </div>
+
+                            <!-- Production Month -->
+                            <div class="col">
+                              <div class="form-group" style="margin-bottom: 5px">
+                          <label style="
+                              font-size: 11px;
+                              font-weight: bold;
+                              margin-bottom: 2px;
+                            ">Production Month:</label>
+                                <ng-select placeholder="Select Month"
+                                  [(ngModel)]="productionMonth" (ngModelChange)="productionMonth = $event"
+                                  name="productionMonth" [clearable]="true" [searchable]="true"
+                                  (change)="getFieldError('productionMonth')" #productionMonthCtrl="ngModel" required>
+                                  @for (item of months; track item) {
+                                    <ng-option [value]="item.label">{{ item.label }}</ng-option>
+                                  }
+                                </ng-select>
+                                @if (productionMonthCtrl.invalid && (productionMonthCtrl.touched || modelEntryForm.submitted)) {
+                                  <div class="field-error">
+                                    @if (productionMonthCtrl.errors?.['required']) {
+                                      <div>
+                                        Production Month is required.
+                                      </div>
+                                    }
+                                  </div>
+                                }
+                              </div>
+                            </div>
+
+                            <!-- Production Year -->
+                            <div class="col">
+                              <div class="form-group" style="margin-bottom: 5px">
+                          <label style="
+                              font-size: 11px;
+                              font-weight: bold;
+                              margin-bottom: 2px;
+                            ">Production Year:<span class="mandetory" style="color: red">*</span></label>
+                                  <ng-select [items]="years" bindLabel="label" bindValue="value" placeholder="Select Year"
+                                    [(ngModel)]="productionYear" (ngModelChange)="productionYear = $event" name="productionYear"
+                                    (change)="getFieldError('productionYear')" #productionYearCtrl="ngModel" required>
+                                  </ng-select>
+                                  @if (productionYearCtrl.invalid && (productionYearCtrl.touched || modelEntryForm.submitted)) {
+                                    <div class="field-error">
+                                      @if (productionYearCtrl.errors?.['required']) {
+                                        <div>
+                                          Production Year is required.
+                                        </div>
+                                      }
+                                    </div>
+                                  }
+                                </div>
+                              </div>
+
+                              <!-- Certified Authority -->
+                              <div class="col">
+                                <div class="form-group" style="margin-bottom: 5px">
+                          <label style="
+                              font-size: 11px;
+                              font-weight: bold;
+                              margin-bottom: 2px;
+                            ">Certified Authority:<span class="mandetory" style="color: red">*</span></label>
+                                    <ng-select [items]="certAuthorityList" bindLabel="param2" bindValue="param1"
+                                      placeholder="Select Authority" [ngModel]="selectedCertAuthorityId || null"
+                                      (ngModelChange)="selectedCertAuthorityId = $event" name="certAuthority" [clearable]="false"
+                                      [searchable]="true" #certAuthorityCtrl="ngModel" required>
+                                    </ng-select>
+                                    @if (certAuthorityCtrl.invalid && (certAuthorityCtrl.touched || modelEntryForm.submitted)) {
+                                      <div class="field-error">
+                                        @if (certAuthorityCtrl.errors?.['required']) {
+                                          <div>
+                                            Certified Authority is required.
+                                          </div>
+                                        }
+                                      </div>
+                                    }
+                                  </div>
+                                </div>
+
+                                <!-- IRNSS/Non-IRNSS (hidden by default) -->
+                                <!-- <div class="col flex" style="margin-top: 21px; display: none">
+                                <div class="chk">
+                                  <input type="radio" id="yes" name="mobility" value="yes" [(ngModel)]="irnss" checked />
+                                  <span>IRNSS</span>
+                                </div>
+                                <div class="chk">
+                                  <input type="radio" id="no" name="mobility" value="no" [(ngModel)]="irnss" />
+                                  <span>Non-IRNSS</span>
+                                </div>
+                              </div> -->
+
+                              <!-- Certificate Sections -->
+                              <div class="row col-md-12">
+                                <!-- Type Approval Certificate (TAC) -->
+                        <div class="row col-md-4" style="
+                            border: 1px solid #e0e0e0;
+                            border-radius: 5px;
+                            margin-left: 10px;
+                            padding: 10px;
+                            background: #f9f9f9;
+                          ">
+                          <div class="col-sm-12" style="
+                              text-align: center;
+                              font-weight: bold;
+                              border-bottom: 1px solid #e0e0e0;
+                              margin-bottom: 10px;
+                              font-size: 12px;
+                              color: #0b58b9;
+                            ">
+                                    Type Approval Certificate
+                                  </div>
+
+                                  <div class="col-sm-12">
+                                    <div class="form-group" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Certificate No:<span class="mandetory" style="color: red">*</span></label>
+                              <input class="form-control shadow-sm text-uppercase" style="
+                                  font-size: 11px;
+                                  height: 28px;
+                                  padding: 2px 8px;
+                                  border-radius: 3px;
+                                  transition: all 0.3s ease;" 
+                                          type="text" placeholder="Certificate No"
+                                          minlength="4" maxlength="12"
+                                          id="appCertNO" [(ngModel)]="tacCertNo" name="tacCertNo" #tacCertNoCtrl="ngModel" required />
+                                        @if (tacCertNoCtrl.invalid && (tacCertNoCtrl.touched || modelEntryForm.submitted)) {
+                                          <div class="field-error">
+                                            @if (tacCertNoCtrl.errors?.['required']) {
+                                              <div>
+                                                Certificate No is required.
+                                              </div>
+                                            }
+                                            @if (tacCertNoCtrl.errors?.['minlength']) {
+                                              <div>
+                                                Certificate No must be at least 4 characters.
+                                              </div>
+                                            }
+                                            @if (tacCertNoCtrl.errors?.['maxlength']) {
+                                              <div>
+                                                Certificate No cannot exceed 12 characters.
+                                              </div>
+                                            }
+                                          </div>
+                                        }
+                                      </div>
+                                    </div>
+
+                                    <div class="col-sm-12">
+                                      <div class="form-group j-input" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Upload TAC:<span class="mandetory" style="color: red">*</span></label>
+                              <div style="
+                                  display: flex;
+                                  align-items: center;
+                                  border: 1px solid #007bff;
+                                  padding: 5px;
+                                ">
+                                <label for="taccertificate" class="custom-file-upload" style="
+                                    font-size: 10px;
+                                    padding: 4px 10px;
+                                    border: 1px solid #0b58b9;
+                                    color: #0b58b9;
+                                    border-radius: 3px;
+                                    cursor: pointer;
+                                    display: inline-block;
+                                    background: white;
+                                    transition: all 0.3s ease;
+                                    margin-bottom: 0;
+                                  ">
+                                              <i class="fa fa-cloud-upload"></i> Upload File
+                                            </label>
+                                            @if (tacFile) {
+<span style="
+                                    margin-left: 8px;
+                                    font-size: 10px;
+                                    color: #333;
+                                    max-width: 100px;
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                  " [title]="tacFile.name">{{ tacFile.name }}</span>
+                                            }
+                                          </div>
+                                          <input id="taccertificate" name="upload_cont_img" type="file"
+                                            (change)="onTacFileChange($event)" accept="application/pdf" style="display: none"
+                                            />
+                                          @if (modelEntryForm.submitted && formErrors['tacFile']) {
+                                            <div class="field-error">
+                                              {{ formErrors['tacFile'] }}
+                                            </div>
+                                          }
+
+                                        </div>
+                                      </div>
+
+                                      <div class="col-sm-6">
+                                        <div class="form-group" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Certificate Date:<span class="mandetory" style="color: red">*</span></label>
+                                            <input
+                                              class="form-control form-control-sm"
+                                              type="text"
+                                              name="taccertdate"
+                                              [(ngModel)]="tacCertDate"
+                                              id="tacdatecertpicker"
+                                              required
+                                              placeholder="Select Date"
+                                              />
+                              <!-- <input class="form-control shadow-sm datepick" style="
+                                  font-size: 11px;
+                                  height: 28px;
+                                  padding: 2px 8px;
+                                  border-radius: 3px;
+                                  transition: all 0.3s ease;
+                                " type="text" id="appcertdate" [(ngModel)]="tacCertDate" name="tacCertDate"
+                                            [class.error]="getFieldError('tacCertDate')" readonly /> -->
+                                            <!-- <div class="field-error" *ngIf="modelEntryForm.submitted && getFieldError('tacCertDate')">
+                                            {{ getErrorMessage("tacCertDate") }}
+                                          </div> -->
+                                        </div>
+                                      </div>
+
+                                      <div class="col-sm-6">
+                                        <div class="form-group" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Validity:<span class="mandetory" style="color: red">*</span></label>
+                                            <input
+                                              class="form-control form-control-sm"
+                                              type="text"
+                                              name="taccertvalidity"
+                                              [(ngModel)]="tacCertValidity"
+                                              id="taccertvalidity"
+                                              required
+                                              placeholder="Select Date"
+                                              />
+                              <!-- <input class="form-control shadow-sm datepick1" style="
+                                  font-size: 11px;
+                                  height: 28px;
+                                  padding: 2px 8px;
+                                  border-radius: 3px;
+                                  transition: all 0.3s ease;
+                                " type="text" id="appcertvalidity" [(ngModel)]="tacCertValidity" name="tacCertValidity"
+                                            [class.error]="getFieldError('tacCertValidity')" readonly /> -->
+                                            <!-- <div class="field-error" *ngIf="modelEntryForm.submitted && getFieldError('tacCertValidity')">
+                                            {{ getErrorMessage("tacCertValidity") }}
+                                          </div> -->
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <!-- Confirmative Of Production Certificate (COP) -->
+                        <div class="row col-md-4" style="
+                            margin-left: 15px;
+                            border: 1px solid #e0e0e0;
+                            border-radius: 5px;
+                            padding: 10px;
+                            background: #f9f9f9;
+                          ">
+                          <div class="col-sm-12" style="
+                              text-align: center;
+                              font-weight: bold;
+                              border-bottom: 1px solid #e0e0e0;
+                              margin-bottom: 10px;
+                              font-size: 12px;
+                              color: #0b58b9;
+                            ">
+                                        Confirmative Of Production Certificate
+                                      </div>
+
+                                      <div class="col-md-12" style="display: none">
+                                        <label for="" id="copuplod">COP Upload</label><label
+                                      class="mandetory">*</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                      <label class="form-check-label">
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <input class="form-check-input" id="Yes" name="copuplod" value="Yes" type="radio"
+                                          [(ngModel)]="copUpload" (change)="onCopUploadChange()" checked="checked" />Yes
+                                        </label>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label class="form-check-label">
+                                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                          <input class="form-check-input" id="No" name="copuplod" value="No" type="radio"
+                                            [(ngModel)]="copUpload" (change)="onCopUploadChange()" />No
+                                          </label>
+                                        </div>
+
+                                        @if (showCopSection) {
+                                          <div class="col-sm-12">
+                                            <div class="form-group" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Certificate No:<span class="mandetory" style="color: red">*</span></label>
+                              <input class="form-control shadow-sm text-uppercase" style="
+                                  font-size: 11px;
+                                  height: 28px;
+                                  padding: 2px 8px;
+                                  border-radius: 3px;
+                                  transition: all 0.3s ease;" 
+                                                  placeholder="Certificate No" type="text"
+                                                  id="conCertNO" [(ngModel)]="copCertNo" name="copCertNo"
+                                                  #copCertNoCtrl="ngModel"
+                                                  minlength="4"
+                                                  maxlength="12"
+                                                  required/>
+                                                @if (copCertNoCtrl.invalid && (copCertNoCtrl.touched || modelEntryForm.submitted)) {
+                                                  <div class="field-error">
+                                                    @if (copCertNoCtrl.errors?.['required']) {
+                                                      <div>
+                                                        Certificate No is required.
+                                                      </div>
+                                                    }
+                                                    @if (copCertNoCtrl.errors?.['maxlength']) {
+                                                      <div>
+                                                        Certificate No cannot exceed 12 characters.
+                                                      </div>
+                                                    }
+                                                    @if (copCertNoCtrl.errors?.['minlength']) {
+                                                      <div>
+                                                        Certificate No must be at least 4 characters.
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                }
+                                              </div>
+                                            </div>
+                                          }
+
+                                          @if (showCopSection) {
+                                            <div class="col-sm-12">
+                                              <div class="form-group j-input" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Upload COP:<span class="mandetory" style="color: red">*</span></label>
+                              <div style="
+                                  display: flex;
+                                  align-items: center;
+                                  border: 1px solid #007bff;
+                                  padding: 5px;
+                                ">
+                                <label for="copcertificate" class="custom-file-upload" style="
+                                    font-size: 10px;
+                                    padding: 4px 10px;
+                                    border: 1px solid #0b58b9;
+                                    color: #0b58b9;
+                                    border-radius: 3px;
+                                    cursor: pointer;
+                                    display: inline-block;
+                                    background: white;
+                                    transition: all 0.3s ease;
+                                    margin-bottom: 0;
+                                  ">
+                                                      <i class="fa fa-cloud-upload"></i> Upload File
+                                                    </label>
+                                                    @if (copFile) {
+<span style="
+                                    margin-left: 8px;
+                                    font-size: 10px;
+                                    color: #333;
+                                    max-width: 100px;
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                  " [title]="copFile.name">{{ copFile.name }}</span>
+                                                    }
+                                                  </div>
+                                                  <input id="copcertificate" name="upload_cont_img" type="file"
+                                                    (change)="onCopFileChange($event)" accept="application/pdf" style="display: none"
+                                                    [class.error]="getFieldError('copFile')" />
+                                                  @if (modelEntryForm.submitted && formErrors['copFile']) {
+                                                    <div class="field-error">
+                                                      {{ formErrors['copFile'] }}
+                                                    </div>
+                                                  }
+                                                </div>
+                                              </div>
+                                            }
+
+                                            @if (showCopSection) {
+                                              <div class="col-sm-6">
+                                                <div class="form-group" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Certificate Date:<span class="mandetory" style="color: red">*</span></label>
+                                                    <input
+                                                      class="form-control form-control-sm"
+                                                      type="text"
+                                                      name="copdatecert"
+                                                      [(ngModel)]="copCertDate"
+                                                      id="copdatecertpicker"
+                                                      required
+                                                      placeholder="Select Date"
+                                                      />
+                              <!-- <input class="form-control shadow-sm datepick" style="
+                                  font-size: 11px;
+                                  height: 28px;
+                                  padding: 2px 8px;
+                                  border-radius: 3px;
+                                  transition: all 0.3s ease;
+                                " type="text" id="concertdate" [(ngModel)]="copCertDate" name="copCertDate"
+                                                    [class.error]="getFieldError('copCertDate')" readonly /> -->
+                                                    @if (getFieldError('copCertDate')) {
+                                                      <div class="field-error">
+                                                        {{ getErrorMessage("copCertDate") }}
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                </div>
+                                              }
+
+                                              @if (showCopSection) {
+                                                <div class="col-sm-6">
+                                                  <div class="form-group" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Validity:<span class="mandetory" style="color: red">*</span></label>
+                                                      <input
+                                                        class="form-control form-control-sm"
+                                                        type="text"
+                                                        name="copcertvalidity"
+                                                        [(ngModel)]="copCertValidity"
+                                                        id="copcertvalidity"
+                                                        required
+                                                        placeholder="Select Date"/>
+                              <!-- <input class="form-control shadow-sm datepick1" style="
+                                  font-size: 11px;
+                                  height: 28px;
+                                  padding: 2px 8px;
+                                  border-radius: 3px;
+                                  transition: all 0.3s ease;
+                                " type="text" id="concertvalidity" [(ngModel)]="copCertValidity" name="copCertValidity"
+                                                      [class.error]="getFieldError('copCertValidity')" readonly /> -->
+                                                      <!-- <div class="field-error" *ngIf="getFieldError('copCertValidity')">
+                                                      {{ getErrorMessage("copCertValidity") }}
+                                                    </div> -->
+                                                  </div>
+                                                </div>
+                                              }
+                                            </div>
+
+                                            <!-- Protocol and Remark -->
+                        <div class="row col-md-4" style="
+                            margin-left: 5px;
+                            border: 1px solid #e0e0e0;
+                            border-radius: 5px;
+                            padding: 10px;
+                            background: #f9f9f9;
+                          ">
+                                              <div class="col-sm-12">
+                                                <div class="form-group j-input" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Upload Protocol:<span class="mandetory" style="color: red">*</span></label>
+                              <div style="
+                                  display: flex;
+                                  align-items: center;
+                                  border: 1px solid #007bff;
+                                  padding: 5px;
+                                ">
+                                <label for="isprotocol" class="custom-file-upload" style="
+                                    font-size: 10px;
+                                    padding: 4px 10px;
+                                    border: 1px solid #0b58b9;
+                                    color: #0b58b9;
+                                    border-radius: 3px;
+                                    cursor: pointer;
+                                    display: inline-block;
+                                    background: white;
+                                    transition: all 0.3s ease;
+                                  ">
+                                                        <i class="fa fa-cloud-upload"></i> Upload File
+                                                      </label>
+
+                                                      @if (protocolFile) {
+<span style="
+                                    margin-left: 8px;
+                                    font-size: 10px;
+                                    color: #333;
+                                    max-width: 100px;
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                  " [title]="protocolFile.name">{{ protocolFile.name }}</span>
+                                                      }
+                                                      <input id="isprotocol" name="upload_cont_img" type="file"
+                                                        (change)="onProtocolFileChange($event)" accept="application/pdf" style="display: none"
+                                                        [class.error]="getFieldError('protocolFile')" />
+                                                    </div>
+                                                    @if (formErrors['protocolFile']) {
+                                                      <div class="field-error">
+                                                        {{ formErrors['protocolFile'] }}
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                </div>
+
+                                                <div class="col-sm-12">
+                                                  <div class="form-group" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Upload Brochure:</label>
+                                                    <input type="file" style="width: 100%; font-size: 10px"
+                                                      class="btn btn-sm btn-outline-primary shadow-sm" name="brouchureFile"
+                                                      (change)="onBrochureFileChange($event)" id="isbrochure" accept="application/pdf" />
+                                                    @if (formErrors['brochureFile']) {
+                                                      <div class="field-error">
+                                                        {{ formErrors['brochureFile'] }}
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                </div>
+
+                                                <div class="col-sm-12" style="display: none">
+                                                  <div class="form-group j-input">
+                                                    <label for="">Upload Certificate:</label><label class="mandetory">*</label>
+                                                    <input type="file" style="width: 13pc" class="me-2 mb-2 btn btn-outline-primary"
+                                                      name="file" id="isCertificate" (change)="onCertificateFileChange($event)"
+                                                      accept="application/pdf" />
+                                                    @if (formErrors['certificateFile']) {
+                                                      <div class="field-error">
+                                                        {{ formErrors['certificateFile'] }}
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                </div>
+
+                                                <div class="col-sm-12">
+                                                  <div class="form-group" style="margin-bottom: 5px">
+                              <label style="
+                                  font-size: 11px;
+                                  font-weight: bold;
+                                  margin-bottom: 2px;
+                                ">Remark:</label>
+                              <textarea class="form-control shadow-sm" style="
+                                  font-size: 11px;
+                                  height: 60px;
+                                  padding: 5px;
+                                  border-radius: 3px;
+                                  resize: none;
+                                  transition: all 0.3s ease;
+                                " (keyup)="validateRemark()" 
+                                                      placeholder="Remark" type="text" id="remark"
+                                                    [(ngModel)]="remark" name="remark" maxlength="100"></textarea>
+                                                    @if (getFieldError('remark')) {
+                                                      <div class="field-error">
+                                                        {{ getErrorMessage("remark") }}
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div class="form-buttons-w text-center">
+                <button type="reset" (click)="resetForm()" class="btn btn-secondary shadow-sm" style="
+                    font-size: 12px;
+                    font-weight: bold;
+                    border-radius: 20px;
+                    transition: all 0.3s ease;
+                    background: #6c757d;
+                    border: none;
+                    margin-right: 10px;
+                  ">
+                                        <i class="fa fa-arrow-left" style="margin-right: 5px"></i>
+                                        Reset
+                                      </button>
+                                      <button type="submit" (click)="insertModelData()" [disabled]="loading" class="btn btn-primary shadow-sm"
+                  style="
+                    font-size: 12px;
+                    font-weight: bold;
+                    border-radius: 20px;
+                    transition: all 0.3s ease;
+                    background: #0b58b9;
+                    border: none;
+                  ">
+                                        <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-check'" style="margin-right: 5px"></i>
+                                        @if (!loading) {
+                                          <span>Submit</span>
+                                        }
+                                        @if (loading) {
+                                          <span>Submitting...</span>
+                                        }
+                                      </button>
+                                    </div>
+
+                                    <!-- <div *ngIf="errorMessage" class="alert alert-danger" style="margin-top: 10px;">
+                                    {{errorMessage}}
+                                  </div> -->
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    @if (errorMessage) {
+                      <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+                    }
+                    @if (successMessage) {
+                      <app-toast [message]="successMessage" type="success"
+                      (closed)="successMessage = null"></app-toast>
+                    }

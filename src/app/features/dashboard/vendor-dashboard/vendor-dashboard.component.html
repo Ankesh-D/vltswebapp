@@ -1,0 +1,410 @@
+<div id="vendor_dashboard" class="vendor-overview">
+  <header class="overview-header">
+    <div><h1>Fleet overview</h1><p>Everything about your vehicles, in one place.</p></div>
+    <label class="alert-search"><i class="bx bx-search" aria-hidden="true"></i><input type="search" [(ngModel)]="alertSearch" placeholder="Search alerts" aria-label="Search alerts" /></label><div class="overview-date"><i class="bx bx-calendar" aria-hidden="true"></i><span>{{ todaydate | date:'EEEE, dd MMM yyyy' }}</span></div>
+  </header>
+
+  <section class="summary-grid" aria-label="Fleet summary">
+    <button type="button" class="summary-card devices" (click)="openDeviceModal('TotalDevice')" [disabled]="all_devices === 0">
+      <strong class="summary-value">{{ all_devices | number }}</strong><span class="summary-label">Devices</span><span class="summary-track" aria-hidden="true"><span></span></span>
+    </button>
+    <button type="button" class="summary-card assets" (click)="openDeviceModal('Installed')" [disabled]="all_installed === 0">
+      <strong class="summary-value">{{ all_installed | number }}</strong><span class="summary-label">Assets</span><span class="summary-track" aria-hidden="true"><span></span></span>
+    </button>
+    <button type="button" class="summary-card activated" (click)="openDeviceModal('ACTIVATED')" [disabled]="approved_devices === 0">
+      <strong class="summary-value">{{ approved_devices | number }}</strong><span class="summary-label">Activated</span><span class="summary-track" aria-hidden="true"><span></span></span>
+    </button>
+    <button type="button" class="summary-card pending" (click)="openDeviceModal('PENDING')" [disabled]="pending_devices === 0">
+      <strong class="summary-value">{{ pending_devices | number }}</strong><span class="summary-label">Pending</span><span class="summary-track" aria-hidden="true"><span></span></span>
+    </button>
+    <button type="button" class="summary-card dealers" (click)="openDeviceModal('Dealers')" [disabled]="vendor_dealer_count === 0">
+      <strong class="summary-value">{{ vendor_dealer_count | number }}</strong><span class="summary-label">Dealers</span><span class="summary-track" aria-hidden="true"><span></span></span>
+    </button>
+    <button type="button" class="summary-card inactive" (click)="openDeviceModal('DownVehicles')" [disabled]="notreceived === 0">
+      <strong class="summary-value">{{ notreceived | number }}</strong><span class="summary-label">Inactive assets</span><span class="summary-track" aria-hidden="true"><span></span></span>
+    </button>
+  </section>
+
+  <div class="overview-grid">
+    <section class="overview-panel alerts-panel" aria-labelledby="alerts-title">
+      <div class="panel-heading"><div><h2 id="alerts-title">Alerts</h2><p>Alert volumes relative to the highest count. Select a row for details.</p></div><span class="section-icon"><i class="bx bx-bell" aria-hidden="true"></i></span></div>
+      <div class="alert-controls"><span>{{ filteredAlerts.length }} alert types</span><label>Sort <select [(ngModel)]="alertSort" aria-label="Sort alerts"><option value="highest">Highest first</option><option value="name">Name A–Z</option></select></label></div>
+      <div class="alert-grid">
+        @for (item of filteredAlerts; track item; let i = $index) {
+          <button type="button" class="alert-tile" [style.--alert-accent]="alertBarColor(item.param3)" (click)="onAlertClick(item)" [class.is-selected]="details_label === item.param3 + ' Alert'" [attr.aria-pressed]="details_label === item.param3 + ' Alert'">
+            <span class="alert-row-label"><i class="status-dot" aria-hidden="true"></i>{{ item.param3 }}</span>
+            <strong>{{ item.param4 | number }}</strong>
+            <span class="alert-track" aria-hidden="true"><span [style.width.%]="alertPercentage(item.param4)"></span></span>
+          </button>
+        } @empty {
+          <div class="alerts-empty"><i class="bx bx-shield-quarter" aria-hidden="true"></i><h3>{{ alertSearch ? 'No matching alerts' : 'No alerts to display' }}</h3><p>Vehicle alerts will appear here when available.</p></div>
+        }
+      </div>
+    </section>
+
+    <aside class="overview-sidebar" aria-label="Operational status">
+      <section class="overview-panel panic-panel" aria-labelledby="panic-title">
+        <div class="panel-heading"><div><h2 id="panic-title">Panic alerts</h2></div><span class="section-icon"><i class="bx bx-error" aria-hidden="true"></i></span></div>
+        <div class="split-metrics"><div><strong>{{ panic_activation | number }}</strong><span>Activated vehicles</span></div><div><strong>{{ before_panic_activation | number }}</strong><span>Before activation</span></div></div>
+        @if (panic_activation === 0 && before_panic_activation === 0) { <p class="panic-clear"><i class="bx bx-check" aria-hidden="true"></i> No panic alerts right now</p> }
+      </section>
+
+      <section class="overview-panel activity-panel" aria-labelledby="activity-title">
+        <div class="panel-heading"><div><h2 id="activity-title">Installation & activation</h2></div></div>
+        <label class="date-range"><i class="bx bx-calendar" aria-hidden="true"></i><span>{{ selectedRange?.fromDate }} — {{ selectedRange?.toDate }}</span>
+          <input ngxDaterangepickerMd [(ngModel)]="selectedRange" (datesUpdated)="onDateRangeSelected($event)" [autoApply]="true" [showDropdowns]="true" [linkedCalendars]="true" [alwaysShowCalendars]="false" [ranges]="{}" aria-label="Select installation and activation date range" readonly />
+        </label>
+        <div class="split-metrics"><div><strong>{{ Installation | number }}</strong><span>Installations</span></div><div><strong>{{ Activation | number }}</strong><span>Activations</span></div></div>
+      </section>
+
+      <section class="overview-panel polling-panel" aria-labelledby="polling-title">
+        <div class="panel-heading"><div><h2 id="polling-title">Polling status</h2></div><span class="section-icon"><i class="bx bx-broadcast" aria-hidden="true"></i></span></div>
+        <div class="polling-bar" aria-label="Polling distribution">
+          <button type="button" class="received" [style.flex-grow]="received" [disabled]="!received" (click)="openDeviceModal('Received')" [attr.aria-label]="'Received: ' + received" [title]="'Received: ' + received"></button>
+          <button type="button" class="missing" [style.flex-grow]="notreceived" [disabled]="!notreceived" (click)="openDeviceModal('NotReceived')" [attr.aria-label]="'Not received: ' + notreceived" [title]="'Not received: ' + notreceived"></button>
+          <button type="button" class="never" [style.flex-grow]="neverreceived" [disabled]="!neverreceived" (click)="openDeviceModal('NeverReceived')" [attr.aria-label]="'Never received: ' + neverreceived" [title]="'Never received: ' + neverreceived"></button>
+        </div><div class="polling-list">
+          <button type="button" (click)="openDeviceModal('Received')"><span><i class="status-dot received"></i>Received</span><strong>{{ received | number }}</strong><i class="bx bx-chevron-right" aria-hidden="true"></i></button>
+          <button type="button" (click)="openDeviceModal('NotReceived')"><span><i class="status-dot missing"></i>Not received</span><strong>{{ notreceived | number }}</strong><i class="bx bx-chevron-right" aria-hidden="true"></i></button>
+          <button type="button" (click)="openDeviceModal('NeverReceived')"><span><i class="status-dot never"></i>Never received</span><strong>{{ neverreceived | number }}</strong><i class="bx bx-chevron-right" aria-hidden="true"></i></button>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+    @if (showTrackModal) {
+      <div class="modal-overlay" (click)="closeModal()">
+        <div class="modal-content" style=" width: 95%; " (click)="$event.stopPropagation()">
+          <div class="modal-header" style="background: #b5e5b5;">
+            <h6 style="font-size: 14px; margin: 0;">Vehicle Details</h6>
+            <button type="button" class="btn btn-sm" (click)="closeModal()"
+            style="color: #fff; background: #db0000; height: 30px; width: 30px; font-weight: bold; cursor: pointer; border: none; padding: 0;">x</button>
+          </div>
+          <div class="modal-body" style="padding: 0;">
+            <form autocomplete="off">
+              <div class="col-md-12" style="top: 10px;">
+                <!-- Search and Pagination Controls -->
+                <div style="width: 100%; padding: 10px 0px 10px 0px;">
+                  <table style="width: 100%;">
+                    <tbody class="bg-body">
+                      <tr>
+                        <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                          <font style="font-weight: bold;">Search : </font>
+                        </td>
+                        <td>
+                          <div style="display: flex; align-items: center;">
+                            <div
+                              style="display: flex; align-items: center; border: 1px solid #0b58b9; border-radius: 4px; overflow: hidden; background: white;">
+                              <input type="search" readonly onfocus="this.removeAttribute('readonly');"
+                                class="tabletitlesearch" id="searchby" placeholder="Type here..."
+                                style="border: none; height: 24px; width: 180px; padding: 0 8px; outline: none; font-size: 11px;"
+                                autocomplete="disabled" maxlength="50" [(ngModel)]="searchText"
+                                (keyup.enter)="getSearchDetails()" name="searchby">
+                              <button id="searchbtn" (click)="getSearchDetails()"
+                                style="background: #0b58b9; color: white; border: none; height: 24px; width: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa fa-search" style="font-size: 12px;"></i>
+                              </button>
+                            </div>
+                            <button (click)="reloadData()" [disabled]="loading"
+                              style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+                              <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
+                              <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+                            </button>
+                          </div>
+                        </td>
+                        <td>
+                          <div style="display: flex; align-items: center; justify-content: flex-end; font-size: 11px;">
+                            <div style="display: flex; align-items: center; margin-right: 15px;">
+                              <label for="excelpdfdownload"
+                              style="margin: 0 5px 0 0; font-weight: bold; color: #333;">Download:</label>
+                              <select name="excelpdfdownload" [(ngModel)]="selectedDownloadType" (change)="onDownloadChange()"
+                                style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; color: #333; outline: none; background: white;">
+                                <option value="">Select</option>
+                                <!-- <option value="Excel">Excel</option> -->
+                                <option value="">Excel</option>
+                              </select>
+                              @if (isExporting) {
+                                <span style="margin-left:8px; font-size:11px; color:#0b58b9;">
+                                  Generating...
+                                </span>
+                              }
+                            </div>
+                            <div style="display: flex; align-items: center; margin-right: 15px;">
+                              <label style="margin: 0 5px 0 0; font-weight: bold; color: #333;">Show Rows:</label>
+                              <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize"
+                                style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; color: #333; outline: none; background: white;">
+                                @for (size of pageSizeOptions; track size) {
+                                  <option [value]="size === totalCount ? 'All' : size">
+                                    {{size === totalCount ? 'All' : size}}
+                                  </option>
+                                }
+                              </select>
+                            </div>
+                            <div style="font-weight: bold; color: #0b58b9; padding-right: 5px;">
+                              Total Records : {{pageCount}} of {{totalCount}}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </form>
+            <div class="table-responsive" style=" height: 465px; overflow-y: auto; overflow-x: hidden;">
+              <table class="table-striped app-table table"
+                style="border-top: 1px solid black; border-bottom: 1px solid black;margin-left: 0px;" id="devicetable">
+                <thead class="device-thead">
+                  <tr>
+                    <th style="width:35px;">#</th>
+                    <th (click)="sort('param5')" class="sortable">
+                      Chassis No.
+                      <hr style="margin: 1px 0;">
+                      Vehicle No.
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param5',
+                      'sorting_asc': !reverse && sortKey=='param5'}">
+                      </span>
+                    </th>
+                    <th (click)="sort('param7')" class="sortable">
+                      Engine No
+                    </th>
+                    <th (click)="sort('param8')" class="sortable">
+                      Serial No.
+                      <hr style="margin: 1px 0;">
+                      IMEI No.
+                      <hr style="margin: 1px 0;">ICCID No.
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param8',
+                      'sorting_asc': !reverse && sortKey=='param8'}">
+                      </span>
+                    </th>
+                    <th (click)="sort('param9')" class="sortable">
+                      Vehicle Type
+                      <hr style="margin: 1px 0;">
+                      Vehicle Class
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param9',
+                      'sorting_asc': !reverse && sortKey=='param9'}">
+                      </span>
+                    </th>
+                    <th style="width:130px;" (click)="sort('param50')" class="sortable">
+                      Make
+                      <hr style="margin: 1px 0;">Model
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param50',
+                      'sorting_asc': !reverse && sortKey=='param50'}">
+                      </span>
+                    </th>
+                    <th style="width:160px;" (click)="sort('param16')" class="sortable">
+                      Installation date
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param16',
+                      'sorting_asc': !reverse && sortKey=='param16'}">
+                      </span>
+                    </th>
+                    <th (click)="sort('param47')" class="sortable">
+                      Customer Details
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param47',
+                      'sorting_asc': !reverse && sortKey=='param47'}">
+                      </span>
+                    </th>
+                    <th (click)="sort('param34')" class="sortable">
+                      Dealer
+                      <hr style="margin: 1px 0;"> (Vendor)
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param34',
+                      'sorting_asc': !reverse && sortKey=='param34'}">
+                      </span>
+                    </th>
+                    <th (click)="sort('param48')" class="sortable">
+                      RTO Name
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param48',
+                      'sorting_asc': !reverse && sortKey=='param48'}">
+                      </span>
+                    </th>
+                    <th (click)="sort('param48')" class="sortable">
+                      Activation Status
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param48',
+                      'sorting_asc': !reverse && sortKey=='param48'}">
+                      </span>
+                    </th>
+                    <th (click)="sort('param48')" class="sortable">
+                      Polling Status
+                  <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param48',
+                      'sorting_asc': !reverse && sortKey=='param48'}">
+                      </span>
+                    </th>
+                    <!-- <th>Download Receipt</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- NO DATA -->
+                  @if (totalCount === 0) {
+                    <tr>
+                      <td colspan="12" style="text-align:center;font-weight:bold;">
+                        NO DATA FOUND
+                      </td>
+                    </tr>
+                  }
+                  <!-- DATA ROWS -->
+                  @for (d of vehicledet; track d) {
+                    <tr>
+                      <td>{{ d['param1'] || 'NA' }}</td>
+                      <td>
+                        {{ d['param12'] || 'NA' }}<br>
+                        {{ d['param11'] || 'NA' }}
+                      </td>
+                      <td>
+                        {{ d['param13'] || 'NA' }}
+                      </td>
+                      <td>
+                        {{ d['param5'] || 'NA' }}<br>
+                        {{ d['param4'] || 'NA' }}<br>{{ d['param6'] || 'NA' }}
+                      </td>
+                      <td>
+                        {{ d['param19'] || 'NA' }}<br>
+                        {{ d['param42'] || 'NA' }}
+                      </td>
+                      <!-- param50make ka hay ab filal pata nhi  -->
+                      <td>
+                        {{ d['param40'] || 'NA' }}<br>
+                        {{ d['param41'] || 'NA' }}
+                      </td>
+                      <td>
+                        {{ d['param43'] || 'NA' }}
+                      </td>
+                      <td>
+                        {{ d['param28'] || 'NA' }}<br>
+                        {{ d['param29'] || 'NA' }}
+                      </td>
+                      <td>
+                        {{ d['param8'] || 'NA' }}<br>
+                        ({{ d['param7'] || 'NA' }})
+                      </td>
+                      <td>
+                        {{ d['param18'] || 'NA' }}
+                      </td>
+                      <!-- ✅ Activation Status -->
+                      <td>
+                        <span [ngClass]="{'badge badge-success': d['param25'] === 'Activated', 'badge badge-warning': d['param25'] === 'Pending' || d['param25'] === 'Pending OTP'}"
+                          [style.background-color]="d['param25'] === 'Pending' ? 'orange' : (d['param25'] === 'Pending OTP' ? 'yellow' : '')"
+                          [style.color]="d['param25'] === 'Pending' ? 'white' : (d['param25'] === 'Pending OTP' ? 'black' : '')"
+                          [style.font-size]="(d['param25'] === 'Activated' || d['param25'] === 'Pending' || d['param25'] === 'Pending OTP') ? '11px' : ''">
+                          {{ d['param25'] || 'NA' }}
+                        </span><br>
+                        {{ d['param14'] || 'NA' }}
+                      </td>
+                      <!-- ✅ Polling Status -->
+                      <td>
+                        {{ d['param45'] || 'NA' }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              <!-- Pagination Controls -->
+              <div class="row">
+                <div class="col-md-12">
+                  @if (totalCount > 0) {
+                    <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                      @if (currentPage > 1) {
+                        <button (click)="onPageChange(currentPage - 1)" [disabled]="loading"
+                          style="border: 1px solid #0b58b9; background: white; color: #0b58b9; padding: 5px 10px; margin: 0 2px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                          Previous
+                        </button>
+                      }
+                      @for (page of getPageNumbers(); track page) {
+                        @if (page === -1) {
+                          <span style="margin: 0 5px; color: #0b58b9; align-self: center;">...</span>
+                        }
+                        @if (page !== -1) {
+                          <button (click)="onPageChange(page)" [disabled]="loading || page === currentPage"
+                            [style.background]="page === currentPage ? '#0b58b9' : 'white'"
+                            [style.color]="page === currentPage ? 'white' : '#0b58b9'"
+                            style="border: 1px solid #0b58b9; padding: 5px 10px; margin: 0 2px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                            {{page}}
+                          </button>
+                        }
+                      }
+                      @if (currentPage < getTotalPages()) {
+                        <button (click)="onPageChange(currentPage + 1)" [disabled]="loading"
+                          style="border: 1px solid #0b58b9; background: white; color: #0b58b9; padding: 5px 10px; margin: 0 2px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">
+                          Next
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- DEALER MODAL -->
+    @if (showDealerModal) {
+      <div class="dealer-overlay" (click)="closeDealerModal()">
+        <div class="dealer-modal" (click)="$event.stopPropagation()">
+          <!-- HEADER -->
+          <div class="dealer-header">
+            <h6>Dealer Details</h6>
+            <button (click)="closeDealerModal()" class="close-btn">
+              x
+            </button>
+          </div>
+          <!-- BODY -->
+          <div class="dealer-body">
+            <div class="dealer-table-wrapper">
+              <table class="dealer-table">
+                <!-- HEADER -->
+                <thead>
+                  <tr>
+                    <th rowspan="2">#</th>
+                    <th rowspan="2">Vendor Name</th>
+                    <th rowspan="2">Dealer Name</th>
+                    <th rowspan="2">Contact</th>
+                    <th rowspan="2">Mobile</th>
+                    <th rowspan="2">Alt Mobile</th>
+                    <th rowspan="2">Email</th>
+                    <th rowspan="2">Address</th>
+                    <th rowspan="2">City</th>
+                    <th rowspan="2">State</th>
+                    <th colspan="4">Devices</th>
+                  </tr>
+                  <tr>
+                    <th>Total</th>
+                    <th>Installed</th>
+                    <th>Activated</th>
+                    <th>Pending</th>
+                  </tr>
+                </thead>
+                <!-- BODY -->
+                <tbody>
+                  @if (dealerList.length === 0) {
+                    <tr>
+                      <td colspan="14" class="no-data">NO DATA FOUND</td>
+                    </tr>
+                  }
+                  @for (d of dealerList; track d; let i = $index) {
+                    <tr
+                      [class.alt-row]="i % 2 === 0">
+                      <td>{{ d.param1 }}</td>
+                      <td>{{ d.param18 }}</td>
+                      <td>{{ d.param3 }}</td>
+                      <td>{{ d.param9 }}</td>
+                      <td>{{ d.param11 }}</td>
+                      <td>{{ d.param12 }}</td>
+                      <td>{{ d.param10 }}</td>
+                      <td>{{ d.param5 }}</td>
+                      <td>{{ d.param7 }}</td>
+                      <td>{{ d.param8 }}</td>
+                      <td class="center">{{ d.param29 }}</td>
+                      <td class="center">{{ d.param30 }}</td>
+                      <td class="center">{{ d.param31 }}</td>
+                      <td class="center">{{ d.param32 }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    }

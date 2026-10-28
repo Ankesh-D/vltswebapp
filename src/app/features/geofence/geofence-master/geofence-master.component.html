@@ -1,0 +1,344 @@
+<div class="content-i geofence-page">
+  <div class="content-box">
+    <div class="element-box">
+      <div class="pagetitlestyle">
+        <span><i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;&nbsp;Geofence Master</span>
+      </div>
+
+      <div class="geofence-layout">
+        <div class="geofence-panel">
+          <div class="panel-section entry-section">
+            <div class="section-title">
+              <span>Geofence Entry</span>
+              <small>{{ toUpdate ? 'Update Mode' : 'New Entry' }}</small>
+            </div>
+
+            <form novalidate #geofenceForm="ngForm" autocomplete="off">
+              <div class="row compact-row">
+                <div class="col-md-6">
+                  <div class="form-group" tooltip="Enter Geofence Name" [ngClass]="{
+                    'has-danger': nameCtrl.invalid && submitted,
+                    'has-success': nameCtrl.valid && (nameCtrl.dirty || nameCtrl.touched) }">
+                    <label>Geofence Name <span>*</span></label>
+                    <input type="text" name="gofencename" class="form-control form-control-sm"
+                      placeholder="Enter Geofence Name" [(ngModel)]="insertGeofenceReqParam.geofencename" required
+                      minlength="3" maxlength="50" #nameCtrl="ngModel">
+                    @if (nameCtrl.invalid && nameCtrl.touched) {
+                      <span class="small text-danger">
+                        @if (nameCtrl.errors?.['required']) {
+                          <span>Please Enter Geofence Name</span>
+                        }
+                        @if (nameCtrl.errors?.['minlength']) {
+                          <span>Geofence Name Should Be 3 to 20 characters.</span>
+                        }
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group" tooltip="Enter Geofence Type" [ngClass]="{
+                    'has-danger': typeCtrl.invalid && submitted,
+                    'has-success': typeCtrl.valid && (typeCtrl.dirty || typeCtrl.touched) }">
+                    <label>Geofence Type <span>*</span></label>
+                    <input type="text" name="geofencetype" class="form-control form-control-sm"
+                      placeholder="Enter Geofence Type" [(ngModel)]="insertGeofenceReqParam.geofencetype" required
+                      minlength="3" maxlength="50" #typeCtrl="ngModel">
+                    @if (typeCtrl.invalid && typeCtrl.touched) {
+                      <span class="small text-danger">
+                        @if (typeCtrl.errors?.['required']) {
+                          <span>Please Enter Geofence Type</span>
+                        }
+                        @if (typeCtrl.errors?.['minlength']) {
+                          <span>Geofence Type Should Be 3 to 20 characters.</span>
+                        }
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group color-field" tooltip="Select Color" [ngClass]="{
+                    'has-danger': colorCtrl.invalid && submitted,
+                    'has-success': colorCtrl.valid && (colorCtrl.dirty || colorCtrl.touched) }">
+                    <label>Border Color <span>*</span></label>
+                    <input type="color" name="styleColor" class="form-control form-control-sm"
+                      [(ngModel)]="insertGeofenceReqParam.stylealternatecolor" required #colorCtrl="ngModel">
+                    @if (colorCtrl.invalid && colorCtrl.touched) {
+                      <span class="small text-danger">
+                        @if (colorCtrl.errors?.['required']) {
+                          <span>Please Select Color</span>
+                        }
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group" tooltip="Select Category" [ngClass]="{
+                    'has-danger': categoryCtrl.invalid && submitted,
+                    'has-success': categoryCtrl.valid && (categoryCtrl.dirty || categoryCtrl.touched) }">
+                    <label>Category <span>*</span></label>
+                    <ng-select name="category" dropdownPosition="bottom" placeholder="Select Category"
+                      [items]="categoryList" bindLabel="param2" [searchable]="true" [clearable]="true"
+                      [(ngModel)]="categoryObj" (change)="onCategoryChange()" required #categoryCtrl="ngModel">
+                    </ng-select>
+                    @if (categoryCtrl.invalid && categoryCtrl.touched) {
+                      <span class="small text-danger">
+                        @if (categoryCtrl.errors?.['required']) {
+                          <span>Please Select Category</span>
+                        }
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Geofence Shape <span>*</span></label>
+                    <div class="shape-toggle" role="group" aria-label="Select geofence shape">
+                      @for (option of geofenceShapeOptions; track option) {
+                        <button type="button" class="shape-btn"
+                          [class.active]="selectedGeofenceType === option.value"
+                          (click)="selectGeofenceType(option.value)">
+                          <i class="fa" [ngClass]="option.icon" aria-hidden="true"></i>
+                          <span>{{ option.label }}</span>
+                        </button>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                @if (selectedGeofenceType === 'circle') {
+                  <div class="col-md-6">
+                  <div class="form-group" tooltip="Enter Radius" [ngClass]="{
+                    'has-danger': radiusCtrl.invalid && submitted,
+                    'has-success': radiusCtrl.valid && (radiusCtrl.dirty || radiusCtrl.touched) }">
+                      <label>Radius (KM) <span>*</span></label>
+                      <input type="text" name="radius" class="form-control form-control-sm" placeholder="Enter Radius"
+                        inputmode="numeric" pattern="^[1-9][0-9]*$" minlength="1" maxlength="8"
+                        [(ngModel)]="insertGeofenceReqParam.radius" (keydown)="allowOnlyNumbers($event)"
+                        (input)="onRadiusInput($any($event.target).value)" required #radiusCtrl="ngModel">
+                      @if (radiusCtrl.invalid && radiusCtrl.touched) {
+                        <span class="small text-danger">
+                          @if (radiusCtrl.errors?.['required']) {
+                            <span>Please Enter Radius</span>
+                          }
+                          @if (radiusCtrl.errors?.['pattern']) {
+                            <span>Enter Valid Radius In KM</span>
+                          }
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @if (toUpdate) {
+                  <div class="col-md-12">
+                  <div class="form-group" tooltip="Enter Remark" [ngClass]="{
+                    'has-danger': remarkCtrl.invalid && submitted,
+                    'has-success': remarkCtrl.valid && (remarkCtrl.dirty || remarkCtrl.touched) }">
+                      <label>Remark <span>*</span></label>
+                      <input type="text" name="remark" class="form-control form-control-sm"
+                        [(ngModel)]="insertGeofenceReqParam.remarks" placeholder="Enter Remark"
+                        [required]="toUpdate ==true" minlength="3" maxlength="50" #remarkCtrl="ngModel">
+                      @if (remarkCtrl.invalid && remarkCtrl.touched && remarkCtrl.dirty) {
+                        <span class="small text-danger">
+                          @if (remarkCtrl.errors?.['required']) {
+                            <span>Please Enter Remark</span>
+                          }
+                          @if (remarkCtrl.errors?.['minlength']) {
+                            <span>Type Should be 3 to 50 characters</span>
+                          }
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <div class="col-md-12">
+                  <div class="action-row">
+                    <button type="button" class="btn btn-primary btn-sm" (click)="addGeofence()">
+                      <i class="fa fa-pencil me-1" aria-hidden="true"></i> Draw {{ selectedGeofenceType | titlecase }}
+                    </button>
+                    @if (selectedGeofenceType === 'polygon') {
+                      <small class="draw-help">Click to add points. Double-click the final point to finish.</small>
+                    }
+                    @if (!toUpdate) {
+                      <button type="button" class="btn btn-sm btn-success btn-sm"
+                        (click)="insertGeofence(geofenceForm)">
+                        <i class="fa fa-save me-1" aria-hidden="true"></i> Submit
+                      </button>
+                    }
+                    @if (toUpdate) {
+                      <button type="button" class="btn btn-warning btn-sm"
+                        (click)="updateGeofence(geofenceForm)">
+                        <i class="fa fa-check-circle me-1" aria-hidden="true"></i> Update
+                      </button>
+                    }
+                    <button type="reset" id="resetButton" class="btn btn-secondary btn-sm" (click)="resetForm()">
+                      <i class="fa fa-refresh me-1" aria-hidden="true"></i> Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="panel-section list-section">
+            <div class="table-toolbar">
+              <div class="search-box">
+                <input type="text" class="form-control" placeholder="Search geofence"
+                  [(ngModel)]="detailsParam.searchParameter" aria-label="Search geofence"
+                  (keydown.enter)="getGeofenceDetails()">
+                <button class="btn btn-primary btn-sm" type="button" (click)="getGeofenceDetails()" tooltip="Search">
+                  <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+              </div>
+
+              <div class="toolbar-actions">
+                <button class="icon-btn refresh" type="button" (click)="refreshdata()" tooltip="Refresh">
+                  <span class="fa fa-refresh"></span>
+                </button>
+                <!-- (click)="expotPDFExcel('pdf')" -->
+                <button type="button" class="icon-btn pdf" [disabled]="totalcount==0"
+                  tooltip="Download pdf">
+                  <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                </button>
+                <!-- (click)="expotPDFExcel('excel')"  -->
+                <button type="button" class="icon-btn excel" [disabled]="totalcount==0"
+                  tooltip="Download Excel">
+                  <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                </button>
+                <span class="count-pill">Total: {{totalcount}}</span>
+              </div>
+            </div>
+
+            <div class="gridTable">
+              <ng-template #geofenceCell let-item let-column="column">
+                @if (column.key === 'view') {
+                  <button class="table-action view" type="button" (click)="setData(item)" tooltip="View">
+                    <i class="fa fa-eye" aria-hidden="true"></i>
+                  </button>
+                } @else if (column.key === 'delete') {
+                  <button class="table-action delete" type="button" data-toggle="modal"
+                    data-target="#deleteGeofenceModal" (click)="setData(item)" tooltip="Delete">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                } @else {
+                  {{ geofenceTable.cellValue(item, column) }}
+                }
+              </ng-template>
+              <app-common-table #geofenceTable [columns]="tableColumns" [rows]="geofenceDetails"
+                [cellTemplate]="geofenceCell" tableClass="table table-hover table-striped"
+                emptyMessage="No Records Found !">
+              </app-common-table>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-panel">
+          <div class="map-header">
+            <div>
+              <strong>Map View</strong>
+              <span>Draw and preview geofence area</span>
+            </div>
+            <span class="live-dot"></span>
+          </div>
+          <div class="map-canvas-wrap">
+            <div class="map-layer-switcher">
+              <button class="map-layer-switcher__toggle" type="button" (click)="toggleLayerPanel()"
+                [class.active]="isLayerSwitcherOpen">
+                <i class="fa fa-map"></i>
+                <span>Layers</span>
+              </button>
+
+              <div class="dropdown-panel layer-panel" [class.open]="isLayerSwitcherOpen">
+                <div class="layer-header">
+                  <i class="fa fa-map"></i>
+                  <span>Map Layers</span>
+                  <button class="btn-close" type="button" (click)="isLayerSwitcherOpen = false"><i class="fa fa-times"></i></button>
+                </div>
+                <div class="layer-body">
+                  <app-map-layer-options [active]="activeMapStyle" (selected)="changeMapStyle($event)"></app-map-layer-options>
+
+                  <label class="layer-item police-layer" for="Police_Stations">
+                    <input type="checkbox" id="Police_Stations" name="Police_Stations"
+                      [(ngModel)]="showPoliceStations" (change)="togglePoliceStations()">
+                    <span class="layer-swatch police"></span>
+                    <span class="text-dark">Police Stations</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div id="geofenceMap" #geofenceMapContainer></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade geofence-modal" id="deleteGeofenceModal" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title mb-0">Delete Details</h5>
+        <button type="button" id="closebtn" class="close" data-dismiss="modal" aria-label="Close" (click)="resetForm()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form novalidate #deleteForm="ngForm">
+          <div class="row">
+            <div class="col-md-4 pr-0">
+              <p class="field-label">Select Reason:</p>
+            </div>
+            <div class="col pl-0">
+              <div class="form-group">
+                <ng-select [ngClass]="deletesubmitted?'ng-error':''" name="reason" dropdownPosition="bottom"
+                  id="reason" placeholder="Select Reason*" [(ngModel)]="deletereasonObj" required
+                  #reasonCtrl="ngModel">
+                  @for (item of reasonList; track item) {
+                    <ng-option [value]="item">{{item.param2}}</ng-option>
+                  }
+                </ng-select>
+                @if (reasonCtrl.invalid && reasonCtrl.touched) {
+                  <small class="text-danger">Please Select Reason</small>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group mb-0" [ngClass]="{ 'has-danger': deleteCtrl.invalid && deletesubmitted,
+                'has-success': deleteCtrl.valid && (deleteCtrl.dirty || deleteCtrl.touched)}">
+                <textarea class="form-control" id="deletefield" autocomplete="off" type="text"
+                  placeholder="Enter Your Remark" [(ngModel)]="deleteremark" name="deleteremark" #deleteCtrl="ngModel"
+                required minlength="10" maxlength="100"></textarea>
+                @if (deleteCtrl.invalid && (deleteCtrl.dirty || deleteCtrl.touched)) {
+                  <span class="form-control-feedback text-danger validationmsg"
+                    >
+                    @if (deleteCtrl.errors?.['required']) {
+                      <small>Please Enter Remark</small>
+                    }
+                    @if (deleteCtrl.errors?.['minlength']) {
+                      <small>Remark should be 10 to 100 characters</small>
+                    }
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-danger" [disabled]="deleteForm.invalid || loading"
+        (click)="deleteGeofence(deleteForm)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

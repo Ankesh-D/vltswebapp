@@ -1,0 +1,218 @@
+.form-control {
+    padding: 0px;
+}
+::ng-deep .ng-select .ng-select-container {
+    border-radius: 0px !important;
+    height: 22px !important;
+    border: 1px solid #e0e0e0 !important;
+    font-size: 0.9rem !important;
+}
+::ng-deep .ng-select .ng-select-container.ng-has-value {
+    border-color: #28a745 !important;
+    box-shadow: none !important;
+}
+::ng-deep .ng-select .ng-select-container:hover {
+    border-color: #218838 !important;
+}
+.mandetory {
+    color: red;
+    margin-left: 2px;
+    font-size: 1.2rem;
+    line-height: 0;
+}/* ===============================
+   FULL WIDTH & LAYOUT
+   =============================== */
+
+.content-i,
+.content-box,
+.element-wrapper,
+.element-box {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.element-box {
+  min-height: calc(100vh - 90px);
+  padding: 12px;
+}
+
+/* ===============================
+   PAGE TITLE
+   =============================== */
+
+.pagetitleborder {
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 10px;
+}
+
+/* ===============================
+   NOTE SECTION
+   =============================== */
+
+.form-desc {
+  background: #f8f9fa;
+  border-left: 4px solid #4CAF50;
+  padding: 8px 12px;
+  font-size: 12px;
+  margin-bottom: 15px;
+}
+
+.mandetory {
+  color: red;
+  font-weight: bold;
+}
+
+/* ===============================
+   FORM LABELS
+   =============================== */
+
+label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+}
+
+.small {
+  font-size: 11px !important;
+}
+
+/* ===============================
+   NG-SELECT STYLING
+   =============================== */
+
+::ng-deep .ng-select {
+  font-size: 12px;
+}
+
+::ng-deep .ng-select .ng-select-container {
+  min-height: 34px;
+  height: 34px;
+  border: 1px solid #0b58b9;
+  border-radius: 4px;
+}
+
+::ng-deep .ng-select.ng-select-focused .ng-select-container {
+  border-color: #0b58b9;
+  box-shadow: 0 0 0 1px rgba(11, 88, 185, 0.2);
+}
+
+/* ===============================
+   BUTTONS
+   =============================== */
+
+button.btn {
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 110px;
+  height: 32px;
+  border-radius: 4px;
+}
+
+.btn-primary {
+  background-color: #0b58b9;
+  border-color: #0b58b9;
+}
+
+.btn-primary:hover {
+  background-color: #094a9a;
+  border-color: #094a9a;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   VALIDATION TEXT
+   =============================== */
+
+.text-danger {
+  font-size: 11px;
+}
+
+/* ===============================
+   TABLE STYLING
+   =============================== */
+
+.table {
+  width: 100%;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.table thead th {
+  background: #c8e4b2;
+  font-size: 11px;
+  border: 1px solid #d3a130;
+}
+
+.table tbody td {
+  font-size: 11px;
+  border: 1px solid #d3a130;
+  vertical-align: middle;
+}
+
+.table-striped tbody tr:nth-child(odd) {
+  background-color: #e5f3d6;
+}
+
+.table-striped tbody tr:nth-child(even) {
+  background-color: #f7ffef;
+}
+
+/* ===============================
+   CHECKBOX
+   =============================== */
+
+input[type="checkbox"] {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+/* ===============================
+   ALIGNMENTS
+   =============================== */
+
+.text-center {
+  text-align: center;
+}
+
+/* ===============================
+   ALERTS (if any)
+   =============================== */
+
+.alert {
+  font-size: 12px;
+  padding: 8px 12px;
+}
+
+/* ===============================
+   RESPONSIVE
+   =============================== */
+
+@media (max-width: 768px) {
+
+  .element-box {
+    padding: 8px;
+  }
+
+  button.btn {
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .table {
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,73 @@
+.notification-container {
+  position: fixed;
+  top: 80px; // Adjusted to be below a potential header
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 320px;
+  max-width: 450px;
+  z-index: 9999;
+  color: white;
+  animation: slideIn 0.3s ease-out;
+  border-left: 5px solid;
+}
+
+.notification-message {
+  flex-grow: 1;
+  margin-right: 15px;
+  font-weight: 500;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.8;
+  padding: 0;
+}
+
+.notification-close:hover {
+  opacity: 1;
+}
+
+.notification-success {
+  background-color: #e9f6ec;
+  color: #28a745;
+  border-color: #28a745;
+}
+
+.notification-error {
+  background-color: #fdecea;
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.notification-warning {
+  background-color: #fff8e6;
+  color: #ffc107;
+  border-color: #ffc107;
+}
+
+.notification-info {
+  background-color: #e8f7f9;
+  color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

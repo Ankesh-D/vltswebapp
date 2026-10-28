@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep ngb-pagination.app-pagination .pagination { gap: 4px; }
+:host ::ng-deep ngb-pagination.app-pagination .page-link {
+  min-width: 27px;
+  min-height: 27px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 7px;
+  border: 1px solid var(--app-border);
+  border-radius: 6px !important;
+  color: var(--app-text);
+  background: var(--app-surface);
+  font-size: 11px;
+  box-shadow: none;
+}
+:host ::ng-deep ngb-pagination.app-pagination .page-item.active .page-link {
+  color: #fff;
+  background: var(--app-primary);
+  border-color: var(--app-primary);
+  font-weight: 700;
+}
+:host ::ng-deep ngb-pagination.app-pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+  color: var(--app-primary);
+  background: var(--app-primary-soft);
+  border-color: color-mix(in srgb, var(--app-primary) 30%, white);
+}
+:host ::ng-deep ngb-pagination.app-pagination .page-item.disabled .page-link { color: #a2adba; background: #f7f9fb; }

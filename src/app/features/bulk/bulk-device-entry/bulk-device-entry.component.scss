@@ -1,0 +1,387 @@
+/* Match legacy Multiple Device Entry look */
+
+.pagetitleborder {
+  border-bottom: 1px solid #000;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.form-desc {
+  margin-bottom: 5px;
+  font-size: 11px;
+}
+
+.mandetory {
+  color: red;
+  font-weight: normal;
+  margin-left: 2px;
+}
+
+
+
+
+.entrypagediv .form-group {
+  margin-bottom: 4px;
+  min-height: 72px;
+}
+
+.entrypagediv .form-group label {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.entrypagediv .form-control,
+.entrypagediv ::ng-deep .ng-select .ng-select-container {
+  font-size: 11px;
+  padding: 3px 4px;
+  height: 30px;
+  min-height: 24px;
+}
+
+@media (max-width: 768px) {
+  .entrypagediv .row {
+    flex-wrap: wrap;
+  }
+}
+::ng-deep .select2-container--default .select2-selection--single {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+::ng-deep .ng-dropdown-panel.ng-select-bottom {
+  font-size: 12px;
+}
+::ng-deep .ng-select-container {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.custom-excel-modal {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.preview-image {
+  max-height: 75vh;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+.custom-close {
+  font-size: 24px;
+  border: none;
+  background: transparent;
+}
+
+.modal-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+}
+
+.modal-footer {
+  background: #f8f9fa;
+}
+/* ===== Overlay (background blur) ===== */
+.validation-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+/* ===== Modal Container ===== */
+.validation-modal-container {
+  width: 95vw;
+  max-width: 1400px;
+  height: 85vh;
+  background: #fff;
+  border: 1px solid #000;
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: 12px;
+}
+
+/* ===== Header ===== */
+.validation-modal-header {
+  background: #e9f9e5;
+  border-bottom: 1px solid #000;
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.validation-modal-header .title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.close-btn {
+  border: 1px solid #000;
+  background: #fff;
+  font-size: 14px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+/* ===== Body ===== */
+.validation-modal-body {
+  flex: 1;
+  padding: 8px;
+  overflow: hidden;
+}
+
+/* ===== Table Scroll Wrapper ===== */
+.validation-table-wrapper {
+  height: 100%;
+  overflow: auto;
+  border: 1px solid #000;
+}
+
+/* ===== Table ===== */
+.validation-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Header sticky */
+.validation-table thead th {
+  position: sticky;
+  top: 0;
+  background: #d4edda;
+  z-index: 2;
+}
+
+/* Cells */
+.validation-table th,
+.validation-table td {
+  border: 1px solid #000;
+  padding: 4px 6px;
+  text-align: left;
+}
+
+/* Zebra */
+.validation-table tbody tr:nth-child(even) {
+  background: #f7fff5;
+}
+
+/* Error text */
+.error-text {
+  color: #d9534f;
+  font-weight: 600;
+}
+
+/* ===== Footer ===== */
+.validation-modal-footer {
+  border-top: 1px solid #000;
+  padding: 6px 10px;
+  text-align: right;
+  background: #f8f9fa;
+}
+
+.btn-close {
+  background: #fff;
+  border: 1px solid #000;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-close:hover {
+  background: #f0f0f0;
+}
+
+
+
+/* ===== Global Loader ===== */
+.global-loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+/* Loader box */
+.loader-box {
+  text-align: center;
+}
+
+/* Spinner */
+.spinner {
+  width: 45px;
+  height: 45px;
+  border: 4px solid #d4edda;
+  border-top: 4px solid #28a745;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: auto;
+}
+
+/* Text */
+.loader-text {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+/* ===== Overlay ===== */
+.validation-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+/* ===== Modal ===== */
+.validation-modal-container {
+  width: 96vw;
+  max-width: 1500px;
+  height: 86vh;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+/* ===== Header ===== */
+.validation-modal-header {
+  background: linear-gradient(90deg, #dff3e2, #c7e9cc);
+  border-bottom: 1px solid #b6d8b9;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.validation-modal-header .title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f3d2b;
+  letter-spacing: 0.3px;
+}
+
+/* Close button */
+.close-btn {
+  border: none;
+  background: #ffffff;
+  color: #333;
+  font-size: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.close-btn:hover {
+  background: #f1f1f1;
+  transform: scale(1.05);
+}
+
+/* ===== Body ===== */
+.validation-modal-body {
+  flex: 1;
+  padding: 12px;
+  overflow: hidden;
+  background: #f9fbf9;
+}
+
+/* ===== Table Wrapper ===== */
+.validation-table-wrapper {
+  height: 100%;
+  overflow: auto;
+  border-radius: 6px;
+  border: 1px solid #cfe6d2;
+  background: #fff;
+}
+
+/* ===== Table ===== */
+.validation-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Header sticky */
+.validation-table thead th {
+  position: sticky;
+  top: 0;
+  background: #e6f4ea;
+  color: #1d3b29;
+  font-weight: 600;
+  z-index: 2;
+}
+
+/* Cells */
+.validation-table th,
+.validation-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #e1efe4;
+  text-align: left;
+}
+
+/* Zebra */
+.validation-table tbody tr:nth-child(even) {
+  background: #f7fbf8;
+}
+
+/* Hover */
+.validation-table tbody tr:hover {
+  background: #eef7f1;
+}
+
+/* Error text */
+.error-text {
+  color: #e53935;
+  font-weight: 600;
+}
+
+/* ===== Footer ===== */
+.validation-modal-footer {
+  border-top: 1px solid #e0e0e0;
+  padding: 10px 16px;
+  text-align: right;
+  background: #fafafa;
+}
+
+/* Close button */
+.btn-close {
+  background: #ffffff;
+  border: 1px solid #cfd8dc;
+  padding: 6px 16px;
+  font-size: 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-close:hover {
+  background: #f1f1f1;
+}

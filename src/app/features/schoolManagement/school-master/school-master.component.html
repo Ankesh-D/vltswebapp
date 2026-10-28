@@ -1,0 +1,481 @@
+<div class="container-fluid py-2">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-2">
+      <!-- Page Title Row -->
+      <div class="d-flex justify-content-between align-items-center border-bottom border-primary py-2 mb-2" >
+        <div class="pagetitlestyle">{{detailsToggle ? 'Schools Details' : 'School Master Form'}}</div>
+        <ng-container>
+          <a style="font-size: 12px;" class="btn btn-primary btn-sm" (click)="toggleDetails()">
+            <i class="fa fa-plus me-1"></i> {{detailsToggle ? 'Add New' : 'Back to Details'}}
+          </a>
+        </ng-container>
+      </div>
+      @if (detailsToggle) {
+        <!-- Search and Pagination Controls -->
+        <form autocomplete="off" class="mb-2">
+          <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <!-- Left Side: Search -->
+            <div class="d-flex align-items-center">
+              <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Search :</label>
+              <div class="input-group input-group-sm">
+                <input type="search" class="form-control shadow-none" placeholder="Type here..."
+                  [(ngModel)]="schoolDetailsRequest.param1" (keyup.enter)="getDetails('search')" name="searchby" autocomplete="off"
+                  style="font-size: 11px; width: 200px;">
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-primary search-btn" (click)="getDetails('search')">
+                    <i class="fa fa-search" style="font-size: 11px;"></i>
+                  </button>
+                </div>
+              </div>
+              <button type="button" (click)="getDetails('reload')" class="btn btn-outline-success btn-sm ms-2"
+                style="font-size: 11px;" title="Reload">
+                <i class="fa fa-refresh me-1" [class.fa-spin]="loading"></i>
+                {{ loading ? 'Reloading...' : 'Reload' }}
+              </button>
+            </div>
+            <!-- Right Side: Controls -->
+            <div class="d-flex align-items-center">
+              <!-- Download -->
+              <div class="d-flex align-items-center me-3">
+                <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Download :</label>
+                <select name="excelpdfdownload" id="excelpdfdownload"
+                  class="form-control form-control-sm" style="font-size: 11px; width: auto;">
+                  <option value="Select">Select</option>
+                  <!-- <option value="Excel">Excel</option> -->
+                  <option value="">Excel</option>
+                </select>
+              </div>
+              <!-- Show Rows -->
+              <div class="d-flex align-items-center me-3">
+                <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Show Rows :</label>
+                <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize"
+                  class="form-control form-control-sm" style="font-size: 11px; width: auto;">
+                  @for (size of pageSizeOptions; track size) {
+                    <option [value]="size === totalCount ? totalCount : size">
+                      {{size === totalCount ? totalCount : size}}
+                    </option>
+                  }
+                </select>
+              </div>
+              <!-- Total Records -->
+              <span class="fw-bold" style="font-size: 11px;">
+                Total Records : <span class="text-primary">{{pageCount}} of {{totalCount}}</span>
+              </span>
+            </div>
+          </div>
+        </form>
+        <!-- Table -->
+        <div class="table-responsive">
+          <app-common-table [columns]="tableColumns" [rows]="detailData" [loading]="loading"
+            [cellTemplate]="schoolCell" emptyMessage="No Records Found"
+            tableClass="table table-striped app-table table-sm table-bordered mb-1" tableId="devicetable">
+          </app-common-table>
+          <ng-template #schoolCell let-data let-column="column">
+            @if (column.key === 'actions') {
+              <a class="btn btn-primary btn-sm mx-2" title="Edit" (click)="editSchool(data)">
+                <i class="fa fa-edit"></i>
+              </a>
+              <a class="btn btn-danger btn-sm" title="Delete" (click)="openDeleteModal(data)">
+                <i class="fa fa-trash"></i>
+              </a>
+            } @else {
+              {{column.value ? column.value(data) : data.param1}}
+            }
+          </ng-template>
+          <!-- Pagination Controls -->
+          <div class="float-end">
+            @if (totalCount > schoolDetailsRequest.param3) {
+              <ngb-pagination [collectionSize]="totalCount" [(page)]="schoolDetailsRequest.param2"
+                [pageSize]="schoolDetailsRequest.param3" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+                [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+              </ngb-pagination>
+            }
+          </div>
+        </div>
+      }
+      @if (!detailsToggle) {
+        <form #masterForm="ngForm" (ngSubmit)="onSubmit(masterForm)">
+          <div class="row px-4">
+            <!-- Form fields go here -->
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="schoolName" class="field-label">School Name <span>*</span></label>
+                <input type="text" id="schoolName"
+                  name="schoolName"
+                  class="form-control form-control-sm"
+                  placeholder="Enter school name"
+                  #schoolNameCtrl="ngModel"
+                  [(ngModel)]="schoolMasterFormReq.schoolname"
+                  minlength="3" maxlength="100" required>
+                @if (schoolNameCtrl.invalid && ((schoolNameCtrl.dirty || schoolNameCtrl.touched) || masterForm.submitted)) {
+                  <div class="text-danger" style="font-size: 11px;">
+                    @if (schoolNameCtrl.errors?.['required']) {
+                      <div>School name is required.</div>
+                    }
+                    @if (schoolNameCtrl.errors?.['minlength']) {
+                      <div>School name must be at least 3 characters long.</div>
+                    }
+                    @if (schoolNameCtrl.errors?.['maxlength']) {
+                      <div>School name cannot exceed 100 characters.</div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="schoolCode" class="field-label">Code<span>*</span></label>
+                <input type="text" id="schoolCode"
+                  name="schoolCode"
+                  class="form-control form-control-sm"
+                  #schoolCodeCtrl="ngModel"
+                  [(ngModel)]="schoolMasterFormReq.schoolcode"
+                  placeholder="Enter school code"
+                  (input)="toggleCodeUppercase()"
+                  minlength="3" maxlength="20" required>
+                @if (schoolCodeCtrl.invalid && ((schoolCodeCtrl.dirty || schoolCodeCtrl.touched) || masterForm.submitted)) {
+                  <div class="text-danger" style="font-size: 11px;">
+                    @if (schoolCodeCtrl.errors?.['required']) {
+                      <div>School code is required.</div>
+                    }
+                    @if (schoolCodeCtrl.errors?.['minlength']) {
+                      <div>School code must be at least 3 characters long.</div>
+                    }
+                    @if (schoolCodeCtrl.errors?.['maxlength']) {
+                      <div>School code cannot exceed 20 characters.</div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+            <!-- contact person -->
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="schoolContact" class="field-label">Contact Person<span>*</span></label>
+                <input type="text" id="schoolContact"
+                  name="schoolContact"
+                  class="form-control form-control-sm"
+                  #schoolContactCtrl="ngModel"
+                  [(ngModel)]="schoolMasterFormReq.contactperson"
+                  placeholder="Enter school contact"
+                  minlength="10" maxlength="15" required>
+                @if (schoolContactCtrl.invalid && ((schoolContactCtrl.dirty || schoolContactCtrl.touched) || masterForm.submitted)) {
+                  <div class="text-danger" style="font-size: 11px;">
+                    @if (schoolContactCtrl.errors?.['required']) {
+                      <div>School contact is required.</div>
+                    }
+                    @if (schoolContactCtrl.errors?.['minlength']) {
+                      <div>School contact must be at least 10 characters long.</div>
+                    }
+                    @if (schoolContactCtrl.errors?.['maxlength']) {
+                      <div>School contact cannot exceed 15 characters.</div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+            <!-- contact email -->
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="schoolEmail" class="field-label">Email<span>*</span></label>
+                <input type="email" id="schoolEmail"
+                  name="schoolEmail"
+                  class="form-control form-control-sm"
+                  placeholder="Enter school email"
+                  #schoolEmailCtrl="ngModel"
+                  [(ngModel)]="schoolMasterFormReq.emailid"
+                  required>
+                  @if (schoolEmailCtrl.invalid && ((schoolEmailCtrl.dirty || schoolEmailCtrl.touched) || masterForm.submitted)) {
+                    <div class="text-danger" style="font-size: 11px;">
+                      @if (schoolEmailCtrl.errors?.['required']) {
+                        <div>School email is required.</div>
+                      }
+                      @if (schoolEmailCtrl.errors?.['email']) {
+                        <div>Please enter a valid email address.</div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <!-- contact number -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="schoolContactNumber" class="field-label">Contact Number <span>*</span></label>
+                  <input type="text" id="schoolContactNumber"
+                    name="schoolContactNumber"
+                    class="form-control form-control-sm"
+                    placeholder="Enter school contact number"
+                    #schoolContactNumberCtrl="ngModel"
+                    [(ngModel)]="schoolMasterFormReq.mobileno"
+                    minlength="10" maxlength="10" required>
+                  @if (schoolContactNumberCtrl.invalid && ((schoolContactNumberCtrl.dirty || schoolContactNumberCtrl.touched) || masterForm.submitted)) {
+                    <div class="text-danger" style="font-size: 11px;">
+                      @if (schoolContactNumberCtrl.errors?.['required']) {
+                        <div>School contact number is required.</div>
+                      }
+                      @if (schoolContactNumberCtrl.errors?.['minlength']) {
+                        <div>School contact number must be at least 10 characters long.</div>
+                      }
+                      @if (schoolContactNumberCtrl.errors?.['maxlength']) {
+                        <div>School contact number cannot exceed 10 characters.</div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <!-- state -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="schoolState" class="field-label">State<span>*</span></label>
+                  <ng-select
+                    placeholder="Select state"
+                    [(ngModel)]="stateObj"
+                    name="schoolState"
+                    #schoolStateCtrl="ngModel"
+                    (change)="onStateChange()"
+                    required>
+                    @for (state of stateList; track state) {
+                      <ng-option [value]="state">{{ state.param2 }}</ng-option>
+                    }
+                  </ng-select>
+                  @if (schoolStateCtrl.invalid && ((schoolStateCtrl.dirty || schoolStateCtrl.touched) || masterForm.submitted)) {
+                    <div class="text-danger" style="font-size: 11px;">
+                      @if (schoolStateCtrl.errors?.['required']) {
+                        <div>School state is required.</div>
+                      }
+                      @if (schoolStateCtrl.errors?.['minlength']) {
+                        <div>School state must be at least 2 characters long.</div>
+                      }
+                      @if (schoolStateCtrl.errors?.['maxlength']) {
+                        <div>School state cannot exceed 50 characters.</div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="schoolCity" class="field-label">City<span>*</span></label>
+                  <ng-select
+                    placeholder="Select city"
+                    [(ngModel)]="cityObj"
+                    name="schoolCity"
+                    #schoolCityCtrl="ngModel"
+                    required>
+                    @for (city of cityList; track city) {
+                      <ng-option [value]="city">{{ city.param2 }}</ng-option>
+                    }
+                  </ng-select>
+                  @if (schoolCityCtrl.invalid && ((schoolCityCtrl.dirty || schoolCityCtrl.touched) || masterForm.submitted)) {
+                    <div class="text-danger" style="font-size: 11px;">
+                      @if (schoolCityCtrl.errors?.['required']) {
+                        <div>School city is required.</div>
+                      }
+                      @if (schoolCityCtrl.errors?.['minlength']) {
+                        <div>School city must be at least 2 characters long.</div>
+                      }
+                      @if (schoolCityCtrl.errors?.['maxlength']) {
+                        <div>School city cannot exceed 50 characters.</div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <!-- Address -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="schoolAddress" class="field-label">Address<span>*</span></label>
+                  <textarea id="schoolAddress"
+                    type="text"
+                    name="schoolAddress"
+                    class="form-control form-control-sm"
+                    placeholder="Enter school address"
+                    #schoolAddressCtrl="ngModel"
+                    [(ngModel)]="schoolMasterFormReq.address"
+                  minlength="5" maxlength="200" required></textarea>
+                  @if (schoolAddressCtrl.invalid && ((schoolAddressCtrl.dirty || schoolAddressCtrl.touched) || masterForm.submitted)) {
+                    <div class="text-danger" style="font-size: 11px;">
+                      @if (schoolAddressCtrl.errors?.['required']) {
+                        <div>School address is required.</div>
+                      }
+                      @if (schoolAddressCtrl.errors?.['minlength']) {
+                        <div>School address must be at least 5 characters long.</div>
+                      }
+                      @if (schoolAddressCtrl.errors?.['maxlength']) {
+                        <div>School address cannot exceed 200 characters.</div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <!-- Pincode -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="schoolPincode" class="field-label">Pincode<span>*</span></label>
+                  <input type="text" id="schoolPincode"
+                    name="schoolPincode"
+                    class="form-control form-control-sm"
+                    #schoolPincodeCtrl="ngModel"
+                    [(ngModel)]="schoolMasterFormReq.pincode"
+                    placeholder="Enter school pincode"
+                    minlength="6" maxlength="6" required>
+                  @if (schoolPincodeCtrl.invalid && ((schoolPincodeCtrl.dirty || schoolPincodeCtrl.touched) || masterForm.submitted)) {
+                    <div class="text-danger" style="font-size: 11px;">
+                      @if (schoolPincodeCtrl.errors?.['required']) {
+                        <div>School pincode is required.</div>
+                      }
+                      @if (schoolPincodeCtrl.errors?.['minlength']) {
+                        <div>School pincode must be at least 6 characters long.</div>
+                      }
+                      @if (schoolPincodeCtrl.errors?.['maxlength']) {
+                        <div>School pincode cannot exceed 10 characters.</div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <!-- LATTITUDE / LONGITUDE -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="schoolLatitude" class="field-label">Latitude</label>
+                  <input type="text" id="schoolLatitude"
+                    name="schoolLatitude"
+                    class="form-control form-control-sm"
+                    #schoolLatitudeCtrl="ngModel"
+                    [(ngModel)]="schoolMasterFormReq.latitude"
+                    placeholder="Enter school latitude"
+                    maxlength="20">
+                  @if (schoolLatitudeCtrl.invalid && ((schoolLatitudeCtrl.dirty || schoolLatitudeCtrl.touched) || masterForm.submitted)) {
+                    <div class="text-danger" style="font-size: 11px;">
+                      @if (schoolLatitudeCtrl.errors?.['maxlength']) {
+                        <div>School latitude cannot exceed 20 characters.</div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="schoolLongitude" class="field-label">Longitude</label>
+                  <input type="text" id="schoolLongitude"
+                    name="schoolLongitude"
+                    class="form-control form-control-sm"
+                    #schoolLongitudeCtrl="ngModel"
+                    [(ngModel)]="schoolMasterFormReq.longitude"
+                    placeholder="Enter school longitude"
+                    maxlength="20">
+                    @if (schoolLongitudeCtrl.invalid && ((schoolLongitudeCtrl.dirty || schoolLongitudeCtrl.touched) || masterForm.submitted)) {
+                      <div class="text-danger" style="font-size: 11px;">
+                        @if (schoolLongitudeCtrl.errors?.['maxlength']) {
+                          <div>School longitude cannot exceed 20 characters.</div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+                <!-- button for modal open for selecting lat long -->
+                <div class="col-md-1">
+                  <div class="form-group">
+                    <label class="field-label">&nbsp;</label>
+                    <button type="button" class="btn btn-outline-primary btn-sm form-control select-poi" (click)="openLatLongModal()">
+                      <i class="fa fa-map-marker me-1"></i> Select
+                    </button>
+                  </div>
+                </div>
+                <!-- Submit Button -->
+                <div class="col-md-2">
+                  <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-secondary btn-sm me-2" (click)="resetForm()">
+                      Reset
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-sm" [disabled]="masterForm.invalid">
+                      {{ updateFlag ? 'Update' : 'Submit' }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          }
+        </div>
+      </div>
+    </div>
+    <!-- modal for selecting latitude and longitude -->
+    <div class="modal fade" id="latLongModal" tabindex="-1" role="dialog" aria-labelledby="latLongModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header py-1">
+            <h5 class="modal-title" id="latLongModalLabel">Select Latitude and Longitude</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <!-- Modal content for selecting latitude and longitude -->
+            <div id="mapContainer" style="width: 100%; height: 400px;"></div>
+            <!-- <div class="form-group">
+            <label for="modalLatitude" class="field-label">Latitude</label>
+            <input type="text" id="modalLatitude" class="form-control form-control-sm" [(ngModel)]="schoolMasterFormReq.latitude" placeholder="Enter latitude" maxlength="20">
+          </div>
+          <div class="form-group">
+            <label for="modalLongitude" class="field-label">Longitude</label>
+            <input type="text" id="modalLongitude" class="form-control form-control-sm" [(ngModel)]="schoolMasterFormReq.longitude" placeholder="Enter longitude" maxlength="20">
+          </div> -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary btn-sm" (click)="toastService.closeModal('latLongModal')">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header py-1">
+          <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form #deleteForm="ngForm">
+          <div class="modal-body">
+            <span>Are you sure you want to delete this school?</span>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="deleteSchoolName" class="field-label">Remarks <span class="text-danger">*</span></label>
+                  <textarea type="text"
+                    id="deleteSchoolName"
+                    class="form-control form-control-sm"
+                    [(ngModel)]="deleteSchoolMasterReq.remarks"
+                    #deleteSchoolNameCtrl="ngModel"
+                    name="deleteSchoolName" required
+                  minlength="5" maxlength="100"></textarea>
+                  @if (deleteSchoolNameCtrl.invalid && ((deleteSchoolNameCtrl.dirty || deleteSchoolNameCtrl.touched) || deleteForm.submitted)) {
+                    <div class="text-danger" style="font-size: 11px;">
+                      @if (deleteSchoolNameCtrl.errors?.['required']) {
+                        <div>Remarks is required.</div>
+                      }
+                      @if (deleteSchoolNameCtrl.errors?.['minlength']) {
+                        <div>Remarks must be at least 5 characters long.</div>
+                      }
+                      @if (deleteSchoolNameCtrl.errors?.['maxlength']) {
+                        <div>Remarks cannot exceed 100 characters.</div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button"
+              class="btn btn-secondary btn-sm" data-dismiss="modal"
+            (click)="closeDeleteModal()">Cancel</button>
+            <button type="submit" class="btn btn-danger btn-sm" (click)="confirmDelete()">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>

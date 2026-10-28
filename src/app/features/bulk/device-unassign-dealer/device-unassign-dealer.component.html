@@ -1,0 +1,255 @@
+<div class="content-i">
+  <!-- <div class="content-box"> -->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="element-wrapper">
+        <div class="element-box">
+          <!-- PAGE HEADER -->
+          <div class="page-header-row">
+
+            <!-- TITLE -->
+            <div class="page-title">
+              Unassign Device From Dealer
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="header-actions">
+
+              @if (roleId !== '12') {
+                <button
+                  type="button"
+                  class="add-new-btn"
+                  routerLink="/device/unassign-distributor">
+                  Unassign Distributor
+                </button>
+              }
+
+              <button
+                type="button"
+                class="add-new-btn"
+                routerLink="/dealer/change">
+                <i class="fa fa-exchange"></i>
+                Change Dealer
+              </button>
+
+              <button
+                type="button"
+                class="add-new-btn"
+                routerLink="/device/change">
+                <i class="fa fa-refresh"></i>
+                Change Device
+              </button>
+
+            </div>
+          </div>
+
+          <!-- SEARCH + CONTROLS -->
+          <div class="table-responsive">
+            <form autocomplete="off" class="top-controls-row">
+
+              <!-- LEFT : SEARCH + RELOAD -->
+              <div class="left-controls">
+
+                <span class="search-label">Search :</span>
+
+                <div class="search-box">
+                  <input
+                    type="search"
+                    readonly
+                    onfocus="this.removeAttribute('readonly')"
+                    class="search-input inner"
+                    placeholder="Type here and press button...."
+                    maxlength="50"
+                    [(ngModel)]="searchText"
+                    (keyup.enter)="getSearchDetails()"
+                    name="searchby"
+                    />
+
+                  <button
+                    type="button"
+                    class="search-inner-btn"
+                    (click)="getSearchDetails()">
+                    <i class="fa fa-search"></i>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  class="reload-btn"
+                  (click)="reloadData()"
+                  [disabled]="loading">
+                  {{ loading ? 'Reloading...' : 'Reload' }}
+                </button>
+
+              </div>
+
+              <!-- RIGHT : ROWS + TOTAL -->
+              <div class="right-controls">
+
+                <div class="control-item">
+                  <label>Show Rows :</label>
+                  <select
+                    [(ngModel)]="pageSize"
+                    (change)="onPageSizeChange($event)"
+                    name="pageSize">
+                    @for (size of pageSizeOptions; track size) {
+                      <option
+                        [value]="size === totalCount ? totalCount : size">
+                        {{ size === totalCount ? totalCount : size }}
+                      </option>
+                    }
+                  </select>
+                </div>
+
+                <div class="total-records-text">
+                  Total Records : {{ pageCount }} of {{ totalCount }}
+                </div>
+
+              </div>
+
+            </form>
+
+
+
+            <table class="table-striped app-table table mb-1" style="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;">
+              <thead>
+                <tr>
+                  <th style="width: 20px;">#</th>
+                  <th (click)="sort('param21')" style="cursor: pointer;">
+                    Vehicle No.<hr> Chassis No.
+                    @if (sortKey === 'param21') {
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                    }
+                  </th>
+                  <th (click)="sort('param6')" style="cursor: pointer;">
+                    Serial No.<hr>IMEI No.
+                    @if (sortKey === 'param6') {
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                    }
+                  </th>
+                  <th (click)="sort('param7')" style="cursor: pointer;">
+                    ICCID No.
+                    @if (sortKey === 'param7') {
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                    }
+                  </th>
+                  <th (click)="sort('param36')" style="cursor: pointer;">
+                    Customer Details
+                    @if (sortKey === 'param36') {
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                    }
+                  </th>
+                  <th (click)="sort('param16')" style="cursor: pointer;">
+                    Dealer
+                    @if (sortKey === 'param16') {
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                    }
+                  </th>
+                  <th (click)="sort('param15')" style="cursor: pointer;">
+                    Vendor
+                    @if (sortKey === 'param15') {
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                    }
+                  </th>
+                  <th (click)="sort('param27')" style="cursor: pointer;">
+                    Vehicle Status
+                    @if (sortKey === 'param27') {
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                    }
+                  </th>
+                  <th>Activity</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (deviceDetails.length === 0 && !loading) {
+                  <tr>
+                    <td style="font-weight: bold; text-align: center;" colspan="100">NO DATA FOUND</td>
+                  </tr>
+                }
+                @for (dev of getPaginatedData(); track dev) {
+                  <tr>
+                    <td>{{dev.param1 || 'NA'}}</td>
+                    <td>{{dev.param20 || 'NA'}}<br>{{dev.param21 || 'NA'}}</td>
+                    <td>{{dev.param6 || 'NA'}}<br>{{dev.param5 || 'NA'}}</td>
+                    <td>{{dev.param7 || 'NA'}}</td>
+                    <td>{{dev.param36 || 'NA'}}<br>{{dev.param37 || 'NA'}}</td>
+                    <td>{{dev.param16 || 'NA'}}</td>
+                    <td>{{dev.param15 || 'NA'}}</td>
+                    <td>{{dev.param38 === 'Assigned' ? 'Installed' : 'Not Installed'}}</td>
+                    <td>
+                      <div class="btn-group btn-group-sm">
+                        <button type="button" (click)="openUnassignModal(dev)">
+                          Edit
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            <!-- Pagination Controls -->
+            <div class="float-end">
+              @if (totalCount > pageSize) {
+                <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+                  [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+                  [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+                </ngb-pagination>
+              }
+            </div>
+            <!-- <div class="pagination-wrapper" *ngIf="getTotalPages() > 1">
+            <button
+              *ngFor="let page of getPageNumbers()"
+              (click)="onPageChange(page)"
+              [disabled]="page === -1 || currentPage === page"
+              [class.active]="currentPage === page">
+              <span *ngIf="page === -1">...</span>
+              <span *ngIf="page !== -1">{{page}}</span>
+            </button>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<!-- </div> -->
+
+<!-- Unassign Device Modal -->
+@if (showUnassignModal) {
+  <div class="modal-overlay unassign-device-modal" (click)="back()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-size: 13px;">
+          Unassign Device From Dealer
+        </h5>
+        <button type="button" class="close" (click)="back()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <span style="font-size: 11px;">Serial No. : <font>{{editSerialNo}}</font></span><br>
+          <table class="table-bordered table">
+            <thead>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <label for="" style="font-weight: bold;">Remark:</label><label for="" class="mandetory">*</label>
+                    <textarea class="form-control ignoresymbol_name" id="remarks"
+                    placeholder="Reason" [(ngModel)]="remark" (keyup)="checkRemark()" name="remark"></textarea>
+                  </div>
+                </div>
+              </div>
+            </thead>
+          </table>
+        </div>
+      </div>
+      <div id="updatemodelheaderbutton" class="modelbtnstyle">
+        <button (click)="unassignDevice()" [disabled]="isRemarkInvalid || loading">
+          {{loading ? 'Unassigning...' : 'Submit'}}
+        </button>
+        <button id="btnstyle" type="reset" (click)="back()">Back</button>
+      </div>
+    </div>
+  </div>
+}

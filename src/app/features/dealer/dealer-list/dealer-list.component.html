@@ -1,0 +1,330 @@
+<div  [ngStyle]="{ padding: isVisible ? '20px' : null }">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+
+        <!-- TITLE BAR -->
+        @if (isVisible) {
+          <div class="page-header-row">
+            <!-- TITLE -->
+            <div class="pagetitlestyle">
+              Dealer Details
+            </div>
+            <!-- ADD NEW BUTTON -->
+            <button type="button" class="add-new-btn" [routerLink]="'/dealer/entry'">
+              <i class="fa fa-plus"></i>
+              <span>Add New</span>
+            </button>
+          </div>
+        }
+
+
+        <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here..." [showExcel]="true"
+          [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
+          (reload)="reloadData()" [loading]="loading" [exportLoading]="isExporting" [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
+          (pageSizeChange)="onPageSizeChange($event)" (excelExport)="exportToExcel()" pageSizeLabel="Show Rows"
+          totalLabel="Total Records" countSeparator="of">
+          @if (isExporting) {
+            <span class="dealer-exporting"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Generating...</span>
+          }
+        </app-common-data-toolbar>
+
+        <ng-template #dealerHeader let-column>
+          @switch (column.key) {
+            @case ('param28') { Status<hr class="my-0">Activity }
+            @default { {{ column.label }} }
+          }
+        </ng-template>
+        <ng-template #dealerCell let-dealer let-column="column">
+          @switch (column.key) {
+            @case ('param1') { {{ dealer.param1 || 'NA' }} }
+            @case ('param3') {
+              <div>{{ dealer.param18 || 'NA' }}</div>
+              
+            }
+            @case ('param3') { {{ dealer.param3 || 'NA' }} }
+            @case ('param9') { {{ dealer.param9 || 'NA' }} }
+            @case ('param11') { {{ dealer.param11 || 'NA' }} }
+            @case ('param12') { {{ dealer.param12 || 'NA' }} }
+            @case ('param10') { {{ dealer.param10 || 'NA' }} }
+            @case ('param5') { {{ dealer.param5 || 'NA' }} }
+            @case ('param7') { {{ dealer.param7 || 'NA' }} }
+            @case ('param8') { {{ dealer.param8 || 'NA' }} }
+            @case ('param29') { {{ dealer.param29 || 0 }} }
+            @case ('param30') { {{ dealer.param30 || 0 }} }
+            @case ('param31') { {{ dealer.param31 || 0 }} }
+            @case ('param32') { {{ dealer.param32 || 0 }} }
+            @case ('param28') {
+              <span class="status-badge" [class.status-badge--active]="dealer.param28 === 'Active'"
+                [class.status-badge--inactive]="dealer.param28 !== 'Active'">{{ dealer.param28 || 'NA' }}</span>
+              <div class="dealer-actions">
+                <button type="button" class="btn btn-sm btn-outline-primary" (click)="openEditModal(dealer)"
+                  [disabled]="dealer.param28 !== 'Active'"><i class="fa fa-pencil" aria-hidden="true"></i> Edit</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="openDeleteModal(dealer)"
+                  [disabled]="dealer.param28 === 'Suspend'"><i class="fa fa-trash" aria-hidden="true"></i> Delete</button>
+                <button type="button" class="btn btn-sm"
+                  [class.btn-outline-warning]="dealer.param28 === 'Active'"
+                  [class.btn-outline-success]="dealer.param28 !== 'Active'" (click)="openBlockModal(dealer)">
+                  <i class="fa" [ngClass]="dealer.param28 === 'Active' ? 'fa-ban' : 'fa-check'" aria-hidden="true"></i>
+                  {{ dealer.param28 === 'Active' ? 'Block' : 'Active' }}
+                </button>
+              </div>
+            }
+          }
+        </ng-template>
+        <app-common-table [columns]="tableColumns" [rows]="getPaginatedDealers()" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" [headerTemplate]="dealerHeader" [cellTemplate]="dealerCell"
+          tableClass="table table-striped app-table mb-1" tableId="dealertable"
+          (sortChange)="sort($event)">
+        </app-common-table>
+        <div class="d-flex justify-content-end">
+          <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+            [disabled]="loading" (pageChange)="onPageChange($event)">
+          </app-common-pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+@if (showEditModal) {
+  <div class="dealer-modal-overlay" (click)="closeEditModal()">
+    <div class="dealer-modal" (click)="$event.stopPropagation()">
+      <!-- Header -->
+      <div class="dealer-modal-header py-1">
+        <h5 class="dealer-modal-title">
+          <i class="fa fa-pencil-square-o"></i> Update Dealer
+        </h5>
+        <button type="button" class="dealer-modal-close" (click)="closeEditModal()">
+          &times;
+        </button>
+      </div>
+      <!-- Body -->
+      <div class="dealer-modal-body">
+        <div class="row">
+          @if (roleId == '10') {
+            <div class="col-sm-4">
+              <div class="form-field">
+                <label>Vendor <span class="required">*</span></label>
+                <ng-select [(ngModel)]="vendorObj" name="vendorlist"
+                  placeholder="Select Vendor" required #vendorlistCtrl="ngModel" (change)="onVendorChange()">
+                  @for (item of vendorlist; track item) {
+                    <ng-option [value]="item">{{item.param2}}</ng-option>
+                  }
+                </ng-select>
+                <!-- <ng-select [items]="vendorlist" bindLabel="param2" bindValue="param1"
+                placeholder="Select Vendor"  [(ngModel)]="vendorId" name="editVendorId">
+              </ng-select> -->
+            </div>
+          </div>
+        }
+        <!-- Distributor Selection -->
+        @if (roleId != '12') {
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label class="field-label">Select Distributor:<span class="mandetory">*</span></label>
+              <ng-select [(ngModel)]="distributorObj" name="distributorlist"
+                placeholder="Select Distributor" required #distributorlistCtrl="ngModel">
+                @for (item of distributorList; track item) {
+                  <ng-option [value]="item.param1">{{item.param2}}</ng-option>
+                }
+              </ng-select>
+              <!-- <ng-select [items]="distributorList" bindLabel="param2" bindValue="param1"
+              placeholder="Select Distributor" [(ngModel)]="distributorId" name="editDistributorId"
+            style="font-size: 11px;"></ng-select> -->
+          </div>
+        </div>
+      }
+      <div class="col-sm-4">
+        <div class="form-field">
+          <label>Dealer Name <span class="required">*</span></label>
+          <input class="form-control" maxlength="250"
+            placeholder="Dealer Name" type="text"
+            [(ngModel)]="dealerName" name="editDealerName" />
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-field">
+          <label>Contact Person <span class="required">*</span></label>
+          <input class="form-control" maxlength="60"
+            placeholder="Contact Person" type="text"
+            [(ngModel)]="contactPerson" name="editContactPerson" />
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-field">
+          <label>Mobile No <span class="required">*</span></label>
+          <input class="form-control" maxlength="10"
+            placeholder="Mobile No" type="text"
+            [(ngModel)]="mobileNo" name="editMobileNo" />
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-field">
+          <label>Alternate No</label>
+          <input class="form-control" maxlength="10"
+            placeholder="Alternate Mobile No" type="text"
+            [(ngModel)]="alternateMobileNo" name="editAltMobileNo" />
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-field">
+          <label>Email Id <span class="required">*</span></label>
+          <input class="form-control"
+            placeholder="Email Id" type="text"
+            [(ngModel)]="emailId" name="editEmailId" />
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-field">
+          <label>State</label>
+          <ng-select [(ngModel)]="stateObj" id="statelist" name="statelist"
+            placeholder="Select State" #statelistCtrl="ngModel" (change)="onStateChange()">
+            @for (item of statelist; track item) {
+              <ng-option [value]="item">{{item.param2}}</ng-option>
+            }
+          </ng-select>
+          <!-- <ng-select [items]="statelist" bindLabel="param2" bindValue="param1"
+          placeholder="Select State" [(ngModel)]="selectedStateId"
+          (change)="selectedCityId=null;  onStateChange()">
+        </ng-select> -->
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="form-field">
+        <label>City</label>
+        <ng-select [(ngModel)]="cityObj" id="citylist" name="citylist"
+          placeholder="Select City" #citylistCtrl="ngModel">
+          @for (item of citylist; track item) {
+            <ng-option [value]="item">{{item.param2}}</ng-option>
+          }
+        </ng-select>
+        <!-- <ng-select [items]="citylist" bindLabel="param2" bindValue="param1"
+        placeholder="Select City" [(ngModel)]="selectedCityId" (change)="onCityChange()">
+      </ng-select> -->
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="form-field">
+      <label>Address <span class="required">*</span></label>
+      <textarea class="form-control" maxlength="80"
+      placeholder="Address" [(ngModel)]="address" name="editAddress"></textarea>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="form-field">
+      <label>Remark <span class="required">*</span></label>
+      <textarea class="form-control remark-box" maxlength="100"
+      placeholder="Remark" [(ngModel)]="updateRemark" name="editRemark"></textarea>
+    </div>
+  </div>
+</div>
+</div>
+<!-- Footer -->
+<div class="dealer-modal-footer">
+  <button class="btn-submit" (click)="editDealerData()">
+    <i class="fa fa-check"></i> Submit
+  </button>
+  <button class="btn-back" (click)="closeEditModal()">
+    <i class="fa fa-times"></i> Back
+  </button>
+</div>
+</div>
+</div>
+}
+
+<!-- DELETE MODAL -->
+@if (showDeleteModal) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content" style="width: 500px;" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Dealer</h5>
+        <button type="button" class="close" (click)="closeDeleteModal()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete dealer:
+          <strong>{{ dealerName }}</strong>?
+        </p>
+        <div class="form-group">
+          <label>Remark: <span class="mandetory">*</span></label>
+          <textarea class="form-control" placeholder="Enter remark (min 10 characters)" [(ngModel)]="remarkForDelete"
+          name="deleteRemark" maxlength="100"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" (click)="deleteDealerData()">Delete</button>
+        <button type="button" (click)="closeDeleteModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+}
+<!-- BLOCK / UNBLOCK MODAL -->
+@if (showBlockModal) {
+  <div class="modal-overlay" (click)="closeBlockModal()"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1050;">
+    <div class="modal-content" (click)="$event.stopPropagation()"
+      style="width: 350px; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.3); border: none; overflow: hidden; background: #fff;">
+      <div class="modal-header"
+        [style.background]="blockUnblock === 'block' ? '#fff5f5' : '#f0fff4'"
+        style="padding: 12px 20px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;">
+        <h5 class="modal-title"
+          [style.color]="blockUnblock === 'block' ? '#e3342f' : '#38c172'"
+          style="font-size: 14px; font-weight: 700; margin: 0; display: flex; align-items: center;">
+          <i class="fa" [ngClass]="blockUnblock === 'block' ? 'fa-ban' : 'fa-check-circle'" style="margin-right: 8px;"></i>
+          {{ blockUnblock === 'block' ? 'Block' : 'Unblock' }} Dealer
+        </h5>
+        <button type="button" class="close" (click)="closeBlockModal()"
+          style="outline: none; border: none; background: transparent; font-size: 20px; color: #aaa; cursor: pointer; line-height: 1;">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 20px; font-size: 12px; color: #555;">
+        <p style="margin-bottom: 15px; line-height: 1.6; text-align: center;">
+          Are you sure you want to
+          <strong [style.color]="blockUnblock === 'block' ? '#e3342f' : '#38c172'" style="text-transform: uppercase;">{{ blockUnblock }}</strong>
+          the dealer<br>
+          <strong style="font-size: 14px; color: #333;">{{ dealerName }}</strong>?
+        </p>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label style="font-weight: 600; margin-bottom: 6px; display: block; font-size: 11px; color: #777;">Remark <span class="mandetory" style="color: red;">*</span></label>
+          <textarea id="remarkforblock" class="form-control" rows="3" maxlength="100"
+            placeholder="Enter remark (min 10 characters)" [(ngModel)]="remarkForBlock"
+          style="font-size: 11px; resize: none; border-radius: 8px; background: #f9f9f9; border: 1px solid #e0e0e0; padding: 10px; width: 100%;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 12px 20px; background: #fcfcfc; border-top: 1px solid #f0f0f0; display: flex; justify-content: center; gap: 10px;">
+        @if (blockUnblock === 'block') {
+          <button type="button" class="btn btn-sm shadow-sm"
+            (click)="blockUnblockDetails()"
+            style="background: #e3342f; color: #fff; border: none; border-radius: 20px; padding: 6px 25px; font-size: 11px; font-weight: 600; transition: all 0.3s;">
+            Block
+          </button>
+        }
+        @if (blockUnblock === 'unblock') {
+          <button type="button" class="btn btn-sm shadow-sm"
+            (click)="blockUnblockDetails()"
+            style="background: #38c172; color: #fff; border: none; border-radius: 20px; padding: 6px 25px; font-size: 11px; font-weight: 600; transition: all 0.3s;">
+            Unblock
+          </button>
+        }
+        <button type="button" class="btn btn-sm shadow-sm" (click)="closeBlockModal()"
+          style="background: #fff; color: #666; border: 1px solid #ddd; border-radius: 20px; padding: 6px 25px; font-size: 11px; font-weight: 600; transition: all 0.3s;">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success"
+  (closed)="successMessage = null"></app-toast>
+}

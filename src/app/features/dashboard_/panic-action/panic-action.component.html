@@ -1,0 +1,35 @@
+<div class="action-backdrop">
+  <section class="action-dialog" role="dialog" aria-modal="true" aria-labelledby="panic-action-title" cdkTrapFocus [cdkTrapFocusAutoCapture]="true" (click)="$event.stopPropagation()">
+    <header><h2 id="panic-action-title"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Emergency alerts</h2><button type="button" aria-label="Close emergency alert" (click)="closed.emit()"><i class="fa fa-times" aria-hidden="true"></i></button></header>
+    <form #actionForm="ngForm" (ngSubmit)="submit()">
+      <div class="vehicle-details">
+        <div><span>Vehicle no.</span><strong>{{ session.vehicleNumber || '—' }}</strong></div>
+        <div><span>Chassis no.</span><strong>{{ session.chassisNumber || '—' }}</strong></div>
+        <div><span>Vehicle class</span><strong>{{ session.vehicleClass || '—' }}</strong></div>
+        <div><span>RTO</span><strong>{{ session.rto || '—' }}</strong></div>
+        <div><span>Owner / contact holder</span><strong>{{ session.ownerName || '—' }}</strong></div>
+        <div><span><i class="fa fa-phone" aria-hidden="true"></i> Contact number</span><a >{{ session.ownerPhone }}</a><ng-template #noPhone>—</ng-template></div>
+        <div><span>IMEI</span><strong>{{ session.imeiNumber || '—' }}</strong></div>
+        <div><span>Vendor</span><strong>{{ session.vendorName || 'Not provided' }}</strong></div>
+        <div><span>Model Name</span><strong>{{ session.modelName || '—' }}</strong></div>
+        <div><span>Device Serial No</span><strong>{{ session.deviceSerialNo || '—' }}</strong></div>
+        <div><span>ICCID</span><strong>{{ session.iccid || '—' }}</strong></div>
+        <div><span>Primary MSISDN</span><strong>{{ session.primaryMsisdn || '—' }}</strong></div>
+        <div><span>Network 1</span><strong>{{ session.primaryNetwork || '—' }}</strong></div>
+        <div><span>Fallback MSISDN</span><strong>{{ session.fallbackMsisdn || '—' }}</strong></div>
+        <div><span>Network 2</span><strong>{{ session.fallbackNetwork || '—' }}</strong></div>
+        <div><span>Device Activation Date</span><strong>{{ session.deviceActivationDate || '—' }}</strong></div>
+        <div><span>Device Activated Upto</span><strong>{{ session.deviceActivatedUpto || '—' }}</strong></div>
+        <div><span>Dealer Name</span><strong>{{ session.dealerName || '—' }}</strong></div>
+        <div><span>Last panic event</span><strong>{{ session.lastEventTime || '—' }}</strong></div>
+        <div><span>Location</span><strong>{{ session.lastEventLocation || '—' }}</strong></div>
+      </div>
+      <div class="form-fields">
+        <label>Reason <em>*</em><select name="reason" [(ngModel)]="reason" required cdkFocusInitial [disabled]="reasonsLoading || !reasons.length || submitting"><option value="" disabled>{{ reasonsLoading ? 'Loading reasons...' : 'Select reason' }}</option><option *ngFor="let option of reasons" [value]="option.id">{{ option.name }}</option></select><span *ngIf="reasonsError" role="status">{{ reasonsError }} <button type="button" (click)="loadReasons()">Retry</button></span></label>
+        <label class="remark">Panic Close Comment. <em>*</em><textarea name="remark" [(ngModel)]="remark" required pattern="[\s\S]*\S[\s\S]*" maxlength="1000" rows="2" placeholder="Enter panic close comment"></textarea></label>
+      </div>
+      
+      <footer><button type="button" class="cancel" (click)="closed.emit()">Cancel</button><button type="submit" [disabled]="actionForm.invalid || submitting || reasonsLoading || !reason || !reasons.length"><i class="fa fa-check" aria-hidden="true"></i> {{ submitting ? 'Submitting...' : 'Submit' }}</button></footer>
+    </form>
+  </section>
+</div>

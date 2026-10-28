@@ -1,0 +1,155 @@
+<div style="padding: 10px 10px;">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+
+        <!-- TITLE BAR -->
+        <div class="page-header-row">
+
+          <!-- TITLE -->
+          <div class="pagetitlestyle">
+            Backend Connected Device Details
+          </div>
+
+        </div>
+
+
+        <!-- SEARCH + CONTROLS BAR -->
+        <div class="top-controls-row">
+
+          <!-- LEFT SEARCH -->
+          <div class="left-controls">
+
+            <!-- SEARCH WITH INNER BUTTON -->
+            <div class="search-box">
+              <input type="search" class="search-input inner" placeholder="Type here and press button...."
+                maxlength="50" [(ngModel)]="detailsRequest.param4" (keyup.enter)="getDetails('search')"
+                name="searchTextBox" />
+
+              <button type="button" class="search-inner-btn" (click)="getDetails('search')">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+
+            <!-- RELOAD -->
+            <button (click)="getDetails('init')" [disabled]="loading"
+              style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+              <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
+              <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+            </button>
+
+          </div>
+
+          <!-- RIGHT CONTROLS -->
+          <div class="right-controls">
+            <!-- <div style="display: flex; align-items: center; margin-right: 15px;">
+            <label class="total-records-text">
+              Download: &nbsp;
+            </label>
+
+            <select [(ngModel)]="selectedDownloadType" (change)="onDownloadChange()"
+              [disabled]="isExporting"
+              style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; background: white;">
+
+              <option value="" selected>Select</option>
+              <option value="Excel">Excel</option>
+            </select>
+
+            <span *ngIf="isExporting" style="margin-left:8px; font-size:11px; color:#0b58b9;">
+              <i class="fa fa-spinner fa-spin"></i> Generating...
+            </span>
+          </div> -->
+          <select class="rows-select" [(ngModel)]="detailsRequest.param3" (change)="getDetails('pageSize')">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size === totalCount ? 'All' : size">
+                {{ size === totalCount ? 'All' : size }}
+              </option>
+            }
+          </select>
+
+          <div class="total-records-text">
+            Total Records : {{ pageCount }} of {{ totalCount }}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-responsive">
+        <ng-template #backendCell let-item let-column="column">
+          @switch (column.key) {
+            @case ('param2') {
+              <span [ngStyle]="{'color': (!item.param29 || item.param29.trim() === '') ? 'red' : 'green', 'font-weight': 'bold'}">
+                {{item.param2 || '-'}}
+              </span>
+            }
+            @case ('param4') { <span class="text-end">{{item.param4 || '-'}}</span> }
+            @case ('param5') { <span class="text-center">{{item.param5 || '-'}}</span> }
+            @case ('param7') { <span class="text-center">{{item.param7 || '-'}}</span> }
+            @case ('param8') { <span class="text-end">{{item.param8 || '-'}}</span> }
+            @case ('coordinates') { {{item.param9 !== '0' ? item.param9 : '-'}}<hr class="m-0">{{item.param11 !== '0' ? item.param11 : '-'}} }
+            @case ('direction') {
+              <i class="fa fa-arrow-circle-up" style="font-size: 14px; color:sienna; display:inline-block"
+                [style.transform]="'rotate(' + item.param15 + 'deg)'"
+                [title]="item.param15 + '° (' + item.param13 + ')'"></i>
+            }
+            @case ('mncMcc') { {{item.param24}}<hr>{{item.param25}} }
+            @case ('operatorSatellites') { {{item.param17}}<hr>{{item.param18}} }
+            @case ('ignitionPower') {
+              <i class="fa" [ngClass]="item.param19 === 'true' ? 'fa-key text-success' : 'fa-key text-danger'"
+                [title]="item.param19 === 'true' ? 'Ignition ON' : 'Ignition OFF'"></i>
+              <hr>
+              <i class="fa" [ngClass]="item.param20 === 'true' ? 'fa-power-off text-success' : 'fa-power-off text-danger'"
+                [title]="item.param20 === 'true' ? 'Main Power ON' : 'Main Power OFF'"></i>
+            }
+            @default { {{item[column.key] || 'NA'}} }
+          }
+        </ng-template>
+        <app-common-table [columns]="tableColumns" [rows]="detailsData" [loading]="loading"
+          [cellTemplate]="backendCell" tableClass="table app-table" tableId="devicetable"
+          emptyMessage="No Record Found">
+        </app-common-table>
+
+</div>
+@if (totalPages > 1) {
+  <div class="custom-pagination" style="display:flex;justify-content: end;"
+    >
+    <button class="pg-btn" (click)="changePage(pageNo - 1)" [disabled]="pageNo === 1">
+      Prev
+    </button>
+    <button class="pg-num" [class.active]="pageNo === 1" (click)="changePage(1)">
+      1
+    </button>
+    @if (pageNo > 3) {
+      <span class="pg-dots">...</span>
+    }
+    @if (pageNo > 2) {
+      <button class="pg-num" (click)="changePage(pageNo - 1)">
+        {{ pageNo - 1 }}
+      </button>
+    }
+    @if (pageNo !== 1 && pageNo !== totalPages) {
+      <button class="pg-num active">
+        {{ pageNo }}
+      </button>
+    }
+    @if (pageNo < totalPages - 1) {
+      <button class="pg-num" (click)="changePage(pageNo + 1)">
+        {{ pageNo + 1 }}
+      </button>
+    }
+    @if (pageNo < totalPages - 2) {
+      <span class="pg-dots">...</span>
+    }
+    <button class="pg-num" [class.active]="pageNo === totalPages" (click)="changePage(totalPages)">
+      {{ totalPages }}
+    </button>
+    <button class="pg-btn" (click)="changePage(pageNo + 1)" [disabled]="pageNo === totalPages">
+      Next
+    </button>
+  </div>
+}
+</div>
+</div>
+</div>
+</div>

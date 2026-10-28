@@ -1,0 +1,202 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle">
+            <span style=" color: #3E4B5B; font-family: monospace; line-height: 1.5;">Inactive Assets</span>
+          </div>
+        </div>
+        <form autocomplete="off">
+          <div class="table-responsive">
+            <div id="dataTable1_wrapper">
+              <div class="col-sm-12">
+
+                <div class="top-controls-row">
+
+                  <!-- LEFT SEARCH -->
+                  <div class="left-controls">
+
+                    <!-- SEARCH WITH INNER BUTTON -->
+                    <div class="search-box">
+                      <input type="search" class="search-input inner" placeholder="Type here and press button...."
+                        maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()"
+                        name="searchTextBox" />
+
+                      <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+
+                    <!-- RELOAD -->
+                    <button (click)="reloadData()" [disabled]="loading"
+                      style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+                      <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
+                      <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+                    </button>
+
+                  </div>
+
+                  <!-- RIGHT CONTROLS -->
+
+                  <div class="right-controls">
+                    <div class="toggle-container modern-toggle">
+
+                      <button class="toggle-option" [class.active]="vehicleType === 'New'" (click)="onChangeVehicleType('New')">
+                        New
+                      </button>
+
+                      <button class="toggle-option" [class.active]="vehicleType === 'Old'" (click)="onChangeVehicleType('Old')">
+                        Old
+                      </button>
+
+                    </div>
+                    <div style="display: flex; align-items: center; margin-right: 15px;">
+                      <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                        [showPageSize]="false" [showTotal]="false" [exportLoading]="isExporting"
+                        (excelExport)="exportToExcel()"></app-common-data-toolbar>
+                    </div>
+                    <select id="days" class="searchable" [(ngModel)]="selectedDays"
+                      [ngModelOptions]="{ standalone: true }" (change)="onDaysChange()">
+                      @for (option of daysOptions; track option) {
+                        <option [value]="option.value">
+                          {{ option.label }}
+                        </option>
+                      }
+                    </select>
+                    <select class="rows-select" name="pageSize" [(ngModel)]="pageSize"
+                      (ngModelChange)="onPageSizeChange($event)">
+                      @for (size of pageSizeOptions; track size) {
+                        <option [ngValue]="size">
+                          {{ size === totalCount ? 'All' : size }}
+                        </option>
+                      }
+                    </select>
+
+
+
+                    <div class="total-records">
+                      Total Records : {{ getEndRecord() }} of {{ totalCount }}
+                    </div>
+
+                  </div>
+                </div>
+                <div id="livedetailsadmindetailsTable" style="text-align: center; margin-top: 10px;">
+
+
+
+                  <div style="display: flex; justify-content: flex-start;">
+                    <span style="font-size: 10px; color: red;">**Note : Click on Last Polling Time for track on
+                    map</span>
+                  </div>
+
+                  <ng-template #inactiveAssetCell let-inactive let-column="column">
+                    @switch (column.key) {
+                      @case ('param5') { {{inactive.param5 || 'NA'}}<br>{{inactive.param4 || 'NA'}} }
+                      @case ('param18') { {{inactive.param18 || 'NA'}}<br>{{inactive.param19 || 'NA'}} }
+                      @case ('param22') {
+                        <span style="color: darkblue; cursor: pointer; text-decoration: underline;"
+                          (click)="trackinactivevehicle(inactive)">{{inactive.param22 || 'NA'}}</span>
+                      }
+                      @case ('param27') { {{inactive.param27 || 'NA'}}<br>{{inactive.param29 || 'NA'}} }
+                      @case ('param25') { {{inactive.param25 || 'NA'}}<br>{{inactive.param26 || 'NA'}} }
+                      @case ('param28') {
+                        {{inactive.param21 === 'Connected' ? 'Received' : (inactive.param21 === 'Not Connected' ? 'Not Received' : 'Never Received')}}
+                        <br>{{inactive.param28}}
+                      }
+                      @default { {{inactive[column.key] || 'NA'}} }
+                    }
+                  </ng-template>
+                  <app-common-table [columns]="tableColumns" [rows]="devices" [loading]="loading"
+                    [cellTemplate]="inactiveAssetCell" [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
+                    tableClass="table-striped app-table table" tableId="devicetable"
+                    tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
+                    headerClass="device-thead" emptyMessage="NO DATA FOUND">
+                  </app-common-table>
+
+                          <div class="row">
+                            <div class="col-md-12">
+                              @if (totalCount > pageSize) {
+                                <div class="pagination-wrapper">
+                                  <ul class="pagination"
+                                    style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+                                    <li [class.disabled]="currentPage === 1">
+                                      <button (click)="getInactiveAssetsDetails(currentPage - 1)"
+                                      [disabled]="currentPage === 1">Previous</button>
+                                    </li>
+                                    @for (page of getPageNumbers(); track page) {
+                                      <li [class.active]="currentPage === page">
+                                        <button (click)="getInactiveAssetsDetails(page)">{{page}}</button>
+                                      </li>
+                                    }
+                                    <li [class.disabled]="currentPage >= getTotalPages()">
+                                      <button (click)="getInactiveAssetsDetails(currentPage + 1)"
+                                      [disabled]="currentPage >= getTotalPages()">Next</button>
+                                    </li>
+                                  </ul>
+                                </div>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                        <br>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          @if (showTrackModal) {
+            <div class="modal-overlay" (click)="closeModal()">
+              <div class="modal-content" style="max-width: 1124px; width: 90%;" (click)="$event.stopPropagation()">
+                <div class="modal-header" style="background: #b5e5b5;">
+                  <h6 style="font-size: 14px; margin: 0;">Vehicle No : {{selectedVehicleNo}}</h6>
+                  <button type="button" class="btn btn-sm" (click)="closeModal()"
+                  style="color: #fff; background: #db0000; height: 30px; width: 30px; font-weight: bold; cursor: pointer; border: none; padding: 0;">x</button>
+                </div>
+                <div class="modal-body" style="padding: 0;">
+                  <div class="col-md-12" id="maptrack1" style="position: relative;">
+                    <div style="position: absolute; z-index: 1; border-radius: 3px; margin: 10px;">
+                      <button class="btn" id="togglebtn1" type="button" (click)="toggleLayers()"
+                        style="box-shadow: 1px 1px 0px 1px #a5a5a5;">
+                        <i class="fa fa-eye"></i> &nbsp;Layers
+                      </button>
+                      <div id="toggleDiv1" class="p-1 text-left" [style.display]="showLayersToggle ? 'block' : 'none'"
+                        style="background: #80808073; color: black; font-weight: bold;">
+                        <div>
+                          <ul style="list-style: none; margin-left: -40px;">
+                            <li style="padding: 5px;"><input type="checkbox" id="Delhi_Psv_All"><span>&nbsp;&nbsp;View All</span>
+                          </li>
+                          <li style="padding: 5px;"><input type="checkbox"
+                            id="National_District_region"><span>&nbsp;&nbsp;District Boundary</span></li>
+                            <li style="padding: 5px;"><input type="checkbox"
+                              id="Delhi_Noida_Rd_Highways_polyline"><span>&nbsp;&nbsp;Highways</span></li>
+                              <li style="padding: 5px;"><input type="checkbox"
+                                id="Delhi_Noida_Rd_ACH_polyline"><span>&nbsp;&nbsp;RoadACH</span></li>
+                                <li style="padding: 5px;"><input type="checkbox" id="Delhi_Noida_Landuse_region"><span>&nbsp;&nbsp;Land
+                                Use</span></li>
+                                <li style="padding: 5px;"><input type="checkbox"
+                                  id="Delhi_Noida_Locality_region"><span>&nbsp;&nbsp;Locality</span></li>
+                                  <li style="padding: 5px;"><input type="checkbox" id="Delhi_Noida_POI_point"><span>&nbsp;&nbsp;POI</span>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div id="map1" style="width: 100%; height: 486px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+
+
+              @if (loading) {
+                <app-loading></app-loading>
+              }
+              @if (errorMessage) {
+                <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+              }

@@ -1,0 +1,347 @@
+/* Match legacy Unassign Device From Dealer UI */
+
+.content-i {
+  padding: 20px;
+}
+
+.pagetitleborder {
+  border-bottom: 1px solid #0b58b9;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+table.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+table.table thead tr {
+  background-color: #c8e4b2;
+}
+
+table.table tbody tr:nth-child(odd) {
+  background-color: #e5f3d6;
+}
+
+table.table tbody tr:nth-child(even) {
+  background-color: #f7ffef;
+}
+
+table.table th,
+table.table td {
+  padding: 4px 6px;
+  vertical-align: middle;
+}
+
+.sorting {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+}
+
+.sorting_asc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #000;
+}
+
+.sorting_desc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #000;
+}
+
+.pagination-wrapper {
+  margin-top: 10px;
+  text-align: center;
+  padding: 5px 0 10px;
+}
+
+.pagination-wrapper button {
+  padding: 3px 8px;
+  margin: 0 2px;
+  border: 1px solid #7b7a7a;
+  background-color: #eff9f0;
+  color: #0d9706;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.pagination-wrapper button.active {
+  background-color: #76dd6b;
+  border-color: #159706;
+  color: #fff;
+  text-decoration: underline;
+}
+
+.pagination-wrapper button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modelbtnstyle {
+  text-align: center;
+  padding: 10px 0 15px;
+}
+
+.modelbtnstyle button {
+  margin-left: 10px;
+  padding: 5px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.modelbtnstyle button:first-child {
+  background-color: #0b58b9;
+  color: white;
+}
+
+.modelbtnstyle button:last-child {
+  background-color: #6c757d;
+  color: white;
+}
+
+.mandetory {
+  color: red;
+  font-weight: normal;
+}
+
+/* Modal overlay and content */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 4px;
+  padding: 0;
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 300px;
+}
+
+.modal-header {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #b5e5b5;
+}
+
+.modal-title {
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.modal-body {
+  padding: 10px 15px;
+  margin-top: -5px;
+}
+
+
+.page-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #0b58b9;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #58b047;
+}
+
+.add-new-btn {
+  background: #0b66ff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+}
+/* ===== HEADER ===== */
+
+.page-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.page-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* ===== HEADER BUTTONS ===== */
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.add-new-btn {
+  height: 28px;
+  padding: 0 14px;
+  font-size: 11px;
+  font-weight: bold;
+  background: #fff;
+  color: #0b58b9;
+  border: 1px solid #0b58b9;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.add-new-btn:hover {
+  background: #0b58b9;
+  color: #fff;
+}
+
+/* ===== TOP CONTROLS ===== */
+
+.top-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  width: 100%;
+}
+
+.left-controls,
+.right-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== SEARCH ===== */
+
+.search-label {
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.search-box {
+  display: flex;
+  border: 1px solid #0b58b9;
+  border-radius: 4px;
+  overflow: hidden;
+  height: 26px;
+  background: #fff;
+}
+
+.search-input.inner {
+  border: none;
+  outline: none;
+  padding: 0 8px;
+  font-size: 11px;
+  width: 200px;
+}
+
+.search-inner-btn {
+  width: 32px;
+  background: #0b58b9;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== RELOAD ===== */
+
+.reload-btn {
+  height: 26px;
+  padding: 0 14px;
+  font-size: 11px;
+  font-weight: bold;
+  background: #fff;
+  color: #0b58b9;
+  border: 1px solid #0b58b9;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.reload-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== RIGHT CONTROLS ===== */
+
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.control-item label {
+  font-weight: bold;
+}
+
+.control-item select {
+  height: 26px;
+  font-size: 11px;
+  border: 1px solid #0b58b9;
+  border-radius: 4px;
+  padding: 0 6px;
+  background: #fff;
+}
+
+.total-records-text {
+  font-size: 11px;
+  font-weight: bold;
+  color: #0b58b9;
+  white-space: nowrap;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+  .top-controls-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .right-controls {
+    flex-wrap: wrap;
+  }
+}

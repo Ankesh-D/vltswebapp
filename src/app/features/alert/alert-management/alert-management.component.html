@@ -1,0 +1,219 @@
+<style>
+  /* Animation */
+  @keyframes fadeInUp {
+  from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+.element-box {
+border-radius: 8px;
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+padding: 20px;
+background: #fff;
+animation: fadeInUp 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Header */
+.pagetitleborder {
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-bottom: 1px solid #eee;
+padding-bottom: 4px;
+margin-bottom: 3px;
+flex-direction: row-reverse;
+}
+
+.pagetitlestyle span {
+font-size: 18px;
+font-weight: 700;
+color: #2c3e50;
+position: relative;
+}
+
+.pagetitlestyle span::after {
+content: '';
+display: block;
+width: 40px;
+height: 3px;
+background: #3b9dba;
+margin-top: 5px;
+border-radius: 2px;
+}
+
+.page-actions {
+display: flex;
+gap: 10px;
+}
+
+.pagebtn {
+background: #fff;
+border: 1px solid #3b9dba;
+border-radius: 20px;
+padding: 4px 15px;
+transition: all 0.3s ease;
+cursor: pointer;
+}
+
+.pagebtn:hover {
+background: #3b9dba;
+box-shadow: 0 3px 8px rgba(59, 157, 186, 0.3);
+}
+
+.pagebtn a {
+color: #3b9dba;
+font-size: 12px;
+font-weight: 600;
+text-decoration: none;
+}
+
+.pagebtn:hover a {
+color: #fff;
+}
+
+/* Table */
+.table-container {
+border-radius: 6px;
+overflow-y: auto;
+overflow-x: hidden;
+height: 315px;
+border: 1px solid #eee;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+margin-top: 10px;
+}
+
+/* Checkboxes */
+input[type="checkbox"] {
+cursor: pointer;
+width: 16px;
+height: 16px;
+accent-color: #3b9dba;
+}
+
+/* Submit Button */
+.form-buttons-w {
+margin-top: 20px;
+text-align: center;
+}
+
+.btn-submit {
+background: linear-gradient(135deg, #3b9dba 0%, #2a8a9a 100%);
+color: white;
+border: none;
+padding: 8px 30px;
+border-radius: 25px;
+font-size: 13px;
+font-weight: 600;
+letter-spacing: 0.5px;
+box-shadow: 0 4px 15px rgba(59, 157, 186, 0.3);
+transition: all 0.3s ease;
+cursor: pointer;
+}
+
+.btn-submit:hover {
+transform: translateY(-2px);
+box-shadow: 0 6px 20px rgba(59, 157, 186, 0.4);
+}
+
+.total-records {
+font-size: 12px;
+font-weight: 600;
+color: #3b9dba;
+margin-bottom: 10px;
+text-align: right;
+}
+</style>
+
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="pagetitleborder">
+          <div class="page-actions">
+            <button class="pagebtn">
+              <a routerLink="/config/details"><i class="fa fa-plus"></i>&nbsp;&nbsp;Details</a>
+            </button>
+            <button class="pagebtn">
+              <a routerLink="/configure"><i class="fa fa-plus"></i>&nbsp;&nbsp;Configure</a>
+            </button>
+          </div>
+          <div class="pagetitlestyle"><span>Alert Management</span></div>
+        </div>
+
+        <form>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="total-records">
+                Total Records : {{totalCount}}
+              </div>
+
+              <div class="table-responsive table-container">
+                <table class="table table-striped app-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 50px;">#</th>
+                      <th (click)="sort('param3')" style="cursor: pointer;">
+                        Alert Type
+                        <i class="fa" style="float: right; margin-top: 2px;"
+                        [ngClass]="{'fa-sort': sortKey !== 'param3', 'fa-sort-asc': sortKey === 'param3' && !reverse, 'fa-sort-desc': sortKey === 'param3' && reverse}"></i>
+                      </th>
+                      <th style="text-align: center;">Notification</th>
+                      <th style="text-align: center;">Email</th>
+                      <th style="text-align: center;">Sms</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @if (alertTypeConfig.length === 0 && !loading) {
+                      <tr>
+                        <td colspan="5" style="text-align: center;font-weight: bold;">NO DATA FOUND</td>
+                      </tr>
+                    }
+                    @for (alert of alertTypeConfig; track alert) {
+                      <tr>
+                        <td>{{alert.param1 || 'NA'}}</td>
+                        <td>{{alert.param3 || 'NA'}}</td>
+                        <td style="text-align: center;">
+                          <input type="checkbox" [checked]="isNotificationChecked(alert.param1)"
+                            (change)="onNotificationChange(alert.param1, $event)" id="notificationcheck{{alert.param1}}">
+                        </td>
+                        <td style="text-align: center;">
+                          <input type="checkbox" [checked]="isEmailChecked(alert.param1)"
+                            (change)="onEmailChange(alert.param1, $event)" id="emailcheck{{alert.param1}}">
+                        </td>
+                        <td style="text-align: center;">
+                          <input type="checkbox" [checked]="isSmsChecked(alert.param1)"
+                            (change)="onSmsChange(alert.param1, $event)" id="smscheck{{alert.param1}}">
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              <div class="form-buttons-w">
+                <button class="btn-submit" type="submit" (click)="submitAlertType()">
+                  <i class="fa fa-check"></i> Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success"
+  (closed)="successMessage = null"></app-toast>
+}

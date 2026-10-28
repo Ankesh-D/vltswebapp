@@ -1,0 +1,177 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-box">
+
+      <!-- PAGE TITLE -->
+      <div class="pagetitlestyle">
+        <span>Vendor Status Report</span>
+      </div>
+
+      <!-- MAIN LAYOUT -->
+      <div class="overspeed-layout">
+        <!-- LEFT FILTER PANEL -->
+        <!-- <div class="left-filter-panel entrypagediv">
+
+        <div class="form-group">
+          <label class="control-label">Select Vendor <span style="color:red">*</span></label>
+          <ng-select name="vendor" class="searchable full-control" placeholder="Select Vendor"
+            [(ngModel)]="selectedVendor">
+            <ng-option *ngFor="let v of vendorList" [value]="v.param1">{{v.param2}}</ng-option>
+          </ng-select>
+        </div>
+
+
+        <div class="date-row">
+          <div class="date-col" style="width:100%">
+            <label class="control-label">Select Date Range<span style="color:red">*</span> </label>
+            <input type="text" id="datepicker" class="form-control" name="date"/>
+          </div>
+        </div>
+
+        <div class="date-row">
+
+          <div class="date-col">
+            <label class="control-label">From Time<span style="color:red">*</span></label>
+            <input type="time" class="form-control" [(ngModel)]="fromTime" step="60" />
+          </div>
+
+          <div class="date-col">
+            <label class="control-label">To Time<span style="color:red">*</span></label>
+            <input type="time" class="form-control" [(ngModel)]="toTime" step="60" />
+          </div>
+
+        </div>
+        <div class="search-btn-row">
+          <button class="search-btn-full" (click)="getAlertOverview()">
+            <i class="fa fa-search"></i> Search
+          </button>
+        </div>
+      </div> -->
+      <!-- *ngIf="showSummary" -->
+      <!-- RIGHT REPORT PANEL -->
+      <div class="right-report-panel">
+        <!-- 🔹 TOP CONTROLS BAR -->
+        <div class="top-controls-row">
+
+          <!-- LEFT SIDE -->
+          <div class="left-controls">
+
+            <!-- 🔍 SEARCH BOX -->
+            <div class="search-box">
+              <input type="search" class="search-input inner" placeholder="Search here..." maxlength="50"
+                [(ngModel)]="formReq.param1" (keyup.enter)="getSearchDetails()" />
+
+              <button class="search-inner-btn" (click)="getSearchDetails()">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+
+            <!-- 🔄 RELOAD BUTTON -->
+            <button class="reload-btn" (click)="reloadData()" [disabled]="loading">
+
+              <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+              <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+
+            </button>
+
+          </div>
+          <div>
+            <div>
+              <ng-select name="filterFor"
+                class="searchable full-control"
+                placeholder="Select Filter"
+                [(ngModel)]="selectedFilterBy"
+                [clearable]=false
+                (change)="onFilterChange()">
+                @for (v of filterList; track v) {
+                  <ng-option [value]="v">{{v.label}}</ng-option>
+                }
+              </ng-select>
+
+            </div>
+
+
+          </div>
+
+
+          <!-- RIGHT SIDE -->
+          <div class="right-controls">
+            <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+              [showPageSize]="false" [showTotal]="false" (excelExport)="exportToExcel()">
+            </app-common-data-toolbar>
+            <!-- <div class="total-records-text">Show Rows :</div> -->
+            <!-- ROWS SELECT -->
+            <!-- <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChanged(pageSize)">
+
+            <option *ngFor="let size of pageSizeOptions" [value]="size === totalCount ? 'All' : size">
+              {{ size === totalCount ? 'All' : size }}
+            </option>
+
+          </select> -->
+
+          <!-- TOTAL RECORD TEXT -->
+          <div class="total-records-text">
+            Total Records : {{ totalCount }}
+          </div>
+
+        </div>
+
+      </div>
+      <!-- TABLE -->
+      <ng-template #vendorStatusRows let-rows>
+        @for (d of rows; track d) {
+          <tr>
+            <td class="text-end">{{ d.param1 }}</td>
+            <td>{{ d.param2 }}</td>
+            <td class="text-end">{{ d.param3 != '' ? d.param3 : '-' }}</td>
+            <td class="text-end">{{ d.param4 != '' ? d.param4 : '-' }}</td>
+            <td class="text-end">{{ d.param5 != '' ? d.param5 : '-' }}</td>
+            <td class="text-end">{{ d.param6 != '' ? d.param6 : '-' }}</td>
+            <td class="text-end">{{ d.param7 != '' ? d.param7 : '-' }}</td>
+            <td class="text-end">{{ d.param8 != '' ? d.param8 : '-' }}</td>
+            <td class="text-end">{{ d.param9 != '' ? d.param9 : '-' }}</td>
+            <td class="text-end">{{ d.param11 ? d.param11 : '-' }}</td>
+            <td class="text-end">{{ d.param12 ? d.param12 : '-' }}</td>
+            <td class="text-end">{{ d.param10 != '' ? d.param10 : '-' }}</td>
+          </tr>
+        }
+      </ng-template>
+      <app-common-table [columns]="tableColumns" [rows]="reportData" [loading]="loading"
+        [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="vendorStatusRows" tableClass="table-grid table-striped">
+      </app-common-table>
+        <!-- <div class="custom-pagination" style="display:flex;justify-content: end;"
+        *ngIf="totalCount > pageSize || page > 1">
+        <button class="pg-btn" (click)="changePage(page - 1)" [disabled]="page === 1">
+          Prev
+        </button>
+        <span *ngIf="page > 3" class="pg-dots">...</span>
+
+        <button *ngIf="page > 2" class="pg-num" (click)="changePage(page - 1)">
+          {{ page - 1 }}
+        </button>
+
+        <button class="pg-num active">
+          {{ page }}
+        </button>
+
+        <button *ngIf="page < totalPages - 1" class="pg-num" (click)="changePage(page + 1)">
+          {{ page + 1 }}
+        </button>
+
+        <span *ngIf="page < totalPages - 2" class="pg-dots">...</span>
+
+        <button class="pg-num" (click)="changePage(totalPages)">
+          {{ totalPages }}
+        </button>
+
+        <button class="pg-btn" (click)="changePage(page + 1)" [disabled]="page === totalPages">
+          Next
+        </button>
+
+      </div> -->
+    </div>
+
+  </div>
+</div>
+</div>
+</div>

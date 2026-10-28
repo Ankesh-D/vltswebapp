@@ -1,0 +1,103 @@
+<div class="table-responsive common-table"
+  [ngClass]="[wrapperClass, maxHeight ? 'common-table--scrollable' : '', stickyHeader ? 'common-table--sticky-header' : '']"
+  [style.max-height]="maxHeight || null">
+  <table [class]="tableClass" [attr.id]="tableId || null" [attr.style]="tableStyle || null">
+    <thead [class]="headerClass">
+      @if (headerRowsTemplate) {
+        <ng-container [ngTemplateOutlet]="headerRowsTemplate"></ng-container>
+      } @else {
+        <tr>
+          @for (column of getVisibleColumns(); track column.key || column.header || column.label || $index) {
+            <th [style.width]="column.width || null" [style.height]="column.height || null"
+              [ngClass]="column.className || null"
+              [class.sortable]="column.sortable"
+              [attr.tabindex]="column.sortable ? 0 : null"
+              [attr.aria-sort]="column.sortable && sortKey === getColumnKey(column) ? (reverse ? 'descending' : 'ascending') : null"
+              (click)="requestSort(column)" (keydown)="onHeaderKeydown($event, column)">
+              @if (headerTemplate) {
+                <ng-container [ngTemplateOutlet]="headerTemplate"
+                  [ngTemplateOutletContext]="{ $implicit: column }"></ng-container>
+              } @else if (column.headers?.length) {
+                @for (heading of column.headers; track $index; let last = $last) {
+                  {{ heading }}
+                  @if (!last) {
+                    <hr class="table-heading-divider">
+                  }
+                }
+              } @else {
+                {{ column.header || column.label }}
+              }
+              @if (column.subLabel) {
+                <span class="common-table__sub-label">{{ column.subLabel }}</span>
+              }
+              @if (column.sortable && column.showSortIndicator !== false) {
+                <span class="sorting"
+                  [ngClass]="{'sorting_desc': reverse && sortKey === getColumnKey(column), 'sorting_asc': !reverse && sortKey === getColumnKey(column)}">
+                </span>
+              }
+            </th>
+          }
+        </tr>
+      }
+    </thead>
+    <tbody [class]="bodyClass">
+      @if (loading) {
+        <tr><td [attr.colspan]="getVisibleColumns().length || 1" class="common-table__message">Loading...</td></tr>
+      } @else if (rows.length === 0) {
+        <tr><td [attr.colspan]="getVisibleColumns().length || 1" class="common-table__message">{{ emptyMessage }}</td></tr>
+      } @else if (bodyTemplate) {
+        <ng-container [ngTemplateOutlet]="bodyTemplate"
+          [ngTemplateOutletContext]="{ $implicit: rows }"></ng-container>
+      } @else {
+        @for (row of rows; track row; let rowIndex = $index) {
+          <tr [ngClass]="rowClass(row)">
+            @for (column of getVisibleColumns(); track column.key || column.header || column.label || $index) {
+              <td [style.width]="column.width || null" [style.height]="column.height || null"
+                [ngClass]="getCellClassNames(row, column)" [ngStyle]="getCellStyle(row, column)"
+                (click)="onCellClick(row, column)">
+                @if (column.cellTemplate) {
+                  <ng-container [ngTemplateOutlet]="column.cellTemplate"
+                    [ngTemplateOutletContext]="{ $implicit: row }"></ng-container>
+                } @else if (cellTemplate) {
+                  <ng-container [ngTemplateOutlet]="cellTemplate"
+                    [ngTemplateOutletContext]="{ $implicit: row, column: column, index: rowIndex }"></ng-container>
+                } @else {
+                  {{ cellValue(row, column) }}
+                }
+                @for (action of column.actions || []; track $index) {
+                  @if (!action.visible || action.visible(row)) {
+                    <button type="button" class="btn btn-sm"
+                      [ngClass]="['btn-' + (action.tone || 'secondary'), action.className || '']"
+                      [disabled]="action.disabled?.(row) || false"
+                      [attr.aria-label]="action.iconOnly ? getActionLabel(row, action) : null"
+                      (click)="action.run(row)">
+                      @if (action.icon) {
+                        <i [class]="action.icon" aria-hidden="true"></i>
+                      }
+                      @if (!action.iconOnly) {
+                        <span>{{ getActionLabel(row, action) }}</span>
+                      }
+                    </button>
+                  }
+                }
+              </td>
+            }
+          </tr>
+          @if (rowDetailTemplate && expandedRow === row) {
+            <tr class="common-table__detail-row">
+              <td [attr.colspan]="getVisibleColumns().length || 1">
+                <ng-container [ngTemplateOutlet]="rowDetailTemplate"
+                  [ngTemplateOutletContext]="{ $implicit: row }"></ng-container>
+              </td>
+            </tr>
+          }
+        }
+      }
+    </tbody>
+    @if (footerTemplate) {
+      <tfoot>
+        <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+      </tfoot>
+    }
+  </table>
+</div>

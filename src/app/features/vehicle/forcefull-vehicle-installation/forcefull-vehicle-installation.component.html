@@ -1,0 +1,793 @@
+<div class="content-i px-0">
+  <div class="content-box px-0">
+    <div class="element-wrapper">
+      <div class="element-box px-0">
+        <!-- HEADER -->
+        <div class="table-responsive">
+          <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+            <div class="col-md-12 pagetitleborder p-0">
+              <div class="page-header-row mb-3">
+                <!-- TITLE -->
+                <div class="pagetitlestyle mb-3">
+                  Forcefully Activation Details
+                </div>
+              </div>
+
+              <div class="top-controls-row">
+                <!-- LEFT CONTROLS -->
+                <div class="left-controls d-flex gap-2 flex-wrap">
+                  <form #searchVendorForm="ngForm" (ngSubmit)="getSearchDetails()"
+                    class="d-flex gap-2 align-items-start flex-wrap">
+                    <!-- VENDOR SELECT -->
+                    <div class="vendor-control">
+                      <ng-select [items]="vendorList" bindLabel="param2" bindValue="param1" placeholder="Select Vendor"
+                        [(ngModel)]="selectedVendor" name="vendorId" #vendorIdRef="ngModel" required
+                        class="vendor-select" style="min-width: 200px;">
+                      </ng-select>
+                      <!-- <div class="invalid-feedback d-block"
+                      *ngIf="vendorIdRef.invalid && (vendorIdRef.dirty || vendorIdRef.touched)">
+                      Vendor selection is required.
+                    </div> -->
+                  </div>
+                  <!-- SEARCH INPUT -->
+                  <div class="search-control mx-2">
+                    <div class="search-box">
+                      <input type="search"  class="search-input inner" placeholder="Search..." maxlength="50"
+                        [(ngModel)]="searchText" name="searchby" (keydown.enter)="getSearchDetails()"/>
+
+                      <!-- <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
+                      <i class="fa fa-search"></i>
+                    </button> -->
+
+                  </div>
+
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div class="button-group d-flex gap-2 mx-2">
+                  <button type="submit" class="btn btn-sm btn-primary" style="height: 27px; font-size: 11px;">
+                    <i class="fa fa-search"></i> Search
+                  </button>
+                  <button type="reset" (click)="clearSearch()" class="btn btn-sm btn-secondary mx-1"
+                    style="height: 27px; font-size: 11px;">
+                    <i class="fa fa-times"></i> Clear
+                  </button>
+                  <!-- <button
+                  type="button"
+                  class="btn btn-sm btn-info mx-1"
+                  (click)="reloadData()"
+                  [disabled]="loading">
+                  <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+                  {{ loading ? 'Reloading...' : 'Reload' }}
+                </button> -->
+              </div>
+            </form>
+          </div>
+          <!-- Right Controls -->
+          <div class="right-control d-flex gap-2 flex-wrap">
+            <!-- Show Rows -->
+            <div class="d-flex align-items-center me-3">
+              <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Show Rows :</label>
+              <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChanged(pageSize)">
+
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size === totalCount ? totalCount : size">
+                    {{ size === totalCount ? totalCount : size }}
+                  </option>
+                }
+
+              </select>
+            </div>
+
+            <!-- Total Records -->
+            <span class="fw-bold align-items-center m-1" style="font-size: 11px;">
+              Total Records : <span class="text-primary">{{pageCount}} of {{totalCount}}</span>
+            </span>
+
+            <div>
+              <button type="button" class="reload-btn mx-2" style="width: 90px;" (click)="reloadData()" [disabled]="loading">
+                {{ loading ? 'Reloading...' : 'Reload' }}
+              </button>
+              <!-- <button (click)="reloadData()" [disabled]="loading" class="btn btn-sm"
+              style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 27px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+              <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
+              <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+            </button> -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="row my-2">
+    <div class="col-md-3">
+      <div>
+        <ng-select
+
+          [items]="vendorList"
+          bindLabel="param2"
+          bindValue="param1"
+          placeholder="Select Vendor"
+          [(ngModel)]="selectedVendor"
+          name="vendorId"
+          (change)="onVendorChange()"
+          #vendorIdRef="ngModel" required style="font-size: 11px;">
+        </ng-select>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="search-box">
+        <input type="search" readonly  class="search-input inner"
+          placeholder="Search..." maxlength="50" [(ngModel)]="searchText"
+          name="searchby" />
+
+        <button type="button" class="search-inner-btn">
+          <i class="fa fa-search"></i>
+        </button>
+        <button type="button" class="reload-btn mx-2" (click)="reloadData()" [disabled]="loading">
+          {{ loading ? 'Reloading...' : 'Reload' }}
+        </button>
+      </div>
+    </div>
+  </div> -->
+
+
+
+
+
+
+  <div class="">
+    <table class="table-striped app-table table mb-1"
+      style="border-top: 1px solid black; border-bottom: 1px solid black;margin-left: 0px;" id="devicetable">
+      <thead class="device-thead">
+        <tr>
+          <th rowspan="2" style="width:35px;">#</th>
+          <th rowspan="2">
+            Vehicle No
+            <hr class="m-0">
+            Chassis No
+          </th>
+          <th rowspan="2">Mfg Year<hr class="m-0">Certificate Validity</th>
+          <th rowspan="2">IMEI No
+            <hr class="m-0">
+            Serial No
+          </th>
+          <th rowspan="2">
+            ESIM Provider
+            <hr class="m-0">
+            ICCID No
+          </th>
+          <th rowspan="2">SIM 1
+            <hr class="m-0">
+            SIM 2
+          </th>
+          <th colspan="9" class="text-center">Compliance Check</th>
+        </tr>
+        <tr>
+          <th>Device Validity Update</th>
+          <th>Mode</th>
+          <th style="width: 90px;">GPS Status</th>
+          <th>Polling Status</th>
+          <th style="width: 90px;">Polling Time</th>
+          <th  style="width: 90px;">Panic Status</th>
+          <!-- <th>Last Panic Time</th> -->
+          <!-- <th>Last Panic Location</th> -->
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (totalCount==0) {
+          <tr>
+            <td colspan="19" class="text-center">No Data Found</td>
+          </tr>
+        }
+        @if (totalCount!=0) {
+          @for (item of devices; track item; let i = $index) {
+            <tr>
+              <td>{{item.param1}}</td>
+              <td>{{item.param20}}
+                <hr class="m-0">
+                {{item.param21}}
+              </td> <!--Chassis No-->
+              <td>
+                {{ item.param25 }}
+                <hr class="m-0">
+                {{ item.param77 == '0' || item.param77 == 0 ? 'NA' : item.param77 + ' YEARS' }}
+              </td><!--Mfg Year-->
+              <td>{{item.param5}}
+                <hr class="m-0">
+                {{item.param6}}
+              </td> <!--Serial No-->
+              <td>{{item.param14 != '' ? item.param14 : '-' }}
+                <hr class="m-0">
+                {{item.param7 == '' ? '-' : item.param7}}
+              </td> <!--ICCID No-->
+              <td>{{item.param8}}
+                <hr class="m-0">
+                {{item.param9}}
+              </td> <!--SIM2 No-->
+              <td class="text-center vertical-align-center">
+                <div class="d-flex justify-content-between px-2">
+                  <div>
+                    <p class="text-small text-primary text-decoration-underline mb-0 fw-bold"
+                      title="Update Validity"
+                      style="cursor: pointer;"
+                      (click)="updateSimValidityAuto(item)">
+                      Auto Update
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-small text-primary text-decoration-underline mb-0 fw-bold"
+                      title="Update Validity"
+                      style="cursor: pointer;"
+                      (click)="setData(item, i)">
+                      Update
+                    </p>
+                  </div>
+                </div>
+                <p class="mb-0">
+                  {{item.param50}}
+                </p>
+              </td> <!--Device Validity-->
+              <td
+  [ngStyle]="{
+    'color': item.param32?.toLowerCase() === 'tcp'
+      ? '#28a745'
+      : '#dc3545',
+    'font-weight': '700'
+  }"
+                >
+                {{
+                !item.param32 || item.param32 === '0' || item.param32?.toLowerCase() === 'na'
+                ? 'N/A'
+                : item.param32
+                }}
+              </td> <!--Mode-->
+              <td
+  [ngStyle]="{
+    'color': isGpsValid(item.param61, item.param62)
+      ? '#28a745'
+      : '#dc3545',
+    'font-weight': '700'
+  }"
+                >
+                {{ getGpsStatusText(item.param61, item.param62) }}
+              </td><!-- GPS Status-->
+              <td
+  [ngStyle]="{
+    'color': item.param48?.toLowerCase() === 'received'
+      ? '#28a745'
+      : '#dc3545',
+    'font-weight': '700'
+  }"
+                >
+                {{ item.param48 }}
+              </td> <!-- Polling Status-->
+              <td
+  [ngStyle]="{
+    'color': isRecentTime(item.param60) ? '#28a745' : '#dc3545',
+    'font-weight': '700'
+  }"
+                >
+                {{ item.param60 != '' ? formatDateTime(item.param60) : item.param60 }}
+              </td> <!-- Polling Time-->
+              <td>
+                <button
+                  class="btn btn-sm btn-primary pushbtnstyle"
+                  (click)="panicPush(item, i)"
+                  >
+                  Panic Push
+                </button>
+                <p
+                  class="mb-0"
+    [ngStyle]="{
+      'color': isRecentTime(item.param73) ? '#28a745' : '#dc3545',
+      'font-weight': '700'
+    }"
+                  >
+                  {{ item.param73 ? item.param73 : 'NA' }}
+                </p>
+              </td>
+              <td class="text-center">
+                <button
+                  class="btn pushbtnstyle btn-sm btn-info"
+                  (click)="activateVehicle(item);"
+                  >
+                  Activate Now
+                </button>
+                <hr class="m-0">
+                <!-- Activated -->
+                @if (item.param35 === 'Activated') {
+                  <p
+                    class="text-center mb-0"
+                    style="color: #28a745 !important; font-weight: 700 !important;"
+                    >
+                    {{ item.param23 || '' }}
+                  </p>
+                }
+                <!-- Not Activated -->
+                @if (item.param35 === 'Not Activated') {
+                  <p
+                    class="text-center mb-0"
+                    style="color: #dc3545 !important; font-weight: 700 !important;"
+                    >
+                    Not Activated
+                  </p>
+                }
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+    <!-- Pagination Controls -->
+    <div class="float-end">
+      @if (totalCount > pageSize) {
+        <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+          [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+          [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+        </ngb-pagination>
+      }
+    </div>
+    <!-- <div class="custom-pagination" style="display:flex;justify-content: end;"
+    *ngIf="totalCount > pageSize || currentPage > 1">
+
+    <button class="pg-btn" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+      Prev
+    </button>
+
+    <span *ngIf="currentPage > 3" class="pg-dots">...</span>
+
+    <button *ngIf="currentPage > 2" class="pg-num" (click)="changePage(currentPage - 1)">
+      {{ currentPage - 1 }}
+    </button>
+
+    <button class="pg-num active">
+      {{ currentPage }}
+    </button>
+
+    <button *ngIf="currentPage < totalPages - 1" class="pg-num" (click)="changePage(currentPage + 1)">
+      {{ currentPage + 1 }}
+    </button>
+
+    <span *ngIf="currentPage < totalPages - 2" class="pg-dots">...</span>
+
+    <button class="pg-num" (click)="changePage(totalPages)">
+      {{ totalPages }}
+    </button>
+
+    <button class="pg-btn" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+      Next
+    </button>
+
+  </div> -->
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- <div class="content-i">
+<div class="content-box">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="element-wrapper">
+        <button class="btn btn-primary returnbtn" routerLink="/AdminDashboard">
+          <i class="fa fa-angle-double-left"></i>
+          Home
+        </button>
+
+        <div class="element-box">
+          <div class="col-md-12 pagetitleborder">
+            <div class="pagetitlestyle"><span>Force Installation</span></div>
+          </div>
+
+          <div class="force-toolbar">
+            <div class="search-wrap">
+              <label for="vendorSelect">Vendor</label>
+              <select
+                id="vendorSelect"
+                class="form-control vendor-select"
+                [(ngModel)]="selectedVendor"
+                (change)="onVendorChange()"
+                name="vendorSelect"
+                [disabled]="vendorLoading || loading || hasRowLoading">
+                <option value="">{{vendorLoading ? 'Loading vendors...' : 'All Vendors'}}</option>
+                <option *ngFor="let vendor of vendorList" [value]="vendor.param1">
+                  {{vendor.param2}} {{vendor.param3 ? '(' + vendor.param3 + ')' : ''}}
+                </option>
+              </select>
+
+              <label for="forceSearch">Search</label>
+              <input
+                id="forceSearch"
+                type="search"
+                class="form-control"
+                placeholder="IMEI or vendor"
+                [(ngModel)]="searchText"
+                (keyup.enter)="onSearch()"
+                name="forceSearch"
+                [disabled]="loading || hasRowLoading">
+
+              <button type="button" class="btn btn-light" (click)="reloadData()" [disabled]="loading || hasRowLoading">
+                <i class="fa fa-refresh"></i>
+                Reload
+              </button>
+            </div>
+
+            <div class="record-count">
+              Total: <strong>{{totalCount}}</strong>
+            </div>
+          </div>
+
+          <div class="table-responsive force-table-wrap">
+            <div *ngIf="loading" class="loading-state">
+              <i class="fa fa-spinner fa-spin"></i>
+              Loading pending vehicle details...
+            </div>
+
+            <table class="table table-striped app-table table-bordered force-table">
+              <thead>
+                <tr>
+                  <th>IMEI</th>
+                  <th>SIM Number</th>
+                  <th>ICCID</th>
+                  <th>Vendor Name</th>
+                  <th class="actions-col">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngIf="filteredDevices.length === 0 && !loading">
+                  <td colspan="5" class="empty-state">NO DATA FOUND</td>
+                </tr>
+
+                <tr *ngFor="let device of paginatedDevices; trackBy: trackByRowKey">
+                  <td>{{getImei(device)}}</td>
+                  <td>
+                    <ng-container *ngIf="getSimNumbers(device) as sims">
+                      <div *ngIf="sims.length; else noSim">
+                        <div *ngFor="let sim of sims" class="sim-line">{{sim}}</div>
+                      </div>
+                      <ng-template #noSim>NA</ng-template>
+                    </ng-container>
+                  </td>
+                  <td>{{getIccid(device)}}</td>
+                  <td>{{getVendorName(device)}}</td>
+
+                  <td class="actions-col">
+                    <button
+                      *ngFor="let action of forceActions"
+                      type="button"
+                      class="btn btn-sm btn-command"
+                      (click)="forceDeviceAction(device, action.type)"
+                      [disabled]="loading || isRowBusy(device)">
+                      <i class="fa" [ngClass]="isRowActionLoading(device, action.type) ? 'fa-spinner fa-spin' : action.icon"></i>
+                      {{isRowActionLoading(device, action.type) ? 'Processing...' : action.label}}
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-info"
+                      (click)="updateSimValidity(device)"
+                      [disabled]="loading || isRowBusy(device)">
+                      <i class="fa" [ngClass]="isRowActionLoading(device, 'validityUpdate') ? 'fa-spinner fa-spin' : 'fa-refresh'"></i>
+                      {{isRowActionLoading(device, 'validityUpdate') ? 'Updating...' : 'Update Validity'}}
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-warning"
+                      (click)="checkCompliance(device)"
+                      [disabled]="loading || isRowBusy(device)">
+                      <i class="fa" [ngClass]="isRowActionLoading(device, 'compliance') ? 'fa-spinner fa-spin' : 'fa-shield'"></i>
+                      {{isRowActionLoading(device, 'compliance') ? 'Checking...' : 'Compliance Check'}}
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-row" *ngIf="totalCount > pageSize">
+            <button type="button" class="btn btn-light" (click)="previousPage()" [disabled]="currentPage === 1 || loading">
+              <i class="fa fa-angle-left"></i>
+              Previous
+            </button>
+            <span>Page <strong>{{currentPage}}</strong> of <strong>{{totalPages}}</strong></span>
+            <button type="button" class="btn btn-light" (click)="nextPage()" [disabled]="currentPage === totalPages || loading">
+              Next
+              <i class="fa fa-angle-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div> -->
+
+<!-- Button trigger modal -->
+<!-- Modal -->
+<div class="modal fade" id="updateValidityModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+  aria-labelledby="updateValidityModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header py-1">
+        <p class="modal-title mb-0" id="updateValidityModalLabel">Update Sim Validity</p>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form #updateValidityForm="ngForm" (ngSubmit)="submitValidityUpdate(updateValidityForm)">
+
+          <!-- Row 1 -->
+          <div class="form-row">
+
+            <div class="form-group col-md-4">
+              <label class="form-label">ICCID <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" placeholder="Enter ICCID" name="iccid"
+                [(ngModel)]="updateSimValidityRequest.param1" required #iccid="ngModel" disabled
+                [class.is-invalid]="updateValidityForm.submitted && iccid.invalid">
+
+              @if (iccid.invalid && (iccid.dirty || iccid.touched)) {
+                <div class="invalid-feedback">
+                  @if (iccid.errors?.['required']) {
+                    <span>
+                      ICCID is required.
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="form-group col-md-4">
+              <label class="form-label">ESIM Provider <span class="text-danger">*</span></label>
+              <ng-select
+                [items]="m2mProviderList"
+                bindLabel="param2"
+                bindValue="param1"
+                placeholder="Select ESIM Provider"
+                name="m2m"
+                [(ngModel)]="m2mProviderObj"
+                required
+                #m2mProvider="ngModel"
+                [clearable]="true"
+                [searchable]="true"
+                [class.is-invalid]="(updateValidityForm.submitted || m2mProvider.touched) && m2mProvider.invalid">
+              </ng-select>
+
+              @if (m2mProvider.invalid && (m2mProvider.dirty || m2mProvider.touched)) {
+                <div class="invalid-feedback">
+                  @if (m2mProvider.errors?.['required']) {
+                    <span>
+                      M2M Provider is required.
+                    </span>
+                  }
+                </div>
+              }
+              <!-- <select class="form-control form-control-sm" name="m2m" [(ngModel)]="updateSimValidityRequest.param12"
+              required #m2m="ngModel" [class.is-invalid]="updateValidityForm.submitted && m2m.invalid">
+
+              <option value="">Select M2M Provider</option>
+              <option *ngFor="let provider of m2mProviderList" [value]="provider.param1">
+                {{ provider.param2 }}
+              </option>
+            </select>
+
+            <div class="invalid-feedback" *ngIf="m2m.invalid && (m2m.dirty || m2m.touched)">
+              <span *ngIf="m2m.errors?.['required']">
+                M2M Provider is required.
+              </span>
+            </div> -->
+          </div>
+
+          <div class="form-group col-md-4">
+            <label class="form-label">Customer Mobile <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-sm" placeholder="Enter Customer Mobile"
+              name="customerMobile" [(ngModel)]="updateSimValidityRequest.param8" required minlength="10"
+              maxlength="10" #customerMobile="ngModel"
+              [class.is-invalid]="updateValidityForm.submitted && customerMobile.invalid">
+
+            @if (customerMobile.invalid && (customerMobile.dirty || customerMobile.touched)) {
+              <div class="invalid-feedback"
+                >
+                @if (customerMobile.errors?.['required']) {
+                  <span>
+                    Customer Mobile is required.
+                  </span>
+                }
+              </div>
+            }
+
+          </div>
+
+
+        </div>
+
+        <!-- Row 2 -->
+        <div class="form-row">
+
+          <div class="form-group col-md-6">
+            <label class="form-label">Mobile 1 <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-sm"
+              placeholder="Enter Primary Mobile" name="mobile1"
+              [(ngModel)]="updateSimValidityRequest.param4" required
+              minlength="13" maxlength="13" #mobile1="ngModel"
+              (keypress)="vs.numberOnlyValidation($event)"
+              [class.is-invalid]="updateValidityForm.submitted && mobile1.invalid">
+
+            @if (mobile1.invalid && (mobile1.dirty || mobile1.touched)) {
+              <div class="invalid-feedback">
+                @if (mobile1.errors?.['required']) {
+                  <span>
+                    Mobile 1 is required.
+                  </span>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="form-group col-md-6">
+            <label class="form-label">
+              Network 1 <span class="text-danger">*</span>
+            </label>
+
+            <ng-select [items]="networkList" bindLabel="param2" bindValue="param2" placeholder="Select Network"
+              name="network1" [(ngModel)]="network1Obj" required #network1="ngModel" [clearable]="true"
+              [searchable]="true"
+              [class.is-invalid]="(updateValidityForm.submitted || network1.touched) && network1.invalid">
+            </ng-select>
+
+            @if ((updateValidityForm.submitted || network1.touched) && network1.invalid) {
+              <div class="invalid-feedback d-block"
+                >
+                @if (network1.errors?.['required']) {
+                  <span>
+                    Network 1 is required.
+                  </span>
+                }
+              </div>
+            }
+          </div>
+          <div class="form-group col-md-6">
+            <label class="form-label">Mobile 2</label>
+            <input type="text" class="form-control form-control-sm" placeholder="Enter Secondary Mobile" required
+              name="mobile2" [(ngModel)]="updateSimValidityRequest.param5"
+              minlength="13" maxlength="13" #mobile2="ngModel" (keypress)="vs.numberOnlyValidation($event)"
+              [class.is-invalid]="updateValidityForm.submitted && mobile2.invalid">
+            @if (mobile2.invalid && (mobile2.dirty || mobile2.touched)) {
+              <div class="invalid-feedback">
+                @if (mobile2.errors?.['required']) {
+                  <span>
+                    Mobile 2 is required.
+                  </span>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="form-group col-md-6">
+            <label class="form-label">
+              Network 2 <span class="text-danger">*</span>
+            </label>
+
+            <ng-select [items]="networkList" bindLabel="param2" bindValue="param2" placeholder="Select Network"
+              name="network2" [(ngModel)]="network2Obj" required #network2="ngModel" [searchable]="true"
+              [clearable]="true"
+              [class.is-invalid]="(updateValidityForm.submitted || network2.touched) && network2.invalid">
+            </ng-select>
+
+            @if ((updateValidityForm.submitted || network2.touched) && network2.invalid) {
+              <div class="invalid-feedback d-block"
+                >
+                @if (network2.errors?.['required']) {
+                  <span>
+                    Network 2 is required.
+                  </span>
+                }
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Row 3 -->
+        <div class="form-row">
+
+
+
+          <div class="form-group col-md-4">
+            <label class="form-label">Validity <span class="text-danger">*</span></label>
+            <!-- <label class="control-label">Select Date Range<span style="color:red">*</span> </label> -->
+            <input
+              type="text"
+              id="datepicker"
+              class="form-control"
+              name="date"
+              [(ngModel)]="selectedDateRange"
+              required #validity2="ngModel"
+              />
+            <!-- <input
+            placeholder="Select Date Range"
+            type="text"
+            class="form-control"
+            ngxDaterangepickerMd
+            [(ngModel)]="selectedDateRange"
+            [singleDatePicker]="true"
+            [maxDate]="today.add(2, 'year')"
+            [opens]="'right'"
+            [drops]="'down'"
+            [autoApply]="true"
+            [locale]="locale"
+            (datesUpdated)="onDateRangeChange($event)"
+            required #validity2="ngModel"/> -->
+            <!-- <input type="date" class="form-control form-control-sm" name="validity2"
+            [(ngModel)]="updateSimValidityRequest.param6" required #validity2="ngModel"
+            [class.is-invalid]="updateValidityForm.submitted && validity2.invalid"> -->
+
+            @if (validity2.invalid && (validity2.dirty || validity2.touched)) {
+              <div class="invalid-feedback">
+                @if (validity2.errors?.['required']) {
+                  <span>
+                    Validity is required.
+                  </span>
+                }
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="text-center mt-3">
+          <button type="submit" class="btn btn-primary btn-sm me-2">
+            Update SIM
+          </button>
+
+          <button type="button" class="btn btn-secondary btn-sm" (click)="resetValidityForm(updateValidityForm)">
+            Reset
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+</div>
+<!-- <div class="modal-backdrop-custom" *ngIf="complianceModalOpen" (click)="closeComplianceModal()"></div>
+<div class="compliance-modal" *ngIf="complianceModalOpen" role="dialog" aria-modal="true" aria-labelledby="complianceCheckTitle">
+  <div class="compliance-modal-dialog">
+    <div class="compliance-modal-header">
+      <div>
+        <h5 id="complianceCheckTitle">Compliance Check</h5>
+        <span *ngIf="selectedComplianceDevice">
+          IMEI: {{getImei(selectedComplianceDevice)}} | Device ID: {{getDeviceId(selectedComplianceDevice)}}
+        </span>
+      </div>
+      <button type="button" class="modal-close" (click)="closeComplianceModal()" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="compliance-modal-body">
+      <div *ngIf="selectedComplianceItems.length; else noComplianceData" class="compliance-grid">
+        <div
+          *ngFor="let item of selectedComplianceItems"
+          class="compliance-check"
+          [ngClass]="{
+            'compliance-check-pass': item.value,
+            'compliance-check-fail': !item.value,
+            'compliance-check-highlight': item.highlighted
+          }">
+          <span>{{item.label}}</span>
+          <i class="fa" [ngClass]="item.value ? 'fa-check-circle' : 'fa-times-circle'"></i>
+        </div>
+      </div>
+
+      <ng-template #noComplianceData>
+        <div class="empty-state">No compliance data found.</div>
+      </ng-template>
+    </div>
+  </div>
+</div> -->

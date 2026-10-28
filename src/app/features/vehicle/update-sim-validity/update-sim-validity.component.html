@@ -1,0 +1,201 @@
+<!-- <div class="search-container">
+<div class="search-wrapper">
+  <div class="search-input-group">
+    <div class="input-with-icon">
+      <i class="fa fa-search search-icon"></i>
+      <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input"
+        id="searchby" placeholder="Search by ICCID, Mobile..." autocomplete="disabled" maxlength="50"
+        [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby">
+    </div>
+    <button class="btn-search" (click)="getSearchDetails()" title="Search">
+      <i class="fa fa-search"></i>
+    </button>
+  </div>
+  <button class="btn-reload" (click)="reloadData()" title="Reload Data" [disabled]="loading">
+    <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+  </button>
+</div>
+
+<div class="pagination-right-controls">
+  <div class="rows-selector">
+    <label>Show Rows:</label>
+    <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
+      <option *ngFor="let size of pageSizeOptions" [value]="size === totalCount ? 'All' : size">
+        {{size === totalCount ? 'All' : size}}
+      </option>
+    </select>
+  </div>
+  <div class="record-info-pill">
+    <i class="fa fa-list"></i> <span>{{pageCount}} of {{totalCount}}</span>
+  </div>
+</div>
+</div> -->
+
+<div class="table-responsive">
+  <form autocomplete="off" class="top-controls-row">
+
+    <!-- LEFT SIDE -->
+    <div class="left-controls">
+
+      <label class="topbar-label">Search :</label>
+
+      <div class="search-box">
+        <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input inner"
+          id="searchby" placeholder="Type here and press button...." autocomplete="disabled" maxlength="50"
+          [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" />
+
+        <button class="search-inner-btn" (click)="getSearchDetails()">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
+
+      <!-- RELOAD -->
+      <button class="reload-btn" (click)="reloadData()">
+        @if (!loading) {
+          <span>Reload</span>
+        }
+        @if (loading) {
+          <span>Reloading...</span>
+        }
+      </button>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right-controls">
+
+      <div class="total-records-text">Show Rows :</div>
+
+      <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
+
+        @for (size of pageSizeOptions; track size) {
+          <option [value]="size === totalCount ? totalCount : size">
+            {{ size === totalCount ? totalCount : size }}
+          </option>
+        }
+
+      </select>
+
+      <div class="total-records-text">
+        Total Records : {{pageCount}} of {{totalCount}}
+      </div>
+
+    </div>
+
+  </form>
+  <table class="table table-striped app-table mb-1" style="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;">
+    <thead>
+      <tr>
+        <th style="width:40px;">#</th>
+        <th (click)="sort('param7')" style="cursor: pointer;">
+          ICCID No
+          @if (sortKey === 'param7') {
+            <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+          }
+        </th>
+        <th (click)="sort('param8')" style="cursor: pointer;">
+          Mobile No.1<br>Mobile Network 1
+          @if (sortKey === 'param8') {
+            <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+          }
+        </th>
+        <th (click)="sort('param9')" style="cursor: pointer;">
+          Mobile No.2<br>Mobile Network 2
+          @if (sortKey === 'param9') {
+            <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+          }
+        </th>
+        <th (click)="sort('param50')" style="cursor: pointer;">
+          Mobile No.1 Validity
+          @if (sortKey === 'param50') {
+            <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+          }
+        </th>
+        <th (click)="sort('param51')" style="cursor: pointer;">
+          Mobile No.2 Validity
+          @if (sortKey === 'param51') {
+            <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+          }
+        </th>
+        <th>UPDATE</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (simValidityData.length === 0 && !loading) {
+        <tr>
+          <td style="font-weight: bold; text-align: center;" colspan="100">NO DATA FOUND</td>
+        </tr>
+      }
+      @for (device of getPaginatedData(); track device) {
+        <tr>
+          <td>{{device.param1 || 'NA'}}</td>
+          <td>{{device.param7 || 'NA'}}</td>
+          <td>{{device.param8 || 'NA'}}<br>{{device.param10 || 'NA'}}</td>
+          <td>{{device.param9 || 'NA'}}<br>{{device.param11 || 'NA'}}</td>
+          <td>{{device.param50 || 'NA'}}</td>
+          <td>{{device.param51 || 'NA'}}</td>
+          <td>
+            <button class="btn-table-update" (click)="updateSimValidity(device)" [disabled]="isUpdating(device.param1)">
+              <i class="fa" [ngClass]="isUpdating(device.param1) ? 'fa-spinner fa-spin' : 'fa-refresh'"></i>
+              <span>{{ isUpdating(device.param1) ? 'Updating...' : 'Update' }}</span>
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <!-- Pagination Controls -->
+  <div class="float-end">
+    @if (totalCount > pageSize) {
+      <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+        [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+        [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+      </ngb-pagination>
+    }
+  </div>
+
+  <!-- Pagination -->
+  <!-- <div *ngIf="totalCount > pageSize" class="pagination-wrapper">
+  <ul class="pagination" style="display: flex; gap: 5px; list-style: none; padding: 0; margin: 0; align-items: center; justify-content: flex-end;">
+    <li [class.disabled]="currentPage === 1">
+      <button type="button" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
+        class="btn btn-sm shadow-sm"
+        style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
+        <i class="fa fa-angle-left" style="margin-right: 4px;"></i> Previous
+      </button>
+    </li>
+
+    <li *ngFor="let page of getPageNumbers()">
+      <span *ngIf="page === -1" style="font-size: 12px; color: #6c757d; padding: 0 5px; font-weight: bold;">...</span>
+      <button type="button" *ngIf="page !== -1" (click)="onPageChange(page)"
+        class="btn btn-sm shadow-sm"
+        [style.background]="currentPage === page ? '#0b58b9' : '#fff'"
+        [style.color]="currentPage === page ? '#fff' : '#0b58b9'"
+        style="font-size: 11px; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1px solid #dee2e6; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+        {{ page }}
+      </button>
+    </li>
+
+    <li [class.disabled]="currentPage >= getTotalPages()">
+      <button type="button" (click)="onPageChange(currentPage + 1)"
+        [disabled]="currentPage >= getTotalPages()"
+        class="btn btn-sm shadow-sm"
+        style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
+        Next <i class="fa fa-angle-right" style="margin-left: 4px;"></i>
+      </button>
+    </li>
+  </ul>
+</div> -->
+</div>
+
+<!-- <div class="pagination-wrapper" *ngIf="getTotalPages() > 1">
+<button
+  *ngFor="let page of getPageNumbers()"
+  (click)="onPageChange(page)"
+  [disabled]="page === -1 || currentPage === page"
+  [class.active]="currentPage === page">
+  <span *ngIf="page === -1">...</span>
+  <span *ngIf="page !== -1">{{page}}</span>
+</button>
+</div> -->
+

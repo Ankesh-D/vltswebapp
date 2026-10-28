@@ -1,0 +1,202 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <div class="pagetitlestyle"><span>Login Creation</span></div>
+            </div>
+
+            <form #loginForm="ngForm" autocomplete="off" (ngSubmit)="createLogin()" novalidate autcomplete="off">
+              <div class="form-desc">
+                <strong>NOTE :</strong><label for="" class="mandetory">*</label> Are Mandatory Fields.
+              </div>
+              <div class="entrypagediv">
+                <div class="row">
+                  <div class="col-xs-3 col-md-3">
+                    <div class="form-group">
+                      <label for="roleselector" class="control-label">
+                        <span>Select Role:</span>
+                        <b style="color: Red; font-weight: normal;">*</b>
+                      </label><br>
+                      <ng-select [(ngModel)]="selectedRoleId" id="roleselector" name="roleSelect" placeholder="Select Role"
+                        required #roleSelect="ngModel" (change)="onRoleChange()">
+                        @for (item of roleList; track item) {
+                          <ng-option [value]="item.param2">{{item.param4}}</ng-option>
+                        }
+                      </ng-select>
+                      @if ((roleSelect.invalid && (roleSelect.touched || loginForm.submitted))) {
+                        <div class="text-danger small">
+                          Role is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  @if (subrolelistflag) {
+                    <div class="col-xs-3 col-md-3" id="subrolelist">
+                      <div class="form-group">
+                        <label for="subrolelist" class="control-label">
+                          <span>Select {{subRoleName}}:</span>
+                          <b style="color: Red; font-weight: normal;">*</b>
+                        </label><br>
+                        <ng-select [(ngModel)]="subroleObj" id="subrolelist" name="subrolelist"
+                          placeholder="Select" required #subrolelist="ngModel" (change)="onSubRoleChange()">
+                          @for (item of subRoleList; track item) {
+                            <ng-option [value]="item.param1">{{item.param2}}</ng-option>
+                          }
+                        </ng-select>
+                        @if ((subrolelistflag && subrolelist.invalid && (subrolelist.touched || loginForm.submitted))) {
+                          <div class="text-danger small">
+                            {{subRoleName}} is required.
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                  <!-- [style.display]="showCityList ? 'block' : 'none'" -->
+                  @if (showCityList) {
+                    <div class="col-xs-3 col-md-3" id="cityList">
+                      <div class="form-group">
+                        <label for="citylist" class="control-label">
+                          <span>Select City:</span>
+                          <b style="color: Red; font-weight: normal;">*</b>
+                        </label><br>
+                        <ng-select [(ngModel)]="selectedCityId" id="citylist" name="citySelect" placeholder="Select"
+                          required #citySelect="ngModel" (change)="getRoleWiseUserList()">
+                          @for (item of cityList; track item) {
+                            <ng-option [value]="item.param1">{{item.param2}}</ng-option>
+                          }
+                        </ng-select>
+                        @if ((showCityList && citySelect.invalid && (citySelect.touched || loginForm.submitted))) {
+                          <div class="text-danger small">
+                            City is required.
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                  @if (rolewiseuserFlag) {
+                    <div class="col-xs-3 col-md-3" id="rolewiseuserlist" >
+                      <div class="form-group">
+                        <label for="companySel" class="control-label">
+                          <span>Select {{filterForName}}:</span>
+                          <b style="color: Red; font-weight: normal;">*</b>
+                        </label><br>
+                        <ng-select [(ngModel)]="selectedRoleWiseUserObj" id="companySel" name="companySelect" placeholder="Select"
+                          required #companySelect="ngModel">
+                          @for (item of roleWiseUserList; track item) {
+                            <ng-option [value]="item.param1">{{item.param2}}</ng-option>
+                          }
+                        </ng-select>
+                        @if ((rolewiseuserFlag && companySelect.invalid && (companySelect.touched || loginForm.submitted))) {
+                          <div class="text-danger small">
+                            {{filterForName}} is required.
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="loginname">Login Name:</label>
+                      <label for="" class="mandetory">*</label>
+                      <input class="form-control form-control-sm clearable accept_loginName" id="loginname"
+                        maxlength="50"
+                        placeholder="Enter Login Name" autocomplete="off"
+                        [(ngModel)]="loginName" name="loginName"
+                        required #loginNameCtrl="ngModel">
+                      @if (loginNameCtrl.invalid && (loginNameCtrl.touched || loginForm.submitted)) {
+                        <div class="text-danger small">
+                          Login Name is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="welcome">Welcome Name:</label>
+                      <label for="" class="mandetory">*</label>
+                      <input class="form-control form-control-sm clearable accept_loginName" id="welcome"
+                        maxlength="50"
+                        placeholder="Enter Welcome Name" autocomplete="off"
+                        [(ngModel)]="welcomeName" name="welcomeName"
+                        required #welcomeNameCtrl="ngModel">
+                      @if (welcomeNameCtrl.invalid && (welcomeNameCtrl.touched || loginForm.submitted)) {
+                        <div class="text-danger small">
+                          Welcome Name is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="form-group password">
+                      <label for="password">Password:</label>
+                      <label for="" class="mandetory">*</label>
+                      <input class="form-control form-control-sm clearable" id="password"
+                        placeholder="Enter New Password" [type]="passwordShow ? 'text' : 'password'"
+                        maxlength="30"
+                        [(ngModel)]="password" name="password" autocomplete="off"
+                        required minlength="6" #passwordCtrl="ngModel"
+                        (keyup)="verifyPassword()">
+                      <i (click)="passwordShow = !passwordShow" class="fa" [ngClass]="{'fa-eye': !passwordShow, 'fa-eye-slash': passwordShow}" ></i>
+                      <!-- (keyup)="verifyPassword()" -->
+                      @if (passwordCtrl.invalid && (passwordCtrl.touched || loginForm.submitted)) {
+                        <div class="text-danger small">
+                          @if (passwordCtrl.errors?.['required']) {
+                            <span>Password is required.</span>
+                          }
+                          @if (passwordCtrl.errors?.['minlength']) {
+                            <span>Password must be at least 6 characters.</span>
+                          }
+                        </div>
+                      }
+                      <span [ngStyle]="{'color': passwordMessage ? 'red' : 'green'}">{{passwordMessage}}</span>
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="form-group password">
+                      <label for="confirmpassword">Re-Enter Password:</label>
+                      <label for="" class="mandetory">*</label>
+                      <input maxlength="30"
+                        class="form-control form-control-sm clearable" id="confirmpassword"
+                        placeholder="Re-Enter Password"
+                        [type]="confirmPasswordShow ? 'text' : 'password'" autocomplete="off"
+                        [(ngModel)]="confirmPassword" name="confirmPassword"
+                        required #confirmPasswordCtrl="ngModel"  (keyup)="checkPasswordsMatch()">
+                      <i (click)="confirmPasswordShow = !confirmPasswordShow" class="fa" [ngClass]="{'fa-eye': !confirmPasswordShow, 'fa-eye-slash': confirmPasswordShow}" ></i>
+                      @if (confirmPasswordCtrl.invalid && (confirmPasswordCtrl.touched || loginForm.submitted)) {
+                        <div class="text-danger small">
+                          Confirm Password is required.
+                        </div>
+                      }
+                      <span [ngStyle]="{'color': confirmPasswordMessage ? 'red' : 'green'}">{{confirmPasswordMessage}}</span>
+                    </div>
+                    <!-- [disabled]="isDisable" -->
+                    <!-- (keyup)="checkPasswordsMatch()" -->
+                  </div>
+
+                  <div class="col-sm-12">
+                    <hr>
+                      <div class="text-center mb-3">
+                        <button class="btn btn-sm btn-warning" type="button" (click)="resetForm()"> Reset</button>
+                        <button class="btn btn-sm btn-primary mx-2" type="submit">Submit</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <app-toast [message]="errorMessage" [type]="msgType" (closed)="errorMessage = null"></app-toast>
+  }

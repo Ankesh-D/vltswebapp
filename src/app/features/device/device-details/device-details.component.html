@@ -1,0 +1,275 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box" id="viewid">
+        <div class="col-md-12 pagetitleborder">
+          <button class="pagebtn">
+            <a routerLink="/device/update"><i class="fa fa-plus"></i>&nbsp;&nbsp;Update Sim Validity</a>
+          </button>
+          <button class="pagebtn" style="margin-right: 10px;">
+            <a routerLink="/device/entry"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add New</a>
+          </button>
+          <div class="pagetitlestyle"><span>Device Details</span></div>
+        </div>
+
+        <div class="table-responsive">
+          <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
+            <table style="width: 100%;">
+              <tbody class="bg-body">
+                <tr>
+                  <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                    <font style="font-weight: bold;">Search : </font>
+                  </td>
+                  <td>
+                    <div class="">
+                      <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="tabletitlesearch"
+                        id="searchby" placeholder="Type here and press button...." style="border: 1px solid #0b58b9; height: 25px; width: 200px;"
+                        autocomplete="disabled" maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby">
+                      &nbsp;&nbsp;
+                      <button class="" id="searchbtn" style="cursor: pointer;" (click)="getSearchDetails()">
+                        <i class="fa fa-search"></i>
+                      </button>
+                      &nbsp;&nbsp;
+                      <button>
+                        <span id="notspin" *ngIf="!loading" style="font-size: 11px; cursor: pointer; margin-top: 6px;"
+                          title="Reload" (click)="reloadData()">Reload</span>
+                        <span id="spin" *ngIf="loading" style="font-size: 11px; cursor: pointer; display: inline; margin-top: 6px;">Reloading...</span>
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <table style="float: right;">
+                      <tbody>
+                        <tr>
+                          <td>
+                            <label style="color: #0e0e0e;">Show Rows : </label>
+                          </td>
+                          <td>
+                            <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize" style="font-size: 10px; height: 23px;">
+                              <option *ngFor="let size of pageSizeOptions" [value]="size === totalCount ? 'All' : size">
+                                {{size === totalCount ? 'All' : size}}
+                              </option>
+                            </select>
+                          </td>
+                          <td style="padding-right: 9px;">
+                            <div style="text-align: right; font-weight: bold; margin-left: 25px;">
+                              <font class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</font>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+
+          <ng-template #deviceDetailsCell let-device let-column="column">
+            @switch (column.key) {
+              @case ('param6') { {{device.param6 || 'NA'}}<br>{{device.param5 || 'NA'}} }
+              @case ('param32') { {{device.param32 || 'NA'}}<br>{{device.param33 || 'NA'}} }
+              @case ('param9') { {{device.param8 || 'NA'}}<br>{{device.param9 || 'NA'}} }
+              @case ('param38') { {{device.param38 === 'Assigned' ? 'Installed' : 'Not Installed'}} }
+              @case ('param27') {
+                <strong>{{(device.param27 === 'Pending OTP' || device.param27 === 'Not Assigned') ? 'Pending' : device.param27}}</strong>
+                @if (device.param27 === 'Activated') { <br>{{device.param23 || 'NA'}} }
+              }
+              @case ('activity') {
+                @if (device.param30 === 'update' || device.param30 === 'noupdate') {
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" (click)="getDeviceDataForEdit(device)" [disabled]="device.param30 === 'noupdate'">Edit</button>
+                    <button type="button" class="btnleft5" (click)="getDeviceDataForDelete(device)" [disabled]="device.param30 === 'noupdate'">Delete</button>
+                  </div>
+                }
+              }
+              @default { {{device[column.key] || 'NA'}} }
+            }
+          </ng-template>
+          <app-common-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
+            [cellTemplate]="deviceDetailsCell" [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
+            tableClass="table table-striped app-table"
+            tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;"
+            emptyMessage="NO DATA FOUND">
+          </app-common-table>
+        </div>
+
+        <div class="pagination-wrapper" *ngIf="getTotalPages() > 1">
+          <ul class="pagination" style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+            <li [class.disabled]="currentPage === 1">
+              <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+            </li>
+            <li *ngFor="let page of getPageNumbers()" [class.active]="currentPage === page">
+              <button (click)="onPageChange(page)">{{page}}</button>
+            </li>
+            <li [class.disabled]="currentPage >= getTotalPages()">
+              <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Device Modal -->
+<div *ngIf="showEditModal" class="modal-overlay device-edit-modal" (click)="closeEditModal()">
+  <div class="modal-content" style="width: 800px;" (click)="$event.stopPropagation()">
+    <div class="modal-header" style="padding: 0.5rem;">
+      <h5 class="modal-title">Update</h5>
+      <button type="button" class="close" (click)="closeEditModal()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+      <div class="modal-body" style="margin-top: -15px;">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <td>
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="" style="font-size: 11px;font-weight: bold;">Serial No.:</label><label for="" class="mandetory">*</label>
+                        <input class="form-control ignorespecialcharacter" id="devicesrno" maxlength="19"
+                          [(ngModel)]="editUniqueDeviceNo" name="editUniqueDeviceNo">
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="" style="font-size: 11px;font-weight: bold;">IMEI No.:</label><label for="" class="mandetory">*</label>
+                        <input class="form-control acceptnumeric_nodecimal" id="imeino" type="text" maxlength="15"
+                          [(ngModel)]="editUniqueId" name="editUniqueId">
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="" style="font-size: 11px;font-weight: bold;">ICCID No.:</label><label for="" class="mandetory">*</label>
+                        <input class="form-control acceptnumeric_nodecimal" id="iccidno" type="text" maxlength="32"
+                          [(ngModel)]="editIccidNo" name="editIccidNo">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="" style="font-size: 11px;font-weight: bold;">Mobile N/W 1</label><label for="" class="mandetory">*</label>
+                        <ng-select
+                          id="nw1"
+                          [items]="networkList"
+                          bindLabel="param2"
+                          bindValue="param1"
+                          placeholder="Select Network 1"
+                          [(ngModel)]="editSmnw1"
+                          name="editSmnw1">
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="" style="font-size: 11px;font-weight: bold;">Mobile No. 1:</label><label for="" class="mandetory">*</label>
+                        <input class="form-control acceptnumeric_nodecimal" id="mob1" type="text" maxlength="13"
+                          [(ngModel)]="editMob1" name="editMob1">
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="" style="font-size: 11px;font-weight: bold;">Mobile N/W 2</label><label for="" class="mandetory">*</label>
+                        <ng-select
+                          id="nw2"
+                          [items]="networkList"
+                          bindLabel="param2"
+                          bindValue="param1"
+                          placeholder="Select Network 2"
+                          [(ngModel)]="editSimnw2"
+                          name="editSimnw2">
+                        </ng-select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="" style="font-size: 11px;font-weight: bold;">Mobile No. 2:</label><label for="" class="mandetory">*</label>
+                        <input class="form-control acceptnumeric_nodecimal" id="mob2" type="text" maxlength="13"
+                          [(ngModel)]="editMob2" name="editMob2">
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="" style="font-size: 11px;font-weight: bold;">Esim Provider :</label><label for="" class="mandetory">*</label>
+                        <ng-select
+                          id="m2mprovider"
+                          [items]="m2mProviderList"
+                          bindLabel="param2"
+                          bindValue="param1"
+                          placeholder="Select Esim Provider"
+                          [(ngModel)]="editM2mProviderId"
+                          name="editM2mProviderId">
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="form-group">
+                        <label for="" style="font-size: 11px;font-weight: bold;">Remark:</label><label for="" class="mandetory">*</label>
+                        <textarea class="form-control ignorespecialcharacter_address" id="remark" placeholder="Reason"
+                          [(ngModel)]="editRemark" (keyup)="checkEditRemark()" name="editRemark"></textarea>
+                        <div *ngIf="isEditRemarkInvalid" style="color: red; font-size: 11px;">
+                          Remark must be at least 10 characters.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer" style="text-align: right; padding: 10px;">
+        <button (click)="updateDevice()" [disabled]="isEditRemarkInvalid || loading">
+          {{loading ? 'Updating...' : 'Submit'}}
+        </button>
+        <button type="reset" (click)="closeEditModal()">Back</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Delete Device Modal -->
+<div *ngIf="showDeleteModal" class="modal-overlay" (click)="closeDeleteModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="modal-title">Delete</h5>
+      <button type="button" class="close" (click)="closeDeleteModal()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <span style="font-size: 11px;">Device Serial No : <font>{{deleteUniqueDeviceNo}}</font></span>
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <td>
+                  <textarea class="form-control ignoresymbol_name" id="remarks" placeholder="Remark"
+                    style="background: white; color: black;" maxlength="50" [(ngModel)]="deleteRemark"
+                    (keyup)="checkDeleteRemark()" name="deleteRemark"></textarea>
+                  <div *ngIf="isDeleteRemarkInvalid" style="color: red; font-size: 11px;">
+                    Remark must be at least 10 characters.
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer" style="text-align: right; padding: 10px;">
+        <button (click)="deleteDevice()" [disabled]="isDeleteRemarkInvalid || loading">
+          {{loading ? 'Deleting...' : 'Submit'}}
+        </button>
+        <button type="reset" (click)="closeDeleteModal()">Back</button>
+      </div>
+    </div>
+  </div>

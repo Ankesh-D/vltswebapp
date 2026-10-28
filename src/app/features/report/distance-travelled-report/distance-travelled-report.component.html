@@ -1,0 +1,341 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-box">
+
+      <!-- PAGE TITLE -->
+      <div class="pagetitlestyle">
+        <span>Distance Travelled</span>
+      </div>
+
+      <!-- MAIN LAYOUT -->
+      <div class="overspeed-layout">
+
+        <!-- LEFT FILTER PANEL -->
+        <div class="left-filter-panel entrypagediv">
+
+          <!-- FILTER BY -->
+          <div class="form-group filterby-row">
+            <label  style="margin: 2px;" class="control-label">Filter By :</label>
+
+            <div class="filterby-options">
+              <label class="radio-item">
+                <input type="radio" name="filter"
+                  (change)="onFilterByChange('Vendor')" checked>
+                Vendor
+              </label>
+
+              <label class="radio-item">
+                <input type="radio" name="filter"
+                  (change)="onFilterByChange('RTO')">
+                RTO
+              </label>
+            </div>
+          </div>
+
+          <!-- VENDOR -->
+          <!-- VENDOR -->
+          @if (filterBy === 'Vendor') {
+            <div class="form-group" >
+              <label class="control-label">Select Vendor <span style="color:red">*</span></label>
+              <select class="searchable full-control"
+                [(ngModel)]="selectedVendor"
+                (change)="onVendorChange()">
+                <option value="">Select Vendor</option>
+                @for (v of vendorList; track v) {
+                  <option [value]="v.param1">
+                    {{v.param2}}
+                  </option>
+                }
+              </select>
+            </div>
+          }
+
+          <!-- RTO -->
+          @if (filterBy === 'RTO') {
+            <div class="form-group">
+              <label class="control-label">Select RTO <span style="color:red">*</span></label>
+              <select class="searchable full-control"
+                [(ngModel)]="selectedRTO"
+                (change)="onRTOChange()">
+                <option value="">Select RTO</option>
+                @for (r of rtoList; track r) {
+                  <option [value]="r.param1">
+                    {{r.param2}}
+                  </option>
+                }
+              </select>
+            </div>
+          }
+          <!-- 🔥 DEVICE TYPE -->
+          <!-- <div class="form-group filterby-row">
+          <label class="control-label">Device Type :</label>
+
+          <div class="filterby-options">
+
+            <label class="radio-item">
+              <input type="radio"
+                name="deviceType"
+                value="NEW"
+                [(ngModel)]="deviceType">
+              New
+            </label>
+
+            <label class="radio-item">
+              <input type="radio"
+                name="deviceType"
+                value="OLD"
+                [(ngModel)]="deviceType">
+              Old
+            </label>
+
+          </div>
+        </div> -->
+        <!-- VEHICLE -->
+        <div class="form-group">
+          <label class="control-label">Select Vehicle / Chassis No <span style="color:red">*</span></label>
+
+
+          <!-- 🔍 SEARCH BOX -->
+          <div class="vehicle-search-box">
+
+            <input type="text"
+              class="form-control search-input"
+              placeholder="Enter Vehicle Number"
+              [(ngModel)]="vehicleSearch"
+              (keyup.enter)="searchVehicle()" />
+
+            <button class="btn-search-blue"
+              (click)="searchVehicle()">
+              <i class="fa fa-search"></i>
+            </button>
+
+          </div>
+
+
+          <!-- 🚗 DROPDOWN -->
+
+          @if (isVehicleLoaded && visibleVehicleList.length > 0) {
+            <select
+              class="searchable full-control"
+              [(ngModel)]="selectedVehicle"
+              placeholder="Select Vehicle">
+              <option value="" disabled selected hidden>
+                Select Vehicle
+              </option>
+              <option [ngValue]="null">Select Vehicle</option>
+              @for (v of visibleVehicleList; track v) {
+                <option
+                  [ngValue]="v.param1">
+                  {{ v.param2 }}
+                </option>
+              }
+            </select>
+          }
+
+        </div>
+
+        <!-- ALERT TYPE -->
+        <!-- <div class="form-group">
+        <label class="control-label">Alert Type <span style="color:red">*</span></label>
+        <select class="searchable full-control"
+          [(ngModel)]="selectedAlertType">
+          <option value="">Select Alert</option>
+
+          <option *ngFor="let a of alertTypeList" [value]="a.param1">
+            {{a.param2}}
+          </option>
+        </select>
+      </div> -->
+
+      <!-- DATE -->
+      <div class="date-row">
+        <div class="date-col" style="width:100%">
+          <label class="control-label">Select Date Range<span style="color:red">*</span> </label>
+          <input
+            placeholder="Select Date Range"
+            type="text"
+            class="form-control"
+            ngxDaterangepickerMd
+            [(ngModel)]="selectedDateRange"
+            [maxDate]="today"
+            [opens]="'right'"
+            [drops]="'up'"
+            [locale]="{ format: 'DD-MMM-YYYY' }"
+            (applyDaterangepicker)="onDateRangeChange($event)"
+            />
+
+        </div>
+      </div>
+
+      <div class="date-row">
+
+        <div class="date-col">
+          <label class="control-label">From Time<span style="color:red">*</span></label>
+          <input
+            type="time"
+            class="form-control"
+            [(ngModel)]="fromTime"
+            step="60"
+            />
+        </div>
+
+        <div class="date-col">
+          <label class="control-label">To Time<span style="color:red">*</span></label>
+          <input
+            type="time"
+            class="form-control"
+            [(ngModel)]="toTime"
+            step="60"
+            />
+        </div>
+
+      </div>
+      <!-- SEARCH -->
+      <div class="search-btn-row">
+        <button class="search-btn-full"
+          (click)="getAlertOverview()">
+          <i class="fa fa-search"></i>   Search
+        </button>
+      </div>
+    </div>
+    <!-- *ngIf="showSummary" -->
+    <!-- RIGHT REPORT PANEL -->
+    <div class="right-report-panel" >
+      <!-- 🔹 TOP CONTROLS BAR -->
+      <div class="top-controls-row">
+
+        <!-- LEFT SIDE -->
+        <div class="left-controls">
+
+          <!-- 🔍 SEARCH BOX -->
+          <div class="search-box">
+            <input
+              type="search"
+              class="search-input inner"
+              placeholder="Search vehicle / alert..."
+              maxlength="50"
+              [(ngModel)]="searchText"
+              (keyup.enter)="getSearchDetails()" />
+
+            <button class="search-inner-btn" (click)="getSearchDetails()">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+
+          <!-- 🔄 RELOAD BUTTON -->
+          <button
+            class="reload-btn"
+            (click)="reloadData()"
+            [disabled]="loading">
+
+            <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+            <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+
+          </button>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="right-controls">
+          <div class="total-records-text">Show Rows :</div>
+          <!-- ROWS SELECT -->
+          <select
+            class="rows-select"
+            [(ngModel)]="pageSize"
+            (change)="onPageSizeChanged(pageSize)">
+
+            @for (size of pageSizeOptions; track size) {
+              <option
+                [value]="size === totalCount ? 'All' : size">
+                {{ size === totalCount ? 'All' : size }}
+              </option>
+            }
+
+          </select>
+
+          <!-- TOTAL RECORD TEXT -->
+          <div class="total-records-text">
+            Total Records : {{ pageCount }} of {{ totalCount }}
+          </div>
+
+        </div>
+
+      </div>
+      <!-- TABLE -->
+      <div class="table-wrapper" >
+        <ng-template #reportTableRows let-rows>
+@if (alertData.length === 0) {
+              <tr>
+                <td colspan="8" class="no-data">
+                  NO DATA FOUND
+                </td>
+              </tr>
+            }
+
+            @for (data of rows; track data; let i = $index) {
+              <tr>
+                <td>{{data.param1.length >0 ? data.param1 : 'NA'}}</td>
+                <td>{{data.param4.length >0 ? data.param4 : 'NA'}}</td>
+                <td>{{data.param16.length >0 ? data.param16 : 'NA'}}</td>
+                <td>{{data.param32.length >0 ? data.param32: 'NA'}}</td>
+                <td>{{data.param27.length >0 ? data.param27 : 'NA'}}<br>{{data.param29.length >0 ? data.param29: 'NA'}}</td>
+                <td>{{data.param5.length >0 ? data.param5 : 'NA'}}</td>
+                <td>{{data.param6.length >0 ? data.param6 : 'NA'}}</td>
+                <td>{{data.param7.length >0 ? data.param7 : 'NA'}}</td>
+              </tr>
+            }
+</ng-template>
+<app-common-table [columns]="tableColumns" [rows]="alertData" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table-grid"></app-common-table>
+
+      </div>
+      @if (totalCount > pageSize || page > 1) {
+        <div class="custom-pagination"style="display:flex;justify-content: end;">
+          <button class="pg-btn"
+            (click)="changePage(page - 1)"
+            [disabled]="page === 1">
+            Prev
+          </button>
+          @if (page > 3) {
+            <span class="pg-dots">...</span>
+          }
+          @if (page > 2) {
+            <button
+              class="pg-num"
+              (click)="changePage(page - 1)">
+              {{ page - 1 }}
+            </button>
+          }
+          <button class="pg-num active">
+            {{ page }}
+          </button>
+          @if (page < totalPages - 1) {
+            <button
+              class="pg-num"
+              (click)="changePage(page + 1)">
+              {{ page + 1 }}
+            </button>
+          }
+          @if (page < totalPages - 2) {
+            <span class="pg-dots">...</span>
+          }
+          <button class="pg-num"
+            (click)="changePage(totalPages)">
+            {{ totalPages }}
+          </button>
+          <button class="pg-btn"
+            (click)="changePage(page + 1)"
+            [disabled]="page === totalPages">
+            Next
+          </button>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>
+</div>
+</div>
+
+
+
+<!-- 🔥 ALERT EVENT DETAILS MODAL -->

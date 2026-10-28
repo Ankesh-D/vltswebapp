@@ -1,0 +1,119 @@
+<div class="row filter-box">
+
+  <!-- Vendor Dropdown -->
+  <div class="col-md-3">
+    <label>Vendor</label>
+
+    <select class="form-control"
+      [(ngModel)]="companyId"
+      (change)="loadData()">
+
+      <option value="">All Vendor</option>
+
+      @for (v of vendorList; track v) {
+        <option
+          [value]="v.param1">
+          {{ v.param2 }}
+        </option>
+      }
+
+    </select>
+  </div>
+
+
+  <!-- Search -->
+  <div class="col-md-3">
+    <label>Search</label>
+
+    <div class="search-box">
+
+      <input type="text"
+        class="form-control"
+        placeholder="Search Name / Mobile"
+        [(ngModel)]="searchText"
+
+        (keyup)="searchOtp()">
+
+      <button class="reload-btn"
+        (click)="reloadData()">
+        Reload
+      </button>
+
+    </div>
+  </div>
+
+
+  <!-- From Date -->
+  <div class="col-md-2">
+    <div class="date-col" style="width:100%">
+      <label class="control-label">
+        Select Date Range
+        <span style="color:red">*</span>
+      </label>
+
+      <input
+        type="text"
+        class="form-control"
+        ngxDaterangepickerMd
+        [(ngModel)]="selectedDateRange"
+        (ngModelChange)="onDateRangeChange($event)"
+        [autoApply]="true"
+        [locale]="{ format: 'DD-MMM-YYYY' }"
+        />
+    </div>
+
+
+    <!-- Search Button -->
+    <!-- <div class="col-md-4">
+    <label>&nbsp;</label>
+
+    <button class="btn btn-primary "
+      (click)="loadData()">
+
+      Search
+
+    </button>
+  </div> -->
+
+</div>
+<div class="table-responsive mt-3">
+
+  <ng-template #otpRows let-rows>
+    @for (d of rows; track d; let i = $index) {
+        <tr>
+          <td>{{(page-1)*pageSize + i + 1}}</td>
+          <td>{{d.param7}}</td>   <!-- Vendor Name -->
+          <td>{{d.param4}}</td>   <!-- IMEI -->
+          <td>{{d.param5}}</td>   <!-- Unique Device No -->
+          <td>{{d.param9}}</td>   <!-- Vehicle / Chassis No -->
+          <td>{{d.param21}}</td>  <!-- Name -->
+          <td>{{d.param22}}</td>  <!-- Mobile -->
+          <td class="otp-text">{{d.param31}}</td> <!-- OTP -->
+          <td>{{d.param32 | date:'dd-MMM-yyyy HH:mm:ss'}}</td> <!-- Time -->
+        </tr>
+    }
+  </ng-template>
+  <app-common-table [columns]="tableColumns"
+    [rows]="filteredList | slice:(page-1)*pageSize:(page)*pageSize"
+    [bodyTemplate]="otpRows" [sortKey]="sortKey" [reverse]="reverse"
+    (sortChange)="sort($event)" tableClass="table table-bordered table-striped app-table"
+    headerClass="device-thead">
+  </app-common-table>
+
+</div>@if (filteredList.length > pageSize) {
+<div class="pagination-box">
+  <button class="btn btn-sm btn-secondary"
+    (click)="prevPage()"
+    [disabled]="page==1">
+    Prev
+  </button>
+  <span class="mx-2">
+    Page {{page}}
+  </span>
+  <button class="btn btn-sm btn-secondary"
+    (click)="nextPage()"
+    [disabled]="page*pageSize >= filteredList.length">
+    Next
+  </button>
+</div>
+}

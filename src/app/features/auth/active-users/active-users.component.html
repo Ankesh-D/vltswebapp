@@ -1,0 +1,124 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <!-- Header with Back Button -->
+        <div class="col-md-12 pagetitleborder d-flex justify-content-between align-items-center">
+          <div class="pagetitlestyle"><span>User Login Status</span></div>
+          <button class="btn btn-sm btn-outline-primary shadow-sm" (click)="goBack()"
+            style="font-size: 0.8rem; border-radius: 20px; padding: 5px 15px; font-weight: 500; transition: all 0.3s ease;">
+            <i class="fa fa-arrow-left me-1"></i> Back
+          </button>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <!-- Toolbar Section -->
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap"
+              style="background: #fff; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;">
+
+              <!-- Search Section -->
+              <div class="d-flex align-items-center">
+                <span class="me-2" style="font-size: 0.75rem; font-weight: 700; color: #666; letter-spacing: 0.5px;">Search:</span>
+                <div class="d-flex align-items-center bg-white"
+                  style="border-radius: 20px; padding: 2px 5px 2px 12px; border: 1px solid #e1e4e8; width: 260px; transition: all 0.3s ease; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);">
+                  <input type="text" class="form-control border-0 shadow-none bg-transparent p-0" placeholder="Type here..."
+                    [(ngModel)]="searchText" (keyup.enter)="getActiveUsers(1)"
+                    style="font-size: 0.8rem; height: 26px;">
+
+                  @if (searchText) {
+                    <button class="btn btn-link text-danger p-0 me-2" type="button" (click)="searchText=''; getActiveUsers(1)" title="Clear">
+                      <i class="fa fa-times" style="font-size: 0.8rem;"></i>
+                    </button>
+                  }
+
+                  <button class="btn btn-primary rounded-circle shadow-sm" type="button" (click)="getActiveUsers(1)" title="Search"
+                    style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; min-width: 28px;">
+                    <i class="fa fa-search" style="font-size: 0.75rem;"></i>
+                  </button>
+
+                  <button class="btn btn-light rounded-circle shadow-sm ms-1" type="button" (click)="getActiveUsers(1)" title="Reload"
+                    style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; min-width: 28px; background: #f8f9fa;">
+                    <i class="fa fa-refresh text-success" [class.fa-spin]="loading" style="font-size: 0.75rem;"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Right Toolbar Controls -->
+              <div class="d-flex align-items-center gap-3">
+                <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                  [showPageSize]="false" [showTotal]="false" (excelExport)="downloadExcel()"></app-common-data-toolbar>
+
+                <!-- Show Rows -->
+                <div class="d-flex align-items-center ms-2">
+                  <label class="me-2 mb-0" style="font-size: 0.75rem; font-weight: 700; color: #666;">Show Rows:</label>
+                  <select class="form-select form-select-sm shadow-sm" [(ngModel)]="pageSize" (change)="getActiveUsers(1)"
+                    style="font-size: 0.8rem; border-radius: 15px; width: 70px; border-color: #e1e4e8; height: 30px; padding-top: 2px; padding-bottom: 2px; cursor: pointer;">
+                    <option [ngValue]="20">20</option>
+                    <option [ngValue]="50">50</option>
+                    <option [ngValue]="100">100</option>
+                  </select>
+                </div>
+
+                <!-- Total Records -->
+                <div class="ms-3 px-3 py-1 bg-light rounded-pill border" style="border-color: #eee;">
+                  <span style="font-size: 0.75rem; font-weight: 700; color: #555;">
+                    Total: <span class="text-primary">{{totalCount}}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Table Section -->
+          <div class="col-sm-12">
+            <div class="shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #e9ecef;">
+              <ng-template #activeUserCell let-login let-column="column">
+                @if (column.key === 'param18') {
+                  <span class="badge rounded-pill shadow-sm"
+                    [ngClass]="login.param18 === 'Active' ? 'bg-success' : 'bg-secondary'"
+                    style="font-size: 0.7rem; padding: 5px 10px; font-weight: 500; letter-spacing: 0.5px;">
+                    {{ login.param18 || 'NA' }}
+                  </span>
+                } @else {
+                  {{ column.value ? column.value(login) : login[column.key] }}
+                }
+              </ng-template>
+              <app-common-table [columns]="tableColumns" [rows]="userLoginList" [loading]="loading"
+                [cellTemplate]="activeUserCell" [sortKey]="sortKey" [reverse]="reverse"
+                (sortChange)="sort($event)" tableClass="table table-hover table-sm mb-0"
+                tableStyle="font-size: 0.85rem;" headerClass="bg-light"
+                emptyMessage="NO DATA FOUND">
+              </app-common-table>
+            </div>
+
+            <!-- Pagination -->
+            @if (totalCount > pageSize) {
+              <div class="d-flex justify-content-end mt-3">
+                <div class="d-flex align-items-center bg-white shadow-sm" style="border-radius: 25px; padding: 4px 8px; border: 1px solid #e9ecef;">
+                  <button class="btn btn-sm rounded-circle" [disabled]="currentPage === 1" (click)="getActiveUsers(currentPage - 1)"
+                    style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;"
+                    [ngClass]="currentPage === 1 ? 'btn-light text-muted' : 'btn-light text-primary'">
+                    <i class="fa fa-chevron-left" style="font-size: 0.7rem;"></i>
+                  </button>
+                  <span class="mx-3 text-muted" style="font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px;">
+                    Page <span class="text-dark">{{currentPage}}</span> of {{getTotalPages()}}
+                  </span>
+                  <button class="btn btn-sm rounded-circle" [disabled]="currentPage >= getTotalPages()" (click)="getActiveUsers(currentPage + 1)"
+                    style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;"
+                    [ngClass]="currentPage >= getTotalPages() ? 'btn-light text-muted' : 'btn-light text-primary'">
+                    <i class="fa fa-chevron-right" style="font-size: 0.7rem;"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (loading) {
+  <app-loading></app-loading>
+}

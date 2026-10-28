@@ -1,0 +1,121 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+
+        <div class="element-wrapper">
+          <div class="element-box">
+
+            <!-- TITLE -->
+            <div class="col-md-12 pagetitleborder">
+              <div class="pagetitlestyle">
+                <span>Current Day Alerts</span>
+                <span class="text-muted ms-2">(Auto refresh 30s)</span>
+              </div>
+            </div>
+
+            <!-- ALERT TILES -->
+            <div class="chart-frame mt-3">
+
+              <div class="pie-grid">
+
+                @for (alert of alertCounts; track alert; let i = $index) {
+                  <div class="pie-item"
+                    (click)="openAlertModal(alert.id, alert.name)">
+                    <div class="pie-color"
+                      [style.background]="getColorByIndex(i)">
+                    </div>
+                    <div class="pie-content">
+                      <div class="pie-name">{{alert.name}}</div>
+                      <div class="pie-value">{{alert.value}}</div>
+                    </div>
+                  </div>
+                }
+
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+@if (showAlertModal) {
+  <div class="alert-modal-overlay">
+    <div class="alert-modal-content">
+      <div class="alert-modal-header">
+        {{selectedAlertName}} Alerts
+        <button class="close-btn" (click)="closeAlertModal()">×</button>
+      </div>
+      <div class="alert-modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped app-table table-bordered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Vehicle</th>
+                <th>Alert</th>
+                <th>Alert Time</th>
+                <th>Vendor</th>
+                <th>RTO</th>
+                <th>Customer</th>
+                <th>Mobile</th>
+                <th>Location</th>
+                <th>Speed</th>
+                <th>Ignition</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (modalData.length === 0) {
+                <tr>
+                  <td colspan="11" class="text-center text-muted">NO DATA FOUND</td>
+                </tr>
+              }
+              @for (row of modalData; track row; let i = $index) {
+                <tr>
+                  <!-- SR NO -->
+                  <td>{{ i + 1 }}</td>
+                  <!-- VEHICLE + CHASSIS (2 params) -->
+                  <td>
+                    <div><b>{{row.param9}}</b></div>
+                    <div class="text-muted small">{{row.param1}}</div>
+                  </td>
+                  <!-- ALERT -->
+                  <td>{{row.param8}}</td>
+                  <!-- TIME -->
+                  <td>{{row.param3}}</td>
+                  <!-- VENDOR -->
+                  <td>{{row.param11}}</td>
+                  <!-- RTO -->
+                  <td>{{row.param12}}</td>
+                  <!-- CUSTOMER -->
+                  <td>{{row.param15}}</td>
+                  <!-- MOBILE -->
+                  <td>{{row.param16}}</td>
+                  <!-- LAT + LONG -->
+                  <td>
+                    {{row.param6}}, {{row.param7}}
+                  </td>
+                  <!-- SPEED -->
+                  <td>{{row.param21}} km/h</td>
+                  <!-- IGNITION -->
+                  <td>
+                    <span [style.color]="row.param20 == '1' ? 'green' : 'red'">
+                      {{row.param20 == '1' ? 'ON' : 'OFF'}}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+}

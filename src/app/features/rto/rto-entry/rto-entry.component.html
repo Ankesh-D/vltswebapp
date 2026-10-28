@@ -1,0 +1,73 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <button class="pagebtn">
+                <a routerLink="/RTODetails/0/0"><i class="fa fa-plus"></i>&nbsp;&nbsp;Details</a>
+              </button>
+              <div class="pagetitlestyle">
+                <span>RTO Entry</span>
+              </div>
+            </div>
+
+            <form id="rtoentryform" autocomplete="off">
+              <div class="form-desc">
+                <strong>NOTE :</strong><label for="" class="mandetory">*</label>
+                Are Mandatory Fields.
+              </div>
+
+              <div class="entrypagediv">
+                <div class="row">
+                  <div class="col-sm-2">
+                    <div class="form-group">
+                      <label for="">RTO Code: </label><label for="" class="mandetory">*</label>
+                      <input type="text"
+                        name="rtocode" id="rtocode"
+                        class="form-control"
+                        placeholder="{{placeholder}}"
+                        [(ngModel)]="rtoCode"
+                        (keyup)="onRTOCodeKeyUp()"
+                        style="text-transform: uppercase" maxlength="5"
+                        name="rtoCode">
+                    </div>
+                  </div>
+                  <div class="col-sm-2">
+                    <div class="form-group">
+                      <label for="">RTO Address:</label><label for="" class="mandetory">*</label>
+                      <input type="text"
+                        name="rtoaddress" id="rtoaddress"
+                        class="form-control"
+                        placeholder="RTO Address"
+                        [(ngModel)]="rtoAddress"
+                        name="rtoAddress">
+                    </div>
+                  </div>
+                  <div class="col-sm-2">
+                    <div class="form-group">
+                      <label for="">PIN Code:</label><label for="" class="mandetory">*</label>
+                      <input type="text"
+                        name="pincode" id="pincode"
+                        class="form-control"
+                        maxlength="6"
+                        placeholder="PIN Code"
+                        [(ngModel)]="pinCode"
+                        name="pinCode">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-buttons-w">
+                <button type="submit" (click)="rtoEntry()" [disabled]="loading">
+                  {{loading ? 'Submitting...' : 'Submit'}}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

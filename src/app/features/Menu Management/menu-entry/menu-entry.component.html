@@ -1,0 +1,845 @@
+<div class="content-i mt-3">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="element-wrapper">
+        <!-- Tabs -->
+        <div class="tabs-wrapper" [ngClass]="activeTab" style="max-width: 450px;">
+          <ul class="nav nav-tabs nav-justified custom-tabs">
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'role'" (click)="activeTab = 'role'">Role-wise Menu</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'user'" (click)="activeTab = 'user'">User-wise Menu</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'menuEntry'" (click)="activeTab = 'menuEntry'">Menu
+              Entry</a>
+            </li>
+          </ul>
+          <div class="tab-slider"></div>
+        </div>
+
+        <!-- Role-wise Menu Content -->
+        @if (activeTab === 'role') {
+          <div class="tab-pane-anim">
+            <div class="element-box mt-3">
+              <form #roleMenuForm="ngForm" autocomplete="off">
+                <div class="row">
+                  <div class="col-sm-3 form-group">
+                    <label>Select Role<span class="text-danger">*</span></label>
+                    <ng-select [items]="rolewisedata" bindLabel="param2" bindValue="param1" placeholder="Select Role"
+                      name="role_role" [(ngModel)]="role_selectedRole">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group">
+                    <label>Menu Type</label>
+                    <ng-select [items]="['Main Menu', 'Sub Menu']" placeholder="Select Menu Type" name="role_menuType"
+                      [(ngModel)]="role_selectedMenuType" (change)="onRoleWiseMenuTypeChange()">
+                    </ng-select>
+                  </div>
+                  @if (role_visibility.menuList) {
+                    <div class="col-sm-3 form-group">
+                      <label>Menu</label>
+                      <ng-select [items]="role_menuList" bindLabel="param2" bindValue="param1" placeholder="Select Menu"
+                        name="role_menu" [(ngModel)]="role_selectedMenuId">
+                      </ng-select>
+                    </div>
+                  }
+                  <div class="col-sm-2 d-flex align-items-end form-group">
+                  <button class="btn btn-primary" (click)="onRoleWiseViewClick()" [disabled]="!role_selectedRole" style=" padding: 0.1rem 0.2rem;
+    font-size: 14px;">
+                      View
+                    </button>
+                  </div>
+                </div>
+              </form>
+              @if (showRoleMenuTable) {
+                <div class="mt-4 user-menu-table-container">
+                  <table class="table table-striped app-table table-sm app-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Menu List</th>
+                        <th>Menu Description</th>
+                        <th>Menu URL</th>
+                        <th>Select Menus</th>
+                        <th>Order Number</th>
+                        <th>Select Landing Page</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @if (role_rolemenulist.length === 0) {
+                        <tr>
+                          <td colspan="7" class="text-center fw-bold">NO DATA FOUND</td>
+                        </tr>
+                      }
+                      @for (main of role_rolemenulist; track main; let i = $index) {
+                        <tr>
+                          <td>{{ i + 1 }}</td>
+                          <td>{{ main.param3 || 'NA' }}</td>
+                          <td>{{ main.param4 || 'NA' }}</td>
+                          <td>{{ main.param5 != 0 ? main.param5 : 'NA' }}</td>
+                          <td><input type="checkbox" [(ngModel)]="main.param7"
+                          (ngModelChange)="onRoleWiseCheckboxChange(main)"></td>
+                          <td><input type="text" class="form-control form-control-sm order-input" [(ngModel)]="main.param6"
+                          (blur)="onRoleWiseOrderBlur(main)" maxlength="3" [disabled]="!main.param7"></td>
+                          <td><input type="radio" name="role_landingPageRadio" [value]="main.param2"
+                          [(ngModel)]="role_landingPageMenuId" [disabled]="!main.param7"></td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                  <div class="text-end mt-3">
+                    <!-- [disabled]="!isRoleWiseSubmitEnabled" -->
+                    <button class="btn btn-sm btn-success" (click)="assignRoleMenuData()">Submit</button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- User-wise Menu Content -->
+        @if (activeTab === 'user') {
+          <div class="tab-pane-anim">
+            <div class="element-box mt-3">
+              <form #userMenuForm="ngForm" autocomplete="off">
+                <div class="row">
+                  <div class="col-sm-3 form-group">
+                    <label>Select Role<span class="text-danger">*</span></label>
+                    <ng-select placeholder="Select Role"
+                      name="role" [(ngModel)]="selectedRole" (change)="onRoleChange($event)">
+                      @for (user of rolewisedata; track user) {
+                        <ng-option [value]="user.param1">
+                          {{ user.param2 }}
+                        </ng-option>
+                      }
+                    </ng-select>
+                  </div>
+                  @if (visibility.distributor || visibility.dealer) {
+                    <div class="col-sm-3 form-group">
+                      <label>Select Company<span class="text-danger">*</span></label>
+                      <ng-select placeholder="Select Company"
+                        name="company" [(ngModel)]="selectedCompanyId" (change)="onChangeCompany($event)">
+                        @for (user of companylist; track user) {
+                          <ng-option [value]="user.param1">
+                            {{ user.param2 }}
+                          </ng-option>
+                        }
+                      </ng-select>
+                    </div>
+                  }
+                  @if (visibility.dealer) {
+                    <div class="col-sm-3 form-group">
+                      <label>Select Distributor<span class="text-danger">*</span></label>
+                      <ng-select placeholder="Select Distributor"
+                        name="distributor" [(ngModel)]="selectedDistributorId" (change)="onChangeDistributor($event)">
+                        @for (user of distributorlist; track user) {
+                          <ng-option [value]="user.param1">
+                            {{ user.param2 }}
+                          </ng-option>
+                        }
+                      </ng-select>
+                    </div>
+                  }
+                  @if (visibility.subrto) {
+                    <div class="col-sm-3 form-group">
+                      <label>Select RTO<span class="text-danger">*</span></label>
+                      <ng-select placeholder="Select RTO"
+                        name="rto" [(ngModel)]="selectedRTOId" (change)="onChangeRTO($event)">
+                        @for (item of getrtolist; track item) {
+                          <ng-option [value]="item.param1">
+                            {{ item.param2 }}
+                          </ng-option>
+                        }
+                      </ng-select>
+                    </div>
+                  }
+                  @if (visibility.mvi) {
+                    <div class="col-sm-3 form-group">
+                      <label>Select City RTO<span class="text-danger">*</span></label>
+                      <ng-select placeholder="Select City RTO"
+                        name="cityrto" [(ngModel)]="selectedCityRTOId" (change)="onChangeCityRTO($event)">
+                        @for (item of getCityRtoList; track item) {
+                          <ng-option [value]="item.param1">
+                            {{ item.param2 }}
+                          </ng-option>
+                        }
+                      </ng-select>
+                    </div>
+                  }
+                  @if (this.roleOwnerFlag == true;) {
+                    <div class="col-sm-3 form-group">
+                      <label>Select {{roleOwnerLabel}}<span class="text-danger">*</span></label>
+                      <ng-select placeholder="Select {{roleOwnerLabel}}"
+                        name="user"
+                        [(ngModel)]="selectedRoleOwner"
+                        (change)="onRoleOwnerChange($event)">
+                        @for (user of roleOwnerList; track user) {
+                          <ng-option [value]="user">
+                            {{ user.param2 }}
+                          </ng-option>
+                        }
+                      </ng-select>
+                    </div>
+                  }
+                  @if (selectedRole !== null && selectedRole !== undefined && selectedRole !== '') {
+                    <div class="col-sm-3 form-group">
+                      <label>Select User<span class="text-danger">*</span></label>
+                      <ng-select placeholder="Select User"
+                        name="user" [(ngModel)]="selectedOwnerId">
+                        @for (user of userlist; track user) {
+                          <ng-option [value]="user.param1">
+                            {{ user.param2 }}
+                          </ng-option>
+                        }
+                      </ng-select>
+                    </div>
+                  }
+                  <!--
+                  <div class="col-sm-3 form-group">
+                    <label>Select Role<span class="text-danger">*</span></label>
+                    <ng-select [items]="rolewisedata" bindLabel="param2" bindValue="param1" placeholder="Select Role"
+                      name="role" [(ngModel)]="selectedRole" (change)="onRoleChange($event)">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.oem">
+                    <label>Select OEM<span class="text-danger">*</span></label>
+                    <ng-select [items]="oemlist" bindLabel="param2" bindValue="param1" placeholder="Select OEM" name="oem"
+                      [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.company">
+                    <label>Select Company<span class="text-danger">*</span></label>
+                    <ng-select [items]="companylist" bindLabel="param2" bindValue="param1" placeholder="Select Company"
+                      name="company" [(ngModel)]="selectedCompanyId" (change)="onCompanyChange($event)">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.distributor">
+                    <label>Select Distributor<span class="text-danger">*</span></label>
+                    <ng-select [items]="distributorlist" bindLabel="param2" bindValue="param1"
+                      placeholder="Select Distributor" name="distributor" [(ngModel)]="selectedDistributorId"
+                      (change)="onDistributorChange($event)">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.dealer">
+                    <label>Select Dealer<span class="text-danger">*</span></label>
+                    <ng-select [items]="dealerdetailslist" bindLabel="param2" bindValue="param1"
+                      placeholder="Select Dealer" name="dealer" [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.rto">
+                    <label>Select State<span class="text-danger">*</span></label>
+                    <ng-select [items]="getrtolist" bindLabel="param2" placeholder="Select State" name="rto"
+                      [(ngModel)]="selectedRto" (change)="onRtoChange($event)">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.subrto">
+                    <label>Select RTO<span class="text-danger">*</span></label>
+                    <ng-select [items]="districtdata" bindLabel="param2" bindValue="param1" placeholder="Select RTO"
+                      name="subrto" [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.m2m">
+                    <label>Select M2M Provider<span class="text-danger">*</span></label>
+                    <ng-select [items]="tm2mprovider" bindLabel="param2" bindValue="param1"
+                      placeholder="Select M2M Provider" name="m2m" [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.certifiedauth">
+                    <label>{{ visibility.certLabel }}<span class="text-danger">*</span></label>
+                    <ng-select [items]="modelnamelist" bindLabel="param2" bindValue="param1" placeholder="Select"
+                      name="certifiedauth" [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.police">
+                    <label>Select Police<span class="text-danger">*</span></label>
+                    <ng-select [items]="policelist" bindLabel="param2" bindValue="param1" placeholder="Select Police"
+                      name="police" [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.citypolice">
+                    <label>Select City Police<span class="text-danger">*</span></label>
+                    <ng-select [items]="citypolicelist" bindLabel="param2" bindValue="param1"
+                      placeholder="Select City Police" name="citypolice" [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.legalmetro">
+                    <label>Select Legal Metrology<span class="text-danger">*</span></label>
+                    <ng-select [items]="legalmetrolist" bindLabel="param2" bindValue="param1"
+                      placeholder="Select Legal Metrology" name="legalmetro" [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.customer">
+                    <label>Select Customer<span class="text-danger">*</span></label>
+                    <ng-select [items]="customerlist" bindLabel="param2" bindValue="param1" placeholder="Select Customer"
+                      name="customer" [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.pmc">
+                    <label>Select PMC<span class="text-danger">*</span></label>
+                    <ng-select [items]="pmclist" bindLabel="param2" bindValue="param1" placeholder="Select PMC" name="pmc"
+                      [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.pmcuser">
+                    <label>Select PMC User<span class="text-danger">*</span></label>
+                    <ng-select placeholder="Select PMC User"
+                      name="pmcuser" [(ngModel)]="selectedOwnerId">
+                      <ng-option *ngFor="let user of userlist" [value]="user.param3">
+                        {{ user.param2 }}
+                      </ng-option>
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.adminuser">
+                    <label>Select Admin User<span class="text-danger">*</span></label>
+                    <ng-select [items]="userlist" bindLabel="param2" bindValue="param1" placeholder="Select Admin User"
+                      name="pmcuser" [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-3 form-group" *ngIf="visibility.companyuser">
+                    <label>Select Company User<span class="text-danger">*</span></label>
+                    <ng-select [items]="userlist" bindLabel="param2" bindValue="param1" placeholder="Select Company User"
+                      name="companyuser" [(ngModel)]="selectedOwnerId">
+                    </ng-select>
+                  </div> -->
+                  <div class="col-sm-3 form-group">
+                    <label>Menu Type<span class="text-danger">*</span></label>
+                    <ng-select [items]="['Main Menu', 'Sub Menu']" placeholder="Select Menu Type" name="menuType"
+                      [(ngModel)]="user_selectedMenuType" (change)="onUserMenuTypeChange()">
+                    </ng-select>
+                  </div>
+                  @if (visibility.menuList) {
+                    <div class="col-sm-3 form-group">
+                      <label>Menu<span class="text-danger">*</span></label>
+                      <ng-select [items]="userMenuList" bindLabel="param2" bindValue="param1" placeholder="Select Menu"
+                        name="menu" [(ngModel)]="user_selectedMenuId">
+                      </ng-select>
+                    </div>
+                  }
+                  <div class="col-sm-2 d-flex align-items-end form-group">
+                    <button class="btn btn-sm btn-primary" (click)="onViewClick()" [disabled]="!isViewButtonEnabled()">
+                      View Menu
+                    </button>
+                  </div>
+                </div>
+              </form>
+              @if (showUserMenuTable) {
+                <div class="mt-4 user-menu-table-container">
+                  <table class="table table-striped app-table table-sm">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Menu List</th>
+                        <th>Menu Description</th>
+                        <th>Menu URL</th>
+                        <th>Select Menus</th>
+                        <th>Order Number</th>
+                        <th>Select Landing Page</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @if (rolemenulist.length === 0) {
+                        <tr>
+                          <td colspan="7" class="text-center fw-bold">NO DATA FOUND</td>
+                        </tr>
+                      }
+                      @for (main of rolemenulist; track main; let i = $index) {
+                        <tr>
+                          <td>{{ i + 1 }}</td>
+                          <td>{{ main.param3 || 'NA' }}</td>
+                          <td>{{ main.param4 || 'NA' }}</td>
+                          <td>{{ main.param5 != 0 ? main.param5 : 'NA' }}</td>
+                          <td><input type="checkbox" [(ngModel)]="main.param7" (ngModelChange)="onCheckboxChange(main)"></td>
+                          <td><input type="text" class="form-control form-control-sm order-input" [(ngModel)]="main.param6"
+                          (blur)="onOrderBlur(main)" maxlength="3" [disabled]="!main.param7"></td>
+                          <td><input type="radio" name="landingPageRadio" [value]="main.param2"
+                          [(ngModel)]="landingPageMenuId" [disabled]="!main.param7"></td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                  <div class="text-end mt-3">
+                    <button class="btn btn-sm btn-success" (click)="assignUserRoleData()"
+                    [disabled]="!isSubmitEnabled">Submit</button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Menu Entry Content -->
+        @if (activeTab === 'menuEntry') {
+          <div class="tab-pane-anim">
+            <div>
+              <form>
+                <div class="row">
+                  <!-- Menu Type Selection -->
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="roleid" class="control-label" style="font-size:14px;">
+                        <font>Menu Type:</font> <b style="color: Red; font-weight: normal;">*</b>
+                      </label>
+                      <ng-select id="roleid" [items]="['Main Menu', 'Sub Menu']" placeholder="Select Menu Type"
+                        [(ngModel)]="selectedMenuType" (change)="onMenuTypeChange()" name="menuType"
+                        style="margin-left: 6rem; margin-top: -30px; width: 180px;">
+                      </ng-select>
+                    </div>
+                  </div>
+                  <!-- Parent Menu Selection (Visible for Sub Menu) -->
+                  @if (showParentMenuList) {
+                    <div class="col-md-4">
+                      <div class="form-group" id="menulist">
+                        <label for="subroleid" class="control-label" style="font-size:14px;">
+                          <font>Menu:</font> <b style="color: Red; font-weight: normal;">*</b>
+                        </label>
+                        <ng-select id="subroleid" [items]="menuList" bindLabel="param3" bindValue="param2"
+                          placeholder="Select menu" [(ngModel)]="selectedParentMenuId" (change)="onParentMenuChange()"
+                          name="parentMenu" style="margin-left: 6rem; margin-top: -30px; width: 225px;">
+                        </ng-select>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </form>
+              <!-- Main Menu Section -->
+              @if (showMainMenuSection) {
+                <div class="menu-section-box" id="mainmenu">
+                  <div class="row">
+                    <!-- Main Menu List -->
+                    <div class="col-md-5 card">
+                      <div class="element-wrapper">
+                        <h6 class="element-header">Menu List</h6>
+                        <div class="element-box-tp menu-list-container">
+                          <div class="table-responsive" style=" overflow-x: hidden;">
+                            <table class="table table-hover menu-list-table app-table">
+                              <thead class="thead">
+                                <tr>
+                                  <th class="thead" style=" background-color: #aacda8!important;">Main Menu</th>
+                                  <th class="text-center thead" style=" background-color: #aacda8!important;">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                @if (menuList.length == 0) {
+                                  <tr>
+                                    <td colspan="2" class="text-center text-muted">No menu found...</td>
+                                  </tr>
+                                }
+                                @for (x of menuList; track x) {
+                                  <tr class="menu-item-row">
+                                    <td>{{x.param3}}</td>
+                                    <td class="text-center">
+                                      <a class="edit-link" (click)="editMain(x)">
+                                        <i class="fa fa-pencil"></i> Edit
+                                      </a>
+                                    </td>
+                                  </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Main Menu Entry Form -->
+                    <div class="col-md-7 card">
+                      <div class="menu-form">
+                        <h6 class="element-header">{{ isEditModeMain ? 'Edit Menu' : 'New Menu Entry' }}</h6>
+                        <div class="form-group row align-items-center">
+                          <label class="col-sm-4 col-form-label">Menu Name <span class="text-danger">*</span></label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control" [(ngModel)]="menuName" name="menuName"
+                              [class.is-invalid]="!menuName" placeholder="Enter menu name" maxlength="50" required>
+                          </div>
+                        </div>
+                        <div class="form-group row align-items-center">
+                          <label class="col-sm-4 col-form-label">URL <span class="text-danger">*</span></label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control" [(ngModel)]="menuUrl" name="menuUrl" maxlength="50"
+                              required>
+                            <small class="form-text text-muted">Note: Use prefix `#!/` (e.g., #!/url)</small>
+                          </div>
+                        </div>
+                        <div class="form-group row align-items-center">
+                          <label class="col-sm-4 col-form-label">Description <span class="text-danger">*</span></label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control" [(ngModel)]="menuDescription" name="menuDescription"
+                              [class.is-invalid]="!menuDescription" placeholder="Enter description" maxlength="100"
+                              required>
+                          </div>
+                        </div>
+                        <!-- Buttons -->
+                        <div class="form-buttons-w text-end mt-4">
+                          @if (!isEditModeMain) {
+                            <div>
+                              <button class="btn btn-primary" (click)="saveMainMenu()">
+                                <i class="fa fa-save"></i> Save
+                              </button>
+                            </div>
+                          }
+                          @if (isEditModeMain) {
+                            <div>
+                              <button class="btn btn-sm btn-secondary" (click)="backMain()">
+                                <i class="fa fa-arrow-left"></i> Back
+                              </button>
+                              <button class="btn btn-danger ms-2" (click)="deleteMainMenu()">
+                                <i class="fa fa-trash"></i> Delete
+                              </button>
+                              <button class="btn btn-primary ms-2" (click)="updateMainMenu()">
+                                <i class="fa fa-save"></i> Update
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+              <!-- Sub Menu Section -->
+              @if (showSubMenuSection) {
+                <div class="element-box menu-section-box" id="submenu">
+                  <div class="row">
+                    <!-- Sub Menu List -->
+                    <div class="col-md-5">
+                      <div class="element-wrapper">
+                        <h6 class="element-header">Sub Menu List</h6>
+                        <div class="element-box-tp menu-list-container">
+                          <div class="table-responsive">
+                            <table class="table table-hover menu-list-table app-table">
+                              <thead>
+                                <tr>
+                                  <th>Sub Menu</th>
+                                  <th class="text-center">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                @if (subMenuList.length == 0) {
+                                  <tr>
+                                    <td colspan="2" class="text-center text-muted">No submenu found...</td>
+                                  </tr>
+                                }
+                                @for (x of subMenuList; track x) {
+                                  <tr class="menu-item-row">
+                                    <td>{{x.param3}}</td>
+                                    <td class="text-center">
+                                      <a class="edit-link" (click)="editSub(x)">
+                                        <i class="fa fa-pencil"></i> Edit
+                                      </a>
+                                    </td>
+                                  </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Sub Menu Entry Form -->
+                    <div class="col-md-7">
+                      <div class="menu-form">
+                        <h6 class="element-header">{{ isEditModeSub ? 'Edit Sub Menu' : 'New Sub Menu Entry' }}</h6>
+                        <div class="form-group row align-items-center">
+                          <label class="col-sm-4 col-form-label">Sub Menu Name <span class="text-danger">*</span></label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control" [(ngModel)]="subMenuName" name="subMenuName"
+                              [class.is-invalid]="!subMenuName" placeholder="Enter sub menu name" maxlength="50" required>
+                          </div>
+                        </div>
+                        <div class="form-group row align-items-center">
+                          <label class="col-sm-4 col-form-label">URL <span class="text-danger">*</span></label>
+                          <div class="col-sm-8">
+                            <input type="text" class="form-control" [(ngModel)]="subMenuUrl" name="subMenuUrl"
+                              placeholder="e.g., #!/my-sub-page" maxlength="50" required>
+                              <small class="form-text text-muted">Note: Do not Use prefix `#!/` (e.g., #!/url)</small>
+                            </div>
+                          </div>
+                          <div class="form-group row align-items-center">
+                            <label class="col-sm-4 col-form-label">Description <span class="text-danger">*</span></label>
+                            <div class="col-sm-8">
+                              <input type="text" class="form-control" [(ngModel)]="subMenuDescription"
+                                name="subMenuDescription" [class.is-invalid]="!subMenuDescription"
+                                placeholder="Enter description" maxlength="100" required>
+                            </div>
+                          </div>
+                          <!-- Buttons -->
+                          <div class="form-buttons-w text-end mt-4">
+                            @if (!isEditModeSub) {
+                              <div>
+                                <button class="btn btn-primary" (click)="saveSubMenu()">
+                                  <i class="fa fa-save"></i> Save
+                                </button>
+                              </div>
+                            }
+                            @if (isEditModeSub) {
+                              <div>
+                                <button class="btn btn-sm btn-secondary" (click)="backSub()">
+                                  <i class="fa fa-arrow-left"></i> Back
+                                </button>
+                                <button class="btn btn-danger ms-2" (click)="deleteSubMenu()">
+                                  <i class="fa fa-trash"></i> Delete
+                                </button>
+                                <button class="btn btn-primary ms-2" (click)="updateSubMenu()">
+                                  <i class="fa fa-save"></i> Update
+                                </button>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .tabs-wrapper {
+    position: relative;
+  }
+
+  .custom-tabs {
+  border-bottom: 2px solid #e9ecef;
+}
+
+.custom-tabs .nav-link {
+border: none;
+cursor: pointer;
+font-weight: 500;
+color: #666;
+padding: 0.5rem 0.8rem;
+font-size: 14px;
+transition: color 0.3s;
+}
+
+.custom-tabs .nav-link:hover {
+border: none;
+color: #000;
+}
+
+.custom-tabs .nav-link.active {
+border: none;
+color: #0b58b9;
+background: transparent;
+}
+
+.tab-slider {
+position: absolute;
+bottom: 0;
+height: 3px;
+background-color: #0b58b9;
+width: 33.33%;
+transition: left 0.3s ease-in-out;
+z-index: 10;
+}
+
+.tabs-wrapper.role .tab-slider {
+left: 0%;
+}
+
+.tabs-wrapper.user .tab-slider {
+left: 33.33%;
+}
+
+.tabs-wrapper.menuEntry .tab-slider {
+left: 66.66%;
+}
+
+.menu-section-box {
+border: 1px solid #e0e0e0;
+border-radius: 8px;
+padding: 20px;
+margin-top: 0px;
+background-color: #fff;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+animation: slideInUp 0.5s ease-out;
+}
+
+.menu-list-container {
+height: 280px;
+border: 1px solid #f0f0f0;
+border-radius: 5px;
+padding: 5px;
+overflow-y: auto;
+}
+
+.menu-list-table {
+font-size: 13px;
+}
+
+.menu-list-table thead th {
+font-weight: 600;
+font-size: 14px;
+background-color: #f8f9fa;
+border-bottom: 2px solid #dee2e6;
+}
+
+.menu-item-row {
+transition: all 0.2s ease-in-out;
+}
+
+.menu-item-row:hover {
+background-color: #f1f1f1;
+transform: translateX(5px);
+}
+
+.edit-link {
+cursor: pointer;
+background-color: #e9f5ff;
+color: #007bff;
+font-weight: 500;
+font-size: 11px;
+text-decoration: none;
+padding: 4px 8px;
+border-radius: 15px;
+transition: all 0.3s ease;
+display: inline-block;
+border: 1px solid #cce5ff;
+}
+
+.edit-link:hover {
+background-color: #007bff;
+color: #fff;
+transform: translateY(-2px) scale(1.05);
+box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.edit-link .fa {
+margin-right: 4px;
+}
+
+.menu-form {
+padding: 0 15px;
+animation: slideInRight 0.6s ease-out;
+}
+
+.menu-form .form-group {
+margin-bottom: 1rem;
+}
+
+.menu-form .col-form-label {
+font-size: 13px;
+font-weight: 500;
+text-align: right;
+padding-right: 10px;
+}
+
+.menu-form .form-control {
+font-size: 13px;
+height: calc(1.5em + .75rem + 2px);
+}
+
+@keyframes fadeIn {
+from {
+opacity: 0;
+}
+
+to {
+opacity: 1;
+}
+}
+
+.tab-pane-anim {
+animation: fadeIn 0.5s;
+}
+
+@keyframes slideInUp {
+from {
+transform: translateY(20px);
+opacity: 0;
+}
+
+to {
+transform: translateY(0);
+opacity: 1;
+}
+}
+
+@keyframes slideInRight {
+from {
+transform: translateX(20px);
+opacity: 0;
+}
+
+to {
+transform: translateX(0);
+opacity: 1;
+}
+}
+
+div.element-box-tp::-webkit-scrollbar-thumb {
+background-color: #6ed62987;
+}
+
+table.table {
+margin-top: 0px;
+}
+
+thead {
+font-size: 9px;
+background-color: #aacda8 !important;
+color: #212529;
+font-family: serif;
+}
+
+::ng-deep .ng-select .ng-select-container {
+min-height: 25px !important;
+height: 25px !important;
+font-size: 11px !important;
+padding-top: 2px !important;
+padding-bottom: 2px !important;
+}
+
+::ng-deep .ng-select .ng-select-dropdown,
+::ng-deep .ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+min-height: 25px !important;
+height: 25px !important;
+font-size: 11px !important;
+padding-top: 2px !important;
+padding-bottom: 2px !important;
+box-sizing: border-box;
+}
+
+.tab-pane-anim .form-group {
+margin-bottom: 1rem;
+}
+
+.tab-pane-anim label {
+font-size: 12px;
+font-weight: 500;
+margin-bottom: .25rem;
+}
+
+.user-menu-table-container {
+border: 2px solid #969c9f59;
+padding: 1rem;
+border-radius: 5px;
+}
+
+.user-menu-table-container .table th,
+.user-menu-table-container .table td {
+padding: 0.4rem;
+font-size: 12px;
+vertical-align: middle;
+}
+
+.order-input {
+width: 50px;
+text-align: center;
+}
+</style>
+
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success"
+  (closed)="successMessage = null"></app-toast>
+}

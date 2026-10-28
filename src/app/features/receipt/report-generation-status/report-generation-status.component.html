@@ -1,0 +1,783 @@
+<div class="content-i">
+  <div class="content-box pt-0">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="content-body">
+          <div class="">
+            <div class="">
+              <div class="card-body">
+                <!-- Title -->
+                <h5 class="fw-bold title-text mb-1 text-center">
+                  AIS-140 / BIS 16833 Receipt Generation Details (New)
+                </h5>
+
+                <div class="soft-bg rounded">
+                  <!-- 📦 DETAILS -->
+
+                  @if (detailsflag) {
+                    <div class="row fade-in-up">
+                      <div class="col-12 mb-3 text-center">
+                        <div id="activatedTable">
+                        <div style=" display: flex; justify-content: space-between;
+                            align-items: center; margin-bottom: 10px;  padding: 0 10px; " >
+                            <!-- Left Side: Search and Reload -->
+                            <div style="display: flex; align-items: center">
+                            <div style="
+                                display: flex;
+                                align-items: center;
+                                border: 1px solid #0b58b9;
+                                border-radius: 4px;
+                                overflow: hidden;
+                                background: white;
+                                margin-right: 10px;
+                              ">
+                              <input type="search" readonly (focus)="
+                                  searchInput.removeAttribute('readonly')
+                                " #searchInput class="tabletitlesearch" id="searchby" placeholder="Search here..." style="
+                                  border: none;
+                                  height: 24px;
+                                  width: 180px;
+                                  padding: 0 8px;
+                                  outline: none;
+                                  font-size: 11px;
+                                " autocomplete="off" maxlength="50" [(ngModel)]="searchBy"
+                                  (keyup.enter)="getSearchDetails()" />
+                              <button id="searchbtn" (click)="getSearchDetails()" style="
+                                  background: #0b58b9;
+                                  color: white;
+                                  border: none;
+                                  height: 24px;
+                                  width: 30px;
+                                  cursor: pointer;
+                                  display: flex;
+                                  align-items: center;
+                                  justify-content: center;
+                                ">
+                                  <i class="fa fa-search" style="font-size: 12px"></i>
+                                </button>
+                              </div>
+                            <button (click)="reloadData()" style="
+                                background: #fff;
+                                border: 1px solid #0b58b9;
+                                color: #0b58b9;
+                                border-radius: 4px;
+                                height: 26px;
+                                padding: 0 12px;
+                                font-size: 11px;
+                                cursor: pointer;
+                                display: flex;
+                                align-items: center;
+                                font-weight: bold;
+                              ">
+                                <i class="fa fa-refresh" [class.fa-spin]="!isVehicleListLoaded"
+                                style="margin-right: 5px"></i>
+                                @if (isVehicleListLoaded) {
+                                  <span>Reload</span>
+                                }
+                                @if (!isVehicleListLoaded) {
+                                  <span>Reloading...</span>
+                                }
+                              </button>
+                            </div>
+                            <!-- Right Side: Download, Page Size, Count -->
+                          <div style="
+                              display: flex;
+                              align-items: center;
+                              font-size: 11px;
+                              gap: 15px;
+                            ">
+                              <!-- <div class="form-group mb-0" style="width: 200px;">
+                              <ng-select
+                                placeholder="Select RTO"
+                                [(ngModel)]="rtoObj"
+                                name="rtoObj"
+                                required
+                                #rtoCtrl="ngModel"
+                                (change)="onChangeRTO()"
+                                [class.is-invalid]="rtoCtrl.invalid && (rtoCtrl.touched)"
+                                >
+                                <ng-option *ngFor="let item of rtoList" [value]="item">
+                                  {{ item.param2 }}
+                                </ng-option>
+                              </ng-select>
+                            </div> -->
+                            <!-- 1️⃣ DATE RANGE PICKER -->
+                            <div style="display: flex; align-items: center">
+                              <label style="
+                                  margin: 0 5px 0 0;
+                                  font-weight: bold;
+                                  color: #333;
+                                ">
+                                Date:
+                              </label>
+                              @if (selectedRange ) {
+                                <input ngxDaterangepickerMd [(ngModel)]="selectedRange"
+                                  (datesUpdated)="onDateApply($event)" [singleDatePicker]="false" [autoApply]="false"
+                                  [showDropdowns]="true" [alwaysShowCalendars]="true" [locale]="{ format: 'DD-MMM-YYYY' }"
+                                  [maxDate]="maxDate" />
+                              }
+                            </div>
+  <div style="
+                                display: flex;
+                                align-items: center;
+                                font-size: 11px;
+                                gap: 15px;
+                              ">
+                               <label for="excelpdfdownload" style="
+                                  margin: 0 5px 0 0;
+                                  font-weight: bold;
+                                  color: #333;
+                                ">
+                                Download:
+                              </label>
+                              <select [(ngModel)]="downloadType" id="excelpdfdownload" (change)="exportData()" style="
+                                  height: 24px;
+                                  border: 1px solid #0b58b9;
+                                  border-radius: 4px;
+                                  font-size: 11px;
+                                  padding: 0 5px;
+                                  background: white;
+                                ">
+                                <option value="">Select</option>
+                                <option value="">Excel</option>
+                                <!-- <option value="Excel">Excel</option> -->
+                                <!-- <option value="Pdf">Pdf</option> -->
+                              </select>
+                              <!-- 4️⃣ SHOW ROWS -->
+                              <div style="display: flex; align-items: center">
+  <label style="
+    margin: 0 5px 0 0;
+    font-weight: bold;
+    color: #333;
+  ">
+                                  Show Rows:
+                                </label>
+                                <select
+                                  [value]="selectedPageSize"
+                                  (change)="onPageSizeChange($event)"
+    style="
+      height: 24px;
+      border: 1px solid #0b58b9;
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 0 5px;
+      background: white;
+    "
+                                  >
+                                  <option value="20">20</option>
+                                  <option value="50">50</option>
+                                  <option value="100">100</option>
+                                  <option value="200">200</option>
+                                  <option value="500">500</option>
+                                  <option value="ALL">All</option>
+                                </select>
+                              </div>
+                              <!-- 5️⃣ TOTAL RECORDS -->
+                              <div style="font-weight: bold; color: #0b58b9">
+                                Total Records : {{ pageCount }} of
+                                {{ totalCount }}
+                              </div>
+                            </div>
+                            <!-- 2️⃣ TYPE FILTER -->
+                            <!-- <div style="display: flex; align-items: center">
+                              <label style="
+                                  margin: 0 5px 0 0;
+                                  font-weight: bold;
+                                  color: #333;
+                                ">
+                              Type:
+                            </label>
+                              <select [(ngModel)]="alertType" (change)="applyFilters()" style="
+                                  height: 24px;
+                                  border: 1px solid #0b58b9;
+                                  border-radius: 4px;
+                                  font-size: 11px;
+                                  padding: 0 5px;
+                                  background: white;
+                                ">
+                              <option value="New System Data">All</option>
+                              <option value="Renewal">Renewal</option>
+                              <option value="Installation">
+                                Installation
+                              </option>
+                            </select>
+                          </div> -->
+                          <!-- ACTIVATION FILTER -->
+                          <!-- <div style="display: flex; align-items: center">
+                          <label style="margin: 0 5px 0 0; font-weight: bold; color: #333;">
+                            Activation Status:
+                          </label>
+                              <select [(ngModel)]="activationFilter" (ngModelChange)="applyFilters()" Style="
+                                  height: 24px;
+                                  border: 1px solid #0b58b9;
+                                  border-radius: 4px;
+                                  font-size: 11px;
+                                  padding: 0 5px;
+                                  background: white;
+                                ">
+                            <option value="" selected="true">Select</option>
+                            <option value="Activated">Activated</option>
+                            <option value="Not Activated">Not Activated</option>
+                          </select>
+                        </div> -->
+                        <!-- MVI VERIFICATION FILTER -->
+                        <div id="MVIDiv" [style.display]="showMviDiv ? 'block' : 'none'" style="align-items: center">
+                          <label style="margin: 0 5px 0 0; font-weight: bold; color: #333;">
+                            MVI Status:
+                          </label>
+                              <select [(ngModel)]="mviFilter" (change)="applyFilters()" style="
+                                  height: 24px;
+                                  border: 1px solid #0b58b9;
+                                  border-radius: 4px;
+                                  font-size: 11px;
+                                  padding: 0 5px;
+                                  background: white;
+                                ">
+                            <option value="All">All</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Verified">Approved</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                        <div style=" display: flex; justify-content: space-between;
+                            align-items: center; margin-bottom: 10px;  padding: 0 10px; 
+                            font-size: 11px; gap: 15px; ">
+                      <!-- 3️⃣ DOWNLOAD -->
+                      <!-- <div style="display: flex; align-items: center">
+                    </div>
+                            <div style="
+                                display: flex;
+                                align-items: center;
+                                font-size: 11px;
+                                gap: 15px;
+                              ">
+                               <label for="excelpdfdownload" style="
+                                  margin: 0 5px 0 0;
+                                  font-weight: bold;
+                                  color: #333;
+                                ">
+                        Download:
+                      </label>
+                              <select [(ngModel)]="downloadType" id="excelpdfdownload" (change)="exportData()" style="
+                                  height: 24px;
+                                  border: 1px solid #0b58b9;
+                                  border-radius: 4px;
+                                  font-size: 11px;
+                                  padding: 0 5px;
+                                  background: white;
+                                ">
+                        <option value="">Select</option>
+                        <option value="Excel">Excel</option>
+                        <option value="Pdf">Pdf</option>
+                      </select>
+                      <div style="display: flex; align-items: center">
+                                <label style="
+                                    margin: 0 5px 0 0;
+                                    font-weight: bold;
+                                    color: #333;
+                                  ">
+                          Show Rows:
+                        </label>
+                                <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" style="
+                                    height: 24px;
+                                    border: 1px solid #0b58b9;
+                                    border-radius: 4px;
+                                    font-size: 11px;
+                                    padding: 0 5px;
+                                    background: white;
+                                  ">
+                          <option *ngFor="let size of pageSizeOptions" [value]="size">
+                            {{ size }}
+                          </option>
+                        </select>
+                      </div>
+                      <div style="font-weight: bold; color: #0b58b9">
+                        Total Records : {{ pageCount }} of
+                        {{ totalCount }}
+                      </div>
+                    </div> -->
+                  </div>
+                  <div class="table-striped table table-container">
+                    <div class="table-filters">
+                      <div class="filter-item">
+                        <select [(ngModel)]="vendorObj" (change)="onChangeVendor()"
+style="
+  height: 24px;
+  border: 1px solid #0b58b9;
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 0 5px;
+  background: white;
+">
+                          <option value="">All Vendor</option>
+                          @for (item of vendorList; track item) {
+                            <option [ngValue]="item">
+                              {{ item.param2 }}
+                            </option>
+                          }
+                        </select>
+                      </div>
+                      <div class="filter-item">
+                        <select [(ngModel)]="rtoObj" (change)="onChangeRTO()"
+style="
+  height: 24px;
+  border: 1px solid #0b58b9;
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 0 5px;
+  background: white;
+">
+                          <option value="">All RTO</option>
+                          @for (item of rtoList; track item) {
+                            <option [ngValue]="item">
+                              {{ item.param2 }}
+                            </option>
+                          }
+                        </select>
+                      </div>
+                      <div class="filter-item">
+    <select [(ngModel)]="alertType" (change)="applyFilters()" style="
+                                    height: 24px;
+                                    border: 1px solid #0b58b9;
+                                    border-radius: 4px;
+                                    font-size: 11px;
+                                    padding: 0 5px;
+                                    background: white;
+                                  ">
+                          <option value="New System Data">All Type</option>
+                          <option value="Renewal">Renewal</option>
+                          <option value="Installation">Installation</option>
+                        </select>
+                      </div>
+                      <div class="filter-item">
+                        <select
+                          [(ngModel)]="activationFilter"
+      (ngModelChange)="applyFilters()" style="
+                                    height: 24px;
+                                    border: 1px solid #0b58b9;
+                                    border-radius: 4px;
+                                    font-size: 11px;
+                                    padding: 0 5px;
+                                    background: white;
+                                  ">
+                          <option value="">Activation Status</option>
+                          <option value="Activated">Activated</option>
+                          <option value="Not Activated">Not Activated</option>
+                        </select>
+                      </div>
+                    </div>
+                    <ng-template #vehicleRows let-rows>
+                      @for (detail of rows; track detail) {
+                        <tr>
+                          <td>{{ detail.param1 || 'NA' }}</td>
+                          <td>{{ detail.param7 || 'NA' }}</td>
+                          <td>{{ detail.param18 || 'NA' }}</td>
+                          <td>{{ detail.param11 || 'NA' }}<br>{{ detail.param12 || 'NA' }}</td>
+                          <td>{{ detail.param5 || 'NA' }}<br>{{ detail.param4 || 'NA' }}<br>{{ detail.param6 || 'NA' }}</td>
+                          <td>{{ detail.param28 || 'NA' }}<br>{{ detail.param29 || 'NA' }}</td>
+                          <td>{{ detail.param19 || 'NA' }}<br>{{ detail.param42 || 'NA' }}<br>{{ detail.param16 || 'NA' }}</td>
+                          <td>{{ getInstallationType(detail.param66) }}</td>
+                          <td>{{ detail.param43 || 'NA' }}</td>
+                          <td>
+                            <span [ngClass]="{
+                              'text-success': detail.param14 && detail.param14 !== 'NA',
+                              'text-danger': !detail.param14 || detail.param14 === 'NA'
+                            }">
+                              {{ (!detail.param14 || detail.param14 === 'NA') ? 'Not Activated' : 'Activated' }}
+                            </span>
+                            <br>{{ detail.param63 || 'NA' }}
+                          </td>
+                          <td>{{ detail.param64 || 'NA' }}</td>
+                          <td>
+                            <div [ngClass]="{
+                              'status-pending': detail.param80 === 'Pending',
+                              'status-verified': detail.param80 === 'Verified',
+                              'status-rejected': detail.param80 === 'Rejected'
+                            }">{{ detail.param80 || 'NA' }}</div>
+                            <div>{{ detail.param82 || 'NA' }}</div>
+                            <div>{{ detail.param83 || 'NA' }}</div>
+                          </td>
+                          <td>
+                            <button (click)="onSearch(detail)" [disabled]="detail.param14 == ''" style="
+                              border: 1px solid #0b58b9;
+                              background: white;
+                              color: #0b58b9;
+                              border-radius: 4px;
+                              padding: 2px 8px;
+                              font-size: 11px;
+                              font-weight: bold;
+                              display: inline-flex;
+                              align-items: center;
+                            ">
+                              <i class="bx bx-search" style="margin-right: 4px; font-size: 12px"></i>
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </ng-template>
+                    <app-common-table [columns]="tableColumns" [rows]="vehicleDetails"
+                      [loading]="!isVehicleListLoaded" [bodyTemplate]="vehicleRows"
+                      tableClass="table table-striped app-table"
+                      tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;">
+                    </app-common-table>
+          </div>
+          @if (getTotalPages() > 1) {
+<div class="pagination-wrapper" style="
+                            display: flex;
+                            justify-content: flex-end;
+                            margin-top: 10px;
+                          ">
+                          <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1" style="
+                              border: 1px solid #0b58b9;
+                              background: white;
+                              color: #0b58b9;
+                              padding: 5px 10px;
+                              margin: 0 2px;
+                              border-radius: 4px;
+                              cursor: pointer;
+                              font-size: 11px;
+                              font-weight: bold;
+                            ">
+                Previous
+              </button>
+              @for (page of getPageNumbers(); track page) {
+                @if (page === -1) {
+<span style="
+                                margin: 0 5px;
+                                color: #0b58b9;
+                                align-self: center;
+                              ">...</span>
+                }
+                @if (page !== -1) {
+                  <button (click)="onPageChange(page)" [disabled]="currentPage === page"
+                              [style.background]="
+                                currentPage === page ? '#0b58b9' : 'white'
+                              " [style.color]="
+                                currentPage === page ? 'white' : '#0b58b9'
+                              " style="
+                                border: 1px solid #0b58b9;
+                                padding: 5px 10px;
+                                margin: 0 2px;
+                                border-radius: 4px;
+                                cursor: pointer;
+                                font-size: 11px;
+                                font-weight: bold;
+                              ">
+                    {{ page }}
+                  </button>
+                }
+              }
+              <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()"
+                            style="
+                              border: 1px solid #0b58b9;
+                              background: white;
+                              color: #0b58b9;
+                              padding: 5px 10px;
+                              margin: 0 2px;
+                              border-radius: 4px;
+                              cursor: pointer;
+                              font-size: 11px;
+                              font-weight: bold;
+                            ">
+                Next
+              </button>
+            </div>
+          }
+          <br />
+        </div>
+      </div>
+    </div>
+  }
+  <!--  -->
+  @if (receiptstatusflag) {
+    <div class="row fade-in-up">
+      <div class="col-12">
+        <div class="row">
+          <div class="col-md-12 mb-3" style="display: flex; justify-content: flex-end">
+                          <button (click)="BackToDetails()" style="
+                              border: 1px solid #0b58b9;
+                              background: white;
+                              color: #0b58b9;
+                              border-radius: 4px;
+                              padding: 2px 8px;
+                              font-size: 11px;
+                              cursor: pointer;
+                              font-weight: bold;
+                              display: inline-flex;
+                              align-items: center;
+                              font-size: 12px;
+                            " title="Back To Details">
+              <i class="bx bx-arrow-out-left-circle-half"></i>
+              Back To Details
+            </button>
+          </div>
+        </div>
+        <!-- 🚗 Vehicle Details -->
+        <div class="row">
+          <div class="col-md-4">
+            <div class="info-card">
+              <div class="info-title bg-vehicle">
+                <i class="bx bx-car"></i> Vehicle Details
+              </div>
+              <div class="info-body">
+                <p>
+                  <span>Vehicle No</span>
+                  {{ responseData.param13 }}
+                </p>
+                <p>
+                  <span>Chassis No</span>
+                  {{ responseData.param14 }}
+                </p>
+                <p>
+                  <span>Engine No</span>
+                  {{ responseData.param15 }}
+                </p>
+                <p>
+                  <span>Customer Name</span>
+                  {{ responseData.param23 }}
+                </p>
+                <p>
+                  <span>Mobile No.</span>
+                  {{ responseData.param24 }}
+                </p>
+                <p>
+                  <span>RTO</span>
+                  {{ responseData.param63 }}
+                </p>
+                <p>
+                  <span>MFG. Year</span>
+                  {{ responseData.param22 }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- 📟 Device Details -->
+          <div class="col-md-4">
+            <div class="info-card">
+              <div class="info-title bg-device">
+                <i class="bx bx-chip"></i> Device Details
+              </div>
+              <div class="info-body">
+                <p>
+                  <span>Activation No</span>
+                  {{ responseData.param17 }}
+                </p>
+                <p>
+                  <span>Activation Date</span>
+                  {{ responseData.param16 }}
+                </p>
+                <p>
+                  <span>IMEI No</span> {{ responseData.param4 }}
+                </p>
+                <p>
+                  <span>ICCID No</span> {{ responseData.param6 }}
+                </p>
+                <p>
+                  <span>Serial No</span> {{ responseData.param5 }}
+                </p>
+                <p>
+                  <span>Model Name</span>
+                  {{ responseData.param10 }}
+                </p>
+                <p>
+                  <span>Manufacturer</span>
+                  {{ responseData.param9 }}
+                </p>
+                <p>
+                  <span>Vendor</span> {{ responseData.param8 }}
+                </p>
+                <p>
+                  <span>Esim Provider</span>
+                  {{
+                  responseData.param43
+                  ? responseData.param43
+                  : "N/A"
+                  }}
+                </p>
+                <!-- <p><span>Esim Provider</span> {{ responseData.param43 ? responseData.param43 : 'N/A' }}</p>   -->
+                <p>
+                  <span>M2M Code</span>
+                  {{
+                  responseData.param42
+                  ? responseData.param42
+                  : "N/A"
+                  }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- 📡 Connectivity Details -->
+          <div class="col-md-4">
+            <div class="info-card">
+              <div class="info-title bg-connectivity">
+                <i class="bx bx-wifi"></i> Connectivity Details
+              </div>
+              <div class="info-body">
+                <p>
+                  <span>SIM Validity</span>
+                  {{ responseData.param27 }}
+                </p>
+                <p>
+                  <span>Backend Validity</span>
+                  {{ responseData.param30 }}
+                </p>
+                <p>
+                  <span>Polling Time</span>
+                  {{ responseData.param26 }}
+                </p>
+                <p>
+                  <span>Status</span>
+                                <span class="{{
+                                    responseData.statuscolorparam1
+                                  }} ms-1 text-white status-badge">{{ responseData.param25 }}</span>
+                </p>
+                <p>
+                  <span>Map</span>
+                  <button class="btn-map-view" (click)="openMapModal(responseData.param12)">
+                    <i class="bx bx-map-alt"></i> View on Map
+                  </button>
+                </p>
+                <p>
+                  <span>Alert Name</span>
+                  {{ responseData.param31 }}
+                </p>
+                <p>
+                  <span>Last Alert</span>
+                  {{ responseData.param32 }}
+                </p>
+                <p>
+                  <span>{{
+                    task === "191" ? "Verified" : "Approved"
+                    }}
+                  By</span>
+                  {{ responseData.param40 || "NA" }}
+                </p>
+                <p>
+                  <span>{{
+                    task === "191" ? "Verified" : "Approved"
+                    }}
+                  Time</span>
+                  {{ responseData.param41 || "NA" }}
+                </p>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div>
+                    @if (task !== '17') {
+                      <i class="fa fa-file-pdf-o pdficon" (click)="DownloadReport()">
+                      </i>
+                    }
+                  </div>
+                  @if (task === '10' || task === '17' || task === '191') {
+                    <div>
+                      <button class="btn-sos mx-1" (click)="clearSosAlert()">
+                        Clear SOS
+                      </button>
+                      <button class="btn btn-reject mx-1" (click)="actionType = '2'; confirmAction()">
+                        Reject
+                      </button>
+                      @if (responseData.param44 !== 'Verified') {
+                        <button class="btn btn-approve"
+                          (click)="actionType = '1'; confirmAction()">
+                          {{
+                          task === "17" || task === "191"
+                          ? "Verify"
+                          : "Approve"
+                          }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header py-0" style="background-color: #07515a">
+        <h5 class="modal-title py-0" id="staticBackdropLabel" style="color: white">
+          Map View
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="toastService.closeModal('staticBackdrop')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0">
+        <div id="mapContainer" style="width: 100%; height: 600px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Remark Modal for Approve, Verify and Reject -->
+<div class="modal fade" id="remarkModal" tabindex="-1" aria-labelledby="remarkModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header py-0" style="background-color: #07515a">
+        <h5 class="modal-title py-0" id="remarkModalLabel" style="color: white">
+          Add Remarks
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="toastService.closeModal('remarkModal')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form #remarkForm="ngForm">
+          <div class="form-group">
+            <textarea [(ngModel)]="remarks" name="remarks" rows="4" class="form-control"
+              placeholder="Enter remarks here..." required minlength="5" #remarksField="ngModel">
+            </textarea>
+            @if (remarksField.invalid && remarksField.touched) {
+              <small class="form-text text-danger">
+                @if (remarksField.errors?.['required']) {
+                  <span>Remarks are required</span>
+                }
+                @if (remarksField.errors?.['minlength']) {
+                  <span>Remarks must be at least 5 characters</span>
+                }
+              </small>
+            }
+          </div>
+          <hr class="my-2" />
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-sm btn-secondary mx-2" data-dismiss="modal">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-sm btn-primary" [disabled]="remarkForm.invalid"
+              (click)="approveReport()">
+              {{
+              actionType == "1"
+              ? task == "191"
+              ? "Verify"
+              : "Approve"
+              : "Reject"
+              }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    @if (errorMessage) {
+      <app-toast [message]="errorMessage" [type]="errorType"
+      (closed)="errorMessage = null"></app-toast>
+    }
+  </div>
+</div>
+</div>
+</div>

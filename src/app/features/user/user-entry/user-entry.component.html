@@ -1,0 +1,442 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <button class="pagebtn">
+                <a routerLink="/user"><i class="fa fa-plus"></i>&nbsp;&nbsp;Details</a>
+              </button>
+              <div class="pagetitlestyle"><span>User Entry</span></div>
+            </div>
+
+            <form id="userentryform" autocomplete="off">
+              <div class="form-desc">
+                <strong>NOTE :</strong><label class="mandetory">*</label> Are Mandatory Fields.
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="entrypagediv">
+                    <div class="row">
+                      <!-- Select Role -->
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Select Role:</label><label for="" class="mandetory">*</label>
+                          <select
+                            id="role"
+                            class="form-control searchable"
+                            [class.error]="getFieldError('role')"
+                            [(ngModel)]="selectedRoleId"
+                            (change)="onRoleChange()"
+                            name="role">
+                            <option value="">Select Role</option>
+                            @for (role of roleList; track role) {
+                              <option [value]="role.param1">{{role.param2}}</option>
+                            }
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Select RTO (conditional) -->
+                      <div class="col-sm-2" id="subrtolist" [style.display]="showRTOList ? 'block' : 'none'">
+                        <div class="form-group">
+                          <label for="">Select RTO:</label><label for="" class="mandetory">*</label>
+                          <select
+                            id="rtoname"
+                            class="form-control searchable"
+                            style="width:180px;height: 40px;font-size: 11px;"
+                            [class.error]="getFieldError('rto')"
+                            [(ngModel)]="selectedRTOId"
+                            (change)="onRTOChange()"
+                            name="rtoname">
+                            <option value="">Select RTO</option>
+                            @for (rto of rtoList; track rto) {
+                              <option [value]="rto.param1">{{rto.param2}}</option>
+                            }
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Organization Name -->
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Organization Name:</label><label for="" class="mandetory">*</label>
+                          <input
+                            class="form-control ignoresymbol_name"
+                            [class.error]="getFieldError('organizationName')"
+                            placeholder="Orgnization Name"
+                            type="text"
+                            id="organisationname"
+                            maxlength="50"
+                            [(ngModel)]="organizationName"
+                            name="organisationname"
+                            autocomplete="off">
+                        </div>
+                      </div>
+
+                      <!-- Organization Code -->
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Organization Code:</label><label for="" class="mandetory">*</label>
+                          <input
+                            class="form-control ignorespecialcharacter"
+                            [class.error]="getFieldError('organizationCode')"
+                            placeholder="Orgnization Code"
+                            type="text"
+                            id="organisationcode"
+                            maxlength="4"
+                            min="4"
+                            [(ngModel)]="organizationCode"
+                            name="organisationcode"
+                            (blur)="validateOrganizationCode()"
+                            autocomplete="off">
+                        </div>
+                      </div>
+
+                      <!-- Contact Person -->
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Contact Person:</label><label for="" class="mandetory">*</label>
+                          <input
+                            class="form-control ignoresymbol_name"
+                            [class.error]="getFieldError('contactPerson')"
+                            placeholder="Contact Person"
+                            type="text"
+                            id="contactperson"
+                            maxlength="200"
+                            [(ngModel)]="contactPerson"
+                            name="contactperson"
+                            autocomplete="off">
+                        </div>
+                      </div>
+
+                      <!-- Mobile No -->
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Mobile No:</label><label for="" class="mandetory">*</label>
+                          <input
+                            class="form-control acceptnumeric_nodecimal"
+                            [class.error]="getFieldError('mobileNo')"
+                            placeholder="Mobile No"
+                            type="text"
+                            id="mobileno"
+                            maxlength="10"
+                            [(ngModel)]="mobileNo"
+                            name="mobileno"
+                            (blur)="validateMobileNo()"
+                            autocomplete="off">
+                          @if (formErrors['mobileNo']) {
+                            <span id="mobilenomsg" class="mandetory">{{errorMessage}}</span>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Alternate Mobile No -->
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Alternate Mobile No:</label><label for="" class="mandetory">*</label>
+                          <input
+                            class="form-control acceptnumeric_nodecimal"
+                            [class.error]="getFieldError('alternateMobileNo')"
+                            placeholder="Alternate Mobile No"
+                            type="text"
+                            id="alternatemobileno"
+                            maxlength="10"
+                            [(ngModel)]="alternateMobileNo"
+                            name="alternatemobileno"
+                            (blur)="validateAlternateMobileNo()"
+                            autocomplete="off">
+                          @if (formErrors['alternateMobileNo']) {
+                            <span id="alternatemobilenomsg" class="mandetory">{{errorMessage}}</span>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Email ID -->
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Email Id:</label><label for="" class="mandetory">*</label>
+                          <input
+                            class="form-control"
+                            [class.error]="getFieldError('emailId')"
+                            placeholder="Email Id"
+                            type="email"
+                            id="emailid"
+                            [(ngModel)]="emailId"
+                            name="emailid"
+                            (keyup)="validateEmail()"
+                            autocomplete="off">
+                          @if (emailMessage) {
+                            <span id="emailmsg" class="mandetory">{{emailMessage}}</span>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Address -->
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Address:</label><b for="" class="mandetory">*</b>
+                          <textarea
+                            class="form-control ignorespecialcharacter_address"
+                            [class.error]="getFieldError('address')"
+                            placeholder="Address"
+                            maxlength="60"
+                            type="text"
+                            id="address"
+                            [(ngModel)]="address"
+                            name="address"
+                          autocomplete="off"></textarea>
+                        </div>
+                      </div>
+
+                      <!-- Select District -->
+                      <div class="col-sm-2" id="districtlist">
+                        <div class="form-group">
+                          <label for="">Select District:</label><label for="" class="mandetory">*</label>
+                          <select
+                            id="district"
+                            class="form-control searchable"
+                            [class.error]="getFieldError('district')"
+                            [(ngModel)]="selectedDistrictId"
+                            (change)="onDistrictChange()"
+                            name="district">
+                            <option value="">Select District</option>
+                            @for (district of districtList; track district) {
+                              <option [value]="district.param1">{{district.param2}}</option>
+                            }
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Select State -->
+                      <div class="col-sm-2" id="statelist">
+                        <div class="form-group">
+                          <label for="">Select State:</label><label for="" class="mandetory">*</label>
+                          <select
+                            id="statename"
+                            class="form-control searchable"
+                            [class.error]="getFieldError('state')"
+                            [(ngModel)]="selectedStateId"
+                            (change)="onStateChange()"
+                            name="statename">
+                            <option value="">Select State</option>
+                            @for (state of stateList; track state) {
+                              <option [value]="state.param1">{{state.param2}}</option>
+                            }
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Select City -->
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Select City:</label><label for="" class="mandetory">*</label>
+                          <select
+                            id="cityname"
+                            class="form-control searchable"
+                            [class.error]="getFieldError('city')"
+                            [(ngModel)]="selectedCityId"
+                            (change)="onCityChange()"
+                            name="cityname">
+                            <option value="">Select City</option>
+                            @for (city of cityList; track city) {
+                              <option [value]="city.param1">{{city.param2}}</option>
+                            }
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Pincode -->
+                      <div class="col-sm-2">
+                        <div class="form-group">
+                          <label for="">Pincode:</label><label for="" class="mandetory">*</label>
+                          <input
+                            class="form-control acceptnumeric_nodecimal"
+                            [class.error]="getFieldError('pincode')"
+                            placeholder="Pincode"
+                            type="text"
+                            id="pincode"
+                            maxlength="6"
+                            [(ngModel)]="pincode"
+                            name="pincode"
+                            (blur)="validatePincode()"
+                            autocomplete="off">
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Enforcement Location Details (conditional) -->
+                    <div class="form-group" id="enforcementLoc" [style.display]="showEnforcementLocation ? 'block' : 'none'">
+                      <div class="col-md-12" style="text-align:center;border-bottom: 1px solid darkgrey;font-weight: bold;">
+                        <span>Enforcement Location Details</span>
+                      </div>
+                      <div class="row" style="margin-top: 10px;">
+                        <div class="col-sm-2">
+                          <div class="form-group">
+                            <label for="">POI Icon:</label><label for="" class="mandetory">*</label>
+                            <select
+                              class="form-control"
+                              [class.error]="getFieldError('poiIcon')"
+                              [(ngModel)]="poiIcon"
+                              (change)="onPoiIconChange()"
+                              id="poiIcon"
+                              name="poiIcon">
+                              <option value="">Select Icon</option>
+                              <option value="railway">Railway</option>
+                              <option value="airport">AirPort</option>
+                              <option value="bar">Bar</option>
+                              <option value="building">Building</option>
+                              <option value="coffeehouse">Coffee House</option>
+                              <option value="education">Education</option>
+                              <option value="flag">Flag</option>
+                              <option value="garden">Garden</option>
+                              <option value="hospital">Hospital</option>
+                              <option value="industry">Industry</option>
+                              <option value="mapicon">Map Icon</option>
+                              <option value="market">Market</option>
+                              <option value="office">Office</option>
+                              <option value="postoffice">Post Office</option>
+                              <option value="restaurant">Restaurant</option>
+                              <option value="stopmarker">Stop Marker</option>
+                              <option value="temple">Temple</option>
+                              <option value="water">Water</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="">
+                          <div class="form-group" style="margin-top: 20px;">
+                            @if (poiIconImageUrl) {
+                              <img [src]="poiIconImageUrl" />
+                            }
+                          </div>
+                        </div>
+                        <div class="col-sm-2">
+                          <div class="form-group">
+                            <label for="">Latitude:</label><label for="" class="mandetory">*</label>
+                            <input
+                              class="form-control acceptnumeric_decimal"
+                              [class.error]="getFieldError('latitude')"
+                              placeholder="Latitude"
+                              type="text"
+                              id="latitude"
+                              maxlength="6"
+                              [(ngModel)]="latitude"
+                              name="latitude"
+                              autocomplete="off">
+                          </div>
+                        </div>
+                        <div class="col-sm-2">
+                          <div class="form-group">
+                            <label for="">Longitude:</label><label for="" class="mandetory">*</label>
+                            <input
+                              class="form-control acceptnumeric_decimal"
+                              [class.error]="getFieldError('longitude')"
+                              placeholder="Longitude"
+                              type="text"
+                              id="longitude"
+                              maxlength="6"
+                              [(ngModel)]="longitude"
+                              name="longitude"
+                              autocomplete="off">
+                          </div>
+                        </div>
+                        <div class="col-sm-2">
+                          <div class="form-group">
+                            <label for="" id="dname">Range:<label>(Km)</label><label for="" class="mandetory">*</label></label>
+                            <input
+                              class="form-control clearable acceptnumeric_decimal"
+                              [class.error]="getFieldError('range')"
+                              placeholder="Range"
+                              id="range"
+                              type="text"
+                              maxlength="5"
+                              [(ngModel)]="range"
+                              name="range"
+                              autocomplete="off">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Login Details -->
+                    <div>
+                      <div class="col-md-12" style="text-align:center;border-bottom: 1px solid darkgrey;font-weight: bold;">
+                        <span>Login Details</span>
+                      </div>
+                      <div class="row" style="margin-top: 10px;">
+                        <div class="col-sm-2">
+                          <div class="form-group">
+                            <label for="">Login Name:</label>
+                            <input
+                              class="form-control accept_loginName"
+                              [class.error]="getFieldError('loginName')"
+                              placeholder="Login Name"
+                              type="text"
+                              id="loginname"
+                              [(ngModel)]="loginName"
+                              name="loginname"
+                              autocomplete="nope">
+                            <span class="clearer glyphicon glyphicon-remove form-control-feedback"></span>
+                          </div>
+                        </div>
+                        <div class="col-sm-2">
+                          <div class="form-group">
+                            <label for="">Password:</label>
+                            <input
+                              class="form-control"
+                              [class.error]="getFieldError('password')"
+                              placeholder="Password"
+                              type="password"
+                              id="password"
+                              [(ngModel)]="password"
+                              name="password"
+                              (keyup)="validatePassword()"
+                              autocomplete="new-password">
+                            @if (passwordMessage) {
+                              <span [ngStyle]="passwordMessageStyle">{{passwordMessage}}</span>
+                            }
+                          </div>
+                        </div>
+                        <div class="col-sm-2">
+                          <div class="form-group">
+                            <label for="">Re-Enter Password:</label>
+                            <input
+                              class="form-control"
+                              [class.error]="getFieldError('confirmPassword')"
+                              placeholder="Re-Enter Password"
+                              type="password"
+                              id="confirm_password"
+                              [(ngModel)]="confirmPassword"
+                              name="confirm_password"
+                              (blur)="validateConfirmPassword()"
+                              autocomplete="off">
+                            @if (confirmPasswordMessage) {
+                              <span id="cpasswordmsg" class="mandetory">{{confirmPasswordMessage}}</span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-buttons-w">
+                <button type="button" (click)="userEntry()" [disabled]="loading">
+                  @if (!loading) {
+                    <span>Submit</span>
+                  }
+                  @if (loading) {
+                    <span>Submitting...</span>
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

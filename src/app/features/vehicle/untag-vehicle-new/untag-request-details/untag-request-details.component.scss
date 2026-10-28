@@ -1,0 +1,130 @@
+th {
+    padding: 5px;
+}
+/* 🔵 PAGINATION WRAPPER */
+.custom-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* 🔘 BUTTON BASE */
+.pg-btn,
+.pg-num {
+  min-width: 32px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #0b58b9;
+  background: #fff;
+  color: #0b58b9;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* 🔢 NUMBER BUTTON */
+.pg-num {
+  font-weight: 600;
+}
+
+/* 🔥 ACTIVE PAGE */
+.pg-num.active {
+  background: #0b58b9;
+  color: #fff;
+}
+
+/* 🖱 HOVER */
+.pg-btn:hover,
+.pg-num:hover {
+  background: #0b58b9;
+  color: #fff;
+}
+
+/* ❌ DISABLED */
+.pg-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ... DOTS */
+.pg-dots {
+  padding: 0 4px;
+  font-size: 14px;
+  color: #666;
+}
+
+.compliance-btn {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+.modern-nav-group {
+            display: flex;
+            background: #ffffff;
+            padding: 2px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            gap: 2px;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+          }
+
+          .nav-pill-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 11px;
+            color: #4b5563;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 4px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap;
+            position: relative;
+
+            .icon-box {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 24px;
+              height: 24px;
+              transition: transform 0.3s ease;
+            }
+
+            &:hover {
+              color: #1e40af;
+              background: #f3f4f6;
+              transform: translateY(-2px);
+
+              .icon-box {
+                transform: scale(1.2);
+              }
+            }
+
+            &.active {
+              background: linear-gradient(135deg, #b6d1f4 0%, #a6b4e6 100%);
+              color: #000000;
+              box-shadow: 0 10px 15px -3px rgba(11, 88, 185, 0.3);
+
+              .icon-box {
+                color: #ffffff;
+                background: linear-gradient(135deg, #b6d1f4 0%, #a6b4e6 100%);
+                color: #000000;
+              }
+
+              &:hover {
+                transform: translateY(-2px) scale(1.02);
+              }
+            }
+
+            i {
+              font-size: 15px;
+              color: #000000;
+            }
+          }

@@ -1,0 +1,647 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <div class="pagetitlestyle">
+                <span>Current Day Alerts</span>
+              </div>
+              <!-- <div style="font-size: 10px; color: red">
+              <span>**Note : Click on chart to filter the data according to view.</span>
+            </div> -->
+          </div>
+
+          <!-- New Animated Tabs Design -->
+          <div class="today-alert-tabs-header">
+            <div class="today-alert-tab-item" [class.active]="viewMode === 'map'" (click)="setViewMode('map')">
+              <i class="fa fa-map-marker"></i> Map View
+            </div>
+            <div class="today-alert-tab-item" [class.active]="viewMode === 'grid'" (click)="setViewMode('grid')">
+              <i class="fa fa-table"></i> Panic Alerts
+            </div>
+            <div class="today-alert-tab-item" [class.active]="viewMode === 'restalertgrid'"
+              (click)="setViewMode('restalertgrid')">
+              <i class="fa fa-table"></i> Other Alerts
+            </div>
+            <div class="today-alert-tab-item" [class.active]="viewMode === 'chart'" (click)="setViewMode('chart')">
+              <i class="fa fa-bar-chart"></i> Chart View
+            </div>
+            <div class="today-alert-tab-item" [class.active]="viewMode === 'rtowisealert'" (click)="setViewMode('rtowisealert')" style="width:170px">
+              <i class="fa fa-bar-chart"></i> RTO Wise Panic
+            </div>
+            <div class="today-alert-tab-item" [class.active]="viewMode === 'vclasswisealert'" (click)="setViewMode('vclasswisealert')"  style="width:188px">
+              <i class="fa fa-bar-chart"></i> Vehicle Class Wise Panic
+            </div>
+
+
+            <!-- <div class="today-alert-sliding-line" [ngClass]="viewMode"></div> -->
+          </div>
+
+
+          @if (viewMode === 'chart') {
+            <div>
+              <!-- id="alertschartdiv" style="width: 100%; height: 407px;" -->
+              <app-alert-graph-view></app-alert-graph-view>
+            </div>
+          }
+
+          @if (viewMode === 'grid') {
+            <div class="table-responsive">
+              <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
+                <table style="width: 100%;">
+                  <tbody class="bg-body">
+                    <tr>
+                      <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                        <font style="font-weight: bold; color: #0b58b9; font-size: 12px;">Search : </font>
+                      </td>
+                      <td>
+                        <div style="display: flex; align-items: center;">
+                          <input type="search" class="form-control" id="searchby" placeholder="Type here..."
+                            style="border: 1px solid #ced4da; height: 28px; width: 220px; font-size: 12px; border-radius: 4px 0 0 4px; padding: 4px 10px;"
+                            [(ngModel)]="searchText" name="searchby" (keyup.enter)="getSearchDetails()">
+                          <button type="button"
+                            style="cursor: pointer; margin-left: 0; height: 28px; border: none; background-color: #0b58b9; color: white; border-radius: 0 4px 4px 0; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center;"
+                            (click)="getSearchDetails()" title="Search">
+                            <i class="fa fa-search"></i>
+                          </button>
+                          <button type="button" (click)="reloadData()"
+                            style="margin-left: 6px; height: 28px; border: 1px solid #0b58b9; background-color: white; color: #0b58b9; border-radius: 4px; padding: 0 12px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="fa fa-refresh" style="margin-right: 4px;"></i>Reload
+                          </button>
+                        </div>
+                      </td>
+                      <td>
+                        <table style="float: right;">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div class="toggle-container modern-toggle">
+                                  <button class="toggle-option" [class.active]="vehicleType === 'NEW'"
+                                    (click)="setView('NEW')">
+                                    NEW
+                                  </button>
+                                  <button class="toggle-option" [class.active]="vehicleType === 'OLD'"
+                                    (click)="setView('OLD')">
+                                    OLD
+                                  </button>
+                                </div>
+                              </td>
+                              <td style="vertical-align: middle; padding-right: 15px;">
+                                <div style="display: flex; align-items: center;">
+                                  <label class="control-label"
+                                    style="color: #0b58b9; margin-bottom: 0; margin-right: 5px; font-size: 12px; font-weight: bold;">Download
+                                  :</label>
+                                  <select
+                                    (change)="downloadPDFExcel($event)"
+                                    style="height: 25px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;">
+                                    <option value="Select">Select</option>
+                                    <option value="">Excel</option>
+                                    <!-- <option value="excel">Excel</option> -->
+                                    <option value="Pdf">Pdf</option>
+                                  </select>
+                                </div>
+                              </td>
+                              <td style="vertical-align: middle; padding-right: 5px;">
+                                <div style="font-weight: bold; color: #0b58b9; font-size: 12px;">
+                                  Show Rows :
+                                </div>
+                              </td>
+                              <td style="vertical-align: middle; padding-right: 15px;">
+                                <select [(ngModel)]="pageSize" name="pageSize" (change)="onPageSizeChange($event)"
+                                  style="font-size: 11px; height: 25px; border: 1px solid #ccc; border-radius: 3px;">
+                                  @for (size of [20, 50, 100, 200, 500]; track size) {
+                                    <option [value]="size">{{size}}</option>
+                                  }
+                                </select>
+                              </td>
+                              <td style="vertical-align: middle; padding-right: 9px;">
+                                <div style="text-align: right; font-weight: bold; font-size: 12px; color: #0b58b9;">
+                                  <span> Total Records : {{totalCount || 0}}</span>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </form>
+              <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+                <div class="col-sm-12">
+                  <table class="table table-striped app-table"
+                    style="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px; width: 100%;">
+                    <thead>
+                      <tr>
+                        <th style="width: 50px;">#</th>
+                        <th (click)="sort('param9')" style="cursor: pointer; ">
+                          Vehicle No
+                          <span class="sorting"
+                          [ngClass]="{'sorting_desc': reverse && sortKey === 'param9', 'sorting_asc': !reverse && sortKey === 'param4'}"></span>
+                        </th>
+                        <th (click)="sort('param21')" style="cursor: pointer; ">
+                          Speed
+                          <span class="sorting"
+                          [ngClass]="{'sorting_desc': reverse && sortKey === 'param21', 'sorting_asc': !reverse && sortKey === 'param21'}"></span>
+                        </th>
+                        <th (click)="sort('param22')" style="cursor: pointer; ">
+                          Ignition
+                          <span class="sorting"
+                          [ngClass]="{'sorting_desc': reverse && sortKey === 'param22', 'sorting_asc': !reverse && sortKey === 'param22'}"></span>
+                        </th>
+                        <th (click)="sort('param8')" style="cursor: pointer; ">
+                          Alert Type
+                          <span class="sorting"
+                          [ngClass]="{'sorting_desc': reverse && sortKey === 'param8', 'sorting_asc': !reverse && sortKey === 'param5'}"></span>
+                        </th>
+                        <th (click)="sort('param3')" style="cursor: pointer; ">
+                          Alert Time
+                          <span class="sorting"
+                          [ngClass]="{'sorting_desc': reverse && sortKey === 'param3', 'sorting_asc': !reverse && sortKey === 'param11'}"></span>
+                        </th>
+                        <th (click)="sort('param11')" style="cursor: pointer; ">
+                          Vendor Name
+                          <span class="sorting"
+                          [ngClass]="{'sorting_desc': reverse && sortKey === 'param11', 'sorting_asc': !reverse && sortKey === 'param12'}"></span>
+                        </th>
+                        <th (click)="sort('param12')" style="cursor: pointer; ">
+                          RTO Name
+                          <span class="sorting"
+                          [ngClass]="{'sorting_desc': reverse && sortKey === 'param12', 'sorting_asc': !reverse && sortKey === 'param18'}"></span>
+                        </th>
+                        <th (click)="sort('param15')" style="cursor: pointer; ">
+                          Customer Name
+                          <span class="sorting"
+                          [ngClass]="{'sorting_desc': reverse && sortKey === 'param15', 'sorting_asc': !reverse && sortKey === 'param28'}"></span>
+                        </th>
+                        <th (click)="sort('param16')" style="cursor: pointer; ">
+                          Customer Mobile
+                          <span class="sorting"
+                          [ngClass]="{'sorting_desc': reverse && sortKey === 'param16', 'sorting_asc': !reverse && sortKey === 'param29'}"></span>
+                        </th>
+                        <th (click)="sort('param16')" style="cursor: pointer; ">
+                          Location
+                          <span class="sorting"
+                          [ngClass]="{'sorting_desc': reverse && sortKey === 'param16', 'sorting_asc': !reverse && sortKey === 'param29'}"></span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @if (alertDetails.length === 0 && !loading) {
+                        <tr>
+                          <td style="font-weight: bold; text-align: center; padding: 5px; color: #6c757d;" colspan="12">NO
+                          DATA FOUND</td>
+                        </tr>
+                      }
+                      @for (alert of alertDetails; track alert; let i = $index) {
+                        <tr>
+                          <td style="text-align: center;">{{alert.param1 || (currentPage - 1) * pageSize + i + 1}}</td>
+                          <td style="color: #0b58b9; cursor: pointer; text-decoration: underline; font-weight: bold;" (click)="openSingleAlertMap(alert)" title="Click to view on map">
+                            {{alert.param9 || 'NA'}}
+                          </td>
+                          <td>{{alert.param21 || '0'}}</td>
+                          <td>
+                            <span
+                              class="badge px-2 py-1"
+                              style="font-size: 11px;"
+                              [ngClass]="{'text-success': alert.param22?.trim() === '1', 'text-danger': alert.param22?.trim() === '0'}">
+                              {{ alert.param22?.trim() === '1' ? 'ON' : 'OFF' }}
+                            </span>
+                          </td>
+                          <td>{{alert.param8 || 'NA'}}</td>
+                          <td>{{alert.param3 || 'NA'}}</td>
+                          <td>{{alert.param11 || 'NA'}}</td>
+                          <td>{{alert.param12 || 'NA'}}</td>
+                          <td>{{alert.param15 || 'NA'}}</td>
+                          <td>{{alert.param16 || 'NA'}}</td>
+                          <td>{{alert.param6 || 'NA'}}<br>{{alert.param7 || 'NA'}}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                  @if (totalCount > pageSize) {
+                    <div class="pagination-wrapper"
+                      style="display: flex; justify-content: flex-end; align-items: center; margin-top: 15px;">
+                      <ul class="pagination"
+                        style="display: flex; gap: 5px; list-style: none; padding: 0; margin: 0; align-items: center;">
+                        <li [class.disabled]="currentPage === 1">
+                          <button type="button" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
+                            class="btn btn-sm shadow-sm"
+                            style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
+                            <i class="fa fa-angle-left" style="margin-right: 4px;"></i> Previous
+                          </button>
+                        </li>
+                        @for (page of getPageNumbers(); track page) {
+                          <li>
+                            @if (page === -1) {
+                              <span
+                              style="font-size: 12px; color: #6c757d; padding: 0 5px; font-weight: bold;">...</span>
+                            }
+                            @if (page !== -1) {
+                              <button type="button" (click)="onPageChange(page)"
+                                class="btn btn-sm shadow-sm"
+                                [style.background]="currentPage === page ? '#0b58b9' : '#fff'"
+                                [style.color]="currentPage === page ? '#fff' : '#0b58b9'"
+                                style="font-size: 11px; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1px solid #dee2e6; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                {{ page }}
+                              </button>
+                            }
+                          </li>
+                        }
+                        <li [class.disabled]="currentPage >= getTotalPages()">
+                          <button type="button" (click)="onPageChange(currentPage + 1)"
+                            [disabled]="currentPage >= getTotalPages()" class="btn btn-sm shadow-sm"
+                            style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
+                            Next <i class="fa fa-angle-right" style="margin-left: 4px;"></i>
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+          @if (viewMode === 'restalertgrid' ) {
+            <div class="table-responsive">
+              <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
+                <table style="width: 100%;">
+                  <tbody class="bg-body">
+                    <tr>
+                      <!-- <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                      <font style="font-weight: bold; color: #0b58b9; font-size: 12px;">Search : </font>
+                    </td> -->
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="search" class="form-control" id="searchby" placeholder="Type here..."
+                          style="border: 1px solid #ced4da; height: 28px; width: 220px; font-size: 12px; border-radius: 4px 0 0 4px; padding: 4px 10px;"
+                          [(ngModel)]="searchText" name="searchby" (keyup.enter)="getSearchDetails()">
+                        <button type="button"
+                          style="cursor: pointer; margin-left: 0; height: 28px; border: none; background-color: #0b58b9; color: white; border-radius: 0 4px 4px 0; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center;"
+                          (click)="getSearchDetails()" title="Search">
+                          <i class="fa fa-search"></i>
+                        </button>
+                        <button (click)="reloadData()" [disabled]="loading"
+                          style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+                          <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
+                          <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+                        </button>
+                        <div class="alert-type-dropdown">
+                          <ng-select name="alertlist" [loading]="isAlertTypeLoading" placeholder="Alert Type..."
+                            [(ngModel)]="selectedAlertType" [ngModelOptions]="{ standalone: true }" [clearable]="true"
+                            [searchable]="true" (change)="getSearchDetails()">
+                            <ng-option value="">All Alerts</ng-option>
+                            <!-- <ng-option *ngFor="let item of alertTypeList" [value]="item">{{ item.param2 }}</ng-option> -->
+                            @for (item of alertTypeList; track item) {
+                              @if (item.param1 !== '10') {
+                                <ng-option [value]="item">
+                                  {{ item.param2 }}
+                                </ng-option>
+                              }
+                            }
+                            <!-- <ng-template ng-label-tmp let-item="item">
+                            <span *ngIf="item"><i class="fa fa-bell"></i> {{ item.param2 }}</span>
+                          </ng-template>
+                          <ng-template ng-option-tmp let-item="item">
+                            <div class="alert-type-option">
+                              <i class="fa fa-bell"></i>
+                              <span>{{ item.param2 }}</span>
+                            </div>
+                          </ng-template> -->
+                        </ng-select>
+                      </div>
+                      <div class="alert-type-dropdown">
+                        <ng-select class="vendor-select" [(ngModel)]="selectedVendorFilter"
+                          (change)="onVendorFilterChange($event)" name="vendorlist" placeholder="All Vendors">
+                          <ng-option value="">All Vendors</ng-option>
+                          @for (item of vendorList; track item) {
+                            <ng-option [value]="item">{{ item.param2 }}</ng-option>
+                          }
+                        </ng-select>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <table style="float: right;">
+                      <tbody>
+                        <tr>
+                          <td style="vertical-align: middle; padding-right: 15px;">
+                            <div style="display: flex; align-items: center;">
+                              <label class="control-label"
+                                style="color: #0b58b9; margin-bottom: 0; margin-right: 5px; font-size: 12px; font-weight: bold;">Download
+                              :</label>
+                              <select
+                                style="height: 25px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;"
+                                (change)="selectedAlertType=null; downloadPDFExcel($event)">
+                                <option value="Select" selected>Select</option>
+                                <!-- <option value="excel">Excel</option> -->
+                                <option value="">Excel</option>
+                                <!-- <option value="Pdf">Pdf</option> -->
+                              </select>
+                            </div>
+                          </td>
+                          <td style="vertical-align: middle; padding-right: 5px;">
+                            <div style="font-weight: bold; color: #0b58b9; font-size: 12px;">
+                              Show Rows :
+                            </div>
+                          </td>
+                          <td style="vertical-align: middle; padding-right: 15px;">
+                            <select [(ngModel)]="pageSize" name="pageSize" (change)="onPageSizeChange($event)"
+                              style="font-size: 11px; height: 25px; border: 1px solid #ccc; border-radius: 3px;">
+                              @for (size of [20, 50, 100, 200, 500]; track size) {
+                                <option [value]="size">{{size}}</option>
+                              }
+                            </select>
+                          </td>
+                          <td style="vertical-align: middle; padding-right: 9px;">
+                            <div style="text-align: right; font-weight: bold; font-size: 12px; color: #0b58b9;">
+                              <span> Total Records : {{totalCount || 0}}</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+          <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+            <div class="col-sm-12">
+              <table class="table table-striped app-table"
+                style="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px; width: 100%;">
+                <thead>
+                  <tr>
+                    <th style="width: 50px;">#</th>
+                    <th (click)="sort('param9')" style="cursor: pointer; ">
+                      Vehicle No
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc': reverse && sortKey === 'param9', 'sorting_asc': !reverse && sortKey === 'param4'}"></span>
+                    </th>
+                    <th (click)="sort('param21')" style="cursor: pointer; ">
+                      Speed
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc': reverse && sortKey === 'param21', 'sorting_asc': !reverse && sortKey === 'param21'}"></span>
+                    </th>
+                    <th (click)="sort('param22')" style="cursor: pointer; ">
+                      Ignition
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc': reverse && sortKey === 'param22', 'sorting_asc': !reverse && sortKey === 'param22'}"></span>
+                    </th>
+                    <th (click)="sort('param8')" style="cursor: pointer; ">
+                      Alert Type
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc': reverse && sortKey === 'param8', 'sorting_asc': !reverse && sortKey === 'param5'}"></span>
+                    </th>
+                    <th (click)="sort('param3')" style="cursor: pointer; ">
+                      Alert Time
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc': reverse && sortKey === 'param3', 'sorting_asc': !reverse && sortKey === 'param11'}"></span>
+                    </th>
+                    <th (click)="sort('param11')" style="cursor: pointer; ">
+                      Vendor Name
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc': reverse && sortKey === 'param11', 'sorting_asc': !reverse && sortKey === 'param12'}"></span>
+                    </th>
+                    <th (click)="sort('param12')" style="cursor: pointer; ">
+                      RTO Name
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc': reverse && sortKey === 'param12', 'sorting_asc': !reverse && sortKey === 'param18'}"></span>
+                    </th>
+                    <th (click)="sort('param15')" style="cursor: pointer; ">
+                      Customer Name
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc': reverse && sortKey === 'param15', 'sorting_asc': !reverse && sortKey === 'param28'}"></span>
+                    </th>
+                    <th (click)="sort('param16')" style="cursor: pointer; ">
+                      Customer Mobile
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc': reverse && sortKey === 'param16', 'sorting_asc': !reverse && sortKey === 'param29'}"></span>
+                    </th>
+                    <th (click)="sort('param16')" style="cursor: pointer; ">
+                      Location
+                      <span class="sorting"
+                      [ngClass]="{'sorting_desc': reverse && sortKey === 'param16', 'sorting_asc': !reverse && sortKey === 'param29'}"></span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (alertDetails.length === 0) {
+                    <tr>
+                      <td style="font-weight: bold; text-align: center; padding: 20px; color: #6c757d;" colspan="11">
+                        NO
+                      DATA FOUND</td>
+                    </tr>
+                  }
+                  @for (alert of alertDetails; track alert; let i = $index) {
+                    <tr>
+                      <td style="text-align: center;">{{alert.param1 || (currentPage - 1) * pageSize + i + 1}}</td>
+                      <td style="color: #0b58b9; cursor: pointer; text-decoration: underline; font-weight: bold;"
+                        (click)="openSingleAlertMap(alert)" title="Click to view on map">
+                        {{alert.param9 || 'NA'}}
+                      </td>
+                      <td class="">{{alert.param21 || '0'}}</td>
+                      <td>
+                        <span
+                          class="badge px-2 py-1"
+                          style="font-size: 11px;"
+                          [ngClass]="{'text-success': alert.param22?.trim() === '1', 'text-danger': alert.param22?.trim() === '0'}">
+                          {{ alert.param22?.trim() === '1' ? 'ON' : 'OFF' }}
+                        </span>
+                      </td>
+                      <td>
+                        <!-- (click)="getVehicleWiseAlert(i, alert)" -->
+                        <div style="cursor:pointer" title="Click Here"
+                          class="fw-bold text-danger text-uppercase"
+                          >
+                          {{alert.param8 || 'NA'}}
+                        </div>
+                      </td>
+                      <td>{{alert.param3 || 'NA'}}</td>
+                      <td>{{alert.param11 || 'NA'}}</td>
+                      <td>{{alert.param12 || 'NA'}}</td>
+                      <td>{{alert.param15 || 'NA'}}</td>
+                      <td>{{alert.param16 || 'NA'}}</td>
+                      <td>{{alert.param6 || 'NA'}}<br>{{alert.param7 || 'NA'}}</td>
+                    </tr>
+                    <!-- <tr>
+                    <td colspan="11" class="p-0 border-0">
+                      <div class="expand-wrapper" [class.expanded]="expandedRow === i">
+                        <div class="inner-content">
+                          <table class="table mb-0 table-striped">
+                            <thead>
+                              <tr>
+                                <th>Vehicle Reg No</th>
+                                <th>IMEI No.</th>
+                                <th>Alert Type</th>
+                                <th>Alert Timestamp</th>
+                                <th>Alert Count</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let item of vehicleWiseData">
+                                <td>{{item.param4 || 'NA'}}</td>
+                                <td>{{item.param9 || 'NA'}}</td>
+                                <td>{{item.param13 || 'NA'}}</td>
+                                <td>{{item.param14 || 'NA'}}</td>
+                                <td>{{item.param15 || 'NA'}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </td>
+                  </tr> -->
+                }
+              </tbody>
+            </table>
+            @if (totalCount > pageSize) {
+              <div class="pagination-wrapper"
+                style="display: flex; justify-content: flex-end; align-items: center; margin-top: 15px;">
+                <ul class="pagination"
+                  style="display: flex; gap: 5px; list-style: none; padding: 0; margin: 0; align-items: center;">
+                  <li [class.disabled]="currentPage === 1">
+                    <button type="button" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
+                      class="btn btn-sm shadow-sm"
+                      style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
+                      <i class="fa fa-angle-left" style="margin-right: 4px;"></i> Previous
+                    </button>
+                  </li>
+                  @for (page of getPageNumbers(); track page) {
+                    <li>
+                      @if (page === -1) {
+                        <span
+                        style="font-size: 12px; color: #6c757d; padding: 0 5px; font-weight: bold;">...</span>
+                      }
+                      @if (page !== -1) {
+                        <button type="button" (click)="onPageChange(page)"
+                          class="btn btn-sm shadow-sm" [style.background]="currentPage === page ? '#0b58b9' : '#fff'"
+                          [style.color]="currentPage === page ? '#fff' : '#0b58b9'"
+                          style="font-size: 11px; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1px solid #dee2e6; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                          {{ page }}
+                        </button>
+                      }
+                    </li>
+                  }
+                  <li [class.disabled]="currentPage >= getTotalPages()">
+                    <button type="button" (click)="onPageChange(currentPage + 1)"
+                      [disabled]="currentPage >= getTotalPages()" class="btn btn-sm shadow-sm"
+                      style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
+                      Next <i class="fa fa-angle-right" style="margin-left: 4px;"></i>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (viewMode === 'map') {
+<div style="height: 500px; border: 8px solid #ffffff;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;">
+        <div id="map" style="width: 100%; height: 100%;"></div>
+      </div>
+    }
+    @if (viewMode === 'rtowisealert') {
+      <div >
+        <div class="panic-chart-caption">
+          <span>RTO-wise panic counts</span>
+          <strong>{{ rtoPanicTotal | number }} total sessions · {{ rtoPanicCounts.length }} RTOs</strong>
+        </div>
+        @if (rtoPanicCountsLoading) {
+          <p class="panic-chart-state" role="status">Loading RTO panic counts...</p>
+        }
+        @if (rtoPanicCountsError) {
+          <p class="panic-chart-error" role="alert">{{ rtoPanicCountsError }}</p>
+        }
+        @if (!rtoPanicCountsLoading && !rtoPanicCountsError && !rtoPanicCounts.length) {
+          <p class="panic-chart-state">No RTO panic counts available.</p>
+        }
+        @if (!rtoPanicCountsLoading && !rtoPanicCountsError && rtoPanicCounts.length) {
+          <app-rto-column-chart
+          [items]="rtoPanicCounts"></app-rto-column-chart>
+        }
+      </div>
+    }
+    @if (viewMode === 'vclasswisealert') {
+      <div class="vehicle-class-panic-chart">
+        <div class="panic-chart-caption">
+          <span class="fw-bolder">Vehicle class-wise panic counts</span>
+          <div class="form-group">
+            <input class="form-control form-control-sm" type="text" name="date" id="datepicker" required
+              placeholder="Select Date"/>
+          </div>
+          <strong>{{ vehicleClassPanicTotal | number }} total sessions</strong>
+        </div>
+        @if (vehicleClassCountsLoading) {
+          <p class="panic-chart-state" role="status">Loading vehicle class panic counts...</p>
+        }
+        @if (vehicleClassCountsError) {
+          <p class="panic-chart-error" role="alert">{{ vehicleClassCountsError }}</p>
+        }
+        @if (!vehicleClassCountsLoading && !vehicleClassCountsError && !vehicleClassCounts.length) {
+          <p class="panic-chart-state">No vehicle class panic counts available.</p>
+        }
+        @if (!vehicleClassCountsLoading && !vehicleClassCountsError && vehicleClassCounts.length) {
+          <div class="panic-class-chart">
+            <div class="panic-class-series"
+              [style.grid-template-columns]="'repeat(' + vehicleClassCounts.length + ', minmax(0, 1fr))'">
+              @for (item of vehicleClassCounts; track item; let i = $index) {
+                <div class="panic-class-column"
+                  [title]="item.label + ': ' + item.count + ' panic sessions'">
+                  <div class="panic-column-zone">
+                    <strong class="panic-class-count" [style.bottom]="'calc(' + item.percent + '% + 4px)'">{{ item.count | number }}</strong>
+                    <span class="panic-column-fill" [style.background]="item.color" [style.height.%]="item.percent"
+                    [style.animation-delay.ms]="i * 35"></span>
+                  </div>
+                  <span class="panic-class-name">{{ item.label }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Single Alert Map Modal -->
+@if (showSingleAlertModal) {
+  <div class="single-alert-modal-overlay">
+    <div class="single-alert-modal-content">
+      <div class="single-alert-header">
+        <span><i class="fa fa-map-marker" style="margin-right: 8px;"></i>{{selectedSingleAlert?.param9}}</span>
+        <span style=" font-size: 12px; color: rgb(48, 65, 51);">Event Time : {{selectedSingleAlert?.param3}}
+          <span class="ms-3" style=" font-size: 12px; color: rgb(48, 65, 51);">Location : {{singleAlertInfoPanelData?.latitude || selectedSingleAlert?.param6}}, {{singleAlertInfoPanelData?.longitude || selectedSingleAlert?.param7}}</span></span>
+          <button class="close-btn" (click)="closeSingleAlertModal()">&times;</button>
+        </div>
+        <div class="single-alert-body">
+          <div id="singleAlertMap" style="width: 100%; height: 100%;"></div>
+          <!-- Collapsible Info Panel -->
+          <div class="single-alert-info-panel" [class.collapsed]="isSingleInfoCollapsed">
+            <div class="panel-header" (click)="toggleSingleInfoPanel()">
+              <span><i class="fa fa-info-circle"></i> Alert Info</span>
+              <i class="fa" [ngClass]="isSingleInfoCollapsed ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </div>
+            @if (!isSingleInfoCollapsed) {
+              <div class="panel-content">
+                <div class="info-row"><strong>Alert:</strong> <span style="color:red">{{selectedSingleAlert?.param8 || 'Live Tracking'}}</span></div>
+                <div class="info-row"><strong>Time:</strong> {{singleAlertInfoPanelData?.pollingdate || selectedSingleAlert?.param3}}</div>
+                <div class="info-row"><strong>Speed:</strong> {{singleAlertInfoPanelData?.speed || selectedSingleAlert?.param21}} km/h</div>
+                <div class="info-row"><strong>Ignition:</strong> <span [style.color]="(singleAlertInfoPanelData?.ignition === 'On' || selectedSingleAlert?.param20 == '1') ? 'green' : 'red'">{{singleAlertInfoPanelData?.ignition || (selectedSingleAlert?.param20 == '1' ? 'On' : 'Off')}}</span></div>
+                <div class="info-row"><strong>Location:</strong> {{singleAlertInfoPanelData?.latitude || selectedSingleAlert?.param6}}, {{singleAlertInfoPanelData?.longitude || selectedSingleAlert?.param7}}</div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }

@@ -1,0 +1,147 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-box">
+
+      <!-- PAGE TITLE -->
+      <div class="pagetitlestyle">
+        <span>Vendorwise SOS Session Report</span>
+      </div>
+
+      <!-- MAIN LAYOUT -->
+      <div class="overspeed-layout">
+        <!-- LEFT FILTER PANEL -->
+        <div class="left-filter-panel entrypagediv">
+
+          <!-- VENDOR -->
+          <div class="form-group">
+            <label class="control-label">Select Vendor <span style="color:red">*</span></label>
+            <ng-select name="vendor" class="searchable full-control" placeholder="Select Vendor"
+              [(ngModel)]="selectedVendor">
+              @for (v of vendorList; track v) {
+                <ng-option [value]="v.param1">{{v.param2}}</ng-option>
+              }
+            </ng-select>
+          </div>
+
+
+          <!-- DATE -->
+          <div class="date-row">
+            <div class="date-col" style="width:100%">
+              <label class="control-label">Select Date Range<span style="color:red">*</span> </label>
+              <!-- <input
+              placeholder="Select Date Range"
+              type="text"
+              class="form-control"
+              ngxDaterangepickerMd
+              [(ngModel)]="selectedDateRange"
+              [maxDate]="today"
+              [opens]="'right'"
+              [drops]="'down'"
+              [autoApply]="true"
+              [locale]="locale"
+              (datesUpdated)="onDateRangeChange($event)" /> -->
+              <input type="text" id="datepicker" class="form-control" name="date"/>
+            </div>
+          </div>
+
+          <div class="date-row">
+
+            <div class="date-col">
+              <label class="control-label">From Time<span style="color:red">*</span></label>
+              <input type="time" class="form-control" [(ngModel)]="fromTime" step="60" />
+            </div>
+
+            <div class="date-col">
+              <label class="control-label">To Time<span style="color:red">*</span></label>
+              <input type="time" class="form-control" [(ngModel)]="toTime" step="60" />
+            </div>
+
+          </div>
+          <!-- SEARCH -->
+          <div class="search-btn-row">
+            <button class="search-btn-full" (click)="getAlertOverview()">
+              <i class="fa fa-search"></i> Search
+            </button>
+          </div>
+        </div>
+        <!-- *ngIf="showSummary" -->
+        <!-- RIGHT REPORT PANEL -->
+        <div class="right-report-panel">
+          <!-- 🔹 TOP CONTROLS BAR -->
+          <div class="top-controls-row">
+
+            <!-- LEFT SIDE -->
+            <div class="left-controls">
+
+              <!-- 🔍 SEARCH BOX -->
+              <div class="search-box">
+                <input type="search" class="search-input inner" placeholder="Search here..." maxlength="50"
+                  [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" />
+
+                <button class="search-inner-btn" (click)="getSearchDetails()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+
+              <!-- 🔄 RELOAD BUTTON -->
+              <button class="reload-btn" (click)="reloadData()" [disabled]="loading">
+
+                <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+                <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+
+              </button>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="right-controls">
+              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                [showPageSize]="false" [showTotal]="false" (excelExport)="exportToExcel()">
+              </app-common-data-toolbar>
+              <div class="total-records-text">Show Rows :</div>
+              <!-- ROWS SELECT -->
+              <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChanged(pageSize)">
+
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size === totalCount ? 'All' : size">
+                    {{ size === totalCount ? 'All' : size }}
+                  </option>
+                }
+
+              </select>
+
+              <!-- TOTAL RECORD TEXT -->
+              <div class="total-records-text">
+                Total Records : {{ pageCount }} of {{ totalCount }}
+              </div>
+
+            </div>
+
+          </div>
+          <!-- TABLE -->
+          <ng-template #vendorSosRows let-rows>
+            @for (d of rows; track d; let i = $index) {
+              <tr>
+                <td class="text-end">{{ i + 1 }}</td>
+                <td>{{ d.param2 }}</td>
+                <td class="text-end">{{ d.param3 != '' ? d.param3 : '-' }}</td>
+                <td class="text-end">{{ d.param4 }}</td>
+                <td class="text-end">{{ d.param5 != '' ? d.param5 : '-' }}</td>
+                <td class="text-end">{{ d.param6 }}</td>
+              </tr>
+            }
+          </ng-template>
+          <app-common-table [columns]="tableColumns" [rows]="alertData" [loading]="loading"
+            [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="vendorSosRows" tableClass="table-grid">
+          </app-common-table>
+          @if (totalCount > pageSize || page > 1) {
+            <app-common-pagination [page]="page" [pageSize]="pageSize" [totalRecords]="totalCount"
+              [disabled]="loading" (pageChange)="changePage($event)">
+            </app-common-pagination>
+          }
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

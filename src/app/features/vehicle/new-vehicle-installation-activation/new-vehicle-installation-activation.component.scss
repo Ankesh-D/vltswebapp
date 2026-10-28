@@ -1,0 +1,1172 @@
+/* =========================================================
+   VEHICLE INSTALLATION & ACTIVATION
+   FINAL LIVE UI
+   Bootstrap 5
+   Font: Global project font (Roboto)
+   ========================================================= */
+
+
+/* =========================================================
+   GLOBAL FONT
+   ========================================================= */
+
+:host {
+  display: block;
+  width: 100%;
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+:host {
+  display: block;
+  width: 100%;
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+
+:host {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+
+:host input,
+:host button,
+:host select,
+:host textarea,
+:host table,
+:host th,
+:host td,
+:host label,
+:host .form-control,
+:host .btn,
+:host .ng-select,
+:host .ng-dropdown-panel {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+
+/* Font Awesome must remain FontAwesome */
+:host i.fa,
+:host i.fa::before {
+  font-family: FontAwesome !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+}
+
+/* =========================================================
+   PAGE CONTAINER
+   ========================================================= */
+
+.content-i {
+  width: 100%;
+  padding: 0 14px !important;
+  box-sizing: border-box;
+}
+
+.content-box {
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.content-box > .row {
+  width: 100%;
+  margin: 0 !important;
+}
+
+.content-box > .row > .col-lg-12 {
+  width: 100%;
+  padding: 0 !important;
+}
+
+.element-wrapper {
+  width: 100%;
+  margin: 0 !important;
+}
+
+.element-box {
+  width: 100%;
+  box-sizing: border-box;
+margin-top: 10px !important;
+  background: #fff;
+
+  // border-radius: 8px;
+
+  padding: 15px !important;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+/* =========================================================
+   PAGE TITLE
+   ========================================================= */
+
+.pagetitleborder {
+  width: 100%;
+
+  border-bottom: 2px solid #0c04a7;
+
+  margin-bottom: 10px;
+
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+
+/* =========================================================
+   IMEI SEARCH SECTION
+   ========================================================= */
+
+#imeisearch {
+  width: 100%;
+
+  min-height: 82px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  margin: 0 !important;
+
+  padding: 12px 0 14px !important;
+
+  background: #fff;
+
+  border-radius: 6px;
+}
+
+
+/* IMEI column */
+
+#imeisearch > .col-md-5 {
+  max-width: 550px;
+
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+
+/* IMEI label */
+
+#imeisearch label {
+  display: block;
+
+  text-align: center;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 600 !important;
+
+  margin-bottom: 5px !important;
+
+  color: #222;
+}
+
+
+/* Input group */
+
+#imeisearch .input-group {
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: nowrap;
+
+  width: 100%;
+}
+
+
+/* IMEI input */
+
+#imeisearch .form-control {
+  height: 34px;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 600 !important;
+
+  text-align: center;
+
+  border: 1px solid #ced4da;
+
+  border-radius: 4px 0 0 4px;
+}
+
+
+/* Bootstrap 4 compatibility if old HTML is still used */
+
+#imeisearch .input-group-append {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-left: 8px;
+}
+
+
+/* Bootstrap 5 replacement */
+
+#imeisearch .input-group > .d-flex {
+  display: flex !important;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-left: 8px !important;
+}
+
+
+/* =========================================================
+   BUTTON BASE
+   ========================================================= */
+
+.btn {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 400;
+
+  padding: 5px 12px;
+
+  border-radius: 4px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   IMEI BUTTONS
+   ========================================================= */
+
+/* Search */
+
+#imeisearch .btn-primary {
+  height: 34px;
+
+  background-color: #3000a8 !important;
+
+  border-color: #3000a8 !important;
+
+  color: #fff !important;
+
+  font-size: 12px !important;
+}
+
+
+/* Refresh */
+
+#imeisearch .btn-warning {
+  height: 34px;
+
+  background-color: #f39c12 !important;
+
+  border-color: #f39c12 !important;
+
+  color: #fff !important;
+
+  font-size: 12px !important;
+}
+
+#imeisearch .btn-warning i {
+  color: #fff !important;
+}
+
+
+/* Clear */
+
+#imeisearch .btn-secondary {
+  height: 34px;
+
+  background-color: #6c757d !important;
+
+  border-color: #6c757d !important;
+
+  color: #fff !important;
+
+  font-size: 12px !important;
+}
+
+
+/* =========================================================
+   BUTTON HOVER
+   ========================================================= */
+
+.btn:hover {
+  opacity: 0.92;
+}
+
+
+/* =========================================================
+   DETAILS ROW
+   ========================================================= */
+
+#details {
+  width: 100%;
+
+  margin-top: 0 !important;
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+
+  padding-top: 4px;
+}
+
+
+/* =========================================================
+   THREE COLUMNS
+   ========================================================= */
+
+#details > .details-section {
+  padding-left: 10px !important;
+
+  padding-right: 10px !important;
+
+  margin-bottom: 10px;
+}
+
+
+/* =========================================================
+   TABLE WRAPPER
+   ========================================================= */
+
+#details .table-responsive {
+  width: 100%;
+
+  border-radius: 0;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   MAIN TABLE
+   ========================================================= */
+
+#details table.table {
+  width: 100% !important;
+
+  margin-bottom: 0 !important;
+
+  background-color: #f9f9f9 !important;
+
+  border-collapse: collapse !important;
+
+  table-layout: fixed;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+}
+
+
+/* =========================================================
+   TABLE HEADER
+   LIVE PURPLE HEADER
+   ========================================================= */
+
+#details table.table thead th {
+  background-color: #300080 !important;
+
+  color: #fff !important;
+
+  border: 1px solid #300080 !important;
+
+  height: 29px;
+
+  padding: 5px 6px !important;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 600 !important;
+
+  line-height: 1.2;
+
+  text-align: center !important;
+
+  vertical-align: middle !important;
+}
+
+
+/* =========================================================
+   TABLE BODY
+   ========================================================= */
+
+#details table.table tbody td {
+  background-color: #f9f9f9 !important;
+
+  color: #111 !important;
+
+  border: 1px solid #d9d9d9 !important;
+
+  padding: 5px 8px !important;
+
+  height: 29px;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 400;
+
+  line-height: 1.2;
+
+  vertical-align: middle !important;
+}
+
+
+/* Left label */
+
+#details table.table tbody td:first-child {
+  width: 43%;
+
+  font-weight: 600 !important;
+}
+
+
+/* Value */
+
+#details table.table tbody td:nth-child(2) {
+  width: 57%;
+
+  font-weight: 400 !important;
+}
+
+
+/* =========================================================
+   TABLE BORDER OVERRIDE
+   Remove unwanted orange borders
+   ========================================================= */
+
+#details .table-bordered {
+  border-color: #d9d9d9 !important;
+}
+
+#details .table-bordered > :not(caption) > * {
+  border-width: 1px;
+}
+
+#details .table-bordered > :not(caption) > * > * {
+  border-width: 1px;
+
+  border-color: #d9d9d9 !important;
+}
+
+
+/* =========================================================
+   BOLD FONT
+   ========================================================= */
+
+.boldfont {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-weight: 600 !important;
+
+  font-size: 12px !important;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status-text {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 700 !important;
+}
+
+
+/* =========================================================
+   STATUS COLORS
+   ========================================================= */
+
+.text-success {
+  color: #28a745 !important;
+}
+
+.text-danger {
+  color: #dc003c !important;
+}
+
+.text-warning {
+  color: #f39c12 !important;
+}
+
+
+/* =========================================================
+   AIS COMPLIANCE BUTTONS
+   ========================================================= */
+
+.compliance-btn {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 600 !important;
+
+  padding: 6px 12px !important;
+
+  border-radius: 4px !important;
+}
+
+
+/* View */
+
+#vehicleactivation .btn-info {
+  background-color: #00a9b7 !important;
+
+  border-color: #00a9b7 !important;
+
+  color: #fff !important;
+}
+
+
+/* Refresh */
+
+#vehicleactivation .btn-warning {
+  background-color: #f39c12 !important;
+
+  border-color: #f39c12 !important;
+
+  color: #fff !important;
+}
+
+
+/* =========================================================
+   AIS COMPLIANCE TABLE
+   ========================================================= */
+
+#vehicleactivation table {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+}
+
+#vehicleactivation table th {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 600 !important;
+}
+
+#vehicleactivation table td {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+}
+
+
+/* =========================================================
+   VALIDITY UPDATE BUTTON
+   ========================================================= */
+
+#details .btn-primary {
+  background-color: #3000a8 !important;
+
+  border-color: #3000a8 !important;
+
+  color: #fff !important;
+
+  font-size: 11px !important;
+
+  padding: 3px 8px !important;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-group label {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 11px !important;
+
+  font-weight: 600 !important;
+
+  margin-bottom: 3px;
+
+  color: #333;
+}
+
+
+/* =========================================================
+   NG SELECT
+   ========================================================= */
+
+::ng-deep .ng-select-container {
+  min-height: 34px !important;
+
+  height: 34px !important;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  border-radius: 4px !important;
+}
+
+::ng-deep .ng-select-container .ng-value-container {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+}
+
+::ng-deep .ng-select-container .ng-placeholder {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+}
+
+::ng-deep .ng-dropdown-panel {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+}
+
+::ng-deep .ng-dropdown-panel .ng-option {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+}
+
+::ng-deep .ng-select-container:hover {
+  border-color: #0c04a7 !important;
+}
+
+::ng-deep .ng-clear-wrapper {
+  display: none !important;
+}
+
+
+/* =========================================================
+   INSTALLATION FORM
+   ========================================================= */
+
+#vehicleinstall {
+  background: #fff;
+
+  border-radius: 6px;
+
+  border: 1px solid #eee;
+}
+
+
+/* =========================================================
+   INSTALLATION FORM HEADER
+   ========================================================= */
+
+#vehicleinstall .boldfont {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 600 !important;
+}
+
+
+/* =========================================================
+   OTP
+   ========================================================= */
+
+.otp-inline {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  flex-wrap: wrap;
+}
+
+.otp-input {
+  width: 95px;
+
+  height: 30px;
+
+  flex: 0 0 95px;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+}
+
+
+/* OTP message */
+
+#vehicleactivation .small {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 10px !important;
+}
+
+
+/* =========================================================
+   MANDATORY STAR
+   ========================================================= */
+
+.mandetory {
+  color: red;
+
+  margin-left: 2px;
+}
+
+
+/* =========================================================
+   COMPLIANCE MODAL
+   EXACT LIVE MODEL
+   ========================================================= */
+
+
+/* Modal dialog */
+
+.compliance-modal-dialog {
+  width: 800px !important;
+
+  max-width: 800px !important;
+
+  margin: 0 auto !important;
+}
+
+
+/* Modal content */
+
+.compliance-modal-content {
+  width: 800px !important;
+
+  max-width: 800px !important;
+
+  min-height: 565px;
+
+  border: 0 !important;
+
+  border-radius: 5px !important;
+
+  overflow: hidden;
+
+  background: #fff;
+}
+
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.compliance-modal-header {
+  height: 52px !important;
+
+  padding: 7px 15px !important;
+
+  background: #fff !important;
+
+  border-bottom: 1px solid #ddd !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  justify-content: space-between !important;
+}
+
+
+/* Modal title */
+
+.compliance-title {
+  margin: 0 !important;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 20px !important;
+
+  font-weight: 400 !important;
+
+  line-height: 30px !important;
+
+  color: #292d32 !important;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   MODAL IMEI
+   ========================================================= */
+
+.compliance-imei {
+  display: inline-flex !important;
+
+  align-items: center !important;
+
+  height: 31px !important;
+
+  margin-left: 15px !important;
+
+  padding: 0 12px !important;
+
+  background: #f8f9fa !important;
+
+  border: 1px solid #d8dde3 !important;
+
+  border-radius: 4px !important;
+
+  color: #343a40 !important;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 400 !important;
+
+  white-space: nowrap;
+}
+
+.compliance-imei strong {
+  font-weight: 700 !important;
+
+  margin-right: 3px !important;
+}
+
+
+/* =========================================================
+   MODAL CLOSE BUTTON
+   Bootstrap 5
+   ========================================================= */
+
+.compliance-close {
+  width: 16px !important;
+
+  height: 16px !important;
+
+  padding: 0 !important;
+
+  margin: 0 !important;
+
+  opacity: 0.55 !important;
+
+  box-shadow: none !important;
+
+  flex-shrink: 0;
+}
+
+.compliance-close:hover {
+  opacity: 0.8 !important;
+}
+
+
+/* =========================================================
+   MODAL BODY
+   ========================================================= */
+
+.compliance-modal-body {
+  padding: 0 5px 4px 5px !important;
+
+  background: #fff !important;
+
+  overflow: hidden !important;
+}
+
+
+/* =========================================================
+   COMPLIANCE TABLE WRAPPER
+   ========================================================= */
+
+.compliance-table-wrapper {
+  width: 100% !important;
+
+  max-height: 515px !important;
+
+  overflow-y: auto !important;
+
+  overflow-x: hidden !important;
+}
+
+
+/* =========================================================
+   COMPLIANCE TABLE
+   ========================================================= */
+
+.compliance-table {
+  width: 100% !important;
+
+  margin: 0 !important;
+
+  table-layout: fixed !important;
+
+  border-collapse: collapse !important;
+
+  background: #fff !important;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+}
+
+
+/* =========================================================
+   COMPLIANCE ROW
+   ========================================================= */
+
+.compliance-table tbody tr {
+  height: 30px !important;
+}
+
+
+/* =========================================================
+   COMPLIANCE LEFT COLUMN
+   ========================================================= */
+
+.compliance-table td.compliance-name {
+  width: 78% !important;
+
+  padding: 6px 8px !important;
+
+  border: 1px solid #f0a000 !important;
+
+  color: #111 !important;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 11px !important;
+
+  font-weight: 600 !important;
+
+  text-align: left !important;
+
+  vertical-align: middle !important;
+
+  white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   COMPLIANCE RIGHT COLUMN
+   ========================================================= */
+
+.compliance-table td.compliance-result {
+  width: 22% !important;
+
+  padding: 4px 8px !important;
+
+  border: 1px solid #f0a000 !important;
+
+  text-align: center !important;
+
+  vertical-align: middle !important;
+}
+
+
+/* =========================================================
+   COMPLIANCE FAIL
+   ========================================================= */
+
+.compliance-fail {
+  display: inline-flex !important;
+
+  width: 20px !important;
+
+  height: 18px !important;
+
+  align-items: center !important;
+
+  justify-content: center !important;
+
+  background-color: #f50046 !important;
+
+  color: #fff !important;
+
+  border-radius: 4px !important;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 14px !important;
+
+  font-weight: 700 !important;
+
+  line-height: 18px !important;
+
+  text-align: center !important;
+}
+
+
+/* =========================================================
+   COMPLIANCE PASS
+   ========================================================= */
+
+.compliance-pass {
+  display: inline-flex !important;
+
+  width: 20px !important;
+
+  height: 18px !important;
+
+  align-items: center !important;
+
+  justify-content: center !important;
+
+  background-color: #28a745 !important;
+
+  color: #fff !important;
+
+  border-radius: 4px !important;
+
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+
+  font-size: 12px !important;
+
+  font-weight: 700 !important;
+
+  line-height: 18px !important;
+
+  text-align: center !important;
+}
+
+
+/* =========================================================
+   COMPLIANCE SCROLLBAR
+   ========================================================= */
+
+.compliance-table-wrapper::-webkit-scrollbar {
+  width: 5px;
+}
+
+.compliance-table-wrapper::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.compliance-table-wrapper::-webkit-scrollbar-thumb {
+  background: #aaa;
+
+  border-radius: 5px;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 820px) {
+
+  .content-i {
+    padding: 0 10px !important;
+  }
+
+  #details > .details-section {
+    padding-left: 5px !important;
+
+    padding-right: 5px !important;
+  }
+
+  #imeisearch > .col-md-5 {
+    max-width: 100%;
+  }
+
+  #imeisearch .input-group {
+    flex-wrap: wrap;
+  }
+
+  #imeisearch .input-group-append {
+    width: 100%;
+
+    margin-left: 0;
+
+    margin-top: 6px;
+
+    justify-content: center;
+  }
+
+  .compliance-modal-dialog {
+    width: calc(100% - 20px) !important;
+
+    max-width: calc(100% - 20px) !important;
+
+    margin: 20px auto 0 !important;
+  }
+
+  .compliance-modal-content {
+    width: 100% !important;
+
+    max-width: 100% !important;
+  }
+
+  .compliance-title {
+    font-size: 18px !important;
+  }
+
+  .compliance-imei {
+    max-width: 180px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 576px) {
+
+  #imeisearch {
+    padding: 10px 0 !important;
+  }
+
+  #imeisearch .form-control {
+    font-size: 11px !important;
+  }
+
+  #imeisearch .btn {
+    font-size: 11px !important;
+
+    padding: 5px 9px !important;
+  }
+
+  #details table.table tbody td {
+    font-size: 11px !important;
+  }
+
+  #details table.table thead th {
+    font-size: 11px !important;
+  }
+
+  .compliance-title {
+    font-size: 16px !important;
+  }
+
+  .compliance-imei {
+    margin-left: 8px !important;
+
+    padding: 0 7px !important;
+
+    font-size: 10px !important;
+
+    max-width: 145px;
+  }
+
+  .compliance-table td.compliance-name {
+    font-size: 10px !important;
+  }
+
+  .compliance-table td.compliance-result {
+    width: 25% !important;
+  }
+
+  .compliance-fail,
+  .compliance-pass {
+    width: 19px !important;
+
+    height: 18px !important;
+  }
+}

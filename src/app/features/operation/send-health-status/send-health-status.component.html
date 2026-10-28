@@ -1,0 +1,53 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle">
+            <span>Send Health Status</span>
+          </div>
+        </div>
+
+        <div class="col-sm-12">
+          <div class="row" style="margin-top:10px;">
+            <div class="col-sm-2">
+              <label for="name" class="control-label">Select Vendor:</label><label class="mandetory">*</label>
+              <select class="searchable" id="companyCode" [(ngModel)]="selectedCompany"
+                (change)="onCompanyChange()" name="companyCode">
+                <option value="">Select Vendor</option>
+                @for (items of companyList; track items) {
+                  <option [value]="items.param1">{{items.param2}}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-sm-2">
+              <label for="name" class="control-label">Select IMEI No.:</label><label class="mandetory">*</label>
+              <select class="searchable" id="deviceCode" [(ngModel)]="selectedDevice" name="deviceCode">
+                <option value="">Select IMEI No.</option>
+                @for (item of deviceList; track item) {
+                  <option [value]="item.param2">{{item.param2}}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-sm-1">
+              <button type="button" style="margin-top:20px;" (click)="requestHealthAck()">Send</button>
+            </div>
+
+            <div style="margin-top: 12px;">
+              <table class="table table-striped app-table" style="width: 350px;">
+                <tr>
+                  <td class="fontset" style="background-color: #d9e7d8;width: 120px;border: none !important;">
+                    Response Message :
+                  </td>
+                  <td style="border: none !important;">{{message}}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

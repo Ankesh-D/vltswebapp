@@ -1,0 +1,450 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-box">
+
+      <!-- PAGE TITLE -->
+      <div class="pagetitlestyle">
+        <span>Route Deviation Report</span>
+      </div>
+
+      <!-- MAIN LAYOUT -->
+      <div class="overspeed-layout">
+
+        <!-- LEFT FILTER PANEL -->
+        <div class="left-filter-panel entrypagediv">
+
+          <!-- FILTER BY -->
+          <div class="form-group filterby-row">
+            <label style="margin: 2px;" class="control-label">Filter By :</label>
+
+            <div class="filterby-options">
+              <label class="radio-item">
+                <input type="radio" name="filter" (change)="onFilterByChange('Vendor')" checked>
+                Vendor
+              </label>
+
+              <label class="radio-item">
+                <input type="radio" name="filter" (change)="onFilterByChange('RTO')">
+                RTO
+              </label>
+            </div>
+          </div>
+
+          <!-- VENDOR -->
+          <!-- VENDOR -->
+          @if (filterBy === 'Vendor') {
+            <div class="form-group">
+              <label class="control-label">Select Vendor <span style="color:red">*</span></label>
+              <ng-select name="vendor" class="searchable full-control" placeholder="Select Vendor"
+                [(ngModel)]="selectedVendor" (change)="onVendorChange()">
+                @for (v of vendorList; track v) {
+                  <ng-option [value]="v.param1">{{v.param2}}</ng-option>
+                }
+              </ng-select>
+            </div>
+          }
+          <!-- RTO -->
+          @if (filterBy === 'RTO') {
+            <div class="form-group">
+              <label class="control-label">Select RTO <span style="color:red">*</span></label>
+              <ng-select name="rto" class="searchable full-control" placeholder="Select RTO" [(ngModel)]="selectedRTO"
+                (change)="onRTOChange()">
+                @for (r of rtoList; track r) {
+                  <ng-option [value]="r.param1">
+                  {{r.param2}}</ng-option>
+                }
+              </ng-select>
+            </div>
+          }
+          <!-- 🔥 DEVICE TYPE -->
+
+          <!-- VEHICLE -->
+          <div class="form-group">
+            <label class="control-label">Enter Vehicle No <span style="color:red">*</span></label>
+            <!-- 🔍 SEARCH BOX -->
+
+
+
+            <!-- 🚗 DROPDOWN -->
+            <ng-select name="vehicle" class="searchable full-control" [items]="visibleVehicleList"
+              bindLabel="param2" bindValue="param1" [typeahead]="searchInput"
+              [loading]="loadingVehicle" [(ngModel)]="selectedVehicle"
+              placeholder="Enter last 4 digit of vehicle number....">
+            </ng-select>
+
+          </div>
+
+
+          <!-- DATE -->
+          <div class="date-row">
+            <div class="date-col" style="width:100%">
+              <label class="control-label">Select Date Range<span style="color:red">*</span> </label>
+              <input type="text" id="datepicker" class="form-control" name="date"/>
+            </div>
+          </div>
+
+          <div class="date-row">
+
+            <div class="date-col">
+              <label class="control-label">From Time<span style="color:red">*</span></label>
+              <input type="time" class="form-control" [(ngModel)]="fromTime" step="60" />
+            </div>
+
+            <div class="date-col">
+              <label class="control-label">To Time<span style="color:red">*</span></label>
+              <input type="time" class="form-control" [(ngModel)]="toTime" step="60" />
+            </div>
+
+          </div>
+          <!-- SEARCH -->
+          <div class="search-btn-row">
+            <button class="search-btn-full" (click)="getAlertOverview()">
+              <i class="fa fa-search"></i> Search
+            </button>
+          </div>
+        </div>
+        <!-- *ngIf="showSummary" -->
+        <!-- RIGHT REPORT PANEL -->
+        <div class="right-report-panel">
+          <!-- 🔹 TOP CONTROLS BAR -->
+          <div class="top-controls-row">
+
+            <!-- LEFT SIDE -->
+            <div class="left-controls">
+
+              <!-- 🔍 SEARCH BOX -->
+              <div class="search-box">
+                <input type="search" class="search-input inner" placeholder="Search here..." maxlength="50"
+                  [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" />
+
+                <button class="search-inner-btn" (click)="getSearchDetails()">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+
+              <!-- 🔄 RELOAD BUTTON -->
+              <button class="reload-btn" (click)="reloadData()" [disabled]="loading">
+
+                <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+                <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+
+              </button>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="right-controls">
+              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                [showPageSize]="false" [showTotal]="false" (excelExport)="exportToExcel()">
+              </app-common-data-toolbar>
+              <div class="total-records-text">Show Rows :</div>
+              <!-- ROWS SELECT -->
+              <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChanged(pageSize)">
+
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size === totalCount ? 'All' : size">
+                    {{ size === totalCount ? 'All' : size }}
+                  </option>
+                }
+
+              </select>
+
+              <!-- TOTAL RECORD TEXT -->
+              <div class="total-records-text">
+                Total Records : {{ pageCount }} of {{ totalCount }}
+              </div>
+
+            </div>
+
+          </div>
+          <!-- TABLE -->
+          <div class="table-wrapper">
+            <ng-template #reportTableRows let-rows>
+@if (alertData.length === 0) {
+                    <tr>
+                      <td colspan="11" class="no-data">
+                        NO DATA FOUND
+                      </td>
+                    </tr>
+                  }
+
+                  @for (d of rows; track d; let i = $index) {
+                    <tr>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ d.param5 }}</td> <!-- vehicle no -->
+                      <td>{{ d.param3 }}<br>{{ d.param4 }}</td> <!-- imei no and serial no -->
+                      <td>{{ d.param7 !='' ? d.param7 : '-' }}<br>{{ d.param8 !='' ? d.param8 : '-' }}</td> <!-- permit holder and mobile no -->
+                      <td>{{ d.param13 }}</td> <!--Route Name -->
+                      <td>{{ d.param9 }}</td> <!-- Deviation Start Time -->
+                      <td>{{ d.param10 }}</td> <!-- Deviation End Time -->
+                      <td>{{ d.param12 }}</td> <!-- Duration -->
+                      <td>{{ d.param14 }}</td> <!-- Status -->
+                      <td>
+                        <div class="text-center">
+                          <button class="btn btn-sm btn-transparent text-success" (click)="viewMapModal(d)">
+                            <i class="fa fa-map"></i>
+                          </button>
+                        </div>
+                      </td>
+                      <!-- (click)="onEventCountClick(d)" -->
+                    </tr>
+                  }
+</ng-template>
+<app-common-table [columns]="tableColumns" [rows]="alertData" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table-grid"></app-common-table>
+
+            </div>
+            @if (totalCount > pageSize || page > 1) {
+              <ngb-pagination
+                [collectionSize]="totalCount"
+                [(page)]="page"
+                [pageSize]="pageSize"
+                [maxSize]="5"
+                [rotate]="true"
+                [ellipses]="true"
+                [boundaryLinks]="true"
+                (pageChange)="changePage($event)"
+                size="sm"
+                class="d-flex justify-content-end mt-2 mb-1">
+              </ngb-pagination>
+            }
+            <!-- <div class="custom-pagination" style="display:flex;justify-content: end;"
+            *ngIf="totalCount > pageSize || page > 1">
+
+            <button class="pg-btn" (click)="changePage(page - 1)" [disabled]="page === 1">
+              Prev
+            </button>
+
+            <span *ngIf="page > 3" class="pg-dots">...</span>
+
+            <button *ngIf="page > 2" class="pg-num" (click)="changePage(page - 1)">
+              {{ page - 1 }}
+            </button>
+
+            <button class="pg-num active">
+              {{ page }}
+            </button>
+
+            <button *ngIf="page < totalPages - 1" class="pg-num" (click)="changePage(page + 1)">
+              {{ page + 1 }}
+            </button>
+
+            <span *ngIf="page < totalPages - 2" class="pg-dots">...</span>
+
+            <button class="pg-num" (click)="changePage(totalPages)">
+              {{ totalPages }}
+            </button>
+
+            <button class="pg-btn" (click)="changePage(page + 1)" [disabled]="page === totalPages">
+              Next
+            </button>
+
+          </div> -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- The Modal -->
+<div class="modal fade" id="mapviewModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header" style="background: #b5e5b5;     padding: 0.1rem 1rem; ">
+        <h6 style="font-size: 14px; margin: 0;">Vehicle No : {{selectedVehicleNo}}</h6>
+        <button type="button" class="btn btn-sm" (click)="closeModal()"
+        style="color: #fff; background: #db0000; height: 30px; width: 30px; font-weight: bold; cursor: pointer; border: none; padding: 0;">x</button>
+      </div>
+      <div class="modal-body tracking-modal-body">
+        <div id="routeDeviationMap" class="route-deviation-map"></div>
+        @if (panelOpen) {
+          <aside class="tracking-panel" [class.collapsed]="panelCollapsed">
+            <div class="tracking-panel-header">
+              <div class="tracking-panel-vehicle">
+                <span class="tracking-panel-icon"><i class="fa fa-car"></i></span>
+                <div>
+                  <small>Vehicle tracking</small>
+                  <strong>{{selectedVehicleNo}}</strong>
+                </div>
+              </div>
+              <div class="tracking-panel-actions">
+                <button type="button" (click)="panelCollapsed = !panelCollapsed" [attr.aria-label]="panelCollapsed ? 'Expand panel' : 'Collapse panel'" [title]="panelCollapsed ? 'Expand panel' : 'Collapse panel'"><i class="fa" [ngClass]="panelCollapsed ? 'fa-chevron-up' : 'fa-chevron-down'"></i></button>
+                <button type="button" class="tracking-panel-close" (click)="panelOpen = false; stopTracking()" aria-label="Close tracking panel" title="Close">&times;</button>
+              </div>
+            </div>
+            @if (!panelCollapsed) {
+              <div class="tracking-panel-body">
+                <nav class="tracking-tabs">
+                  <button type="button" [class.active]="activeTrackingTab === 'live'" (click)="openTrackingPanel('live')"><i class="fa fa-signal"></i> Live</button>
+                  <button type="button" [class.active]="activeTrackingTab === 'history'" (click)="openTrackingPanel('history')"><i class="fa fa-history"></i> History</button>
+                </nav>
+                <div class="tracking-info">
+                  <div class="tracking-info-row"><span><i class="fa fa-clock-o"></i> Updated</span><b>{{trackingData.time ? (trackingData.time | date:'medium') : '-'}}</b></div>
+                  <div class="tracking-info-row"><span><i class="fa fa-map-marker"></i> Location</span><b class="tracking-coordinates">{{trackingData.lat | number:'1.6-6'}}, {{trackingData.lng | number:'1.6-6'}}</b></div>
+                  <div class="tracking-info-row"><span><i class="fa fa-key"></i> Ignition</span><b class="tracking-status" [class.is-on]="trackingData.ignition === 'On'" [class.is-off]="trackingData.ignition !== 'On'"><i class="fa fa-circle"></i> {{trackingData.ignition}}</b></div>
+                  <div class="tracking-info-row"><span><i class="fa fa-tachometer"></i> Speed</span><b class="tracking-speed">{{trackingData.speed || 0}} <small>km/h</small></b></div>
+                </div>
+                @if (activeTrackingTab === 'live') {
+                  <section class="live-note">
+                    <i class="fa fa-circle"></i> Live data update in 5 seconds.
+                  </section>
+                }
+                @if (activeTrackingTab === 'history') {
+                  <section class="history-controls">
+                    <div class="date-picker-wrapper">
+                      <i class="fa fa-calendar date-icon"></i>
+                      <input type="text" ngxDaterangepickerMd [singleDatePicker]="true" [drops]="'up'"
+                        [locale]="{ format: 'DD-MMM-YYYY' }" class="form-control" id="historydate"
+                        placeholder="Select Date" [(ngModel)]="historyDate">
+                    </div>
+                    <div class="time-row">
+                      <i class="fa fa-clock"></i>
+                      <timepicker [(ngModel)]="historyFromTime" [showMeridian]="true" [showSpinners]="false" [hourStep]="1" [minuteStep]="1"></timepicker>
+                      <span>to</span>
+                      <timepicker [(ngModel)]="historyToTime" [showMeridian]="true" [showSpinners]="false" [minuteStep]="1"></timepicker>
+                      <button class="plot-history" (click)="showHistoryTrack()" title="Plot History Track"><i class="fa fa-history"></i></button>
+                    </div>
+                    @if (historyPathCoordinates.length > 0) {
+                      <div class="playback-controls">
+                        <div>
+                          <button (click)="playHistory()" [disabled]="isHistoryPlaying"><i class="fa fa-play"></i></button>
+                          <button (click)="restartHistory()"><i class="fa fa-refresh"></i></button>
+                          <button (click)="stopHistory()" [disabled]="!isHistoryPlaying"><i class="fa fa-stop-circle"></i></button>
+                        </div>
+                        <label>Speed <input type="range" min="1" max="20" [(ngModel)]="speedSliderValue" (change)="onSpeedChange($event)"></label>
+                      </div>
+                    }
+                  </section>
+                }
+              </div>
+            }
+          </aside>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- 🔥 ALERT EVENT DETAILS MODAL -->
+@if (showEventModal) {
+  <div class="modal-overlay">
+    <div class="modal-container">
+      <!-- HEADER -->
+      <div class="modal-header" style="padding: 0px;">
+        <div class="pagetitlestyle">
+          <span>Alert Event Details</span>
+        </div>
+        <button class="close-btn" (click)="closeEventModal()">✖</button>
+      </div>
+      <div style="display: flex ; justify-content: end;">
+        <div class="modal-rows-control">
+          <div class="total-records-text">
+          Download : </div>
+          <select (change)="downloadexcelmodel($event)" class="modal-rows-select">
+            <option value="">Select</option>
+            <option value="excel">Excel</option>
+          </select>
+          <div class="total-records-text">Show Rows :</div>
+          <select class="modal-rows-select" [(ngModel)]="eventPageSize" (change)="onEventPageSizeChange(eventPageSize)">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size === eventTotal ? 'All' : size">
+                {{ size === eventTotal ? 'All' : size }}
+              </option>
+            }
+          </select>
+        </div>&nbsp;&nbsp;
+        <div class="total-records-text">
+          Total Records : {{ eventPageSize}} of {{ eventTotal }}
+        </div>
+      </div>
+      <div class="modal-table table-wrapper">
+        <table class="table-grid">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>IMEI</th>
+              <th>Alert Type
+                <hr>Alert Time
+                </th>
+                <th>Speed</th>
+                <th>Ignition</th>
+                <th>GPS</th>
+                <th>Lat
+                  <hr>Lng
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (e of filteredEventList; track e; let i = $index) {
+                  <tr>
+                    <td>{{ e.param1 }}</td>
+                    <td>{{ e.param2 }}</td>
+                    <td>{{ e.param11 }}
+                      <hr style="margin: 0;">{{ e.param3 }}
+                    </td>
+                    <td>{{ e.param6 }}</td>
+                    <td>{{ e.param9 }}</td>
+                    <td>{{ e.param7 }}</td>
+                    <td>{{ e.param4 }}
+                      <hr style="margin: 0; ">{{ e.param5 }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            @if (eventTotal > eventPageSize || eventPage > 1) {
+              <div class="custom-pagination" style="display:flex;justify-content: end;"
+                >
+                <!-- PREV -->
+                <button class="pg-btn" (click)="changeEventPage(eventPage - 1)" [disabled]="eventPage === 1">
+                  Prev
+                </button>
+                <!-- FIRST PAGE -->
+                <!-- <button class="pg-num"
+                [class.active]="eventPage === 1"
+                (click)="changeEventPage(1)">
+                1
+              </button> -->
+              <!-- LEFT DOTS -->
+              @if (eventPage > 3) {
+                <span class="pg-dots">...</span>
+              }
+              <!-- CURRENT - 1 -->
+              @if (eventPage > 2) {
+                <button class="pg-num" (click)="changeEventPage(eventPage - 1)">
+                  {{ eventPage - 1 }}
+                </button>
+              }
+              <!-- CURRENT -->
+              <button class="pg-num active">
+                {{ eventPage }}
+              </button>
+              <!-- CURRENT + 1 -->
+              @if (eventPage < eventTotalPages - 1) {
+                <button class="pg-num" (click)="changeEventPage(eventPage + 1)">
+                  {{ eventPage + 1 }}
+                </button>
+              }
+              <!-- RIGHT DOTS -->
+              @if (eventPage < eventTotalPages - 2) {
+                <span class="pg-dots">...</span>
+              }
+              <!-- LAST PAGE -->
+              <button class="pg-num" [class.active]="eventPage === eventTotalPages"
+                (click)="changeEventPage(eventTotalPages)">
+                {{ eventTotalPages }}
+              </button>
+              <!-- NEXT -->
+              <button class="pg-btn" (click)="changeEventPage(eventPage + 1)" [disabled]="eventPage === eventTotalPages">
+                Next
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }

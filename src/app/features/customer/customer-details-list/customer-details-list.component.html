@@ -1,0 +1,39 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle"><span>Customer Details</span></div>
+        </div>
+        <app-common-data-toolbar
+          [searchText]="searchText"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[10, 20, 50, 100]"
+          [displayedCount]="customerList.length"
+          [totalRecords]="totalCount"
+          [loading]="loading"
+          (searchTextChange)="searchText = $event"
+          (search)="getSearchDetails()"
+          (reload)="reloadData()"
+          (pageSizeChange)="onPageSizeChange($event)">
+        </app-common-data-toolbar>
+        <app-common-table [columns]="tableColumns" [rows]="customerList" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped app-table"
+          tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px; width: 100%;"
+          (sortChange)="sort($event)">
+        </app-common-table>
+        <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+          [disabled]="loading" (pageChange)="onPageChange($event)">
+        </app-common-pagination>
+        <br>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (loading) {
+    <app-loading></app-loading>
+  }
+  @if (errorMessage) {
+    <app-error-message [message]="errorMessage"></app-error-message>
+  }

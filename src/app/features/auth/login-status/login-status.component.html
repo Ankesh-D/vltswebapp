@@ -1,0 +1,311 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="d-flex justify-content-between align-items-center">
+            <div></div>
+            <div class="pagetitlestyle"><span>{{showUserDetails ? 'User Login Activity Details' : 'Login Status'}}</span></div>
+            <div>
+              @if (showUserDetails) {
+                <button class="btn btn-sm btn-outline-primary mb-1 py-1" (click)="showUserDetails = false">
+                  <i class="fa fa-arrow-left"></i> Back
+                </button>
+              }
+            </div>
+
+          </div>
+        </div>
+        @if (!showUserDetails) {
+          <!-- Search Controls -->
+          <div class="top-controls-row">
+            <!-- LEFT SEARCH -->
+            <div class="left-controls">
+              <!-- SEARCH -->
+              <div class="search-box">
+                <input type="search" class="search-input inner" placeholder="Type here and press button...."
+                  maxlength="50" [(ngModel)]="loginStatusDetailsReq.param1" (keyup.enter)="getDetails('search')" />
+                <button type="button" class="search-inner-btn" (click)="getDetails('search')">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+              <!-- RELOAD -->
+              <button class="reload-btn" (click)="getDetails('reload')" [disabled]="loading">
+                <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+                <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+              </button>
+            </div>
+            <!-- RIGHT CONTROLS -->
+            <div class="right-controls">
+              <!-- DOWNLOAD -->
+              <!-- <div class="download-box">
+              <label>Download:</label>
+              <select [(ngModel)]="selectedDownloadType"
+                (change)="onChangeDownload($event)"
+                [disabled]="isExporting">
+                <option value="">Select</option>
+                <option value="Excel">Excel</option>
+              </select>
+              <span *ngIf="isExporting" class="loader-text">
+                <i class="fa fa-spinner fa-spin"></i> Generating...
+              </span>
+            </div> -->
+            <!-- ROWS -->
+            <select class="rows-select" [(ngModel)]="loginStatusDetailsReq.param3" (change)="onPageSizeChange($event)">
+              @for (size of pageSizeOptions; track size) {
+                <option [value]="size === totalCount ? totalCount : size">
+                  {{ size === totalCount ? totalCount : size }}
+                </option>
+              }
+            </select>
+            <!-- TOTAL -->
+            <div class="total-records-text">
+              Total Records : {{ pageCount }} of {{ totalCount }}
+            </div>
+          </div>
+        </div>
+        <ng-template #loginStatusCell let-login let-column="column">
+          @if (column.key === 'users') {
+            <a href="javascript:void(0)" (click)="getLoginname(login)" class="fw-bold text-center">
+              {{ login.param10 || 'NA' }}
+            </a>
+          } @else {
+            {{ loginStatusTable.cellValue(login, column) }}
+          }
+        </ng-template>
+        <app-common-table #loginStatusTable [columns]="loginStatusColumns" [rows]="detailsData"
+          [loading]="loading" [cellTemplate]="loginStatusCell" tableClass="table table-striped app-table mb-1"
+          tableId="devicetable" tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
+          emptyMessage="NO DATA FOUND">
+        </app-common-table>
+        <div class="float-end">
+          @if (totalCount > loginStatusDetailsReq.param3) {
+            <ngb-pagination [collectionSize]="totalCount"
+              [(page)]="loginStatusDetailsReq.param2" [pageSize]="loginStatusDetailsReq.param3"
+              (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true" [ellipses]="false"
+              [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+            </ngb-pagination>
+          }
+        </div>
+      }
+      @if (showUserDetails) {
+        <div class="top-controls-row">
+          <!-- LEFT SEARCH -->
+          <div class="left-controls">
+            <!-- SEARCH -->
+            <!-- <div class="search-box">
+            <input type="search" class="search-input inner" placeholder="Type here and press button...."
+              maxlength="50" [(ngModel)]="activeUsersReq.param1" (keyup.enter)="getDetails('search')" />
+            <button type="button" class="search-inner-btn" (click)="getDetails('search')">
+              <i class="fa fa-search"></i>
+            </button>
+          </div> -->
+          <div class="d-flex align-items-center gap-3" style="flex-wrap: wrap; font-size: 12px;">
+            <span class="fw-bold">Login Name:</span>  <span class="mx-1">{{ loginName || 'NA' }}</span>
+            <span class="fw-bold">Contact Person:</span><span class="mx-1">
+            {{ contactPerson || 'NA' }}
+          </span>
+          <span class="fw-bold">Mobile No.:</span>
+          <span class="mx-1">
+            {{ mobileNo == '0' ? 'NA' : mobileNo || 'NA' }}
+          </span>
+        </div>
+      </div>
+      <!-- RIGHT CONTROLS -->
+      <div class="right-controls">
+        <!-- DOWNLOAD -->
+        <!-- <div class="download-box">
+        <label>Download:</label>
+        <select [(ngModel)]="selectedDownloadType"
+          (change)="onChangeDownload($event)"
+          [disabled]="isExporting">
+          <option value="">Select</option>
+          <option value="Excel">Excel</option>
+        </select>
+        <span *ngIf="isExporting" class="loader-text">
+          <i class="fa fa-spinner fa-spin"></i> Generating...
+        </span>
+      </div> -->
+      <!-- ROWS -->
+      <!-- <select class="rows-select" [(ngModel)]="activeUsersReq.param3" (change)="onPageSizeChange($event)">
+      <option *ngFor="let size of pageSizeOptions" [value]="size === totalCount ? totalCount : size">
+        {{ size === totalCount ? totalCount : size }}
+      </option>
+    </select> -->
+    <!-- RELOAD -->
+    <button class="reload-btn" (click)="getDetails('reload')" [disabled]="loading">
+      <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+      <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+    </button>
+    <!-- TOTAL -->
+    <div class="total-records-text">
+      Total Records :  {{ totalActiveCount }}
+    </div>
+  </div>
+</div>
+<ng-template #userDetailsCell let-login let-column="column">
+  @if (column.key === 'param18') {
+    <span class="badge rounded-pill shadow-sm"
+      [ngClass]="login.param18 === 'Active' ? 'bg-success' : 'bg-secondary'"
+      style="font-size: 0.7rem; padding: 5px 10px; font-weight: 500; letter-spacing: 0.5px;">
+      {{ login.param18 || 'NA' }}
+    </span>
+  } @else {
+    {{ userDetailsTable.cellValue(login, column) }}
+  }
+</ng-template>
+<app-common-table #userDetailsTable [columns]="userDetailsColumns" [rows]="userDetails"
+  [loading]="loading" [cellTemplate]="userDetailsCell" tableClass="table table-striped app-table mb-1"
+  tableId="devicetable" tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
+  emptyMessage="NO DATA FOUND">
+</app-common-table>
+  <!-- <div class="float-end">
+  <ngb-pagination *ngIf="totalCount > loginStatusDetailsReq.param3" [collectionSize]="totalCount"
+    [(page)]="loginStatusDetailsReq.param2" [pageSize]="loginStatusDetailsReq.param3"
+    (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true" [ellipses]="false"
+    [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+  </ngb-pagination>
+</div> -->
+}
+
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- <div class="content-i">
+<div class="content-box">
+  <div class="element-wrapper">
+    <div class="element-box">
+      <div class="col-md-12 pagetitleborder">
+        <div class="pagetitlestyle"><span>Login Status</span></div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap"
+            style="text-transform: none; background: #fff; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;">
+
+            <div class="d-flex align-items-center">
+              <span class="me-2" style="font-size: 0.75rem; font-weight: 700; color: #666; letter-spacing: 0.5px;">Search:</span>
+              <div class="d-flex align-items-center bg-white" style="border-radius: 20px; padding: 2px 5px 2px 12px; border: 1px solid #e1e4e8; width: 260px; transition: all 0.3s ease; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);">
+                <input type="text" class="form-control border-0 shadow-none bg-transparent p-0" placeholder="Type here..."
+                  [(ngModel)]="searchText" (keyup.enter)="getLoginStatus(1)"
+                  style="font-size: 0.8rem; height: 26px;">
+
+                <button *ngIf="searchText" class="btn btn-link text-danger p-0 me-2" type="button" (click)="searchText=''; getLoginStatus(1)" title="Clear">
+                  <i class="fa fa-times" style="font-size: 0.8rem;"></i>
+                </button>
+
+                <button class="btn btn-primary rounded-circle shadow-sm" type="button" (click)="getLoginStatus(1)" title="Search"
+                  style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; min-width: 28px;">
+                  <i class="fa fa-search" style="font-size: 0.75rem;"></i>
+                </button>
+
+                <button class="btn btn-light rounded-circle shadow-sm ms-1" type="button" (click)="searchText=''; getLoginStatus(1)" title="Reload"
+                  style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; min-width: 28px; background: #f8f9fa;">
+                  <i class="fa fa-refresh text-success" style="font-size: 0.75rem;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+              <div class="d-flex align-items-center">
+                <label class="me-2 mb-0 " style="font-size: 0.75rem; font-weight: 700; color: #666;">Download:</label>
+                <select class="form-select form-select-sm shadow-sm" style="font-size: 0.8rem; border-radius: 15px; width: 100px; border-color: #e1e4e8; height: 30px; padding-top: 2px; padding-bottom: 2px; cursor: pointer;" (change)="downloadFile($event)">
+                  <option value="" selected disabled>Select</option>
+                  <option value="Excel">Excel</option>
+                  <option value="Pdf">Pdf</option>
+                </select>
+              </div>
+
+              <div class="d-flex align-items-center ms-2">
+                <label class="me-2 mb-0" style="font-size: 0.75rem; font-weight: 700; color: #666;">Show Rows:</label>
+                <select class="form-select form-select-sm shadow-sm" [(ngModel)]="pageSize" (change)="getLoginStatus(1)"
+                  style="font-size: 0.8rem; border-radius: 15px; width: 70px; border-color: #e1e4e8; height: 30px; padding-top: 2px; padding-bottom: 2px; cursor: pointer;">
+                  <option [ngValue]="10">10</option>
+                  <option [ngValue]="20">20</option>
+                  <option [ngValue]="50">50</option>
+                  <option [ngValue]="100">100</option>
+                </select>
+              </div>
+
+              <div class="ms-3 px-3 py-1 bg-light rounded-pill border" style="border-color: #eee;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: #555;">
+                  Total Records: <span class="text-primary">{{totalCount}}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <div class="table-responsive shadow-sm" style="border-radius: 8px; overflow: hidden; border: 1px solid #e9ecef;">
+            <table class="table table-hover table-sm mb-0" style="font-size: 0.85rem;">
+              <thead class="bg-light">
+                <tr>
+                  <th class="py-2 text-secondary border-bottom-0" style="font-weight: 600; padding-left: 15px;">#</th>
+                  <th (click)="sort('param3')" class="py-2 text-secondary border-bottom-0" style="cursor: pointer; font-weight: 600;">
+                    Login Name <i class="fa" [ngClass]="{'fa-sort-asc': sortKey==='param3' && !reverse, 'fa-sort-desc': sortKey==='param3' && reverse, 'fa-sort': sortKey!=='param3'}" style="font-size: 0.75rem; margin-left: 3px;"></i>
+                  </th>
+                  <th (click)="sort('param7')" class="py-2 text-secondary border-bottom-0" style="cursor: pointer; font-weight: 600;">
+                    Contact Person <i class="fa" [ngClass]="{'fa-sort-asc': sortKey==='param7' && !reverse, 'fa-sort-desc': sortKey==='param7' && reverse, 'fa-sort': sortKey!=='param7'}" style="font-size: 0.75rem; margin-left: 3px;"></i>
+                  </th>
+                  <th (click)="sort('param8')" class="py-2 text-secondary border-bottom-0" style="cursor: pointer; font-weight: 600;">
+                    Mobile No. <i class="fa" [ngClass]="{'fa-sort-asc': sortKey==='param8' && !reverse, 'fa-sort-desc': sortKey==='param8' && reverse, 'fa-sort': sortKey!=='param8'}" style="font-size: 0.75rem; margin-left: 3px;"></i>
+                  </th>
+                  <th (click)="sort('param9')" class="py-2 text-secondary border-bottom-0" style="cursor: pointer; font-weight: 600;">
+                    Email ID <i class="fa" [ngClass]="{'fa-sort-asc': sortKey==='param9' && !reverse, 'fa-sort-desc': sortKey==='param9' && reverse, 'fa-sort': sortKey!=='param9'}" style="font-size: 0.75rem; margin-left: 3px;"></i>
+                  </th>
+                  <th (click)="sort('param10')" class="py-2 text-secondary border-bottom-0" style="cursor: pointer; font-weight: 600;">
+                    Users <i class="fa" [ngClass]="{'fa-sort-asc': sortKey==='param10' && !reverse, 'fa-sort-desc': sortKey==='param10' && reverse, 'fa-sort': sortKey!=='param10'}" style="font-size: 0.75rem; margin-left: 3px;"></i>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="loginStatusList.length === 0 && !loading">
+                  <td class="text-center fw-bold text-muted py-4" colspan="6">NO DATA FOUND</td>
+                </tr>
+                <tr *ngFor="let login of loginStatusList; let i = index">
+                  <td style="padding-left: 15px;">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                  <td>{{login.param3 || 'NA'}}</td>
+                  <td>{{login.param7 || 'NA'}}</td>
+                  <td>{{login.param8 || 'NA'}}</td>
+                  <td>{{login.param9 || 'NA'}}</td>
+                  <td>
+                    <a href="javascript:void(0)" (click)="getLoginname(login)" class="text-decoration-none fw-bold text-primary">
+                      {{login.param10 || 'NA'}}
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-end mt-3" *ngIf="totalCount > pageSize">
+            <div class="d-flex align-items-center bg-white shadow-sm" style="border-radius: 25px; padding: 4px 8px; border: 1px solid #e9ecef;">
+              <button class="btn btn-sm rounded-circle" [disabled]="currentPage === 1" (click)="getLoginStatus(currentPage - 1)"
+                style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;"
+                [ngClass]="currentPage === 1 ? 'btn-light text-muted' : 'btn-light text-primary'">
+                <i class="fa fa-chevron-left" style="font-size: 0.7rem;"></i>
+              </button>
+
+              <span class="mx-3 text-muted" style="font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px;">
+                Page <span class="text-dark">{{currentPage}}</span> of {{getTotalPages()}}
+              </span>
+
+              <button class="btn btn-sm rounded-circle" [disabled]="currentPage >= getTotalPages()" (click)="getLoginStatus(currentPage + 1)"
+                style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;"
+                [ngClass]="currentPage >= getTotalPages() ? 'btn-light text-muted' : 'btn-light text-primary'">
+                <i class="fa fa-chevron-right" style="font-size: 0.7rem;"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<app-loading *ngIf="loading"></app-loading>
+<app-error-message *ngIf="errorMessage" [message]="errorMessage"></app-error-message> -->

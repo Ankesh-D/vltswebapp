@@ -1,0 +1,703 @@
+<!-- <div class="content-i"> -->
+<div class="content-box">
+  <div class="element-wrapper">
+    <!-- Home Button -->
+    <!-- <button style="background: #2bdc16;border-color: #2bdc16;" class="btn btn-primary returnbtn">
+    <i class="fa fa-angle-double-left" style="width: 20px;"></i>
+    <a style="float: right;" (click)="goHome()" style="cursor: pointer;">Home</a>
+  </button>	 -->
+
+  <!-- <div class="element-box"> -->
+  <!-- HEADER -->
+  <div class="table-responsive">
+    <div
+      id="dataTable1_wrapper"
+      class="dataTables_wrapper container-fluid dt-bootstrap4"
+      >
+      <div class="col-md-12 pagetitleborder">
+        <div class="page-header-row">
+          <!-- TITLE -->
+          <div class="pagetitlestyle">Assets Details</div>
+        </div>
+      </div>
+
+      <!-- ERROR MESSAGE -->
+      @if (errorMessage) {
+        <div class="custom-alert">
+          <strong>Warning:</strong> {{ errorMessage }}
+          <button
+            type="button"
+            class="alert-close"
+            (click)="errorMessage = ''"
+            >
+            &times;
+          </button>
+        </div>
+      }
+
+      <!-- SEARCH + CONTROLS -->
+      <form autocomplete="off" class="top-controls-row">
+        <!-- LEFT SEARCH -->
+        <div class="left-controls">
+          <span class="search-label">Search :</span>
+
+          <div class="search-box">
+            <input
+              type="search"
+              readonly
+              onfocus="this.removeAttribute('readonly')"
+              class="search-input inner"
+              placeholder="Search..."
+              maxlength="50"
+              [(ngModel)]="searchText"
+              (keyup.enter)="getSearchDetails()"
+              name="searchby"
+              />
+
+            <button
+              type="button"
+              class="search-inner-btn"
+              (click)="getSearchDetails()"
+              >
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="reload-btn"
+            (click)="reloadData()"
+            [disabled]="loading"
+            >
+            {{ loading ? "Reloading..." : "Reload" }}
+          </button>
+        </div>
+
+        <!-- RIGHT CONTROLS -->
+        <div class="right-controls">
+          <!-- OLD / NEW TOGGLE -->
+          <div class="control-item">
+            <label>Type :</label>
+
+            <select
+              [(ngModel)]="deviceType"
+              (change)="onTypeChange()"
+              name="deviceType">
+              <option value="new">New</option>
+              <option value="old">Old</option>
+            </select>
+          </div>
+          <!-- DOWNLOAD -->
+          <div class="control-item">
+            <label>Download :</label>
+            <select (change)="exportPDFExcel($event)">
+              <option vlaue="" >Select</option>
+              <!-- <option value="excel">Excel</option> -->
+              <option value="">Excel</option>
+            </select>
+          </div>
+
+          <!-- SHOW ROWS -->
+          <div class="control-item">
+            <label>Show Rows :</label>
+            <select
+              [(ngModel)]="pageSize"
+              (change)="onPageSizeChange(pageSize)"
+              name="pageSize"
+              >
+              @for (size of pageSizeOptions; track size) {
+                <option
+                  [value]="size === totalCount ? totalCount : size">
+                  {{ size === totalCount ? totalCount : size }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- TOTAL RECORDS -->
+          <div class="total-records-text">
+            Total Records : {{ pageCount }} of {{ totalCount }}
+          </div>
+        </div>
+      </form>
+
+      <div class="col-sm-12">
+        <table
+          class="table-striped table mb-1"
+                style="
+                  border-top: 1px solid black;
+                  border-bottom: 1px solid black;
+                  margin-left: 0px;
+                "
+          id="devicetable"
+          >
+          <thead class="device-thead">
+            <tr>
+              <th style="width: 35px">#</th>
+
+              <th (click)="sort('param5')" class="sortable">
+                Chassis No.
+                <hr style="margin: 1px 0" />
+                Vehicle No.
+                <span
+                  class="sorting"
+                        [ngClass]="{
+                          sorting_desc: reverse && sortKey == 'param5',
+                          sorting_asc: !reverse && sortKey == 'param5',
+                        }"
+                  >
+                </span>
+              </th>
+
+              <th (click)="sort('param7')" class="sortable">Engine No</th>
+
+              <th (click)="sort('param8')" class="sortable">
+                Serial No.
+                <hr style="margin: 1px 0" />
+                IMEI No.
+                <hr style="margin: 1px 0" />
+                ICCID No.
+                <span
+                  class="sorting"
+                        [ngClass]="{
+                          sorting_desc: reverse && sortKey == 'param8',
+                          sorting_asc: !reverse && sortKey == 'param8',
+                        }"
+                  >
+                </span>
+              </th>
+
+              <th (click)="sort('param9')" class="sortable">
+                Vehicle Type
+                <hr style="margin: 1px 0" />
+                Vehicle Class
+                <span
+                  class="sorting"
+                        [ngClass]="{
+                          sorting_desc: reverse && sortKey == 'param9',
+                          sorting_asc: !reverse && sortKey == 'param9',
+                        }"
+                  >
+                </span>
+              </th>
+
+              <th
+                style="width: 130px"
+                (click)="sort('param50')"
+                class="sortable"
+                >
+                Make
+                <hr style="margin: 1px 0" />
+                Model
+                <span
+                  class="sorting"
+                        [ngClass]="{
+                          sorting_desc: reverse && sortKey == 'param50',
+                          sorting_asc: !reverse && sortKey == 'param50',
+                        }"
+                  >
+                </span>
+              </th>
+
+              <!-- <th style="width:145px;" (click)="sort('param67')" class="sortable">
+              IMSI Primary No
+              <hr style="margin: 1px 0;">
+              IMSI Secondary No
+              <span class="sorting"
+        [ngClass]="{'sorting_desc': reverse && sortKey=='param67',
+                    'sorting_asc': !reverse && sortKey=='param67'}">
+              </span>
+            </th> -->
+
+            <th
+              style="width: 160px"
+              (click)="sort('param16')"
+              class="sortable"
+              >
+              Installation date
+
+              <span
+                class="sorting"
+                        [ngClass]="{
+                          sorting_desc: reverse && sortKey == 'param16',
+                          sorting_asc: !reverse && sortKey == 'param16',
+                        }"
+                >
+              </span>
+            </th>
+
+            <th (click)="sort('param47')" class="sortable">
+              Customer Details
+              <span
+                class="sorting"
+                        [ngClass]="{
+                          sorting_desc: reverse && sortKey == 'param47',
+                          sorting_asc: !reverse && sortKey == 'param47',
+                        }"
+                >
+              </span>
+            </th>
+
+            <th (click)="sort('param34')" class="sortable">
+              Dealer
+              <hr style="margin: 1px 0" />
+              (Vendor)
+              <span
+                class="sorting"
+                        [ngClass]="{
+                          sorting_desc: reverse && sortKey == 'param34',
+                          sorting_asc: !reverse && sortKey == 'param34',
+                        }"
+                >
+              </span>
+            </th>
+
+            <th (click)="sort('param48')" class="sortable">
+              RTO Name
+              <span
+                class="sorting"
+                        [ngClass]="{
+                          sorting_desc: reverse && sortKey == 'param48',
+                          sorting_asc: !reverse && sortKey == 'param48',
+                        }"
+                >
+              </span>
+            </th>
+            <th (click)="sort('param48')" class="sortable">
+              Activation Status
+              <span
+                class="sorting"
+                        [ngClass]="{
+                          sorting_desc: reverse && sortKey == 'param48',
+                          sorting_asc: !reverse && sortKey == 'param48',
+                        }"
+                >
+              </span>
+            </th>
+            <th (click)="sort('param48')" class="sortable">
+              Polling Status
+              <span
+                class="sorting"
+                        [ngClass]="{
+                          sorting_desc: reverse && sortKey == 'param48',
+                          sorting_asc: !reverse && sortKey == 'param48',
+                        }"
+                >
+              </span>
+            </th>
+            @if (roleId == '10') {
+              <th class="sortable">Action</th>
+            }
+            <!-- <th>Download Receipt</th> -->
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- NO DATA -->
+          @if (devices.length === 0) {
+            <tr>
+              <td
+                colspan="13"
+                style="text-align: center; font-weight: bold"
+                >
+                NO DATA FOUND
+              </td>
+            </tr>
+          }
+
+          <!-- DATA ROWS -->
+          @for (d of devices; track d) {
+            <tr>
+              <td>{{ d["param1"] || "NA" }}</td>
+              <td>
+                {{ d["param12"] || "NA" }}<br />
+                {{ d["param11"] || "NA" }}
+              </td>
+              <td>
+                {{ d["param13"] || "NA" }}
+              </td>
+              <td>
+                {{ d["param5"] || "NA" }}<br />
+                {{ d["param4"] || "NA" }}<br />{{ d["param6"] || "NA" }}
+              </td>
+              <td>
+                {{ d["param19"] || "NA" }}<br />
+                {{ d["param42"] || "NA" }}
+              </td>
+              <!-- param50make ka hay ab filal pata nhi  -->
+              <td>
+                {{ d["param40"] || "NA" }}<br />
+                {{ d["param41"] || "NA" }}
+              </td>
+              <td>
+                {{ d["param43"] || "NA" }}
+              </td>
+              <td>
+                {{ d["param28"] || "NA" }}<br />
+                {{ d["param29"] || "NA" }}
+              </td>
+              <td>
+                {{ d["param8"] || "NA" }}<br />
+                ({{ d["param7"] || "NA" }})
+              </td>
+              <td>
+                {{ d["param18"] || "NA" }}
+              </td>
+              <!-- ✅ Activation Status -->
+              <td>
+                      <div class="fw-bold" [ngClass]="{
+                        'text-success': d['param25'] == 'Activated',
+                        'text-danger': d['param25'] == 'Pending OTP',
+                      }">
+                  {{ d["param25"] || "NA" }}
+                </div>
+                <!-- {{ d["param25"] || "NA" }}<br /> -->
+                {{ d["param14"] || "NA" }}
+              </td>
+              <!-- ✅ Polling Status -->
+              <td>
+                      <div class="fw-bold" [ngClass]="{
+                        'text-success': d['param45'] == 'Received',
+                        'text-danger': d['param45'] == 'Never Received',
+                        'text-warning': d['param45'] == 'Not Received',
+                      }">
+                  {{ d["param45"] || "NA" }}
+                </div>
+                <!-- {{ d["param45"] || "NA" }} -->
+              </td>
+              @if (roleId == '10') {
+                <td
+                  style="width: 80px; text-align: center"
+                  >
+                  <div
+                        style="
+                          display: flex;
+                          justify-content: center;
+                          align-items: center;
+                        "
+                    >
+                    <button
+                      [ngClass]="{ 'disabled-btn': d['param25'] === 'Activated' }"
+                      class="btn btn-sm btn-outline-danger"
+                      style="margin: 25%"
+                      title="Delete"
+                      (click)="openDeleteModal(d)"
+                      [disabled]="d['param25'] === 'Activated'"
+                      >
+                      <i class="fa fa-trash"></i>
+                    </button>
+                    <!-- <button *ngIf="d.param25=='Pending OTP'" class="btn btn-danger btn-sm" (click)="setdataData(d)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                  <button *ngIf="d.param25=='Activated'" class="btn btn-danger btn-sm" (click)="untagDevice(d)">
+                    <i class="fa fa-trash"></i>
+                  </button> -->
+                </div>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+    <div class="float-end">
+      @if (totalCount > pageSize) {
+        <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+          [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+          [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+        </ngb-pagination>
+      }
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Pagination Controls -->
+<!-- <div *ngIf="totalCount > pageSize" class="pagination-wrapper">
+<button
+  *ngIf="currentPage > 1"
+  (click)="onPageChange(currentPage - 1)"
+  [disabled]="loading"
+  class="btnleft5"
+  >
+  Previous
+</button>
+
+<span *ngFor="let page of getPageNumbers()">
+  <span *ngIf="page === -1" style="margin: 0 5px">...</span>
+  <button
+    *ngIf="page !== -1"
+    (click)="onPageChange(page)"
+    [disabled]="loading || page === currentPage"
+    [class.active]="page === currentPage"
+    class="btnleft5"
+    >
+    {{ page }}
+  </button>
+</span>
+
+<button
+  *ngIf="currentPage < getTotalPages()"
+  (click)="onPageChange(currentPage + 1)"
+  [disabled]="loading"
+  class="btnleft5"
+  >
+  Next
+</button>
+</div>
+
+<br /> -->
+<!-- </div> -->
+</div>
+</div>
+<!-- </div> -->
+<!-- DELETE MODAL -->
+@if (showDeleteModal) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div
+      class="modal-content change-device-modal"
+      (click)="$event.stopPropagation()"
+      >
+      <!-- HEADER -->
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Asset</h5>
+        <button type="button" class="close-btn" (click)="closeDeleteModal()">
+          ×
+        </button>
+      </div>
+      <!-- BODY -->
+      <div class="modal-body">
+        <div class="serial-info">
+          Vehicle No.: <span>{{ selectedVehicle?.param11 }}</span>
+        </div>
+        <div class="form-row">
+          <!-- IMEI -->
+          <div class="form-col">
+            <label>IMEI No.</label>
+            <input
+              type="text"
+              class="form-control"
+              [value]="$safeNavigationMigration(selectedVehicle?.param4)"
+              readonly
+              />
+          </div>
+          <!-- REMARK -->
+          <div class="form-col">
+            <label>Remark<span class="mandetory">*</span></label>
+            <textarea
+              class="form-control"
+              placeholder="Enter remark"
+              [(ngModel)]="deleteRemark"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+      <!-- FOOTER -->
+      <div class="modal-footer">
+        <button class="btn-primary" (click)="submitDelete()">Submit</button>
+        <button class="stn-secondary" (click)="closeDeleteModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+}
+<!-- 🔥 UNTAG MODAL -->
+<div class="modal fade" [class.show]="showUntagModal" [style.display]="showUntagModal ? 'block' : 'none'"
+  (click)="showUntagModal && closeUntagModal()">
+  <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header modal-header-style py-2">
+        <h5 class="modal-title">
+          <i class="fa fa-exclamation-triangle"></i> Untag Device
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeUntagModal()"
+        [disabled]="isSubmitting"></button>
+      </div>
+      <form #requestForm="ngForm">
+        <div class="modal-body">
+          <div class="alert alert-warning">
+            @if (requestedFor!='') {
+              <strong>Warning!</strong>
+            }
+            @if (requestStatus=='Pending') {
+              <div>
+                @if (requestedFor=='untag') {
+                  <span>
+                    Initializes request to <b>untagged</b> the device
+                  </span>
+                }
+                @if (requestedFor=='delete') {
+                  <span>
+                    Initializes request to <b>delete</b> the device
+                  </span>
+                }
+              </div>
+            }
+            <br>
+              @if (requestedFor!='') {
+                <strong>Reason For {{requestedFor}}</strong>
+              }
+              @if (requestStatus=='Pending') {
+                <div>
+                  @if (requestedFor=='untag') {
+                    <span>
+                      {{requestData.param12 ? requestData.param12 : ''}}
+                    </span>
+                  }
+                </div>
+              }
+
+              <strong>IMEI: {{ selectedDeviceImei || 'N/A' }}</strong><br>
+              <small>(Device ID: {{ selectedDeviceId }})</small>
+            </div>
+            @if ((requestStatus=='Pending' || requestStatus=='Rejected') && roleId=='10') {
+              <div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="status" id="approve" value="Approved"
+                    [(ngModel)]="status">
+                  <label class="form-check-label" for="approve">
+                    Approve
+                  </label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="status" id="reject" value="Rejected"
+                    [(ngModel)]="status">
+                  <label class="form-check-label" for="reject">
+                    Reject
+                  </label>
+                </div>
+              </div>
+            }
+            <div class="form-group">
+              <label for="remarks" class="form-label"><strong>Remarks <span class="text-danger">*</span></strong></label>
+              <textarea id="remarks" class="form-control form-control-lg" rows="4"
+                placeholder="Enter reason for untagging this device..." [(ngModel)]="untagRemarks" name="remarks"
+                #remarkCtrl="ngModel" [disabled]="isSubmitting" required minlength="5" maxlength="500"
+                [class.is-invalid]="remarkCtrl.invalid && (remarkCtrl.dirty || remarkCtrl.touched)">
+              </textarea>
+              <small class="text-muted">{{ untagRemarks.length }}/500 characters</small>
+              @if (remarkCtrl.invalid && (remarkCtrl.dirty || remarkCtrl.touched)) {
+                <div class="invalid-feedback d-block"
+                  >
+                  @if (remarkCtrl.errors?.['required']) {
+                    <span>Remarks are required</span>
+                  }
+                  @if (remarkCtrl.errors?.['minlength']) {
+                    <span>Remarks must be at least 5 characters</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-secondary" (click)="closeUntagModal()" [disabled]="isSubmitting">
+              Cancel
+            </button>
+            <!-- untag or delete if Pending OTP by vendor or any other role-->
+            @if (activationStatus=='Pending OTP') {
+              <button type="button" class="btn btn-sm btn-danger"
+                (click)="performOperation('untag')"
+                [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                @if (!isSubmitting) {
+                  <span>
+                    <i class="fa fa-check"></i> Confirm Untag
+                  </span>
+                }
+                @if (isSubmitting) {
+                  <span>
+                    <i class="fa fa-spinner fa-spin"></i> Processing...
+                  </span>
+                }
+              </button>
+            }
+            @if (activationStatus=='Pending OTP') {
+              <button type="button" class="btn btn-sm btn-danger"
+                (click)="performOperation('delete')"
+                [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                @if (!isSubmitting) {
+                  <span>
+                    <i class="fa fa-check"></i> Confirm Delete
+                  </span>
+                }
+                @if (isSubmitting) {
+                  <span>
+                    <i class="fa fa-spinner fa-spin"></i> Processing...
+                  </span>
+                }
+              </button>
+            }
+
+            <!-- send request by vendor if activation status Activated -->
+            @if (activationStatus=='Activated' && (roleId=='11' || roleId=='61' || roleId=='13')) {
+              <button type="button"
+                class="btn btn-sm btn-danger" (click)="requestType='untag'; performOperation('untag');"
+                [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                @if (!isSubmitting) {
+                  <span>
+                    <i class="fa fa-check"></i> Request For Untag
+                  </span>
+                }
+                @if (isSubmitting) {
+                  <span>
+                    <i class="fa fa-spinner fa-spin"></i> Processing...
+                  </span>
+                }
+              </button>
+            }
+            @if (activationStatus=='Activated' && (roleId=='11' || roleId=='61' || roleId=='13')) {
+              <button type="button"
+                class="btn btn-sm btn-danger" (click)="requestType='delete'; performOperation('delete')"
+                [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                @if (!isSubmitting) {
+                  <span>
+                    <i class="fa fa-check"></i> Request For Delete
+                  </span>
+                }
+                @if (isSubmitting) {
+                  <span>
+                    <i class="fa fa-spinner fa-spin"></i> Processing...
+                  </span>
+                }
+              </button>
+            }
+
+            @if (activationStatus=='Activated' && roleId=='10') {
+              <button type="button" class="btn btn-sm btn-danger"
+                (click)="requestType='untag'; performOperation('untag');"
+                [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                @if (!isSubmitting) {
+                  <span>
+                    <i class="fa fa-check"></i> Confirm Untag
+                  </span>
+                }
+                @if (isSubmitting) {
+                  <span>
+                    <i class="fa fa-spinner fa-spin"></i> Processing...
+                  </span>
+                }
+              </button>
+            }
+            @if (activationStatus=='Activated' && roleId=='10') {
+              <button type="button" class="btn btn-sm btn-danger"
+                (click)="requestType='delete'; performOperation('delete')"
+                [disabled]="isSubmitting || untagRemarks.trim().length < 5">
+                @if (!isSubmitting) {
+                  <span>
+                    <i class="fa fa-check"></i> Confirm Delete
+                  </span>
+                }
+                @if (isSubmitting) {
+                  <span>
+                    <i class="fa fa-spinner fa-spin"></i> Processing...
+                  </span>
+                }
+              </button>
+            }
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div class="modal-backdrop fade" [class.show]="showUntagModal" [style.display]="showUntagModal ? 'block' : 'none'">
+  </div>

@@ -1,0 +1,128 @@
+@use '../../../shared/styles/compact-admin-page' as compact;
+
+.content-i {
+  padding: 20px;
+}
+
+.pagetitleborder {
+  border-bottom: 2px solid var(--app-primary);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.pagebtn {
+  float: right;
+  margin-left: 10px;
+}
+
+.pagebtn a {
+  background-color: var(--app-primary);
+  color: white;
+  padding: 8px 15px;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+// .table {
+//   font-size: 12px;
+// }
+
+.sorting {
+  cursor: pointer;
+}
+
+.sorting_desc::after {
+  content: ' ▼';
+}
+
+.sorting_asc::after {
+  content: ' ▲';
+}
+
+.btn-group-sm button {
+  padding: 5px 10px;
+  font-size: 11px;
+  background-color: var(--app-primary);
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.btn-group-sm button:hover {
+  background-color: var(--app-primary-hover);
+}
+
+.modal-content {
+  border-radius: 8px;
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+}
+
+.modelbtnstyle {
+  text-align: right;
+  padding: 15px;
+}
+
+.modelbtnstyle button {
+  margin-left: 10px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modelbtnstyle button:first-child {
+  background-color: var(--app-primary);
+  color: white;
+}
+
+.modelbtnstyle button:first-child:hover:not(:disabled) {
+  background-color: var(--app-primary-hover);
+}
+
+.modelbtnstyle button:first-child:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modelbtnstyle button:last-child {
+  background-color: #6c757d;
+  color: white;
+}
+
+.mandetory {
+  color: red;
+  font-weight: normal;
+}
+
+.pagination-wrapper {
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  margin: 0 2px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: var(--app-primary);
+  color: white;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination li.active button {
+  background: var(--app-primary);
+  color: white;
+}
+
+@include compact.compact-admin-page;

@@ -1,0 +1,719 @@
+/* ===================== BASE ===================== */
+.content-i {
+  background-color: #fff;
+}
+
+.content-box {
+  padding: 14px;
+}
+
+.element-wrapper {
+  margin-bottom: 12px;
+}
+
+.element-box {
+  background: #e7e7e7;
+  border-radius: 4px;
+  padding: 14px;
+}
+
+.pagetitleborder {
+  border-bottom: 2px solid #4CAF50;
+  margin-bottom: 12px;
+}
+
+/* ===================== TOP KPI ===================== */
+.top-dashboard {
+  padding: 6px;
+}
+
+.kpi-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.kpi-box {
+  width: 150px;
+  height: 105px;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid green;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.vendor {
+  background: #b7ef8a;
+}
+
+.dealer {
+  background: #8fe0c6;
+}
+
+.rto {
+  background: #ef9a9a;
+}
+
+.devices {
+  background: #f2f09a;
+}
+
+.kpi-number {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2e6b1f;
+}
+
+.kpi-title {
+  font-size: 11px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.kpi-footer {
+  margin-top: 8px;
+  padding: 3px;
+  border: 2px solid green;
+  background: #eaffea;
+  font-size: 11px;
+}
+
+.kpi-active {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* ===================== ASSETS ===================== */
+.assets-box {
+  width: 175px;
+  border: 2px solid #999;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.assets-top {
+  display: flex;
+}
+
+.asset-col {
+  width: 50%;
+  text-align: center;
+  padding: 6px 0;
+}
+
+.asset-col.old {
+  background: #d6ffff;
+}
+
+.asset-col.new {
+  background: #5ef5f7;
+}
+
+.asset-value {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.asset-label {
+  font-size: 11px;
+  text-decoration: underline;
+}
+
+.assets-title {
+  background: #1c7d7d;
+  color: white;
+  text-align: center;
+  padding: 4px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* ===================== ALERTS ===================== */
+.alerts-box {
+  width: 185px;
+  border: 2px solid #7a0000;
+  border-radius: 6px;
+  font-family: Arial, sans-serif;
+}
+
+.alerts-title {
+  text-align: center;
+  padding: 4px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.alert {
+  padding: 5px;
+  font-size: 12px;
+}
+
+.alert.overspeed {
+  background: #ffe3b3;
+}
+
+.alert.harsh {
+  background: #d40000;
+  color: white;
+}
+.alert.emergency {
+  background: #ff9900;
+  color: white;
+}
+.alert-count {
+  background: #000;
+  color: #fff;
+  padding: 1px 5px;
+  margin-right: 4px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* ===================== LAST 7 DAYS ===================== */
+.last7-box {
+  width: 210px;
+  text-align: center;
+}
+
+.last7-title {
+  font-size: 13px;
+  text-decoration: underline;
+}
+
+.last7-empty {
+  margin-top: 32px;
+  font-size: 11px;
+}
+
+/* ===================== MIDDLE SECTION ===================== */
+.dashboard-middle {
+  margin-top: 8px;
+}
+
+.vendor-panel,
+.rto-panel {
+  border: 1px solid lightgray;
+  height: 410px;
+  background: #fff;
+}
+
+/* HEADER */
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+}
+
+.panel-title {
+  font-size: 13px;
+  text-decoration: underline;
+  margin: auto;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* SELECTS */
+.vendor-select,
+.rto-select {
+  width: 185px;
+  font-size: 11px;
+}
+
+.date-input {
+  width: 110px;
+  height: 24px;
+  font-size: 11px;
+}
+
+.search-btn {
+  background: green;
+  color: #fff;
+  border: none;
+  height: 24px;
+  width: 28px;
+  border-radius: 4px;
+}
+
+/* VENDOR NAME */
+.vendor-name {
+  text-align: center;
+  font-size: 11px;
+  font-weight: bold;
+  color: darkblue;
+  border-top: 1px solid #ccc;
+  padding: 3px;
+}
+
+/* ===================== SUMMARY ===================== */
+.summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.summary-box {
+  width: 80px;
+  margin: 6px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .18);
+}
+
+.summary-value {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.summary-label {
+  font-size: 10px;
+}
+
+/* ===================== BODY ===================== */
+.vendor-body {
+  margin-top: 4px;
+}
+
+.chart-box {
+  height: 320px;
+  overflow: auto;
+}
+
+.table-box {
+  height: 320px;
+  border-left: 1px solid #ccc;
+}
+
+/* ===================== TABLE ===================== */
+.small-table {
+  font-size: 10.5px;
+}
+
+.subsection {
+  padding: 1px !important;
+  text-align: center;
+}
+
+.green {
+  background: #d6fff0;
+}
+
+.yellow {
+  background: #fff1d6;
+}
+
+.rto-table {
+  max-height: 370px;
+  overflow-y: auto;
+}
+
+/* ===================== NG-SELECT ===================== */
+.dashboard-rto-select ::ng-deep .ng-select-container,
+.vendor-select ::ng-deep .ng-select-container {
+  height: 24px;
+  min-height: 24px;
+  font-size: 11px;
+}
+
+.pagetitleborder {
+  border-bottom: 2px solid #4CAF50;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  /* CENTER horizontally */
+}
+
+/* TOGGLE */
+.view-toggle {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.view-toggle button {
+  font-size: 11px;
+  padding: 3px 10px;
+  border: 1px solid #4caf50;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.view-toggle button.active {
+  background: #4caf50;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* CHART */
+.chart-box.full {
+  height: 350px;
+  width: 100%;
+}
+
+/* STATUS TABLE */
+.status-table {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.table-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.small-table {
+  font-size: 10.5px;
+}
+
+.green {
+  background: #d6fff0;
+}
+
+.yellow {
+  background: #fff1d6;
+}
+
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Labels */
+.view-toggle .label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #777;
+}
+
+.view-toggle .label.active {
+  color: #2e7d32;
+}
+
+/* Switch */
+.switch {
+  position: relative;
+  width: 42px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Track */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ccc;
+  border-radius: 20px;
+  transition: 0.3s;
+}
+
+/* Knob */
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  top: 2px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+/* Checked = Status */
+.switch input:checked+.slider {
+  background-color: #4caf50;
+}
+
+.switch input:checked+.slider::before {
+  transform: translateX(22px);
+}
+
+
+
+/* ===================== STATUS TABLE SCROLL ===================== */
+.status-table {
+  max-height: 350px;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* ===================== STICKY HEADER ===================== */
+.status-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  /* 🔥 IMPORTANT: color preserve + no transparency */
+  background-color: #aacda8;
+  /* default header bg */
+  background-clip: padding-box;
+}
+
+/* ===================== SECOND HEADER ROW (2-line header) ===================== */
+.status-table thead tr:nth-child(2) th {
+  top: 26px;
+  /* first row ki height */
+}
+
+/* ===================== KEEP YOUR EXISTING COLORS ===================== */
+.status-table th.green {
+  background-color: #d6fff0 !important;
+}
+
+.status-table th.yellow {
+  background-color: #fff1d6 !important;
+}
+
+/* ===================== FIX BOOTSTRAP STRIPED OVERLAP ===================== */
+// .status-table thead th {
+//   // box-shadow: inset 0 -1px 0 #ccc;
+// }
+
+/* ===================== RTO TABLE SCROLL ===================== */
+.rto-table {
+  max-height: 370px;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* ===================== STICKY HEADER ===================== */
+.rto-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  /* solid background (no transparency) */
+  background-color: #aacda8;
+  background-clip: padding-box;
+}
+
+/* ===================== SECOND HEADER ROW ===================== */
+.rto-table thead tr:nth-child(2) th {
+  top: 26px;
+  /* first header row height */
+}
+
+/* ===================== PRESERVE COLORS ===================== */
+.rto-table th.green {
+  background-color: #d6fff0 !important;
+}
+
+.rto-table th.yellow {
+  background-color: #fff1d6 !important;
+}
+
+/* ===================== STRIPED TABLE FIX ===================== */
+.rto-table thead th {
+  box-shadow: inset 0 -1px 0 #ccc;
+}
+
+
+
+
+
+.last7-box {
+  width: 100%;
+  max-width: 360px;
+  /* 🔒 card max size */
+  height: 100px;
+  /* 🔒 fixed card height */
+  padding: 10px;
+  overflow: hidden;
+  /* 🔒 prevent overflow */
+}
+
+.last7-chart {
+  width: 260px;
+  /* 👈 chart width yahin se */
+  height: 140px;
+  /* 👈 chart height yahin se */
+  max-width: 260px;
+  max-height: 140px;
+  overflow: hidden;
+}
+
+
+.last7-title {
+  font-weight: 600;
+  // margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.last7-empty {
+  // height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+::ng-deep .form-control, .ng-select
+ {
+    max-width: 100%;
+    max-height: 38px;
+    font-size: 12px;
+}
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.toggle-box {
+  display: flex;
+  width: 100%;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.3s ease;
+}
+
+.toggle-box:hover {
+  transform: scale(1.03);
+}
+
+.toggle-box.active {
+  background: #ffffff;
+  color: #c5221f;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.toggle-container {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #c7d2fe;       /* light blue border */
+  width: fit-content;
+  background: #eef2ff;             /* light blue bg */
+}
+
+.toggle-option {
+  padding: 6px 16px;               /* 🔥 थोड़ा बड़ा */
+  font-size: 12px;                 /* 🔥 readable */
+  font-weight: 500;
+  cursor: pointer;
+  color: blue;//#4f46e5;                  /* blue text */
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.toggle-option:not(:last-child) {
+  border-right: 1px solid #c7d2fe;
+}
+
+.toggle-option:hover {
+  background: #e0e7ff;             /* hover blue */
+}
+
+.toggle-option.active {
+  background: blue;//#4f46e5;             /* 🔥 active blue */
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.modern-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #c7d2fe;
+  width: fit-content;
+  background: #eef2ff;
+}
+
+.modern-toggle .toggle-option {
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: blue;//#4f46e5;
+  background: transparent;
+  border: none;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.modern-toggle .toggle-option:not(:last-child) {
+  border-right: 1px solid #c7d2fe;
+}
+
+.modern-toggle .toggle-option:hover {
+  background: #e0e7ff;
+}
+
+.modern-toggle .toggle-option.active {
+  background: blue;//#4f46e5;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.no-data-box {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #8898aa;
+  font-style: italic;
+  text-align: center;
+}
+
+.no-data-box i {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.no-data-box p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.no-data-box small {
+  font-size: 12px;
+}
+.download-excel-div span {
+  font-size: 12px;
+} 
+.download-excel-div button {
+    color: green;
+    font-size: 16px;
+}

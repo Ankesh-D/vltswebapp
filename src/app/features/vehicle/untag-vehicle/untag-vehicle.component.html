@@ -1,0 +1,530 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+
+        <!-- HEADER -->
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle">
+            <span>Untag Devices</span>
+          </div>
+        </div>
+
+        <!-- ✅ BOOTSTRAP TABS -->
+        <!-- <ul class="nav nav-tabs">
+
+      <li class="nav-item">
+  <a class="nav-link cursor-pointer" 
+     [class.active]="activeTab === 'untag'"
+     (click)="setTab('untag')">
+    <i class="fa fa-device-icon"></i> Untag Device
+  </a>
+</li>
+
+<li class="nav-item">
+  <a class="nav-link cursor-pointer"
+     [class.active]="activeTab === 'approved'"
+     (click)="setTab('approved')">
+    <i class="fa fa-check-circle"></i> Approved Device
+  </a>
+</li>
+
+<li class="nav-item">
+  <a class="nav-link cursor-pointer"
+     [class.active]="activeTab === 'pending'"
+     (click)="setTab('pending')">
+    <i class="fa fa-clock"></i> Pending Device
+  </a>
+</li>
+
+<li class="nav-item">
+  <a class="nav-link cursor-pointer"
+     [class.active]="activeTab === 'vendor'"
+     (click)="setTab('vendor')">
+    <i class="fa fa-building"></i> Untag by Vendor
+  </a>
+</li>
+
+        </ul> -->
+
+        <!-- ✅ TAB CONTENT -->
+        <div class="tab-content" style="border-top: 0px; padding: 20px;">
+
+          <!-- Untag Device Tab -->
+          <div *ngIf="activeTab === 'untag'" class="tab-pane active">
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Search IMEI / ICCID / Vehicle"
+                       [(ngModel)]="searchText">
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary w-100" (click)="onSearch()">
+                  Search
+                </button>
+              </div>
+            </div>
+<table class="table table-bordered table-striped table-sm" *ngIf="deviceList.length">
+  <thead>
+    <tr>
+      <th>#</th>
+
+      <th>
+        IMEI<br>
+       Serial No 
+      </th>
+
+      <th>
+        ICCID<br>
+       Vendor 
+      </th>
+
+      <th>
+        Vehicle No<br>
+       Chassis / Engine 
+      </th>
+
+      <th>
+        Type<br>
+       Model / Make 
+      </th>
+
+      <th>
+        Customer<br>
+       Mobile 
+      </th>
+
+      <th>
+        RTO<br>
+       Dealer 
+      </th>
+
+      <th>
+        Activation<br>
+       Validity 
+      </th>
+
+      <th>
+        Polling<br>
+       Last Time 
+      </th>
+
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let d of deviceList; let i = index">
+
+      <!-- Sr -->
+      <td>{{ i + 1 }}</td>
+
+      <!-- IMEI + Serial -->
+      <td>
+        {{ d.param5 }}<br>
+       {{ d.param6 }} 
+      </td>
+
+      <!-- ICCID + Vendor -->
+      <td>
+        {{ d.param7 }}<br>
+       {{ d.param13 }} 
+      </td>
+
+      <!-- Vehicle -->
+      <td>
+        {{ d.param20 }}<br>
+       {{ d.param21 }} / {{ d.param22 }} 
+      </td>
+
+      <!-- Type -->
+      <td>
+        {{ d.param65 }}<br>
+       {{ d.param53 }} / {{ d.param15 }} 
+      </td>
+
+      <!-- Customer -->
+      <td>
+        {{ d.param37 }}<br>
+       {{ d.param38 }} 
+      </td>
+
+      <!-- RTO -->
+      <td>
+        {{ d.param27 }}<br>
+       {{ d.param15 }} 
+      </td>
+
+      <!-- Dates -->
+      <td>
+        {{ d.param23 }}<br>
+       {{ d.param54 }} 
+      </td>
+
+      <!-- Polling -->
+      <td>
+        <span 
+          [ngClass]="{
+            'text-success': d.param48 === 'Received',
+            'text-warning': d.param48 === 'Not Received',
+            'text-danger': d.param48 === 'Never Received'
+          }">
+          {{ d.param48 || 'Never Received' }}
+        </span>
+        <br>
+       {{ d.param60 }} 
+      </td>
+
+      <!-- Action -->
+      <td>
+        <button class="btn btn-danger btn-sm" (click)="untagDevice(d.param2, d.param5)">
+          <i class="fa fa-trash"></i>
+        </button>
+      </td>
+
+    </tr>
+  </tbody>
+</table>
+            <div class="d-flex justify-content-between mt-3" *ngIf="deviceList.length">
+              <button class="btn btn-sm btn-secondary" (click)="prevPage()" [disabled]="pageNo === 1">
+                Previous
+              </button>
+              <span>Page {{ pageNo }}</span>
+              <button class="btn btn-sm btn-secondary" (click)="nextPage()" [disabled]="deviceList.length < pageSize">
+                Next
+              </button>
+            </div>
+          </div>
+
+          <!-- Approved Device Tab -->
+          <div *ngIf="activeTab === 'approved'" class="tab-pane">
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Search IMEI / ICCID / Vehicle"
+                       [(ngModel)]="searchText">
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary w-100" (click)="onSearch()">
+                  Search
+                </button>
+              </div>
+            </div>
+            <table class="table table-bordered table-striped" *ngIf="deviceList.length">
+              <thead>
+                <tr>
+                  <th>Device ID</th>
+                  <th>IMEI</th>
+                  <th>Unique No</th>
+                  <th>ICCID</th>
+                  <th>Vendor</th>
+                  <th>Vehicle No</th>
+                  <th>Chassis No</th>
+                  <th>Engine No</th>
+                  <th>Activation Date</th>
+                  <th>Mfg Year</th>
+                  <th>Vehicle Type</th>
+                  <th>Validity</th>
+                  <th>Customer</th>
+                  <th>Mobile</th>
+                  <th>Last Polling</th>
+                  <th>Last Alert</th>
+                  <th>Request ID</th>
+                  <th>Request Time</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                  <th>Approve Time</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of deviceList">
+                  <td>{{ d.param2 || '-' }}</td>
+                  <td>{{ d.param3 || '-' }}</td>
+                  <td>{{ d.param4 || '-' }}</td>
+                  <td>{{ d.param5 || '-' }}</td>
+                  <td>{{ d.param7 || '-' }}</td>
+                  <td>{{ d.param9 || '-' }}</td>
+                  <td>{{ d.param10 || '-' }}</td>
+                  <td>{{ d.param11 || '-' }}</td>
+                  <td>{{ d.param12 || '-' }}</td>
+                  <td>{{ d.param13 || '-' }}</td>
+                  <td>{{ d.param14 || '-' }}</td>
+                  <td>{{ d.param15 || '-' }}</td>
+                  <td>{{ d.param17 || '-' }}</td>
+                  <td>{{ d.param18 || '-' }}</td>
+                  <td>{{ d.param19 || '-' }}</td>
+                  <td>{{ d.param20 || '-' }}</td>
+                  <td>{{ d.param21 || '-' }}</td>
+                  <td>{{ d.param22 || '-' }}</td>
+                  <td>{{ d.param23 || '-' }}</td>
+                  <td>
+                    <span class="badge bg-success">{{ d.param24 || '-' }}</span>
+                  </td>
+                  <td>{{ d.param25 || '-' }}</td>
+                  <td>
+                    <!-- No action for approved -->
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="d-flex justify-content-between mt-3" *ngIf="deviceList.length">
+              <button class="btn btn-sm btn-secondary" (click)="prevPage()" [disabled]="pageNo === 1">
+                Previous
+              </button>
+              <span>Page {{ pageNo }}</span>
+              <button class="btn btn-sm btn-secondary" (click)="nextPage()" [disabled]="deviceList.length < pageSize">
+                Next
+              </button>
+            </div>
+          </div>
+
+          <!-- Pending Device Tab -->
+          <div *ngIf="activeTab === 'pending'" class="tab-pane">
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Search IMEI / ICCID / Vehicle"
+                       [(ngModel)]="searchText">
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary w-100" (click)="onSearch()">
+                  Search
+                </button>
+              </div>
+            </div>
+            <table class="table table-bordered table-striped" *ngIf="deviceList.length">
+              <thead>
+                <tr>
+                  <th>Device ID</th>
+                  <th>IMEI</th>
+                  <th>Unique No</th>
+                  <th>ICCID</th>
+                  <th>Vendor</th>
+                  <th>Vehicle No</th>
+                  <th>Chassis No</th>
+                  <th>Engine No</th>
+                  <th>Activation Date</th>
+                  <th>Mfg Year</th>
+                  <th>Vehicle Type</th>
+                  <th>Validity</th>
+                  <th>Customer</th>
+                  <th>Mobile</th>
+                  <th>Last Polling</th>
+                  <th>Last Alert</th>
+                  <th>Request ID</th>
+                  <th>Request Time</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                  <th>Approve Time</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of deviceList">
+                  <td>{{ d.param2 || '-' }}</td>
+                  <td>{{ d.param3 || '-' }}</td>
+                  <td>{{ d.param4 || '-' }}</td>
+                  <td>{{ d.param5 || '-' }}</td>
+                  <td>{{ d.param7 || '-' }}</td>
+                  <td>{{ d.param9 || '-' }}</td>
+                  <td>{{ d.param10 || '-' }}</td>
+                  <td>{{ d.param11 || '-' }}</td>
+                  <td>{{ d.param12 || '-' }}</td>
+                  <td>{{ d.param13 || '-' }}</td>
+                  <td>{{ d.param14 || '-' }}</td>
+                  <td>{{ d.param15 || '-' }}</td>
+                  <td>{{ d.param17 || '-' }}</td>
+                  <td>{{ d.param18 || '-' }}</td>
+                  <td>{{ d.param19 || '-' }}</td>
+                  <td>{{ d.param20 || '-' }}</td>
+                  <td>{{ d.param21 || '-' }}</td>
+                  <td>{{ d.param22 || '-' }}</td>
+                  <td>{{ d.param23 || '-' }}</td>
+                  <td>
+                    <span class="badge bg-warning">{{ d.param24 || '-' }}</span>
+                  </td>
+                  <td>{{ d.param25 || '-' }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-success btn-sm me-1" (click)="approveRequest(d.param21)">
+                      Approve
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="rejectRequest(d.param21)">
+                      Reject
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="d-flex justify-content-between mt-3" *ngIf="deviceList.length">
+              <button class="btn btn-sm btn-secondary" (click)="prevPage()" [disabled]="pageNo === 1">
+                Previous
+              </button>
+              <span>Page {{ pageNo }}</span>
+              <button class="btn btn-sm btn-secondary" (click)="nextPage()" [disabled]="deviceList.length < pageSize">
+                Next
+              </button>
+            </div>
+          </div>
+
+          <!-- Vendor Tab -->
+          <div *ngIf="activeTab === 'vendor'" class="tab-pane">
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Search IMEI / ICCID / Vehicle"
+                       [(ngModel)]="searchText">
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary w-100" (click)="onSearch()">
+                  Search
+                </button>
+              </div>
+            </div>
+            <table class="table table-bordered table-striped" *ngIf="deviceList.length">
+              <thead>
+                <tr>
+                  <th>Device ID</th>
+                  <th>IMEI</th>
+                  <th>Unique No</th>
+                  <th>ICCID</th>
+                  <th>Vendor</th>
+                  <th>Vehicle No</th>
+                  <th>Chassis No</th>
+                  <th>Engine No</th>
+                  <th>Activation Date</th>
+                  <th>Mfg Year</th>
+                  <th>Vehicle Type</th>
+                  <th>Validity</th>
+                  <th>Customer</th>
+                  <th>Mobile</th>
+                  <th>Last Polling</th>
+                  <th>Last Alert</th>
+                  <th>Request ID</th>
+                  <th>Request Time</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                  <th>Approve Time</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of deviceList">
+                  <td>{{ d.param2 || '-' }}</td>
+                  <td>{{ d.param3 || '-' }}</td>
+                  <td>{{ d.param4 || '-' }}</td>
+                  <td>{{ d.param5 || '-' }}</td>
+                  <td>{{ d.param7 || '-' }}</td>
+                  <td>{{ d.param9 || '-' }}</td>
+                  <td>{{ d.param10 || '-' }}</td>
+                  <td>{{ d.param11 || '-' }}</td>
+                  <td>{{ d.param12 || '-' }}</td>
+                  <td>{{ d.param13 || '-' }}</td>
+                  <td>{{ d.param14 || '-' }}</td>
+                  <td>{{ d.param15 || '-' }}</td>
+                  <td>{{ d.param17 || '-' }}</td>
+                  <td>{{ d.param18 || '-' }}</td>
+                  <td>{{ d.param19 || '-' }}</td>
+                  <td>{{ d.param20 || '-' }}</td>
+                  <td>{{ d.param21 || '-' }}</td>
+                  <td>{{ d.param22 || '-' }}</td>
+                  <td>{{ d.param23 || '-' }}</td>
+                  <td>
+                    <span class="fw-bold"
+                      [ngClass]="{
+                        'bg-success': d.param24 === 'Approved',
+                        'bg-danger': d.param24?.toLowerCase().includes('untag'),
+                        'bg-warning-text': d.param24 === 'Pending'
+                      }">
+                      {{ d.param24 || '-' }}
+                    </span>
+                  </td>
+                  <td>{{ d.param25 || '-' }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-success btn-sm me-1" (click)="approveRequest(d.param21)">
+                      Approve
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="rejectRequest(d.param21)">
+                      Reject
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="d-flex justify-content-between mt-3" *ngIf="deviceList.length">
+              <button class="btn btn-sm btn-secondary" (click)="prevPage()" [disabled]="pageNo === 1">
+                Previous
+              </button>
+              <span>Page {{ pageNo }}</span>
+              <button class="btn btn-sm btn-secondary" (click)="nextPage()" [disabled]="deviceList.length < pageSize">
+                Next
+              </button>
+            </div>
+          </div>
+
+        <!-- 🔥 UNTAG MODAL -->
+        <div class="modal fade" [class.show]="showUntagModal" [style.display]="showUntagModal ? 'block' : 'none'" 
+             (click)="showUntagModal && closeUntagModal()">
+          <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+            <div class="modal-content">
+              <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                  <i class="fa fa-exclamation-triangle"></i> Untag Device
+                </h5>
+                <button type="button" class="btn-close btn-close-white" (click)="closeUntagModal()" 
+                        [disabled]="isSubmitting"></button>
+              </div>
+              <div class="modal-body">
+                <div class="alert alert-warning">
+                  <strong>Warning!</strong> You are about to untag device:<br>
+                  <strong>IMEI: {{ selectedDeviceImei || 'N/A' }}</strong><br>
+                  <small>(Device ID: {{ selectedDeviceId }})</small>
+                </div>
+                
+                <div class="form-group">
+                  <label for="remarks" class="form-label"><strong>Remarks <span class="text-danger">*</span></strong></label>
+                  <textarea 
+                    id="remarks"
+                    class="form-control form-control-lg"
+                    rows="4"
+                    placeholder="Enter reason for untagging this device..."
+                    [(ngModel)]="untagRemarks"
+                    [disabled]="isSubmitting"
+                    maxlength="500">
+                  </textarea>
+                  <small class="text-muted">{{ untagRemarks.length }}/500 characters</small>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary" (click)="closeUntagModal()" 
+                        [disabled]="isSubmitting">
+                  Cancel
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="submitUntagRequest()" 
+                        [disabled]="isSubmitting || !untagRemarks.trim()">
+                  <span *ngIf="!isSubmitting">
+                    <i class="fa fa-check"></i> Confirm Untag
+                  </span>
+                  <span *ngIf="isSubmitting">
+                    <i class="fa fa-spinner fa-spin"></i> Processing...
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Backdrop -->
+        <div class="modal-backdrop fade" [class.show]="showUntagModal" 
+             [style.display]="showUntagModal ? 'block' : 'none'"></div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+  

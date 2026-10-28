@@ -1,0 +1,246 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <button class="pagebtn">
+            <a routerLink="/commandentry"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add New</a>
+          </button>
+          <div class="pagetitlestyle"><span>Command Details</span></div>
+        </div>
+        <div class="table-responsive">
+          <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
+            <table style="width: 100%;">
+              <tbody class="bg-body">
+                <tr>
+                  <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                    <font style="font-weight: bold;">Search : </font>
+                  </td>
+                  <td>
+                    <div class="">
+                      <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="tabletitlesearch"
+                        id="searchby" placeholder="Type here and press button...." style="border: 1px solid #0b58b9; height: 25px; width: 200px;"
+                        autocomplete="disabled" maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby">
+                      &nbsp;&nbsp;
+                      <button class="" id="searchbtn" style="cursor: pointer;" (click)="getSearchDetails()">
+                        <i class="fa fa-search"></i>
+                      </button>
+                      &nbsp;&nbsp;
+                      <button>
+                        @if (!loading) {
+                          <span id="notspin" style="font-size: 11px; cursor: pointer; margin-top: 6px;"
+                          title="Reload" (click)="reloadData()">Reload</span>
+                        }
+                        @if (loading) {
+                          <span id="spin" style="font-size: 11px; cursor: pointer; display: inline; margin-top: 6px;">Reloading...</span>
+                        }
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <table style="float: right;">
+                      <tbody>
+                        <tr>
+                          <td>
+                            <label style="color: #0e0e0e;">Show Rows : </label>
+                          </td>
+                          <td>
+                            <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize" style="font-size: 10px; height: 23px;">
+                              @for (size of pageSizeOptions; track size) {
+                                <option [value]="size === totalCount ? 'All' : size">
+                                  {{size === totalCount ? 'All' : size}}
+                                </option>
+                              }
+                            </select>
+                          </td>
+                          <td style="padding-right: 9px;">
+                            <div style="text-align: right; font-weight: bold; margin-left: 25px;">
+                              <font class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</font>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+
+          <table class="table table-striped app-table">
+            <thead>
+              <tr role="row">
+                <th>#</th>
+                @if (roleId !== '11') {
+                  <th (click)="sort('param9')" style="cursor: pointer;">
+                    Vendor
+                    @if (sortKey === 'param9') {
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                    }
+                  </th>
+                }
+                <th (click)="sort('param10')" style="cursor: pointer;">
+                  Model Name
+                  @if (sortKey === 'param10') {
+                    <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                  }
+                </th>
+                <th (click)="sort('param5')" style="cursor: pointer;">
+                  Command Name
+                  @if (sortKey === 'param5') {
+                    <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                  }
+                </th>
+                <th (click)="sort('param6')" style="cursor: pointer;">
+                  Command
+                  @if (sortKey === 'param6') {
+                    <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                  }
+                </th>
+                <th>Activity</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (commandDetails.length === 0 && !loading) {
+                <tr>
+                  <td style="font-weight: bold;text-align: center;" colspan="100">NO DATA FOUND</td>
+                </tr>
+              }
+              @for (data of getPaginatedData(); track data) {
+                <tr>
+                  <td>{{data.param1 && data.param1.length > 0 ? data.param1 : 'NA'}}</td>
+                  @if (roleId !== '11') {
+                    <td>{{data.param9 && data.param9.length > 0 ? data.param9 : 'NA'}}</td>
+                  }
+                  <td>{{data.param10 && data.param10.length > 0 ? data.param10 : 'NA'}}</td>
+                  <td>{{data.param5 && data.param5.length > 0 ? data.param5 : 'NA'}}</td>
+                  <td style="max-width:400px;word-wrap:break-word;">{{data.param6 && data.param6.length > 0 ? data.param6 : 'NA'}}</td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <button type="button" data-target="#editcommand" data-dismiss="modal" data-toggle="modal"
+                        data-content="EDIT COMMAND" (click)="getCommandData(data)">
+                        Edit
+                      </button>
+                      &nbsp;
+                      <button type="button" data-target="#deletecommand" data-toggle="modal" (click)="getCommandData(data)">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          @if (getTotalPages() > 1) {
+            <div class="pagination-wrapper">
+              <ul class="pagination" style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+                <li [class.disabled]="currentPage === 1">
+                  <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+                </li>
+                @for (page of getPageNumbers(); track page) {
+                  <li [class.active]="currentPage === page">
+                    <button (click)="onPageChange(page)">{{page}}</button>
+                  </li>
+                }
+                <li [class.disabled]="currentPage >= getTotalPages()">
+                  <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+                </li>
+              </ul>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editcommand" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalCenterTitle" aria-hidden="true"
+  data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content" style="width: 650px; margin-left: 100px;">
+      <div class="modal-header" id="updatemodelheader" style="padding: 0.5rem;">
+        <h5 class="modal-title">Update</h5>
+        <button type="button" class="close" data-dismiss="modal" (click)="back()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="margin-top: -15px;">
+        <form id="updateuserform">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="">Command Name :</label><label for="" class="mandetory">*</label>
+                      <input class="form-control ignorespecialcharacter"
+                        placeholder="Command Name" type="text" id="commandname" [(ngModel)]="editCommandName" name="commandName" />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="">Command :</label><label for="" class="mandetory">*</label>
+                      <textarea class="form-control" placeholder="Command" type="text" id="command"
+                      maxlength="100" [(ngModel)]="editCommand" name="command"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="">Remark :</label><label for="" class="mandetory">*</label>
+                      <textarea class="form-control" maxlength="100" placeholder="Remark" type="text"
+                      id="remark" [(ngModel)]="editRemark" (keyup)="checkRemark()" name="remark"></textarea>
+                    </div>
+                  </div>
+                  <input id="vendorId" type="hidden" [(ngModel)]="editVendorId" name="vendorId">
+                  <input id="modelId" type="hidden" [(ngModel)]="editModelId" name="modelId">
+                  <input id="commandid" type="hidden" [(ngModel)]="editCommandId" name="commandid">
+                </div>
+              </thead>
+            </table>
+          </div>
+        </form>
+      </div>
+      <div id="updatemodelheaderbutton" class="modelbtnstyle">
+        <button [disabled]="isIncorrect" (click)="updateCommand()">Submit</button>
+        <button type="reset" id="btnstyle" type="reset" data-dismiss="modal" (click)="back()">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deletecommand" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalCenterTitle" aria-hidden="true"
+  data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content" id="deletemodelcontent" style="">
+      <div class="modal-header" id="deletemodelheader" style="">
+        <h5 class="modal-title" id="deletemodeltitle" style="">Delete</h5>
+        <button type="button" class="close" data-dismiss="modal" (click)="back()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <span style="font-size: 11px;">Command Name : <font>{{deleteCommandName}}</font></span>
+          <table class="table table-bordered">
+            <thead>
+              <textarea class="form-control ignoresymbol_name" id="deleteremarks" placeholder="Remark"
+                style="background: white; color: black;" maxlength="50" [(ngModel)]="deleteRemark"
+              (keyup)="checkDeleteRemark()" name="deleteremarks"></textarea>
+            </thead>
+            <tr>
+              <td class="modelbtnstyle">
+                <button [disabled]="isDeleteIncorrect" (click)="deleteCommand()">Submit</button>
+                <button type="reset" data-dismiss="modal" (click)="back()">Back</button>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

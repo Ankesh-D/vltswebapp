@@ -1,0 +1,252 @@
+<div class="content-i">
+
+  <div class="content-box pt-0">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="content-body">
+          <div class="container-fluid px-0">
+            <div class="card main-card">
+              <div class="card-body">
+                <div class="col-md-12 pagetitleborder">
+                  <div class="pagetitlestyle"><span>Vendor Wise Faulty Devices Counts Report</span>
+                </div>
+              </div>
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0px; padding: 0 10px;">
+                <!-- Left Side: Search and Reload -->
+                <div style="display: flex; align-items: center;">
+                  <span style="font-weight: bold; font-size: 12px; margin-right: 10px;">vendor
+                  </span>
+                  <ng-select class="vendor-select" [items]="vendorlist" bindLabel="param2"
+                    bindValue="param1" [(ngModel)]="selectedVendorFilter"
+                    (change)="onVendorFilterChange($event)" placeholder="All">
+                  </ng-select>
+
+
+
+                  <button class="mx-2" (click)="reloadData()"
+                    style="background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+                    <i class="fa fa-refresh" [class.fa-spin]="!listLoaded"
+                    style="margin-right: 5px;"></i>
+                    @if (listLoaded) {
+                      <span>Reload</span>
+                    }
+                    @if (!listLoaded) {
+                      <span>Reloading...</span>
+                    }
+                  </button>
+                  <!-- <input
+                  ngxDaterangepickerMd
+                  [(ngModel)]="selectedRange"
+                  (datesUpdated)="onDateApply($event)"
+                  [showDropdowns]="true"
+                  [alwaysShowCalendars]="true"
+                  [autoApply]="false"
+                  [locale]="{ format: 'DD-MMM-YYYY' }"
+
+                  class="form-control"
+                  style="font-size:12px"
+                  /> -->
+                  <input type="text" id="datepicker" class="form-control" name="date" />
+
+                  <!-- <select [(ngModel)]="alertType" (change)="onAlertTypeChange()"
+                  style="height: 26px; font-size: 11px; margin-left: 10px; border: 1px solid #0b58b9; border-radius: 4px;">
+
+                  <option value="">All</option>
+                  <option value="new">New</option>
+                  <option value="old">Old</option>
+
+                </select> -->
+
+              </div>
+
+              <!-- Right Side: Download, Page Size, Count -->
+              <div style="display: flex; align-items: center; font-size: 11px;">
+                <div class="toggle-container modern-toggle mx-2">
+                  <button class="toggle-option" [class.active]="vehicleType === 'NEW'"
+                    (click)="onChangeVehicleType('NEW')">
+                    NEW (Installation)
+                  </button>
+                  <!-- <button class="toggle-option" [class.active]="vehicleType === 'ALL'"
+                  (click)="onChangeVehicleType('ALL')">
+                  ALL
+                </button> -->
+                <button class="toggle-option" [class.active]="vehicleType === 'OLD'"
+                  (click)="onChangeVehicleType('OLD')">
+                  OLD (Renewal)
+                </button>
+              </div>
+              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                [showPageSize]="false" [showTotal]="false" (excelExport)="downloadExcel()">
+              </app-common-data-toolbar>
+
+            <div style="display: flex; align-items: center; margin-right: 15px;">
+
+              <label style="margin: 0 5px 0 0; font-weight: bold;">Show Rows:</label>
+
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)"
+                style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px;">
+
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size">
+                    {{ size }}
+                  </option>
+                }
+
+              </select>
+            </div>
+
+            <div style="font-weight: bold; color: #0b58b9;">
+              Total Records : {{ totalCount }}
+            </div>
+          </div>
+        </div>
+
+        <ng-template #vendorFaultyHeader>
+          <tr>
+            <th rowspan="2" class="green py-1 text-center">#</th>
+            <th class="green py-1 text-center">Vendor Name</th>
+            <th class="green py-1 text-end">Faulty device count</th>
+            <th class="green py-1 text-end">Activated</th>
+            <th class="green py-1 text-end">Not Activated</th>
+          </tr>
+          <tr>
+            <th class="green py-1 text-center">Total</th>
+            <th class="green py-1 text-end">{{ totalfaultydevicecount }}</th>
+            <th class="green py-1 text-end">{{ total_faultydevicecount_activated }}</th>
+            <th class="green py-1 text-end">{{ total_faultydevicecount_notactivated }}</th>
+          </tr>
+        </ng-template>
+        <div class="status-table">
+          <app-common-table [columns]="tableColumns" [rows]="detailData" [loading]="!listLoaded"
+            [headerRowsTemplate]="vendorFaultyHeader" [rowClass]="rowClass"
+            (cellClick)="openVendorDetails($event.row)" tableClass="table table-striped app-table small-table"
+            wrapperClass="status-table" emptyMessage="NO DATA FOUND">
+          </app-common-table>
+          <!-- Pagination Controls -->
+          <div class="float-end">
+            @if (totalCount > pageSize) {
+              <ngb-pagination [collectionSize]="totalCount"
+                [(page)]="pageCount" [pageSize]="pageSize"
+                (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+                [ellipses]="false" [boundaryLinks]="true" size="sm"
+                class="d-flex justify-content-center mt-2 mb-1">
+              </ngb-pagination>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+@if (showDetailsModal) {
+  <div>
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-content">
+            <div class="modal-header py-2">
+              <div class="d-flex align-items-center justify-content-between w-100">
+                <!-- Title -->
+                <h5 class="modal-title mb-0">
+                  Vendor Details - <span class="text-primary">{{ selectedVendorName }}</span>
+                </h5>
+                <!-- Right Section -->
+                <div class="d-flex align-items-center">
+                  <!-- Search -->
+                  <div class="input-group input-group-sm me-2" style="width:250px;">
+                    <input type="text" class="form-control" placeholder="Search vendor details..."
+                      [(ngModel)]="searchText" (input)="filterData()">
+                  </div>
+                  <div>
+                    <span style="font-size: 12px; font-weight: 600;">Total Record : {{ detailModalTotalCount }}</span>
+                  </div>
+                  <!-- Close -->
+                  <button type="button" class="close ms-2" aria-label="Close"
+                    (click)="closeVendorDetails()">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-body p-1">
+            @if (detailModalLoading) {
+              <div class="text-center py-3">Loading...</div>
+            }
+            @if (!detailModalLoading && detailModalData.length === 0) {
+              <div class="text-center py-3">
+                No data found.
+              </div>
+            }
+            @if (!detailModalLoading && detailModalData.length > 0) {
+              <div class="table-scrolled">
+                <table class="table table-striped app-table table-sm mb-0 vendor-details-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Vendor Name</th>
+                      <th>IMEI No.</th>
+                      <th>ICCID No.</th>
+                      <th>Device Unique No</th>
+                      <th>Vehicle No</th>
+                      <th>Chassis No</th>
+                      <th>RTO Code</th>
+                      <th>Installed Date</th>
+                      <th>Activation Date</th>
+                      <th>Validity Date</th>
+                      <th>Vehicle Status</th>
+                      <th>Last Polling</th>
+                      <th>MVI Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (detail of filteredData; track detail; let i = $index) {
+                      <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ detail.param3 }}</td>
+                        <td>{{ detail.param4 }}</td>
+                        <td>{{ detail.param5 }}</td>
+                        <td>{{ detail.param6 }}</td>
+                        <td>{{ detail.param7 }}</td>
+                        <td>{{ detail.param8 }}</td>
+                        <td>{{ detail.param9 }}</td>
+                        <td>{{ detail.param10 }}</td>
+                        <td>{{ detail.param11 }}</td>
+                        <td>{{ detail.param12 }}</td>
+                        <td>{{ detail.param13 }}</td>
+                        <td>{{ detail.param14 }}</td>
+                        <td>
+                                        <div class="fw-bold" [ngClass]="{
+                           'text-success': detail.param15 != 'pending',
+                           'text-danger': detail.param15 == 'pending'
+                         }">
+                            {{ detail.param15 }}
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+                <div class="float-end">
+                  <!-- <ngb-pagination
+                  [collectionSize]="detailModalTotalCount" [(page)]="detailModalPageCount"
+                  [pageSize]="detailModalPageSize" (pageChange)="onModalPageChange($event)" [maxSize]="5"
+                  [rotate]="true" [ellipses]="false" [boundaryLinks]="true" size="sm"
+                  class="d-flex justify-content-center mt-2 mb-1">
+                </ngb-pagination> -->
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}

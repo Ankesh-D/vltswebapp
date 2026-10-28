@@ -1,0 +1,315 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <button class="pagebtn">
+            <a routerLink="/sim/update-validity"><i class="fa fa-plus"></i>&nbsp;&nbsp;Update Sim Validity</a>
+          </button>
+          <button class="pagebtn" style="margin-right: 10px;">
+            <a routerLink="/customer/update"><i class="fa fa-plus"></i>&nbsp;&nbsp;Update Customer Details</a>
+          </button>
+          <button class="pagebtn" style="margin-right: 10px;">
+            <a routerLink="/vehicle/update"><i class="fa fa-plus"></i>&nbsp;&nbsp;Update Vehicle Details</a>
+          </button>
+          <button class="pagebtn" style="margin-right: 10px;">
+            <a routerLink="/device/update"><i class="fa fa-plus"></i>&nbsp;&nbsp;Update Device Details</a>
+          </button>
+          <div class="pagetitlestyle"><span>Update Dealer Details</span></div>
+        </div>
+
+        <div class="table-responsive">
+          <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
+            <table style="width: 100%;">
+              <tbody class="bg-body">
+                <tr>
+                  <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
+                    <font style="font-weight: bold;">Search : </font>
+                  </td>
+                  <td>
+                    <div class="">
+                      <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="tabletitlesearch"
+                        id="searchby" placeholder="Type here and press button...." style="border: 1px solid #0b58b9; height: 25px; width: 200px;"
+                        autocomplete="disabled" maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby">
+                      &nbsp;&nbsp;
+                      <button class="" id="searchbtn" style="cursor: pointer;" (click)="getSearchDetails()">
+                        <i class="fa fa-search"></i>
+                      </button>
+                      &nbsp;&nbsp;
+                      <button>
+                        <span id="notspin" *ngIf="!loading" style="font-size: 11px; cursor: pointer; margin-top: 6px;"
+                          title="Reload" (click)="reloadData()">Reload</span>
+                        <span id="spin" *ngIf="loading" style="font-size: 11px; cursor: pointer; display: inline; margin-top: 6px;">Reloading...</span>
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <table style="float: right;">
+                      <tbody>
+                        <tr>
+                          <td>
+                            <label style="color: #0e0e0e;">Show Rows : </label>
+                          </td>
+                          <td>
+                            <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize" style="font-size: 10px; height: 23px;">
+                              <option *ngFor="let size of pageSizeOptions" [value]="size === totalCount ? 'All' : size">
+                                {{size === totalCount ? 'All' : size}}
+                              </option>
+                            </select>
+                          </td>
+                          <td style="padding-right: 9px;">
+                            <div style="text-align: right; font-weight: bold; margin-left: 25px;">
+                              <font class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</font>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+
+          <table class="table table-striped app-table" style="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;">
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th (click)="sort('param3')" style="cursor: pointer;">
+                  Dealer Name
+                  <span *ngIf="sortKey === 'param3'" class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                </th>
+                <th (click)="sort('param23')" style="cursor: pointer;">
+                  Dealer Type
+                  <span *ngIf="sortKey === 'param23'" class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                </th>
+                <th (click)="sort('param18')" style="cursor: pointer;">
+                  Vendor Name
+                  <span *ngIf="sortKey === 'param18'" class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                </th>
+                <th (click)="sort('param9')" style="cursor: pointer;">
+                  Contact Person
+                  <span *ngIf="sortKey === 'param9'" class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                </th>
+                <th (click)="sort('param11')" style="cursor: pointer;">
+                  Mobile No.
+                  <span *ngIf="sortKey === 'param11'" class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                </th>
+                <th (click)="sort('param10')" style="cursor: pointer;">
+                  Email ID
+                  <span *ngIf="sortKey === 'param10'" class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                </th>
+                <th (click)="sort('param5')" style="cursor: pointer;">
+                  Address
+                  <span *ngIf="sortKey === 'param5'" class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                </th>
+                <th (click)="sort('param28')" style="cursor: pointer;">
+                  Status<hr>Activity
+                  <span *ngIf="sortKey === 'param28'" class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngIf="dealerDetails.length === 0 && !loading">
+                <td style="font-weight: bold; text-align: center;" colspan="100">NO DATA FOUND</td>
+              </tr>
+              <tr *ngFor="let dealer of getPaginatedData()">
+                <td>{{dealer.param1 || 'NA'}}</td>
+                <td>{{dealer.param3 || 'NA'}}</td>
+                <td>{{dealer.param23 || 'NA'}}</td>
+                <td>{{dealer.param18 || 'NA'}}</td>
+                <td>{{dealer.param9 || 'NA'}}</td>
+                <td>{{dealer.param11 || 'NA'}}</td>
+                <td>{{dealer.param10 || 'NA'}}</td>
+                <td>{{dealer.param5 || 'NA'}}</td>
+                <td>
+                  <span style="font-weight:bold;">{{dealer.param28 || 'NA'}}</span><hr>
+                  <div class="btn-group btn-group-sm action-cell">
+                    <button *ngIf="dealer.param28 === 'Active'" type="button" (click)="openEditModal(dealer)">
+                      Edit
+                    </button>
+                    <button *ngIf="dealer.param28 !== 'Active'" type="button" disabled>Edit</button>
+                    &nbsp;
+                    <button type="button" (click)="openDeleteModal(dealer)">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination-wrapper" *ngIf="getTotalPages() > 1">
+          <button 
+            *ngFor="let page of getPageNumbers()" 
+            (click)="onPageChange(page)"
+            [disabled]="page === -1 || currentPage === page"
+            [class.active]="currentPage === page">
+            <span *ngIf="page === -1">...</span>
+            <span *ngIf="page !== -1">{{page}}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Edit Dealer Modal (Angular overlay, legacy style) -->
+<div *ngIf="showEditModal" class="modal-overlay update-dealer-modal" (click)="back()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header" id="updatemodelheader">
+      <h5 class="modal-title" style="font-size: 13px;">Update</h5>
+      <button type="button" class="close" (click)="back()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">Dealer Name:</label><label class="mandetory">*</label>
+                  <input class="form-control ignoresymbol_name" id="dealername" maxlength="50"
+                    [(ngModel)]="editDealerName" name="dealerName">
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">Dealer Type:</label><label class="mandetory">*</label>
+                  <input class="form-control ignoresymbol_name" id="dealertype" type="text" maxlength="50"
+                    [(ngModel)]="editDealerType" name="dealerType">
+                </div>
+              </div>
+              <div class="col-sm-4" id="comp" *ngIf="roleId === '10' || roleId === '17'">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">Select Vendor:</label><label class="mandetory">*</label>
+                  <select class="form-control" id="selectcomplist" [(ngModel)]="editVendorId" name="vendorId">
+                    <option *ngFor="let item of vendorList" [value]="item.param1">{{item.param2}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">Contact Person:</label><label class="mandetory">*</label>
+                  <input class="form-control ignoresymbol_name" id="contactperson" type="text" maxlength="50"
+                    [(ngModel)]="editContactPerson" name="contactPerson">
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">Mobile No.:</label><label class="mandetory">*</label>
+                  <input class="form-control acceptnumeric_nodecimal" id="mobileno" type="text" maxlength="10"
+                    [(ngModel)]="editMobileNo" (keyup)="checkMobileNumber()" name="mobileNo"
+                    [ngClass]="{'border-danger': isMobileInvalid, 'border-success': !isMobileInvalid && editMobileNo.length === 10}">
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">Email ID:</label><label class="mandetory">*</label>
+                  <input class="form-control" maxlength="50" id="emailid" type="text"
+                    [(ngModel)]="editEmailId" (keyup)="validateEmail()" name="emailId"
+                    [ngClass]="{'border-danger': isEmailInvalid, 'border-success': !isEmailInvalid && editEmailId.length > 0}">
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">Address:</label><label class="mandetory">*</label>
+                  <input class="form-control ignorespecialcharacter_address" maxlength="50" id="address" type="text"
+                    [(ngModel)]="editAddress" name="address">
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">State:</label><label class="mandetory">*</label>
+                  <select class="form-control" id="statename" [(ngModel)]="editState" (change)="onStateChange()" name="state">
+                    <option value="">Select State</option>
+                    <option *ngFor="let state of stateList" [value]="state.param1">{{state.param2}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">City:</label><label class="mandetory">*</label>
+                  <select class="form-control" id="cityname" [(ngModel)]="editCity" name="city">
+                    <option value="">Select City</option>
+                    <option *ngFor="let city of cityList" [value]="city.param1">{{city.param2}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">Alternate Mobile No.:</label>
+                  <input class="form-control acceptnumeric_nodecimal" id="alternatemobileno" type="text" maxlength="10"
+                    [(ngModel)]="editAlternateMobileNo" name="altMobileNo">
+                </div>
+              </div>
+              <div class="col-sm-8">
+                <div class="form-group">
+                  <label style="font-size: 11px;font-weight: bold;">Remark:</label><label class="mandetory">*</label>
+                  <textarea class="form-control ignorespecialcharacter_address" id="remark" placeholder="Reason"
+                    [(ngModel)]="editRemark" (keyup)="checkEditRemark()" name="remark"
+                    [ngClass]="{'border-danger': isEditRemarkInvalid, 'border-success': !isEditRemarkInvalid && editRemark.length >= 10}"></textarea>
+                  <div *ngIf="isEditRemarkInvalid" style="color: red; font-size: 11px;">
+                    Remark must be at least 10 characters.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </thead>
+        </table>
+      </div>
+    </div>
+    <div id="updatemodelheaderbutton" class="modelbtnstyle">
+      <button (click)="updateDealer()" [disabled]="isEditRemarkInvalid || isMobileInvalid || isEmailInvalid || loading">
+        {{loading ? 'Updating...' : 'Submit'}}
+      </button>
+      <button type="reset" id="btnstyle" (click)="back()">Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Dealer Modal (Angular overlay, legacy style) -->
+<div *ngIf="showDeleteModal" class="modal-overlay update-dealer-modal" (click)="back()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header" id="deletemodelheader">
+      <h5 class="modal-title" id="deletemodeltitle">Delete</h5>
+      <button type="button" class="close" (click)="back()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="table-responsive">
+        <span style="font-size: 11px;">Dealer Name : <font>{{deleteDealerName}}</font></span>
+        <table class="table table-bordered">
+          <thead>
+            <textarea class="form-control ignoresymbol_name" id="deleteremarks" placeholder="Remark"
+              style="background: white; color: black;" maxlength="50" [(ngModel)]="deleteRemark"
+              (keyup)="checkDeleteRemark()" name="deleteRemark"
+              [ngClass]="{'border-danger': isDeleteRemarkInvalid, 'border-success': !isDeleteRemarkInvalid && deleteRemark.length >= 10}"></textarea>
+            <div *ngIf="isDeleteRemarkInvalid" style="color: red; font-size: 11px;">
+              Remark must be at least 10 characters.
+            </div>
+          </thead>
+          <tr>
+            <td class="modelbtnstyle">
+              <button (click)="deleteDealer()" [disabled]="isDeleteRemarkInvalid || loading">
+                {{loading ? 'Deleting...' : 'Submit'}}
+              </button>
+              <button type="reset" (click)="back()">Back</button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

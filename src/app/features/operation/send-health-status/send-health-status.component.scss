@@ -1,0 +1,66 @@
+// Send Health Status Component Styles
+
+.content-i {
+  padding: 20px;
+}
+
+.content-box {
+  background: #fff;
+}
+
+.element-wrapper {
+  margin-bottom: 20px;
+}
+
+.element-box {
+  padding: 1rem;
+}
+
+.pagetitleborder {
+  border-bottom: 2px solid #0b58b9;
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+
+.control-label {
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.searchable {
+  width: 100%;
+}
+
+.mandetory {
+  color: red;
+}
+
+.fontset {
+  font-weight: bold;
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #d9e7d8;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+  background-color: #fcfcfc;
+}
+
+button {
+  background: #0b58b9;
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #094a94;
+}

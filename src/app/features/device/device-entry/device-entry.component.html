@@ -1,0 +1,169 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 " style="display: flex; justify-content: space-between;">
+              <div class="pagetitlestyle"><span>Device Entry</span></div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                @if (roleId !== '13') {
+                  <button class="header-btn">
+                    <a routerLink="/bulk-device-entry">
+                      <i class="fa fa-plus"></i>&nbsp;&nbsp;Add Multiple
+                    </a>
+                  </button>
+                }
+
+                <button class="header-btn">
+                  <a routerLink="/device/TotalDevice/0/0">
+                    <i class="fa fa-plus"></i>&nbsp;&nbsp;Details
+                  </a>
+                </button>
+              </div>
+
+
+            </div>
+
+            <form id="entry_form" autocomplete="off">
+              <div class="form-desc">
+                <strong>NOTE :</strong><label for="" class="mandetory">*</label> Are Mandatory Fields.
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="entrypagediv">
+                    <div class="row">
+                      @if (roleId=='10' || roleId=='64') {
+                        <div class="col-sm-3" id="list_for_vendor">
+                          <div class="form-group">
+                            <label for="">Vendor:</label><label for="" style="width: 100px;" class="mandetory">*</label>
+                            <ng-select
+                              id="vendor_obj_id"
+                              [items]="vendorList"
+                              bindLabel="param2"
+                              bindValue="param1"
+                              placeholder="Select Vendor"
+                              [(ngModel)]="selectedVendor"
+                              (change)="onVendorChange()"
+                              name="vendor">
+                            </ng-select>
+                          </div>
+                        </div>
+                      }
+                      @if (roleId=='10' || roleId=='64') {
+                        <div class="col-sm-3" id="list_for_distributor">
+                          <div class="form-group">
+                            <label for="">Distributor:</label>
+                            <ng-select
+                              id="distributor_obj_id"
+                              placeholder="Select Distributor"
+                              [(ngModel)]="selectedDistributor"
+                              (change)="onDistributorChange()"
+                              name="distributor">
+                              @for (item of distributorList; track item) {
+                                <ng-option [value]="item">{{item.param2}}</ng-option>
+                              }
+                            </ng-select>
+                          </div>
+                        </div>
+                      }
+                      @if (roleId=='10' || roleId=='64') {
+                        <div class="col-sm-3" id="list_for_dealer">
+                          <div class="form-group">
+                            <label for="dealer">Dealer:</label>
+                            <ng-select
+                              id="dealer_obj_id"
+                              placeholder="Select Dealer"
+                              [(ngModel)]="selectedDealer"
+                              name="dealer">
+                              @for (item of dealerList; track item) {
+                                <ng-option [value]="item">{{item.param2}}</ng-option>
+                              }
+                            </ng-select>
+                          </div>
+                        </div>
+                      }
+
+
+                      <!-- <div class="col-md-12">
+                      <label style="font-weight: bold;">{{companyLabel}}</label>
+                    </div> -->
+
+                    <div class="col-sm-3">
+                      <div class="form-group">
+                        <label for="">Model Code:</label><label for="" style="width: 100px;" class="mandetory">*</label>
+                        <ng-select
+                          id="modelid"
+                          [items]="deviceModelList"
+                          bindLabel="param2"
+                          bindValue="param1"
+                          placeholder="Select Model Code"
+                          [(ngModel)]="selectedModel"
+                          name="model">
+                        </ng-select>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                      <div class="form-group" style="margin-bottom:4px;">
+                        <label for="">Serial No.</label><label for="" class="mandetory">*</label>
+                        <input class="form-control " placeholder="AAAACCTMMYY12345678"
+                          type="text" id="device_sr_no" maxlength="19" [(ngModel)]="serialNo"
+                          name="serialNo">
+                        <!-- (keyup)="correctUniqueno()"  -->
+                      </div>
+                      <div style="color:red;font-size:11px;"><label>{{msg}}</label></div>
+                    </div>
+
+                    <div class="col-sm-3">
+                      <div class="form-group">
+                        <label for="">IMEI No.</label><label for="" class="mandetory">*</label>
+                        <input class="form-control acceptnumeric_nodecimal" placeholder="Imei No"
+                          type="text" (keyup)="correctImeino()" id="imeino" maxlength="15"
+                          [(ngModel)]="imeiNo" name="imeiNo">
+                      </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                      <div class="form-group">
+                        <label for="">ICCID No.</label><label for="" class="mandetory">*</label>
+                        <input class="form-control " placeholder="Iccid No."
+                          type="text"  maxlength="20" (keyup)="correctIccidno()"
+                          [(ngModel)]="iccidNo" name="iccidNo">
+                      </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                      <div class="form-group">
+                        <label for="">ESIM Provider</label><label for="" style="width: 100px;" class="mandetory">*</label>
+                        <ng-select
+                          id="m2m_provider"
+                          [items]="m2mProviderList"
+                          bindLabel="param2"
+                          bindValue="param1"
+                          placeholder="Select Esim Provider"
+                          [(ngModel)]="m2mProvider"
+                          name="m2mProvider">
+                        </ng-select>
+                      </div>
+                    </div>
+
+
+                  </div>
+                  <div class="btn btn-sm form-buttons-w mt-0 float-end">
+                    <button type="submit" (click)="deviceEntry()" [disabled]="loading">
+                      {{loading ? 'Submitting...' : 'Submit'}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

@@ -1,0 +1,672 @@
+<!-- =========================================================
+     LOGIN STATUS / ACTIVE SESSIONS DASHBOARD
+     Logic and Angular bindings unchanged
+     ========================================================= -->
+
+<div class="content-i">
+    <div class="content-box">
+        <div class="element-wrapper">
+            <div class="element-box">
+<div class="pagetitleborder">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="pagetitlestyle">
+            <span>Login Dashboard</span>
+        </div>
+        <div></div>
+    </div>
+</div>
+                <!-- =====================================================
+                     SUMMARY WIDGETS
+                     ===================================================== -->
+                <div class="row mb-3">
+
+                    <!-- Active Sessions + All Users -->
+                    <div class="col-md-4">
+                        <div class="d-flex gap-3">
+
+                            <!-- Active Sessions Widget -->
+                            <div class="card widget-card"
+                                style="border-left: 4px solid #007bff; box-shadow: 0 2px 8px rgba(0,123,255,0.08);">
+
+                                <div class="d-flex align-items-center h-100 px-3 py-2 gap-3">
+
+                                    <div class="widget-icon widget-icon-primary">
+                                        <i class="fa fa-dot-circle-o" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div class="flex-fill" style="min-width: 0;">
+
+                                        <div
+                                            class="d-flex align-items-center justify-content-between mb-1">
+
+                                            <span class="widget-value fw-bold text-primary pl-2">
+                                                {{ totalActiveSessionsCount || 0 }}
+                                            </span>
+
+                                            <span class="widget-trend widget-trend-primary">
+                                                Online
+                                            </span>
+
+                                        </div>
+
+                                        <div class="widget-label text-muted fw-semibold">
+                                            Active Sessions
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <!-- All Users Widget -->
+                            <div class="card widget-card"
+                                style="border-left: 4px solid #28a745; box-shadow: 0 2px 8px rgba(40,167,69,0.08);">
+
+                                <div class="d-flex align-items-center h-100 px-3 py-2 gap-3">
+
+                                    <div class="widget-icon widget-icon-success">
+                                        <i class="fa fa-users" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div class="flex-fill" style="min-width: 0;">
+
+                                        <div
+                                            class="d-flex align-items-center justify-content-between mb-1">
+
+                                            <span class="widget-value fw-bold text-success pl-2">
+                                                {{ totalUsersCount || 0 }}
+                                            </span>
+
+                                            <span class="widget-trend widget-trend-success">
+                                                Total
+                                            </span>
+
+                                        </div>
+
+                                        <div class="widget-label text-muted fw-semibold">
+                                            All Users
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <!-- =================================================
+                         ROLE-WISE ACTIVE SESSIONS
+                         ================================================= -->
+                    <div class="col-md-8">
+
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+
+                            <h6 class="mb-0 fw-bold text-secondary role-section-title">
+                                Role-wise Active Sessions
+                            </h6>
+
+                        </div>
+
+
+                        <div class="role-scroll-wrap">
+
+                            <!-- Fade effects -->
+                            <div class="role-fade role-fade-left"></div>
+                            <div class="role-fade role-fade-right"></div>
+
+
+                            <!-- Left Scroll Button -->
+                            <div class="role-scroll-arrow role-scroll-arrow-left"
+                                [class.disabled]="isLeftDisabled"
+                                (click)="scrollRoles(-1)"
+                                title="Previous">
+
+                                <i class="fa fa-chevron-left" aria-hidden="true"></i>
+
+                            </div>
+
+
+                            <!-- Right Scroll Button -->
+                            <div class="role-scroll-arrow role-scroll-arrow-right"
+                                [class.disabled]="isRightDisabled"
+                                (click)="scrollRoles(1)"
+                                title="Next">
+
+                                <i class="fa fa-chevron-right" aria-hidden="true"></i>
+
+                            </div>
+
+
+                            <!-- Role Cards -->
+                            <div class="role-scroller" #roleScroller>
+
+                                <div class="role-widget"
+                                    *ngFor="let role of roles">
+
+                                    <div class="card widget-card-a"
+                                        [style.border-left]="'4px solid ' + role.color"
+                                        [style.box-shadow]="'0 2px 8px ' + tint(role.color, '22')">
+
+                                        <div
+                                            class="d-flex align-items-center h-100 px-3 py-2 widget-inner">
+
+                                            <!-- Role Icon -->
+                                            <div class="widget-icon"
+                                                [style.background]="tint(role.color)"
+                                                [style.color]="role.color">
+
+                                                <i class="fa"
+                                                    [ngClass]="role.icon"
+                                                    aria-hidden="true">
+                                                </i>
+
+                                            </div>
+
+
+                                            <!-- Role Information -->
+                                            <div class="flex-fill widget-body">
+
+                                                <div
+                                                    class="d-flex align-items-center justify-content-between mb-1">
+
+                                                    <span class="widget-value fw-bold"
+                                                        [style.color]="role.color">
+
+                                                        {{ role.activeCount || 0 }}
+
+                                                    </span>
+
+
+                                                    <span class="widget-trend"
+                                                        [style.background]="tint(role.color)"
+                                                        [style.color]="role.color">
+
+                                                        Active
+
+                                                    </span>
+
+                                                </div>
+
+
+                                                <div
+                                                    class="widget-label text-muted fw-bold text-truncate">
+
+                                                    {{ role.name }}
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================================
+                     USER DETAILS
+                     ===================================================== -->
+                <ng-container *ngIf="!showUserDetails">
+
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+                            <div class="grid-layout">
+
+
+                                <!-- Page Title -->
+                                <div class="pagetitleborder">
+
+                                    <div
+                                        class="d-flex justify-content-between align-items-center">
+
+                                       <div class="pagetitlestyle">
+    <span>Login Activity</span>
+</div>
+
+                                        <div></div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     TOP CONTROLS
+                                     ================================================= -->
+                                <div class="top-controls-row">
+
+
+                                    <!-- LEFT CONTROLS -->
+                                    <div class="left-controls">
+
+                                        <!-- Search -->
+                                        <div class="search-box">
+
+                                            <input
+                                                type="search"
+                                                class="search-input inner"
+                                                placeholder="Search and press Enter..."
+                                                maxlength="50"
+                                                [(ngModel)]="loginStatusDetailsReq.param1"
+                                                (keyup.enter)="getDetails('search')" />
+
+
+                                            <button
+                                                type="button"
+                                                class="search-inner-btn"
+                                                (click)="getDetails('search')"
+                                                title="Search">
+
+                                                <i
+                                                    class="fa fa-search"
+                                                    aria-hidden="true">
+                                                </i>
+
+                                            </button>
+
+                                        </div>
+
+
+                                        <!-- Reload -->
+                                        <button
+                                            class="reload-btn"
+                                            (click)="getDetails('reload')"
+                                            [disabled]="loading"
+                                            title="Reload">
+
+                                            <i
+                                                class="fa fa-refresh"
+                                                [class.fa-spin]="loading"
+                                                aria-hidden="true">
+                                            </i>
+
+                                            <span>
+                                                {{ loading ? 'Reloading...' : 'Reload' }}
+                                            </span>
+
+                                        </button>
+
+                                    </div>
+
+
+                                    <!-- RIGHT CONTROLS -->
+                                    <div class="right-controls">
+
+                                        <!-- Rows Per Page -->
+                                        <select
+                                            class="rows-select"
+                                            [(ngModel)]="loginStatusDetailsReq.param3"
+                                            (change)="onPageSizeChange($event)"
+                                            title="Rows per page">
+
+                                            <option
+                                                *ngFor="let size of pageSizeOptions"
+                                                [value]="size === totalCount ? totalCount : size">
+
+                                                {{ size === totalCount ? totalCount : size }}
+
+                                            </option>
+
+                                        </select>
+
+
+                                        <!-- Total Records -->
+                                        <div class="total-records-text">
+
+                                            Total Records: {{ pageCount }} of {{ totalCount }}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     USER DETAILS TABLE
+                                     ================================================= -->
+                                <div class="table-responsive">
+
+                                    <table
+                                        class="table table-striped app-table mb-1"
+                                        style="border-top: 1px solid black; border-bottom: 1px solid black;"
+                                        id="devicetable">
+
+
+                                        <!-- TABLE HEADER -->
+                                        <thead>
+
+                                            <tr>
+
+                                                <th style="width: 30px;">
+                                                    #
+                                                </th>
+
+                                                <th>
+                                                    Login Name
+                                                </th>
+
+                                                <th>
+                                                    Role Name
+                                                </th>
+
+                                                <th>
+                                                    Contact Person Name
+                                                </th>
+
+                                                <th>
+                                                    Contact Person Mobile No.
+                                                </th>
+
+                                                <th>
+                                                    Email ID
+                                                </th>
+
+                                                <th>
+                                                    Login Time
+                                                </th>
+
+                                                <th>
+                                                    Status
+                                                </th>
+
+                                                <th class="text-center">
+                                                    Action
+                                                </th>
+
+                                            </tr>
+
+                                        </thead>
+
+
+                                        <!-- TABLE BODY -->
+                                        <tbody>
+
+
+                                            <!-- No Data -->
+                                            <tr
+                                                *ngIf="detailsData.length === 0 && !loading">
+
+                                                <td
+                                                    class="text-center fw-bold text-muted py-1"
+                                                    colspan="10">
+
+                                                    NO DATA FOUND
+
+                                                </td>
+
+                                            </tr>
+
+
+                                            <!-- User Records -->
+                                            <tr
+                                                *ngFor="let login of detailsData; let i = index">
+
+
+                                                <!-- Login ID -->
+                                                <td style="padding-left: 15px;">
+
+                                                    {{ login.param1 || 'NA' }}
+
+                                                </td>
+
+
+                                                <!-- Login Name -->
+                                                <td>
+
+                                                    {{ login.param4 || 'NA' }}
+
+                                                </td>
+
+
+                                                <!-- Role Name -->
+                                                <td>
+
+                                                    {{ login.param5 || 'NA' }}
+
+                                                </td>
+
+
+                                                <!-- Contact Person Name -->
+                                                <td>
+
+                                                    {{ login.param6 || 'NA' }}
+
+                                                </td>
+
+
+                                                <!-- Contact Person Mobile No. -->
+                                                <td>
+
+                                                    {{ login.param7 || 'NA' }}
+
+                                                </td>
+
+
+                                                <!-- Email ID -->
+                                                <td>
+
+                                                    {{ login.param8 || 'NA' }}
+
+                                                </td>
+
+
+                                                <!-- Login Time -->
+                                                <td>
+
+                                                    {{ login.param9 || 'NA' }}
+
+                                                </td>
+
+
+                                                <!-- Status -->
+                                                <td>
+
+                                                    <span
+                                                        [ngClass]="login.param10 ? 'bg-success text-white' : 'bg-danger text-white'"
+                                                        class="px-2 py-1 rounded">
+
+                                                        {{ login.param10 || 'NA' }}
+
+                                                    </span>
+
+                                                </td>
+
+
+                                                <!-- Actions -->
+<td class="text-center">
+
+    <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        title="Update Login Status"
+        (click)="openUpdateLoginStatusModal(login)">
+
+        <i class="fa fa-cog me-1"></i>
+        Action
+
+    </button>
+
+</td>
+
+                                         
+
+                                            </tr>
+
+                                        </tbody>
+
+                                    </table>
+    <ngb-pagination
+        *ngIf="totalCount > pageSize"
+        [collectionSize]="totalCount"
+        [(page)]="currentPage"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)"
+        [maxSize]="5"
+        [rotate]="true"
+        [ellipses]="false"
+        [boundaryLinks]="true"
+        size="sm"
+        class="d-flex justify-content-end mt-2 mb-1">
+    </ngb-pagination>
+
+           
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </ng-container>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- =========================================================
+     UPDATE LOGIN STATUS MODAL
+     API: updateloginstatus
+     
+     Param1 = loginid
+     Param2 = loginstatus / userstatus
+               Block
+               Force Logout
+               Activate
+     Param3 = remarks
+     ========================================================= -->
+
+<div
+    *ngIf="showUpdateLoginStatusModal"
+    class="modal fade show"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    style="display: block; background: rgba(0,0,0,0.5);">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow-lg">
+
+            <!-- Header -->
+            <div class="modal-header">
+
+                <h5 class="modal-title fw-bold">
+                    Update Login Status
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    aria-label="Close"
+                    (click)="closeUpdateLoginStatusModal()">
+                </button>
+
+            </div>
+
+
+            <!-- Body -->
+            <div class="modal-body">
+
+               
+           
+
+
+                <!-- Action -->
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Action
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <select
+                        class="form-select"
+                        [(ngModel)]="updateLoginStatusReq.param2">
+
+                        <option value="" disabled>
+                            Select Action
+                        </option>
+
+                        <option value="Block">
+                            Block
+                        </option>
+
+                        <option value="forcefully logout">
+                            Force Logout
+                        </option>
+
+                        <option value="Activate">
+                            Activate
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Remarks -->
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Remarks
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        rows="3"
+                        maxlength="250"
+                        placeholder="Enter remarks..."
+                        [(ngModel)]="updateLoginStatusReq.param3">
+                    </textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- Footer -->
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light border"
+                    (click)="closeUpdateLoginStatusModal()">
+
+                    Cancel
+
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    [disabled]="!updateLoginStatusReq.param1 ||
+                                !updateLoginStatusReq.param2"
+                    (click)="updateLoginStatus()">
+
+                    <i class="fa fa-check me-1"></i>
+                    Update Status
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

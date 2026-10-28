@@ -1,0 +1,120 @@
+<div style="padding: 10px 10px;">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+
+        <!-- TITLE BAR -->
+        <div class="page-header-row">
+          <!-- TITLE -->
+          <div class="pagetitlestyle">
+            Activation Acknowledgement
+          </div>
+          <div class="modern-nav-group">
+            <a class="nav-pill-item pointer"
+              style=" z-index: 99 !important;" routerLink="/healthcheck">
+              <i class="fa fa-calendar"></i><span>Health Check Acknowledgement</span>
+            </a>
+            <a class="nav-pill-item pointer active"
+              style=" z-index: 99 !important;"  routerLink="/acknowledgeactivation">
+              <i class="fa fa-user"></i><span>Activation Acknowlwdgement</span>
+            </a>
+          </div>
+          <!-- <button type="button" class="header-btn" (click)="goToForm()">
+          <i class="fa fa-plus"></i> Add New User
+        </button> -->
+
+      </div>
+
+
+      <!-- SEARCH + CONTROLS BAR -->
+      <div class="top-controls-row">
+
+        <!-- LEFT SEARCH -->
+        <div class="left-controls">
+
+          <!-- SEARCH WITH INNER BUTTON -->
+          <div class="search-box">
+            <input type="search" class="search-input inner" placeholder="Type here and press button...."
+              maxlength="50" [(ngModel)]="detailsRequest.param4" (keyup.enter)="getDetails('search')"
+              name="searchTextBox" />
+
+            <button type="button" class="search-inner-btn" (click)="getDetails('search')">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+
+          <!-- RELOAD -->
+          <button (click)="getDetails('init')" [disabled]="loading"
+            style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+            <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
+            <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+          </button>
+
+        </div>
+        <!-- CENTER TOOL -->
+        <div class="date-filter-box" style="display:flex; align-items:center; gap:8px;">
+          <label for="datepicker" class="datelabel" style="font-size: 11px; margin-right: 5px;">Date Range:</label>
+          <input type="text" id="datepicker" class="form-control" name="date"/>
+        </div>
+        <!-- RIGHT CONTROLS -->
+        <div class="right-controls">
+
+          <select class="rows-select" [(ngModel)]="detailsRequest.param3" (change)="getDetails('pageSize')">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size === totalCount ? 'All' : size">
+                {{ size === totalCount ? 'All' : size }}
+              </option>
+            }
+          </select>
+
+          <div class="total-records-text">
+            Total Records : {{ pageCount }} of {{ totalCount }}
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-responsive">
+        <app-common-table [columns]="tableColumns" [rows]="detailsData" [loading]="loading"
+          tableClass="table app-table" tableId="devicetable" tableStyle="font-size: 11px;"
+          emptyMessage="No Record Found">
+        </app-common-table>
+        @if (totalCount > pageSize || pageNo > 1) {
+          <div class="custom-pagination" style="display:flex;justify-content: end;"
+            >
+            <button class="pg-btn" (click)="changePage(pageNo - 1)" [disabled]="pageNo === 1">
+              Prev
+            </button>
+            @if (pageNo > 3) {
+              <span class="pg-dots">...</span>
+            }
+            @if (pageNo > 2) {
+              <button class="pg-num" (click)="changePage(pageNo - 1)">
+                {{ pageNo - 1 }}
+              </button>
+            }
+            <button class="pg-num active">
+              {{ pageNo }}
+            </button>
+            @if (pageNo < totalPages - 1) {
+              <button class="pg-num" (click)="changePage(pageNo + 1)">
+                {{ pageNo + 1 }}
+              </button>
+            }
+            @if (pageNo < totalPages - 2) {
+              <span class="pg-dots">...</span>
+            }
+            <button class="pg-num" (click)="changePage(totalPages)">
+              {{ totalPages }}
+            </button>
+            <button class="pg-btn" (click)="changePage(pageNo + 1)" [disabled]="pageNo === totalPages">
+              Next
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+</div>

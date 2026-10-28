@@ -1,0 +1,176 @@
+<div style="padding: 10px 10px;">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+
+        <!-- TITLE BAR -->
+        <div class="page-header-row">
+
+          <!-- TITLE -->
+          <div class="pagetitlestyle">
+            Firware Details
+          </div>
+
+          <!-- ADD NEW BUTTON -->
+          <button type="button" class="add-new-btn" [routerLink]="'/firmware/details'">
+            <i class="fa fa-arrow-left"></i>
+            <span>Back To Details</span>
+          </button>
+
+        </div>
+
+        <form id="firmware_form" autocomplete="off" #firmwareForm="ngForm" (ngSubmit)="firmwareUpload()">
+          <div class="form-desc">
+            <strong>NOTE :</strong> Fields marked <span class="mandetory">*</span> are mandatory.
+          </div>
+
+          <div class="entrypagediv">
+            <div class="row">
+              <!-- Vendor -->
+              @if (roleId === '10' || roleId === '17') {
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="company_obj">Vendor <span class="mandetory">*</span></label>
+                    <ng-select [items]="vendorList" placeholder="Select Vendor" #vendorCtrl="ngModel"
+                      [ngModel]="selectedVendor" bindLabel="param2" bindValue="param1" (change)="onVendorChange($event)"
+                      name="vendor" required [searchable]="true" [clearable]="true" style="font-size: 0.8rem;">
+                    </ng-select>
+                    @if (firmwareForm.submitted && vendorCtrl.invalid) {
+                      <div>
+                        @if (vendorCtrl.errors?.['required']) {
+                          <span class="field-error">Vendor is required</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+              <!-- device Model -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="model_obj">Device Model <span class="mandetory">*</span></label>
+                  <ng-select [items]="deviceModelList" bindLabel="param2" bindValue="param1"
+                    placeholder="Select Device Model" [ngModel]="selectedModel" name="devicemodel" required
+                    (change)="onDeviceModelChange($event)" #devicemodelCtrl="ngModel" [searchable]="true"
+                    [clearable]="true" style="font-size: 0.8rem;">
+                  </ng-select>
+                  @if (firmwareForm.submitted && devicemodelCtrl.invalid) {
+                    <div>
+                      @if (devicemodelCtrl.errors?.['required']) {
+                        <span class="field-error">Device model is
+                        required</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Firmware Name -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="firmware_name">Firmware Name <span class="mandetory">*</span></label>
+                  <input type="text" class="form-control" id="firmware_name" placeholder="Enter Name"
+                    [(ngModel)]="firmwareName" #firmwareNameCtrl="ngModel" name="firmwareName" minlength="3"
+                    maxlength="100" required>
+                  @if (firmwareForm.submitted && firmwareNameCtrl.invalid) {
+                    <div>
+                      @if (firmwareNameCtrl.errors?.['required']) {
+                        <span class="field-error">Firmware name is
+                        required</span>
+                      }
+                      @if (firmwareNameCtrl?.errors?.['minlength']) {
+                        <span class="field-error">
+                          Firmware Name must be at least 3 characters.
+                        </span>
+                      }
+                      @if (firmwareNameCtrl?.errors?.['maxlength']) {
+                        <span class="field-error">
+                          Firmware Name cannot exceed 100 characters.
+                        </span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Firmware Version -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="firmware_version">
+                    Firmware Version <span class="mandetory">*</span>
+                  </label>
+
+                  <input type="text" class="form-control" id="firmware_version" placeholder="Enter Version"
+                    [(ngModel)]="firmwareVersion" name="firmwareVersion" #firmwareVersionRef="ngModel" maxlength="20"
+                    required
+                    [class.is-invalid]="firmwareForm.submitted && firmwareVersionRef.invalid">
+
+                  @if (firmwareForm.submitted && firmwareVersionRef.invalid) {
+                    <div class="field-error">
+                      @if (firmwareVersionRef.errors?.['required']) {
+                        <div class="field-error">
+                          Firmware Version is required.
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+              <!-- Release Date -->
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="date">Release Date <span class="mandetory">*</span></label>
+                  <input type="text" id="datepicker" class="form-control" name="date" [(ngModel)]="selectedDate"
+                    required #releaseDate="ngModel" />
+                  <!-- <input class="form-control" type="text" id="date" name="releaseDate" required> -->
+                </div>
+              </div>
+              <!-- Upload File -->
+              <div class="col-md-3 form-group">
+                <label for="uploadfirmware">Upload Firmware<span class="text-danger">*</span>
+              </label>
+
+              <div class="file-drop-area">
+
+                <input class="file-input" type="file" id="fileControl" multiple name="exceluploadfile"
+                  [(ngModel)]="excelFile" required #firmwarecertificateCtrl="ngModel"
+                  (change)="SelectedExcelFunction($event)" accept=".bin" required />
+              </div>
+              @if (firmwarecertificateCtrl.invalid && firmwareForm.submitted) {
+                <small class="validation">
+                  @if (firmwarecertificateCtrl.errors?.['required']) {
+                    <span class="field-error">
+                      File is required
+                    </span>
+                  }
+                </small>
+              }
+              @if (firmwareErr !='') {
+                <small class="field-error">
+                  {{firmwareErr}}
+                </small>
+              }
+            </div>
+
+
+
+            <!-- Submit Button -->
+            <div class="col-md-3 pt-4">
+              <div class="float-end mx-2">
+                <button type="submit" class="btn-save" [disabled]="loading" style="background: #0b58b9;">
+                  <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-upload'"></i>
+                  {{loading ? '...' : 'Upload'}}
+                </button>
+              </div>
+              <div class="float-end">
+                <button type="reset" class="btn-save" style="background: #8f8f8f;"
+                (click)="resetForm()">Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>

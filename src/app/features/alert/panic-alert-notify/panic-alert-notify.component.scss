@@ -1,0 +1,89 @@
+.blink_me {
+  animation: blinker 4s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.panic-button {
+  position: fixed;
+  z-index: 999;
+  transition: all 1s ease 0s;
+  bottom: 1%;
+  width: 35px;
+  height: 35px;
+  right: 1%;
+  cursor: pointer;
+}
+
+.panic-slide {
+  position: fixed;
+  z-index: 1000;
+  overflow: hidden;
+  bottom: 7%;
+  right: 1%;
+  width: 250px;
+  height: 0px;
+  transition: height 0.5s ease;
+}
+
+.panic-slide.show {
+  height: 500px;
+}
+
+.panic-alert-count {
+  background: #aacda8;
+  padding: 7px;
+  border: 2px solid green;
+}
+
+.panic-alert-details {
+  display: block;
+  box-shadow: 0px 0px 10px 0px grey;
+  margin-top: 10px;
+}
+
+.logged-user-avatar-info {
+  background: #aacda8;
+  height: 35px;
+  width: 100%;
+  text-align: center;
+}
+
+.logged-user-name {
+  text-decoration: underline;
+  font-weight: bold;
+  font-size: 11px;
+  margin-left: 0px;
+}
+
+.close-btn {
+  float: right;
+  background: green;
+  font-size: 18px;
+  padding: 3px;
+  color: white;
+  width: 28px;
+  cursor: pointer;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  padding: 8px;
+  text-align: left;
+  border-bottom: 2px solid #ddd;
+}
+
+.table tbody td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}

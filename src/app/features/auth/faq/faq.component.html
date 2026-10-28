@@ -1,0 +1,40 @@
+<div class="faq-page">
+
+  <div class="faq-header">
+
+    <h1>Vehicle Installation & Renewal FAQ</h1>
+
+    <p>
+      Frequently Asked Questions for Installation, Activation,
+      Compliance and Renewal.
+    </p>
+
+  </div>
+
+  @for (category of faqs; track category) {
+    <div class="faq-category">
+      <div class="category-header">
+        {{category.category}}
+      </div>
+      @for (faq of category.questions; track faq) {
+        <div class="faq-card">
+          <details>
+            <summary>
+              <span>{{faq.question}}</span>
+              <i class="fa fa-chevron-down"></i>
+            </summary>
+            <div class="faq-body">
+              <div [innerHTML]="faq.answer"></div>
+              <!--
+              <img
+                *ngIf="faq.image"
+                [src]="faq.image"
+                class="faq-image"> -->
+            </div>
+          </details>
+        </div>
+      }
+    </div>
+  }
+
+</div>

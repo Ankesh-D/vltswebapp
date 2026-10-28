@@ -1,0 +1,55 @@
+.error {
+  border: 1px solid red !important;
+}
+
+.form-desc {
+  margin-bottom: 15px;
+  font-size: 12px;
+}
+
+.mandetory {
+  color: red;
+  margin-left: 2px;
+}
+
+.form-group label {
+  font-size: 11px;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-control.error {
+  border-color: red;
+}
+
+.pagetitleborder {
+  border-bottom: 1px solid #dde2ec;
+  padding: 1px 0;
+  margin-bottom: 0px;
+}
+
+.pagebtn {
+  background-color: #007de1;
+  border-color: #007de1;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-right: 10px;
+  float: left;
+  color: white;
+}
+
+.pagebtn a {
+  color: white;
+  text-decoration: none;
+}
+
+.pagebtn a:hover {
+  text-decoration: underline;
+}
+
+#poishowimage {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}

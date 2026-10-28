@@ -1,0 +1,467 @@
+.select2 {
+  width: 100% !important;
+}
+
+.stepwizard-step p {
+  font-size: small;
+  margin-top: 0px;
+  color: #050420;
+}
+
+.stepwizard-row {
+  display: table-row;
+}
+
+.stepwizard {
+  display: table;
+  width: 100%;
+  position: relative;
+}
+
+.stepwizard-step button[disabled] {
+  opacity: 1 !important;
+}
+
+.stepwizard-row:before {
+  top: 14px;
+  bottom: 0;
+  position: absolute;
+  content: " ";
+  width: 100%;
+  height: 1px;
+  background-color: #ccc;
+  z-index: 0;
+}
+
+.stepwizard-step {
+  display: table-cell;
+  text-align: center;
+  position: relative;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+
+.titlefontstep {
+  font-size: larger;
+  color: #560f0f;
+  font-weight: 550;
+}
+
+.lablestyle {
+  color: #0e0e0e;
+  font-size: 12px;
+  margin-bottom: 0px;
+}
+
+.selectdivewidth {
+  width: 100% !important;
+}
+
+.fontstyle {
+  font-weight: bold;
+}
+
+.mandetory {
+  color: red;
+  margin-left: 2px;
+}
+
+.pagetitleborder {
+  border-bottom: 2px solid #0b58b9;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.prev-btn, .next-btn {
+  margin: 10px 5px;
+  padding: 8px 15px;
+  background: #0b58b9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.prev-btn:hover, .next-btn:hover {
+  background: #0a4a9a;
+}
+
+.prev-btn:disabled, .next-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+.btn-default {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.step {
+  display: block;
+  margin-top: 20px;
+}
+
+.step.active {
+  display: block;
+}
+
+.panel-heading {
+  padding: 10px 15px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 15px;
+}
+
+.panel-body {
+  padding: 15px;
+}
+
+::ng-deep .select2-container--default .select2-selection--single {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+::ng-deep .ng-dropdown-panel.ng-select-bottom {
+  font-size: 12px;
+}
+::ng-deep .ng-select-container {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+label {
+  margin-bottom: 0px;
+}
+
+.select2 {
+  width: 100% !important;
+}
+
+.stepwizard-step p {
+  font-size: small;
+  margin-top: 0px;
+  color: #050420;
+}
+
+.stepwizard-row {
+  display: table-row;
+}
+
+.stepwizard {
+  display: table;
+  width: 100%;
+  position: relative;
+}
+
+.stepwizard-step button[disabled] {
+  opacity: 1 !important;
+}
+
+.stepwizard-row:before {
+  top: 14px;
+  bottom: 0;
+  position: absolute;
+  content: " ";
+  width: 100%;
+  height: 1px;
+  background-color: #ccc;
+  z-index: 0;
+}
+
+.stepwizard-step {
+  display: table-cell;
+  text-align: center;
+  position: relative;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+
+.titlefontstep {
+  font-size: larger;
+  color: #560f0f;
+  font-weight: 550;
+}
+
+.lablestyle {
+  color: #0e0e0e;
+  font-size: 12px;
+  margin-bottom: 0px;
+}
+
+.selectdivewidth {
+  width: 100% !important;
+}
+
+.fontstyle {
+  font-weight: bold;
+}
+
+.mandetory {
+  color: red;
+  margin-left: 2px;
+}
+
+.pagetitleborder {
+  border-bottom: 2px solid #0b58b9;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.prev-btn, .next-btn {
+  margin: 10px 5px;
+  padding: 8px 15px;
+  background: #0b58b9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.prev-btn:hover, .next-btn:hover {
+  background: #0a4a9a;
+}
+
+.prev-btn:disabled, .next-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+.btn-default {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.step {
+  display: block;
+  margin-top: 20px;
+}
+
+.step.active {
+  display: block;
+}
+
+.panel-heading {
+  padding: 10px 15px;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 15px;
+}
+
+.panel-body {
+  padding: 15px;
+}
+
+::ng-deep .select2-container--default .select2-selection--single {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+::ng-deep .ng-dropdown-panel.ng-select-bottom {
+  font-size: 12px;
+}
+::ng-deep .ng-select-container {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+label {
+  margin-bottom: 0px;
+}
+.alert.alert-warning {
+  font-size: 11px !important;
+  line-height: 1.4;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+}
+
+.alert.alert-warning strong,
+.alert.alert-warning b {
+  font-size: 11px !important;
+}
+
+.fetch-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.fetch-header {
+  text-align: center;
+}
+
+.fetch-header h5 {
+  margin-bottom: 2px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.fetch-header small {
+  color: #777;
+  font-size: 12px;
+}
+
+.fetch-card .form-control {
+  height: 38px;
+  font-size: 14px;
+}
+
+.fetch-btn {
+  margin-top: 10px;
+  width: 100%;
+  height: 38px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+
+
+/* ================================
+   VALIDITY CONFIRMATION MODAL
+   ================================ */
+
+.validity-modal-backdrop {
+  backdrop-filter: blur(2px);
+}
+
+/* Modal box */
+.modal.show .modal-dialog {
+  animation: validityModalIn 0.2s ease-out;
+}
+
+.modal.show .modal-content {
+  border: none;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.20);
+}
+
+/* Header */
+.modal.show .modal-header {
+  padding: 14px 18px;
+  background: #28a745;
+  border-bottom: none;
+  color: #fff;
+}
+
+.modal.show .modal-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* Body */
+.modal.show .modal-body {
+  padding: 28px 20px 22px;
+  text-align: center;
+  background: #fff;
+}
+
+.modal.show .modal-body p {
+  margin: 0;
+  color: #555;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Selected validity */
+.modal.show .modal-body strong {
+  display: inline-block;
+  margin: 0 4px;
+  padding: 5px 12px;
+  border-radius: 5px;
+  background: #eaf2ff;
+  color: #0b58b9 !important;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Footer */
+.modal.show .modal-footer {
+  padding: 12px 18px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Common buttons */
+.modal.show .modal-footer .btn {
+  min-width: 95px;
+  height: 34px;
+  padding: 6px 14px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* No button */
+.modal.show .modal-footer .btn-secondary {
+  background: #6c757d;
+  border: 1px solid #6c757d;
+  color: #fff;
+}
+
+.modal.show .modal-footer .btn-secondary:hover {
+  background: #5c636a;
+  border-color: #5c636a;
+}
+
+/* Yes button */
+.modal.show .modal-footer .btn-success {
+  background: #28a745;
+  border: 1px solid #28a745;
+  color: #fff;
+}
+
+.modal.show .modal-footer .btn-success:hover {
+  background: #218838;
+  border-color: #218838;
+  transform: translateY(-1px);
+}
+
+/* Modal animation */
+@keyframes validityModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

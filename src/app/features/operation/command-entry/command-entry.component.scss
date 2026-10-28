@@ -1,0 +1,55 @@
+@use '../../../shared/styles/compact-admin-page' as compact;
+
+.content-i {
+  padding: 20px;
+}
+
+.pagetitleborder {
+  border-bottom: 2px solid var(--app-primary);
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.pagebtn {
+  float: right;
+  margin-left: 10px;
+}
+
+.pagebtn a {
+  background-color: var(--app-primary);
+  color: white;
+  padding: 8px 15px;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.form-desc {
+  margin-bottom: 15px;
+  font-size: 12px;
+}
+
+.mandetory {
+  color: red;
+  font-weight: normal;
+}
+
+.modal-content {
+  border-radius: 8px;
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+}
+
+.close {
+  font-size: 28px;
+  font-weight: bold;
+  color: #000;
+  opacity: 0.5;
+}
+
+.close:hover {
+  opacity: 1;
+}
+
+@include compact.compact-admin-page;

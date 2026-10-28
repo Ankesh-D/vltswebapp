@@ -1,0 +1,413 @@
+<div class="container-fluid main-wrapper">
+
+  <!-- ================= HEADER ================= -->
+  <header class="top-header">
+
+    <div class="row align-items-center text-center g-0">
+
+      <!-- Government Logo -->
+      <div class="col-2 gov-logo">
+        <img
+          [src]="leftLogo"
+          alt="Government Logo"
+          >
+      </div>
+
+      <!-- Title -->
+      <div class="col-8">
+
+        <div class="main-title">
+          Vehicle Location Tracking System (VLTS)
+        </div>
+
+        <div class="sub-title">
+          Transport Department, Government of West Bengal
+        </div>
+
+      </div>
+
+      <!-- Webel Logo -->
+      <div class="col-2 webel-logo">
+        <img
+          [src]="webelIcon"
+          alt="Webel Logo"
+          >
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- ================= NAVIGATION ================= -->
+  <nav class="nav-links">
+
+    <div class="container-fluid text-center">
+
+      <a
+        (click)="openFaqModal()"
+        class="nav-other"
+        >
+        FAQ
+      </a>
+
+      <a
+        href="https://vlts.wb.gov.in/entityonboarding/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >
+        VLTD Manufacturer Onboarding
+      </a>
+
+      <a
+        (click)="openVendorModal()"
+        >
+        VLTD Manufacturer Having access
+      </a>
+
+      <a
+        (click)="redirectToLogin()"
+        class="nav-other"
+        >
+        Sign In
+      </a>
+
+      <a
+        class="nav-other"
+        href="mailto:support.vlts@wb.gov.in"
+        >
+        Contact Us:
+        <span class="text-dark">
+          support.vlts&#64;wb.gov.in
+        </span>
+      </a>
+
+    </div>
+
+  </nav>
+
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content">
+
+    <!-- PAGE TITLE -->
+    <section class="page-heading-wrapper">
+
+      <div class="page-heading">
+        AIS-140 VLTD Tracking Platform
+      </div>
+
+    </section>
+
+
+    <!-- ================= ANNOUNCEMENT ================= -->
+    @if (announcementData?.length) {
+      <section
+        class="announcement-section"
+        >
+        <div class="news-marquee">
+          <div class="news-text">
+            @for (item of announcementData; track item) {
+              <span class="fw-bold px-1">
+                {{ item.param3 }} :
+              </span>
+              <span class="pe-4">
+                {{ item.param4 }}
+              </span>
+            }
+          </div>
+        </div>
+      </section>
+    }
+
+
+    <!-- ================= MENU ================= -->
+    <section class="containers">
+
+      <!-- MENU ROW 1 -->
+      <div class="row justify-content-center menu-row">
+
+        <div class="col-lg-6 col-md-6 col-sm-10 mb-3">
+
+          <div class="shutter-box">
+
+            <a
+              href="https://vlts.wb.gov.in/entityonboarding/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text text-white"
+              >
+              VLTD Manufacturer Onboarding
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <div class="col-lg-6 col-md-6 col-sm-10 mb-3">
+
+          <div
+            class="shutter-box"
+            (click)="openVendorModal()"
+            >
+
+            <div class="text">
+              VLTD Manufacturer Having Access
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- MENU ROW 2 -->
+      <div class="row justify-content-center menu-row">
+
+        <!-- Installation -->
+        <div class="col-lg-4 col-md-4 col-sm-10 mb-3">
+
+          <div class="shutter-box">
+
+            <a
+              [href]="installationPDF"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text text-white"
+              >
+              VLTD Installation Process
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <!-- Renewal -->
+        <div class="col-lg-4 col-md-4 col-sm-10 mb-3">
+
+          <div class="shutter-box">
+
+            <a
+              [href]="renewalPDF"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text text-white"
+              >
+              VLTD Renewal Process
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <!-- Untag -->
+        <div class="col-lg-4 col-md-4 col-sm-10 mb-3">
+
+          <div class="shutter-box">
+
+            <a
+              [href]="untagPDF"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text text-white"
+              >
+              VLTD Untag Process
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer">
+
+    <div class="footer-left"></div>
+
+    <div class="footer-center">
+
+      Copyrights © 2026 |
+      Transport Department, Government of West Bengal |
+      All rights reserved
+
+    </div>
+
+    <div class="footer-right">
+      Powered by DIMTS
+    </div>
+
+  </footer>
+
+</div>
+
+
+<!-- =====================================================
+VENDOR MODAL
+===================================================== -->
+
+<div
+  class="modal fade"
+  id="vendorModal"
+  tabindex="-1"
+  aria-labelledby="vendorModalLabel"
+  aria-hidden="true"
+  >
+  <div class="modal-dialog modal-dialog-centered vendor-modal-dialog">
+
+    <div class="modal-content">
+
+      <div class="modal-header py-2">
+
+        <h5
+          class="modal-title"
+          id="vendorModalLabel"
+          >
+          VLTD Manufacturers Having Access
+        </h5>
+
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="authService.closeModal('vendorModal')">
+        </button>
+
+      </div>
+
+
+      <div class="modal-body p-0">
+
+        <div class="table-responsive">
+
+          <table class="table vendor-tbl mb-0">
+
+            <thead>
+
+              <tr>
+
+                <th style="width: 50px;">
+                  #
+                </th>
+
+                <th>
+                  Vendor Name
+                </th>
+
+                <th>
+                  Contact No.
+                </th>
+
+                <th>
+                  Email Id
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              @if (vendorList.length === 0) {
+                <tr>
+                  <td
+                    colspan="4"
+                    class="text-center"
+                    >
+                    No VLTD Manufacturers Having Access found.
+                  </td>
+                </tr>
+              }
+
+
+              @for (item of vendorList; track item; let i = $index) {
+                <tr
+                  >
+                  <td>
+                    {{ i + 1 }}
+                  </td>
+                  <td>
+                    {{ item.param3 }}
+                  </td>
+                  <td>
+                    {{ item.param4 }}
+                  </td>
+                  <td>
+                    {{ item.param5 }}
+                  </td>
+                </tr>
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+FAQ MODAL
+===================================================== -->
+
+<div
+  class="modal fade"
+  id="faqModal"
+  tabindex="-1"
+  aria-labelledby="faqModalLabel"
+  aria-hidden="true"
+  >
+
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+
+    <div class="modal-content">
+
+      <div
+        class="modal-header text-white"
+        style="background-color: #885000;"
+        >
+
+        <h5
+          class="modal-title"
+          id="faqModalLabel"
+          >
+          Frequently Asked Questions
+        </h5>
+
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          aria-label="Close"
+          (click)="authService.closeModal('faqModal')"
+        ></button>
+
+      </div>
+
+      <div class="modal-body p-0">
+
+        <app-faq></app-faq>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

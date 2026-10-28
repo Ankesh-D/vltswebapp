@@ -1,0 +1,238 @@
+<div class="content-i">
+  <div class="content-box pt-0">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="content-body">
+          <div class="container-fluid px-0">
+            <div class="card main-card">
+              <div class="card-body">
+                <!-- Title -->
+                <div class="d-flex justify-content-between">
+                  <div></div>
+                  <div>
+                    <h5 class="text-center fw-bold title-text mb-1">
+                      AIS-140 Device Health Ackowledgement - Search by IMEI No.
+                    </h5>
+                  </div>
+                  <div>
+                    <button
+                      class="btn btn-sm backbtn fw-bold"
+                      type="button"
+                      (click)="backBtn()">
+                      <i class="bx bx-arrow-out-left-circle-half"></i> Back
+                    </button>
+                  </div>
+                </div>
+
+                <form #searchForm="ngForm">
+                  <div class="row py-2 justify-content-center" id="imeisearch">
+                    <div class="col-md-5 col-sm-8">
+                      <div class="input-group">
+                        <input
+                          type="text"
+                          class="form-control text-center"
+                          maxlength="20"
+                          minlength="15"
+                          name="imeiNo"
+                          #searchByCtrl="ngModel"
+                          [(ngModel)]="searchBy"
+                          placeholder="Search by IMEI No"
+                          (keyup.enter)="onFetchClick()"
+                          autocomplete="off"
+                          required
+                          />
+                        <div class="input-group-append">
+                          <button
+                            class="btn btn-sm btn-primary"
+                            type="submit"
+                            (click)="onFetchClick()">
+                            Search
+                          </button>
+                          &nbsp;&nbsp;
+                          @if (statusDetailsFlag) {
+                            <button
+                              class="btn btn-sm btn-warning"
+                              type="button"
+                              (click)="onRefreshClick()"
+                              >
+                              <i class="fa fa-refresh"></i></button>
+                              }&nbsp;&nbsp;
+                            </div>
+                          </div>
+                          <div class="text-danger text-small field-error">
+                            @if (searchByCtrl.invalid && searchByCtrl.touched) {
+                              <div
+                                >
+                                Search by is required.
+                              </div>
+                            }
+                            @if (
+                              searchByCtrl.invalid &&
+                              searchByCtrl.touched &&
+                              (searchByCtrl.errors?.['minlength'] ||
+                              searchByCtrl.errors?.['maxlength'])
+                              ) {
+                              <div
+                                class="field-error mt-2"
+                                >
+                                Search by must be 15-20 characters.
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                    <div class="soft-bg rounded">
+                      <!--  -->
+                      @if (statusDetailsFlag) {
+                        <div class="row fade-in-up">
+                          <div class="col-md-12 mb-3 d-flex justify-content-between">
+                            <div
+                              class="text-muted fw-bold pt-2"
+                              style="font-size: 12px"
+                              >
+                              <!-- Note: If you want to change any information, please
+                              click on the edit button <i class="bx bx-edit"></i> in
+                              respective section. -->
+                            </div>
+                            <div>
+                              <button
+                                (click)="onClearClick()"
+                          style="
+                            border: 1px solid #0b58b9;
+                            background: white;
+                            color: #0b58b9;
+                            border-radius: 4px;
+                            padding: 2px 8px;
+                            font-size: 11px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            display: inline-flex;
+                            align-items: center;
+                            font-size: 12px;
+                          "
+                                title="Back To Details"
+                                >
+                                <i class="bx bx-arrow-out-left-circle-half"></i> Clear
+                                Search
+                              </button>
+                            </div>
+                          </div>
+                          <div class="col-md-12">
+                            <div class="info-card">
+                              <div
+                                class="info-title bg-vehicle d-flex align-items-center justify-content-between py-0"
+                                >
+                                <div><i class="bx bx-chip"></i> Device Details</div>
+                              </div>
+                              <div class="info-body details-body">
+                                <div class="row">
+                                  <div class="col-md-4">
+                                    <p><span>Serial No</span> {{ responseData.param5 ?
+                                  responseData.param5 : 'N/A' }}</p>
+                                  <p><span>IMEI No</span> {{ responseData.param4 ? responseData.param4
+                                : 'N/A' }}</p>
+                                <p><span>Esim Provider</span> {{ responseData.param43 ?
+                              responseData.param43 : 'N/A' }} </p>
+                              <!-- <p><span>ESIM Code</span> {{ responseData.param42 ?
+                            responseData.param42 : 'N/A' }}</p> -->
+                            <p><span>ICCID No</span> {{ responseData.param6 ?
+                          responseData.param6 : 'N/A' }}</p>
+                          <p><span>Model Name</span> {{ responseData.param10 ?
+                        responseData.param10 : 'N/A' }}</p>
+                        <p><span>Manufacturer</span> {{ responseData.param8 ?
+                      responseData.param8 : 'N/A' }}</p>
+                      <!-- <p><span>Network 1</span> {{ responseData.param61 ?
+                    responseData.param59 : 'N/A' }}</p> -->
+                    <p><span>SIM 1</span> {{ responseData.param66 ?
+                    responseData.param66 : 'N/A' }} {{ responseData.param59 ?
+                  '('+responseData.param59+')' : '' }}</p>
+                  <!-- <p><span>Network 2</span> {{ responseData.param59 ?
+                responseData.param61 : 'N/A' }}</p> -->
+                <p><span>SIM 2</span> {{ responseData.param67 ?
+                responseData.param67 : 'N/A' }} {{ responseData.param61 ?
+              '('+responseData.param61+')' : '' }}</p>
+              <!-- <div class="d-flex justify-content-between">
+              <div>
+              </div>
+              <div>
+              </div> -->
+            <!-- </div> -->
+          </div>
+          <div class="col-md-4">
+            <p><span>Activation Date</span> {{ responseData.param16 ?
+          responseData.param16 : 'N/A' }}</p>
+          <p><span>Vehicle No</span> {{ responseData.param13 }}</p>
+          <p><span>Chassis No</span> {{ responseData.param14 }}</p>
+          <p><span>Engine No</span> {{ responseData.param15 }}</p>
+          <p><span>Type</span> {{ responseData.param19 }}</p>
+          <p><span>Customer Name</span> {{ responseData.param23 }}</p>
+          <p><span>Mobile No.</span> {{ responseData.param24 }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><span>Manufacturing Year</span> {{ responseData.param22=='0' ?
+        'N/A' : responseData.param22 }}</p>
+        <p><span>Vehicle Make</span> {{ responseData.param53 ?
+        responseData.param53
+      : 'N/A'}}</p>
+      <p><span>Vehicle Model</span> {{ responseData.param55 ?
+      responseData.param55
+    : 'N/A'}}</p>
+    <p><span>Vehicle Class</span> {{ responseData.param57 ?
+    responseData.param57
+  : 'N/A'}}</p>
+  <p><span>RTO</span> {{ responseData.param63 ? responseData.param63
+: 'N/A'}}</p>
+<p>
+  <span>Activation Status</span>
+  <span
+    [ngClass]="{'text-success': responseData.param20 === 'Activated'}">
+    {{ responseData.param20 ? responseData.param20 : '-' }}
+  </span>
+</p>
+</div>
+<div class="col-md-12">
+  <div class="float-end ">
+    <button
+      class="btn btn-sm btn-primary compliance-btn"
+      style="min-width: 170px"
+      type="button"
+      (click)="sendDeviceHealthCheck()"
+      >
+      Send Health Acknowledgement Message
+    </button>
+    <button
+      class="btn btn-sm btn-secondary compliance-btn mx-1"
+      type="button" (click)="getHealthAcknowledgeResponse()">
+      <i class="fa fa-refresh"></i>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+<div class="info-body">
+  <div class="row">
+    <div class="col-md-12 px-1">
+      <div class="devicepacket">
+        <p>
+          <span>Device Packet</span> {{checkHealthAckResponse.param21 ? checkHealthAckResponse.param21 : '-'}}
+        </p>
+        <p>
+          <span>Received Date</span> {{checkHealthAckResponse.param12 ? checkHealthAckResponse.param12 : '-'}}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+}
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>

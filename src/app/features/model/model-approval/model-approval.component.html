@@ -1,0 +1,208 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle"><span>Device Model Approval</span></div>
+        </div>
+
+        <!-- Search Controls -->
+        <div class="top-controls-row">
+
+          <!-- LEFT SEARCH -->
+          <div class="left-controls">
+
+            <!-- SEARCH -->
+            <div class="search-box">
+              <input type="search"
+                class="search-input inner"
+                placeholder="Type here and press button...."
+                maxlength="50"
+                [(ngModel)]="searchText"
+                (keyup.enter)="getSearchDetails()" />
+
+              <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+
+            <!-- RELOAD -->
+            <button class="reload-btn" (click)="reloadData()" [disabled]="loading">
+              <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+              <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+            </button>
+
+          </div>
+
+          <!-- RIGHT CONTROLS -->
+          <div class="right-controls">
+            <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+              [showPageSize]="false" [showTotal]="false" [exportLoading]="isExporting"
+              (excelExport)="exportToExcel()"></app-common-data-toolbar>
+
+            <!-- ROWS -->
+            <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)">
+              @for (size of pageSizeOptions; track size) {
+                <option [value]="size === totalCount ? totalCount : size">
+                  {{ size === totalCount ? totalCount : size }}
+                </option>
+              }
+            </select>
+
+            <!-- TOTAL -->
+            <div class="total-records-text">
+              Total Records : {{ pageCount }} of {{ totalCount }}
+            </div>
+
+          </div>
+
+        </div>
+
+        <app-common-table [columns]="tableColumns" [rows]="models" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="modelApprovalCell"
+          tableClass="table table-striped app-table mb-1" tableId="devicetable"
+          tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
+          (sortChange)="sort($event)">
+        </app-common-table>
+        <ng-template #modelApprovalCell let-model let-column="column" let-index="index">
+          @switch (column.key) {
+            @case ('param1') { {{model.param1 || (index + 1)}} }
+            @case ('param20') {
+              <span [style.background-color]="model.param20 === 'Approved' ? '#28a745' : (model.param20 === 'Pending' ? '#ffc107' : '#dc3545')"
+                [style.color]="model.param20 === 'Pending' ? '#333' : 'white'"
+                style="padding: 2px 4px; border-radius: 50px; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; min-width: 60px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                {{model.param20 || 'NA'}}
+              </span>
+            }
+            @case ('activity') {
+              <button type="button" (click)="openApprovalModal(model)" [disabled]="roleId=='17' || roleId=='18' || roleId=='19'"
+                [style.background-color]="model.param20 === 'Approved' ? '#dc3545' : '#0b58b9'"
+                style="cursor:pointer; min-width: 95px; border: none; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-flex; align-items: center; justify-content: center; gap: 5px;">
+                <i class="fa" [ngClass]="model.param20 === 'Approved' ? 'fa-times' : 'fa-check'"></i>
+                {{model.param20 === 'Approved' ? 'Disapprove' : 'Approve'}}
+              </button>
+            }
+            @case ('tacValidity') {
+              @if (model.param34 === 'Pending' && model.param20 !== 'Pending') {
+                <button type="button" (click)="openTacValidityModal(model)" title="Approve TAC Validity"
+                  style="cursor:pointer; width: 28px; height: 28px; border: 1px solid #0b58b9; background: #fff; color: #0b58b9; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                  <i class="fa fa-pencil"></i>
+                </button>
+              }
+              @if (model.param34 !== 'Pending') {
+                <button type="button" disabled title="Approved"
+                  style="cursor:default; width: 28px; height: 28px; border: 1px solid #28a745; background: #f0fff4; color: #28a745; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;">
+                  <i class="fa fa-check"></i>
+                </button>
+              }
+              @if (model.param34 === 'Pending' && model.param20 === 'Pending') {
+                <button type="button" disabled title="Pending Model Approval"
+                  style="cursor:not-allowed; width: 28px; height: 28px; border: 1px solid #dee2e6; background: #f8f9fa; color: #adb5bd; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;">
+                  <i class="fa fa-clock-o"></i>
+                </button>
+              }
+            }
+            @default {
+              {{column.value ? column.value(model) : 'NA'}}
+            }
+          }
+        </ng-template>
+
+        <!-- Pagination Controls -->
+        <div class="float-end">
+          @if (totalCount > pageSize) {
+            <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+              [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+              [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+            </ngb-pagination>
+          }
+        </div>
+        <!-- <div *ngIf="totalCount > 0" class="pagination-wrapper">
+        <ul class="pagination">
+          <li [class.disabled]="currentPage === 1">
+            <button type="button" (click)="onPageChange(currentPage - 1)"
+            [disabled]="currentPage === 1">Previous</button>
+          </li>
+          <li *ngFor="let page of getPageNumbers(); let i = index" [class.active]="currentPage === (i + 1)">
+            <button type="button" (click)="onPageChange(i + 1)">{{i + 1}}</button>
+          </li>
+          <li [class.disabled]="currentPage >= getTotalPages()">
+            <button type="button" (click)="onPageChange(currentPage + 1)"
+            [disabled]="currentPage >= getTotalPages()">Next</button>
+          </li>
+        </ul>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger" style="margin-top: 10px;">
+        {{errorMessage}}
+      </div> -->
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Approval Modal -->
+@if (showApprovalModal) {
+  <div class="modal-overlay" (click)="closeApprovalModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fa" [ngClass]="approvalAction === 'Approve' ? 'fa-check-circle' : 'fa-times-circle'"></i>
+          {{approvalAction}} Model
+        </h5>
+        <button type="button" class="close" (click)="closeApprovalModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label style="font-weight: 600; color: #333;">Remark <span class="mandetory">*</span></label>
+          <textarea class="form-control" [(ngModel)]="approvalRemark" rows="4" style="resize: none;"
+          placeholder="Enter remark for {{approvalAction.toLowerCase()}}..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="closeApprovalModal()">Cancel</button>
+        <button type="button" class="btn" [ngClass]="approvalAction === 'Approve' ? 'btn-primary' : 'btn-danger'" (click)="approveModel()" [disabled]="loading">
+          <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : (approvalAction === 'Approve' ? 'fa-check' : 'fa-times')"></i>
+          {{loading ? 'Processing...' : approvalAction}}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- TAC Validity Approval Modal -->
+@if (showTacValidityModal) {
+  <div class="modal-overlay" (click)="closeTacValidityModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa fa-calendar-check-o"></i> Approve TAC Validity</h5>
+        <button type="button" class="close" (click)="closeTacValidityModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label style="font-weight: 600; color: #333;">Remark <span class="mandetory">*</span></label>
+          <textarea class="form-control" [(ngModel)]="tacValidityRemark" rows="4" style="resize: none;"
+          placeholder="Enter remark for TAC validity approval..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" (click)="closeTacValidityModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="approveTacValidity()" [disabled]="loading">
+          <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+          {{loading ? 'Processing...' : 'Approve'}}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+
+<!-- <app-toast *ngIf="errorMessage" [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast> -->
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success"
+  (closed)="successMessage = null"></app-toast>
+}

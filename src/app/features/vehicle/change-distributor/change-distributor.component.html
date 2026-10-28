@@ -1,0 +1,376 @@
+<!-- <div class="content-i"> -->
+<div class="row">
+  <div class="col-lg-12">
+    <!-- <div class="content-box"> -->
+    <div class="element-wrapper">
+      <div class="element-box">
+        <!-- PAGE HEADER -->
+        <div class="page-header-row">
+          <!-- TITLE -->
+          <div class="page-title">Change Distributor</div>
+
+          <!-- ACTION BUTTONS -->
+          <!-- <div class="header-actions">
+          <button
+            *ngIf="roleId !== '12'"
+            type="button"
+            class="add-new-btn"
+            routerLink="/device/unassign-distributor"
+            >
+            Unassign Distributor
+          </button>
+
+          <button
+            type="button"
+            class="add-new-btn"
+            routerLink="/device/unassign-dealer"
+            >
+            <i class="fa fa-minus"></i>
+            Unassign Dealer
+          </button>
+
+          <button type="button" class="add-new-btn" routerLink="/device/change">
+            <i class="fa fa-refresh"></i>
+            Change Device
+          </button>
+        </div> -->
+      </div>
+
+      <!-- SEARCH + CONTROLS -->
+      <div class="table-responsive">
+        <form autocomplete="off" class="top-controls-row">
+          <!-- LEFT : SEARCH + RELOAD -->
+          <div class="left-controls">
+            <span class="search-label">Search :</span>
+
+            <div class="search-box">
+              <input type="search" readonly onfocus="this.removeAttribute('readonly')"
+                class="search-input inner" placeholder="Type here and press button...."
+                maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()"
+                name="searchby" />
+
+              <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+
+            <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading">
+              {{ loading ? "Reloading..." : "Reload" }}
+            </button>
+          </div>
+
+          <!-- RIGHT : ROWS + TOTAL -->
+          <div class="right-controls">
+            <div class="control-item">
+              <label>Show Rows :</label>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
+                @for (size of pageSizeOptions; track size) {
+                  <option
+                    [value]="size === totalCount ? 'All' : size">
+                    {{ size === totalCount ? "All" : size }}
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="total-records-text">
+              Total Records : {{ pageCount }} of {{ totalCount }}
+            </div>
+          </div>
+        </form>
+
+                    <table class="table-striped app-table table" style="
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            font-size: 11px;
+          ">
+          <thead>
+            <tr>
+              <th style="width: 40px">#</th>
+              <th (click)="sort('param6')" style="cursor: pointer">
+                Serial No.
+                <hr />
+                IMEI No.
+                @if (sortKey === 'param6') {
+                  <span class="sorting"
+                  [ngClass]="{ sorting_desc: reverse, sorting_asc: !reverse }"></span>
+                }
+              </th>
+              <th (click)="sort('param7')" style="cursor: pointer">
+                ICCID No.
+                @if (sortKey === 'param7') {
+                  <span class="sorting"
+                  [ngClass]="{ sorting_desc: reverse, sorting_asc: !reverse }"></span>
+                }
+              </th>
+              @if (roleId !== '11') {
+                <th (click)="sort('param15')" style="cursor: pointer">
+                  Vendor
+                  @if (sortKey === 'param15') {
+                    <span class="sorting"
+                    [ngClass]="{ sorting_desc: reverse, sorting_asc: !reverse }"></span>
+                  }
+                </th>
+              }
+              <th (click)="sort('param40')" style="cursor: pointer">
+                Distributor
+                @if (sortKey === 'param40') {
+                  <span class="sorting"
+                  [ngClass]="{ sorting_desc: reverse, sorting_asc: !reverse }"></span>
+                }
+              </th>
+              <th (click)="sort('param16')" style="cursor: pointer">
+                Dealer
+                @if (sortKey === 'param16') {
+                  <span class="sorting"
+                  [ngClass]="{ sorting_desc: reverse, sorting_asc: !reverse }"></span>
+                }
+              </th>
+              <th>Activity</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (deviceDetails.length === 0 && !loading) {
+              <tr>
+                <td style="font-weight: bold; text-align: center" colspan="100">
+                  NO DATA FOUND
+                </td>
+              </tr>
+            }
+            @for (device of getPaginatedData(); track device) {
+              <tr>
+                <td>{{ device.param1 || "NA" }}</td>
+                <td>
+                  {{ device.param6 || "NA" }}<br />{{ device.param5 || "NA" }}
+                </td>
+                <td>{{ device.param7 || "NA" }}</td>
+                @if (roleId !== '11') {
+                  <td>{{ device.param15 || "NA" }}</td>
+                }
+                <td>{{ device.param40 || "NA" }}</td>
+                <td>{{ device.param16 || "NA" }}</td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-primary" type="button"
+                      (click)="getDeviceDataForChange(device)">
+                      Edit
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (getTotalPages() > 1) {
+        <div class="pagination-wrapper">
+          @for (page of getPageNumbers(); track page) {
+            <button (click)="onPageChange(page)"
+              [disabled]="page === -1 || currentPage === page" [class.active]="currentPage === page">
+              @if (page === -1) {
+                <span>...</span>
+              }
+              @if (page !== -1) {
+                <span>{{ page }}</span>
+              }
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
+</div>
+<!-- </div> -->
+<!-- </div> -->
+
+<!-- Change Dealer Modal (Angular overlay, legacy style) -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+  aria-labelledby="vendorEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header py-2 px-3" style="background: #d4d8e6;">
+        <h5 class="modal-title" style="font-size: 14px; font-weight: 600; color: #333;">Update Vendor</h5>
+        <button type="button" class="close" (click)="closeEditModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form #editForm="ngForm" (ngSubmit)="changeDistributor()">
+        <div class="modal-body py-3 px-3">
+          <div class="row">
+            @if (roleId == '10') {
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="" style="font-weight: bold">Vendor Name: <span for="" class="mandetory">*</span></label>
+                  <ng-select
+                    placeholder="Select Vendor"
+                    [(ngModel)]="selectedVendor"
+                    (change)="onChangeVendor()"
+                    name="vendorName" [clearable]="true"
+                    #vendorListCtrl="ngModel"
+                    [searchable]="true" style="font-size: 11px;"
+                    required>
+                    @for (item of vendorList; track item) {
+                      <ng-option [value]="item" >{{item.param2}}</ng-option>
+                    }
+                  </ng-select>
+                  @if (vendorListCtrl.invalid && (vendorListCtrl.touched || submittedFlag)) {
+                    <div class="field-error">Vendor is required.</div>
+                  }
+                </div>
+              </div>
+            }
+            @if (roleId == '11' || roleId == '10') {
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="" style="font-weight: bold">Distributor Name:<span for="" class="mandetory">*</span></label>
+                  <ng-select placeholder="Select Distributor"
+                    [(ngModel)]="selectedDistributor"
+                    (change)="onChangeDistributor()"
+                    name="distributorName" [clearable]="true"
+                    #distributorListCtrl="ngModel"
+                    [searchable]="true" style="font-size: 11px;" required>
+                    @for (item of distributorList; track item) {
+                      <ng-option [value]="item" >{{item.param2}}</ng-option>
+                    }
+                  </ng-select>
+                  @if (distributorListCtrl.invalid && (distributorListCtrl.touched || submittedFlag)) {
+                    <div class="field-error">Distributor is required.</div>
+                  }
+                </div>
+              </div>
+            }
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label for="" style="font-weight: bold">Dealer Name:<span for="" class="mandetory">*</span></label>
+                <ng-select placeholder="Select Dealer"
+                  [(ngModel)]="selectedDealerPlain" name="dealerName"
+                  [clearable]="true" #dealerListCtrl="ngModel" [searchable]="true"
+                  style="font-size: 11px;" required>
+                  @for (item of dealerList; track item) {
+                    <ng-option [value]="item" >{{item.param2}}</ng-option>
+                  }
+                </ng-select>
+                @if (dealerListCtrl.invalid && (dealerListCtrl.touched || submittedFlag)) {
+                  <div class="field-error">Dealer is required.</div>
+                }
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label for="" style="font-weight: bold">Remark:<span for="" class="mandetory">*</span></label>
+                <textarea class="form-control ignorespecialcharacter_address"
+                  id="remarks"
+                  placeholder="Reason"
+                  [(ngModel)]="editRemark"
+                  (keyup)="checkRemark()"
+                  #remarksCtrl="ngModel"
+                name="remark"></textarea>
+                @if (remarksCtrl.invalid && (remarksCtrl.touched || submittedFlag)) {
+                  <div class="field-error">
+                    Remark must be at least 10 characters.
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-sm btn-primary"
+                  [disabled]="editForm.invalid || loading">
+                  {{ loading ? "Changing..." : "Submit" }}
+                </button>
+                <button class="btn btn-sm btn-secondary" id="btnstyle" type="button"
+                (click)="back()">Back</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- <div
+*ngIf="showChangeModal"
+class="modal-overlay change-dealer-modal"
+(click)="back()"
+>
+<div class="modal-content" (click)="$event.stopPropagation()">
+  <div class="modal-header">
+    <h5 class="modal-title" style="font-size: 13px">Change Dealer</h5>
+    <button type="button" class="close" (click)="back()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="table-responsive">
+      <span style="font-size: 11px"
+        >Serial No. : <font>{{ editSerialNo }}</font></span
+        ><br />
+        <table class="table-bordered table">
+          <thead>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label for="" style="font-weight: bold">Dealer Name:</label
+                    ><label for="" class="mandetory">*</label>
+                    <select
+                      id="dealer"
+                      [(ngModel)]="selectedDealerPlain"
+                      (ngModelChange)="onNewDealerChange($event)"
+                      name="newDealer"
+                      class="form-control"
+                      >
+                      <option value="">Dealer Name</option>
+                      <option
+                        *ngFor="let item of dealerList"
+                        [value]="item.param1"
+                        >
+                        {{ item.param2 }}
+                      </option>
+                    </select>
+
+
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="" style="font-weight: bold">Remark:</label
+                      ><label for="" class="mandetory">*</label>
+                      <textarea
+                        class="form-control ignorespecialcharacter_address"
+                        id="remarks"
+                        placeholder="Reason"
+                        [(ngModel)]="editRemark"
+                        (keyup)="checkRemark()"
+                        name="remark"
+                    [ngClass]="{
+                      'border-danger': remarksCtrl.invalid && (remarksCtrl.touched || submittedFlag),
+                      'border-success':
+                        !isRemarkInvalid && editRemark.length >= 10,
+                    }"
+                      ></textarea>
+                      <div
+                        *ngIf="isRemarkInvalid"
+                        style="color: red; font-size: 11px"
+                        >
+                        Remark must be at least 10 characters.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </thead>
+            </table>
+          </div>
+        </div>
+        <div id="updatemodelheaderbutton" class="modelbtnstyle">
+          <button
+            (click)="changeDealer()"
+            [disabled]="isRemarkInvalid || !editNewDealerId || loading"
+            >
+            {{ loading ? "Changing..." : "Submit" }}
+          </button>
+          <button id="btnstyle" type="reset" (click)="back()">Back</button>
+        </div>
+      </div>
+    </div> -->

@@ -1,0 +1,576 @@
+<!-- ============================================================
+HOLIDAY CALENDAR MASTER — School Management System
+Consistent with school-master / school-trip-master layout:
+single card, sticky title bar with Details <-> Form toggle.
+============================================================= -->
+<div class="container-fluid py-2 holiday-master">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-2">
+
+      <!-- Page Title Row -->
+      <div class="d-flex justify-content-between align-items-center border-bottom border-primary py-2 mb-2 flex-wrap">
+        <div class="pagetitlestyle">
+          {{ detailsToggle ? 'Holiday Calendar Details' : (isViewMode ? 'View Holiday' : (isEditMode ? 'Edit Holiday' : 'Holiday Calendar Master Form')) }}
+        </div>
+        <div class="d-flex flex-wrap">
+          <!-- <a *ngIf="detailsToggle" style="font-size: 12px;" class="btn btn-outline-secondary btn-sm me-2 mb-1" (click)="openWeekendConfigModal()">
+          <i class="fa fa-cog me-1"></i>Weekend Config
+        </a>
+        <a *ngIf="detailsToggle" style="font-size: 12px;" class="btn btn-outline-secondary btn-sm me-2 mb-1" (click)="openBulkImportModal()">
+          <i class="fa fa-upload me-1"></i>Bulk Import
+        </a> -->
+        <a style="font-size: 12px;" class="btn btn-primary btn-sm mb-1" (click)="detailsToggle ? openCreatePanel() : closeFormPanel()">
+          <i class="fa" [ngClass]="detailsToggle ? 'fa-plus' : 'fa-arrow-left'"></i>
+          {{ detailsToggle ? ' Add New' : ' Back to Details' }}
+        </a>
+      </div>
+    </div>
+
+    <!-- ============================================================
+    DETAILS VIEW — Filters, Holiday List grid, Summary & Calendar
+    ============================================================= -->
+    @if (detailsToggle) {
+      <div class="row">
+        <!-- ===== LEFT : Search + Holiday List Grid ===== -->
+        <div class="col-md-8">
+          <form autocomplete="off" class="mb-2">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+              <div class="d-flex align-items-center flex-wrap">
+                <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Search :</label>
+                <div class="input-group input-group-sm">
+                  <input type="search" class="form-control shadow-none" placeholder="Holiday name / code..."
+                    [(ngModel)]="filter.searchText" (keyup.enter)="onSearch()" name="searchby" autocomplete="off"
+                    style="font-size: 11px; width: 200px;">
+                  <div class="input-group-append">
+                    <button type="button" class="btn btn-primary search-btn" (click)="onSearch()">
+                      <i class="fa fa-search" style="font-size: 11px;"></i>
+                    </button>
+                  </div>
+                </div>
+                <button type="button" (click)="resetFilters()" class="btn btn-outline-success btn-sm ms-2"
+                  style="font-size: 11px;" title="Reload">
+                  <i class="fa fa-refresh me-1" [class.fa-spin]="loading"></i>
+                  {{ loading ? 'Reloading...' : 'Reset' }}
+                </button>
+              </div>
+              <div class="d-flex align-items-center flex-wrap mt-1 mt-md-0">
+                <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                  [showPageSize]="false" [showTotal]="false" (excelExport)="exportExcel()"></app-common-data-toolbar>
+                <button type="button" class="btn btn-outline-danger btn-sm me-1" style="font-size: 11px;" (click)="exportPdf()"><i class="fa fa-file-pdf-o me-1"></i>PDF</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm me-1" style="font-size: 11px;" (click)="printGrid()"><i class="fa fa-print me-1"></i>Print</button>
+                <div class="me-1 position-relative">
+                  <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size: 11px;" (click)="toggleColumnChooser()">
+                    <i class="fa fa-columns me-1"></i>Columns
+                  </button>
+                  <div class="dropdown-menu p-2 column-chooser-menu" [class.show]="columnChooserOpen">
+                    @for (col of visibleColumns | keyvalue; track col) {
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" [id]="'col_' + col.key" [checked]="col.value"
+                          (change)="toggleColumnVisibility(col.key)" />
+                        <label class="custom-control-label" [for]="'col_' + col.key" style="font-size: 11px;">{{ col.key }}</label>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex flex-wrap mt-2">
+              <div class="me-2 mb-1" style="width: 160px;">
+                <ng-select [items]="holidayTypeOptions" bindLabel="label" bindValue="value" placeholder="Holiday Type"
+                [(ngModel)]="filter.holidayType" [ngModelOptions]="{standalone: true}" (change)="onSearch()"></ng-select>
+              </div>
+              <div class="me-2 mb-1" style="width: 160px;">
+                <ng-select [items]="schoolList" bindLabel="name" bindValue="id" placeholder="School"
+                [(ngModel)]="filter.schoolId" [ngModelOptions]="{standalone: true}" (change)="onSearch()"></ng-select>
+              </div>
+              <div class="me-2 mb-1" style="width: 140px;">
+                <ng-select [items]="holidayStatusOptions" bindLabel="label" bindValue="value" placeholder="Status"
+                [(ngModel)]="filter.status" [ngModelOptions]="{standalone: true}" (change)="onSearch()"></ng-select>
+              </div>
+            </div>
+          </form>
+          <app-common-table [columns]="tableColumns" [rows]="holidayTableRows"
+            [bodyTemplate]="holidayTableBody" [sortKey]="sortColumn"
+            [reverse]="sortDirection === 'desc'" tableClass="table table-striped app-table table-sm table-bordered mb-1"
+            tableId="holidayTable" (sortChange)="sortBy($event)">
+          </app-common-table>
+          <ng-template #holidayTableBody let-rows>
+            @if (loading) {
+              @for (row of rows; track $index) {
+                <tr><td [attr.colspan]="11"><div class="skeleton-row"></div></td></tr>
+              }
+            } @else if (!holidayList.length) {
+              <tr><td colspan="11" class="text-center">No Records Found</td></tr>
+            } @else {
+              @for (row of holidayList; track trackByHolidayId(i, row); let i = $index) {
+                <tr>
+                  <td>{{ (pageSize * (currentPage - 1)) + i + 1 }}</td>
+                  @if (visibleColumns['holidayCode']) { <td>{{ row.holidayCode }}</td> }
+                  @if (visibleColumns['holidayName']) { <td>{{ row.holidayName }}</td> }
+                  @if (visibleColumns['holidayType']) {
+                    <td><span class="badge" [style.backgroundColor]="colorForType(row.holidayType)" style="color:#fff">{{ row.holidayType }}</span></td>
+                  }
+                  @if (visibleColumns['holidayDate']) { <td>{{ row.holidayDate | date:'dd MMM yyyy' }}</td> }
+                  @if (visibleColumns['applicableFrom']) { <td>{{ row.applicableFrom | date:'dd MMM yyyy' }}</td> }
+                  @if (visibleColumns['applicableTo']) { <td>{{ row.applicableTo | date:'dd MMM yyyy' }}</td> }
+                  @if (visibleColumns['academicSession']) { <td>{{ getAcademicSessionName(row.academicSessionId) }}</td> }
+                  @if (visibleColumns['applicableSchools']) { <td>{{ getApplicableSchoolNames(row) }}</td> }
+                  @if (visibleColumns['status']) {
+                    <td>
+                      <span class="badge" [class.badge-success]="row.status === holidayStatusEnum.Active"
+                        [class.badge-secondary]="row.status !== holidayStatusEnum.Active">{{ row.status }}</span>
+                    </td>
+                  }
+                  <td class="text-center text-nowrap">
+                    <a class="btn btn-primary btn-sm" title="View" (click)="viewHoliday(row)"><i class="fa fa-eye"></i></a>
+                    <a class="btn btn-primary btn-sm" title="Edit" (click)="editHoliday(row)"><i class="fa fa-edit"></i></a>
+                    <a class="btn btn-secondary btn-sm" title="Copy" (click)="copyHoliday(row)"><i class="fa fa-copy"></i></a>
+                    <a class="btn btn-secondary btn-sm" [title]="row.status === holidayStatusEnum.Active ? 'Deactivate' : 'Activate'" (click)="toggleStatus(row)">
+                      <i class="fa" [class.fa-toggle-on]="row.status === holidayStatusEnum.Active" [class.fa-toggle-off]="row.status !== holidayStatusEnum.Active"></i>
+                    </a>
+                    <a class="btn btn-danger btn-sm" title="Delete" (click)="openDeleteModal(row)"><i class="fa fa-trash"></i></a>
+                  </td>
+                </tr>
+              }
+            }
+          </ng-template>
+          <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div class="d-flex align-items-center">
+              <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Show Rows :</label>
+              <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()" name="pageSize"
+                class="form-control form-control-sm" style="font-size: 11px; width: auto;">
+                @for (size of pageSizeOptions; track size) {
+                  <option [ngValue]="size">{{ size }}</option>
+                }
+              </select>
+              <span class="fw-bold ms-3" style="font-size: 11px;">
+                Total Records : <span class="text-primary">{{ holidayList.length }} of {{ totalCount }}</span>
+              </span>
+            </div>
+            <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage" [pageSize]="pageSize"
+            (pageChange)="onPageChange($event)" [maxSize]="5" [boundaryLinks]="true" class="mb-0"></ngb-pagination>
+          </div>
+        </div>
+        <!-- ===== RIGHT : Summary + Calendar Preview ===== -->
+        <div class="col-md-4">
+          <!-- Month Calendar Preview -->
+          <div class="side-panel mb-3">
+            <div class="side-panel-header d-flex justify-content-between align-items-center">
+              <span><i class="fa fa-calendar text-primary me-2"></i>Calendar Preview</span>
+              <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-outline-secondary" [class.active]="calendarView === calendarViewType.Month" (click)="changeCalendarView(calendarViewType.Month)">Month</button>
+                <button type="button" class="btn btn-outline-secondary" [class.active]="calendarView === calendarViewType.Year" (click)="changeCalendarView(calendarViewType.Year)">Year</button>
+                <button type="button" class="btn btn-outline-secondary" [class.active]="calendarView === calendarViewType.List" (click)="changeCalendarView(calendarViewType.List)">List</button>
+                <button type="button" class="btn btn-outline-secondary" [class.active]="calendarView === calendarViewType.Agenda" (click)="changeCalendarView(calendarViewType.Agenda)">Agenda</button>
+              </div>
+            </div>
+            <div class="side-panel-body">
+              @if (calendarView === calendarViewType.Month || calendarView === calendarViewType.Year) {
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <button type="button" class="btn btn-sm btn-light" (click)="prevMonth()"><i class="fa fa-chevron-left"></i></button>
+                  <strong style="font-size: 12px;">{{ monthNames[calendarMonth] }} {{ calendarYear }}</strong>
+                  <button type="button" class="btn btn-sm btn-light" (click)="nextMonth()"><i class="fa fa-chevron-right"></i></button>
+                </div>
+                <div class="d-flex mb-2">
+                  <input type="date" class="form-control form-control-sm me-1" [(ngModel)]="jumpToDateValue" name="jumpToDate" [ngModelOptions]="{standalone: true}" />
+                  <button type="button" class="btn btn-sm btn-outline-primary me-1" (click)="jumpToDate()">Go</button>
+                  <input type="number" class="form-control form-control-sm me-1" [(ngModel)]="jumpToYearValue" name="jumpToYear" [ngModelOptions]="{standalone: true}" />
+                  <button type="button" class="btn btn-sm btn-outline-primary" (click)="jumpToYear()">Year</button>
+                </div>
+                <div class="calendar-grid">
+                  @for (wd of weekdayNames; track wd) {
+                    <div class="calendar-weekday">{{ wd }}</div>
+                  }
+                  @for (day of calendarDays; track trackByDate($index, day)) {
+                    <div class="calendar-day"
+                      [class.other-month]="!day.isCurrentMonth" [class.today]="day.isToday"
+                      [style.backgroundColor]="getDayColor(day)" (click)="onCalendarDayClick(day)">
+                      <span>{{ day.dayOfMonth }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="calendar-legend mt-3">
+                  <span class="legend-item"><i class="legend-dot" style="background:#e63946"></i>National</span>
+                  <span class="legend-item"><i class="legend-dot" style="background:#1d75d0"></i>School</span>
+                  <span class="legend-item"><i class="legend-dot" style="background:#f77f00"></i>Festival</span>
+                  <span class="legend-item"><i class="legend-dot" style="background:#2a9d63"></i>Optional</span>
+                  <span class="legend-item"><i class="legend-dot" style="background:#9aa1a9"></i>Weekend</span>
+                </div>
+              }
+              @if (calendarView === calendarViewType.List || calendarView === calendarViewType.Agenda) {
+                <ul class="list-group list-group-flush agenda-list">
+                  @for (h of holidayList; track h) {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>
+                        <i class="legend-dot me-2" [style.background]="colorForType(h.holidayType)"></i>
+                        {{ h.holidayName }}
+                      </span>
+                      <small class="text-muted">{{ h.holidayDate | date:'dd MMM yyyy' }}</small>
+                    </li>
+                  }
+                  @if (!holidayList.length) {
+                    <li class="list-group-item text-muted">No holidays found.</li>
+                  }
+                </ul>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ============================================================
+    FORM VIEW — Add / Edit / View a single Holiday
+    ============================================================= -->
+    @if (!detailsToggle) {
+      <form #holidayForm="ngForm" (ngSubmit)="onSubmit(holidayForm)" novalidate #formCard>
+        <!-- Card 1 : Holiday Information -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+            <strong style="font-size: 12px;"><i class="fa fa-info-circle text-primary me-2"></i>Holiday Information</strong>
+            @if (isViewMode) {
+              <span class="badge badge-info">View Only</span>
+            }
+            @if (isEditMode && !isViewMode) {
+              <span class="badge badge-warning">Editing</span>
+            }
+          </div>
+          <div class="card-body p-2">
+            <div class="row px-2">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="field-label">School</label>
+                  <ng-select [items]="schoolList" bindLabel="name" bindValue="id" name="schoolId"
+                    placeholder="Select school" [(ngModel)]="holiday.schoolId" [disabled]="isViewMode">
+                  </ng-select>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="field-label">Academic Session <span>*</span></label>
+                  <ng-select [items]="academicSessions" bindLabel="name" bindValue="id" name="academicSessionId"
+                    placeholder="Select academic session" [(ngModel)]="holiday.academicSessionId" [disabled]="isViewMode"
+                    [class.is-invalid]="isControlInvalid('academicSessionId')" required>
+                  </ng-select>
+                  @if (isControlInvalid('academicSessionId')) {
+                    <div class="text-danger" style="font-size: 11px;">{{ fieldErrors['academicSessionId'] }}</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="field-label">Holiday Type <span>*</span></label>
+                  <ng-select [items]="holidayTypeOptions" bindLabel="label" bindValue="value" name="holidayType"
+                    placeholder="Select type" [(ngModel)]="holiday.holidayType" [disabled]="isViewMode"
+                    [class.is-invalid]="isControlInvalid('holidayType')" required>
+                  </ng-select>
+                  @if (isControlInvalid('holidayType')) {
+                    <div class="text-danger" style="font-size: 11px;">{{ fieldErrors['holidayType'] }}</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="field-label">Holiday Name <span>*</span></label>
+                  <input type="text" class="form-control form-control-sm" name="holidayName" #holidayNameCtrl="ngModel"
+                    [(ngModel)]="holiday.holidayName" [maxlength]="validationLimits.holidayNameMax" [readOnly]="isViewMode"
+                    [class.is-invalid]="isControlInvalid('holidayName')" required />
+                  @if (isControlInvalid('holidayName')) {
+                    <div class="text-danger" style="font-size: 11px;">{{ fieldErrors['holidayName'] }}</div>
+                  }
+                  <small class="text-muted">{{ holiday.holidayName.length || 0 }}/{{ validationLimits.holidayNameMax }}</small>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="field-label">Holiday Category</label>
+                  <ng-select [items]="holidayCategoryOptions" bindLabel="label" bindValue="value" name="holidayCategory"
+                    placeholder="Select category" [(ngModel)]="holiday.holidayCategory" [disabled]="isViewMode">
+                  </ng-select>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="field-label">Holiday Date <span>*</span></label>
+                  <input type="date" class="form-control form-control-sm" name="holidayDate" [(ngModel)]="holiday.holidayDate"
+                    (ngModelChange)="onHolidayDateChange()" [readOnly]="isViewMode"
+                    [class.is-invalid]="isControlInvalid('holidayDate')" required />
+                  @if (isControlInvalid('holidayDate')) {
+                    <div class="text-danger" style="font-size: 11px;">{{ fieldErrors['holidayDate'] }}</div>
+                  }
+                  @if (weekendWarning) {
+                    <small class="text-warning d-block"><i class="fa fa-exclamation-triangle me-1"></i>{{ weekendWarning }}</small>
+                  }
+                  @if (duplicateWarning) {
+                    <small class="text-warning d-block"><i class="fa fa-exclamation-triangle me-1"></i>{{ duplicateWarning }}</small>
+                  }
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="d-flex justify-content-between align-items-center">
+                    <span class="field-label mb-0">Applicable From</span>
+                    <span class="custom-control custom-checkbox small">
+                      <input type="checkbox" class="custom-control-input" id="singleDayChk" name="singleDayChk"
+                        [(ngModel)]="isSingleDayHoliday" (ngModelChange)="onSingleDayToggle()" [disabled]="isViewMode" />
+                      <label class="custom-control-label" for="singleDayChk" style="font-size: 11px;">Single-day</label>
+                    </span>
+                  </label>
+                  <input type="date" class="form-control form-control-sm" name="applicableFrom" [(ngModel)]="holiday.applicableFrom"
+                    (ngModelChange)="onApplicableDateChange()" [readOnly]="isViewMode"
+                    [class.is-invalid]="isControlInvalid('applicableFrom')" />
+                  @if (isControlInvalid('applicableFrom')) {
+                    <div class="text-danger" style="font-size: 11px;">{{ fieldErrors['applicableFrom'] }}</div>
+                  }
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="field-label">Applicable To</label>
+                  <input type="date" class="form-control form-control-sm" name="applicableTo" [(ngModel)]="holiday.applicableTo"
+                    (ngModelChange)="onApplicableDateChange()" [readOnly]="isViewMode || isSingleDayHoliday"
+                    [class.is-invalid]="isControlInvalid('applicableTo')" />
+                  @if (isControlInvalid('applicableTo')) {
+                    <div class="text-danger" style="font-size: 11px;">{{ fieldErrors['applicableTo'] }}</div>
+                  }
+                  <small class="text-muted">Number of Holiday Days: <strong>{{ holiday.numberOfDays }}</strong></small>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="field-label">Description</label>
+                  <textarea class="form-control form-control-sm" rows="2" name="description" [(ngModel)]="holiday.description"
+                    [maxlength]="validationLimits.descriptionMax" [readOnly]="isViewMode"
+                  [class.is-invalid]="isControlInvalid('description')"></textarea>
+                  @if (isControlInvalid('description')) {
+                    <div class="text-danger" style="font-size: 11px;">{{ fieldErrors['description'] }}</div>
+                  }
+                  <small class="text-muted">{{ holiday.description.length || 0 }}/{{ validationLimits.descriptionMax }}</small>
+                </div>
+              </div>
+              <!-- <div class="col-md-1">
+              <div class="form-group">
+                <label class="field-label">Color Code</label>
+                <input type="color" class="form-control form-control-sm p-1" name="colorCode" [(ngModel)]="holiday.colorCode" [disabled]="isViewMode" />
+              </div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+      <!-- Card 2 : Holiday Applicability -->
+      <!-- <div class="card shadow-sm mb-3">
+      <div class="card-header bg-white py-2"><strong style="font-size: 12px;"><i class="fa fa-users text-primary me-2"></i>Holiday Applicability</strong></div>
+      <div class="card-body p-2">
+        <label class="field-label">Apply To <span>*</span></label>
+        <div class="d-flex flex-wrap mb-2">
+          <div class="custom-control custom-checkbox mr-4 mb-2" *ngFor="let opt of applicableToOptions">
+            <input type="checkbox" class="custom-control-input" [id]="'apply_' + opt.value"
+              [checked]="isApplicabilitySelected(opt.value)"
+              (change)="toggleApplicability(opt.value, $any($event.target).checked)" [disabled]="isViewMode" />
+            <label class="custom-control-label" [for]="'apply_' + opt.value" style="font-size: 11px;">{{ opt.label }}</label>
+          </div>
+        </div>
+        <div class="text-danger mb-2" style="font-size: 11px;" *ngIf="isControlInvalid('applicabilityTypes')">{{ fieldErrors['applicabilityTypes'] }}</div>
+        <div class="row px-2">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="field-label">Selected Schools</label>
+              <ng-select [items]="schoolList" bindLabel="name" bindValue="id" [multiple]="true" name="schoolIds"
+                placeholder="Select one or more schools" [(ngModel)]="holiday.schoolIds" [disabled]="isViewMode">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="field-label">Classes</label>
+              <ng-select [items]="[]" [multiple]="true" [addTag]="true" name="classIds" placeholder="Type &amp; press enter to add a class"
+                [(ngModel)]="holiday.classIds" [disabled]="isViewMode">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="field-label">Sections</label>
+              <ng-select [items]="[]" [multiple]="true" [addTag]="true" name="sectionIds" placeholder="Add sections"
+                [(ngModel)]="holiday.sectionIds" [disabled]="isViewMode">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="field-label">Students</label>
+              <ng-select [items]="[]" [multiple]="true" [addTag]="true" name="studentIds" placeholder="Add students"
+                [(ngModel)]="holiday.studentIds" [disabled]="isViewMode">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label class="field-label">Teachers</label>
+              <ng-select [items]="[]" [multiple]="true" [addTag]="true" name="teacherIds" placeholder="Add teachers"
+                [(ngModel)]="holiday.teacherIds" [disabled]="isViewMode">
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label class="field-label">Staff</label>
+              <ng-select [items]="[]" [multiple]="true" [addTag]="true" name="staffIds" placeholder="Add staff"
+                [(ngModel)]="holiday.staffIds" [disabled]="isViewMode">
+              </ng-select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+    <!-- Form actions -->
+    @if (!isViewMode) {
+      <div class="d-flex justify-content-end mb-2">
+        <button type="button" class="btn btn-secondary btn-sm me-2" (click)="closeFormPanel()">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm" [disabled]="saving">
+          @if (saving) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+            }Save Holiday
+          </button>
+        </div>
+      }
+      @if (isViewMode) {
+        <div class="d-flex justify-content-end mb-2">
+          <button type="button" class="btn btn-secondary btn-sm" (click)="closeFormPanel()">Close</button>
+        </div>
+      }
+    </form>
+  }
+
+</div>
+</div>
+</div>
+
+<!-- ============================================================
+MODALS
+============================================================= -->
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="deleteHolidayModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header py-1">
+        <h5 class="modal-title">Delete Holiday</h5>
+        <button type="button" class="close" (click)="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete <strong>{{ holidayPendingDelete?.holidayName }}</strong>? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-danger btn-sm" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Holiday detail popup (calendar click) -->
+<div class="modal fade" id="holidayDetailModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    @if (selectedCalendarHoliday; as sh) {
+      <div class="modal-content">
+        <div class="modal-header py-1">
+          <h5 class="modal-title">{{ sh.holidayName }}</h5>
+          <button type="button" class="close" (click)="closeHolidayDetailModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Holiday Type:</strong> {{ sh.holidayType }}</p>
+          <p><strong>Description:</strong> {{ sh.description || '-' }}</p>
+          <p><strong>Applicable Schools:</strong> {{ getApplicableSchoolNames(sh) }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" (click)="closeHolidayDetailModal()">Close</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Weekend configuration modal -->
+<div class="modal fade" id="weekendConfigModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header py-1">
+        <h5 class="modal-title">Weekend Configuration</h5>
+        <button type="button" class="close" (click)="closeWeekendConfigModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="custom-control custom-checkbox mb-2">
+          <input type="checkbox" class="custom-control-input" id="wSunday" [(ngModel)]="weekendConfig.sunday" [ngModelOptions]="{standalone: true}" />
+          <label class="custom-control-label" for="wSunday">Sunday</label>
+        </div>
+        <div class="custom-control custom-checkbox mb-2">
+          <input type="checkbox" class="custom-control-input" id="wSaturday" [(ngModel)]="weekendConfig.saturday" [ngModelOptions]="{standalone: true}" />
+          <label class="custom-control-label" for="wSaturday">Every Saturday</label>
+        </div>
+        <div class="custom-control custom-checkbox mb-2">
+          <input type="checkbox" class="custom-control-input" id="wSecondSat" [(ngModel)]="weekendConfig.secondSaturday" [ngModelOptions]="{standalone: true}" />
+          <label class="custom-control-label" for="wSecondSat">2nd Saturday</label>
+        </div>
+        <div class="custom-control custom-checkbox mb-3">
+          <input type="checkbox" class="custom-control-input" id="wFourthSat" [(ngModel)]="weekendConfig.fourthSaturday" [ngModelOptions]="{standalone: true}" />
+          <label class="custom-control-label" for="wFourthSat">4th Saturday</label>
+        </div>
+        <label class="field-label">Custom Weekend Dates</label>
+        <ng-select [items]="[]" [multiple]="true" [addTag]="true" placeholder="Add custom dates (yyyy-mm-dd)"
+        [(ngModel)]="weekendConfig.customDates" [ngModelOptions]="{standalone: true}"></ng-select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="closeWeekendConfigModal()">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" (click)="saveWeekendConfig()">Save Configuration</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk import modal -->
+<div class="modal fade" id="bulkImportModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header py-1">
+        <h5 class="modal-title">Bulk Import Holiday Calendar</h5>
+        <button type="button" class="close" (click)="closeBulkImportModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small">Upload an Excel (.xlsx/.xls) or CSV file. The system validates duplicate holidays,
+        invalid dates and duplicate names before import.</p>
+        <a href="/assets/excelformat/holidaycalendaruploadformat.xlsx" class="d-block mb-2"><i class="fa fa-download me-1"></i>Download sample template</a>
+        <input type="file" class="form-control-file" #fileInput accept=".xlsx,.xls,.csv" (change)="onFileSelected($event)" />
+
+        @if (importSummary; as s) {
+          <div class="mt-3">
+            <h6>Import Summary</h6>
+            <ul class="list-unstyled small">
+              <li>Total Records: <strong>{{ s.totalRecords }}</strong></li>
+              <li class="text-success">Success: <strong>{{ s.successCount }}</strong></li>
+              <li class="text-danger">Failed: <strong>{{ s.failedCount }}</strong></li>
+              <li class="text-warning">Duplicate Holidays: <strong>{{ s.duplicateHolidays }}</strong></li>
+              <li class="text-warning">Invalid Dates: <strong>{{ s.invalidDates }}</strong></li>
+              <li class="text-warning">Duplicate Names: <strong>{{ s.duplicateNames }}</strong></li>
+            </ul>
+            @if (s.errors.length) {
+              <div class="alert alert-danger small">
+                @for (e of s.errors; track e) {
+                  <div>{{ e }}</div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" (click)="closeBulkImportModal()">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" [disabled]="!selectedImportFile || importing" (click)="submitBulkImport()">
+          @if (importing) {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+            }Import
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

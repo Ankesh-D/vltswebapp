@@ -1,0 +1,4 @@
+@if (loading) { <p class="chart-message" role="status">Loading RTO counts…</p> }
+@else if (error) { <p class="chart-message chart-error" role="alert">{{ error }}</p> }
+@else if (!items.length) { <p class="chart-message" role="status">No RTO panic sessions for this period.</p> }
+<div #chartContainer class="column-canvas" [class.chart-hidden]="loading || !!error || !items.length" [attr.aria-hidden]="loading || !!error || !items.length" aria-label="RTO panic session counts"></div>

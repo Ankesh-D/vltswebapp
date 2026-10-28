@@ -1,0 +1,478 @@
+<div style="padding: 10px 10px">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <!-- TITLE BAR -->
+        <div class="page-header-row">
+          <!-- TITLE -->
+          <div class="pagetitlestyle">Command Entry</div>
+
+          <!-- ADD NEW BUTTON -->
+          <button type="button" class="add-new-btn" [routerLink]="'/command'">
+            <i class="fa fa-arrow-left"></i>
+            <span>Back To Details</span>
+          </button>
+        </div>
+
+        <form
+          id="firmware_form"
+          autocomplete="off"
+          #sendCommandForm="ngForm"
+          (ngSubmit)="isEditMode ? updateCommand() : saveCommand()"
+          >
+          <div class="form-desc">
+            <strong>NOTE :</strong> Fields marked
+            <span class="mandetory">*</span> are mandatory.
+          </div>
+
+          <div class="entrypagediv">
+            <div class="row">
+              <div class="col-md-7">
+                <div class="row">
+                  <!-- Vendor -->
+                  @if (roleId === '10' || roleId === '17') {
+                    <div
+                      class="col-md-6"
+                      >
+                      <div class="form-group">
+                        <label for="company_obj"
+                          >Vendor <span class="mandetory">*</span></label
+                          >
+                          <ng-select
+                            placeholder="Select Vendor"
+                            #vendorCtrl="ngModel"
+                            [ngModel]="selectedVendor"
+                            [ngModel]="selectedVendor"
+                            (change)="onVendorChange($event)"
+                            name="vendor"
+                            required
+                            >
+                            @for (item of vendorList; track item) {
+                              <ng-option
+                                [value]="item"
+                                >{{ item.param2 }}</ng-option
+                                >
+                              }
+                            </ng-select>
+                            @if (sendCommandForm.submitted && vendorCtrl.invalid) {
+                              <div
+                                >
+                                @if (vendorCtrl.errors?.['required']) {
+                                  <span
+                                    class="field-error"
+                                    >Vendor is required</span
+                                    >
+                                  }
+                                </div>
+                              }
+                            </div>
+                          </div>
+                        }
+                        <!-- device Model -->
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="model_obj"
+                              >Device Model <span class="mandetory">*</span></label
+                              >
+                              <ng-select
+                                [items]="deviceModelList"
+                                bindLabel="param2"
+                                bindValue="param1"
+                                placeholder="Select Device Model"
+                                [ngModel]="selectedModel"
+                                name="devicemodel"
+                                required
+                                (change)="onDeviceModelChange($event)"
+                                #devicemodelCtrl="ngModel"
+                                [searchable]="true"
+                                [clearable]="true"
+                                style="font-size: 0.8rem"
+                                >
+                              </ng-select>
+                              @if (
+                                sendCommandForm.submitted && devicemodelCtrl.invalid
+                                ) {
+                                <div
+                                  >
+                                  @if (devicemodelCtrl.errors?.['required']) {
+                                    <span
+                                      class="field-error"
+                                      >Device model is required</span
+                                      >
+                                    }
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                            <!-- Number of variable parameter -->
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="model_obj"
+                                  >No. Of Parameter
+                                  <span class="mandetory">*</span></label
+                                  >
+                                  <ng-select
+                                    [items]="paramList"
+                                    bindLabel="param1"
+                                    placeholder="Select No. Parameter"
+                                    [ngModel]="selectedNumber"
+                                    name="numberOfParams"
+                                    required
+                                    (change)="onNoOfParamChange($event)"
+                                    #noOfParamCtrl="ngModel"
+                                    [searchable]="true"
+                                    [clearable]="true"
+                                    style="font-size: 0.8rem"
+                                    >
+                                  </ng-select>
+                                  @if (
+                                    sendCommandForm.submitted && devicemodelCtrl.invalid
+                                    ) {
+                                    <div
+                                      >
+                                      @if (devicemodelCtrl.errors?.['required']) {
+                                        <span
+                                          class="field-error"
+                                          >Device model is required</span
+                                          >
+                                        }
+                                      </div>
+                                    }
+                                  </div>
+                                </div>
+
+                                <!-- Command Name -->
+                                <div class="col-md-6">
+                                  <div class="form-group">
+                                    <label for="commandName"
+                                      >Command Name <span class="mandetory">*</span></label
+                                      >
+                                      <input
+                                        type="text"
+                                        class="form-control"
+                                        id="commandName"
+                                        placeholder="Enter command name"
+                                        [(ngModel)]="commandName"
+                                        #commandNameCtrl="ngModel"
+                                        name="commandName"
+                                        minlength="3"
+                                        maxlength="100"
+                                        required
+                                        />
+                                      @if (
+                                        sendCommandForm.submitted && commandNameCtrl.invalid
+                                        ) {
+                                        <div
+                                          >
+                                          @if (commandNameCtrl.errors?.['required']) {
+                                            <span
+                                              class="field-error"
+                                              >Command name is required</span
+                                              >
+                                            }
+                                            @if (commandNameCtrl?.errors?.['minlength']) {
+                                              <span
+                                                class="field-error"
+                                                >
+                                                Command Name must be at least 3 characters.
+                                              </span>
+                                            }
+                                            @if (commandNameCtrl?.errors?.['maxlength']) {
+                                              <span
+                                                class="field-error"
+                                                >
+                                                Command Name cannot exceed 100 characters.
+                                              </span>
+                                            }
+                                          </div>
+                                        }
+                                      </div>
+                                    </div>
+                                    <!-- Command Description -->
+                                    <div class="col-md-6">
+                                      <div class="form-group">
+                                        <label for="description"
+                                          >Description <span class="mandetory">*</span></label
+                                          >
+                                          <textarea
+                                            type="text"
+                                            class="form-control"
+                                            id="description"
+                                            placeholder="Enter command description"
+                                            [(ngModel)]="discription"
+                                            #descriptionCtrl="ngModel"
+                                            name="discription"
+                                            minlength="3"
+                                            maxlength="100"
+                                            required
+                                          ></textarea>
+                                          @if (
+                                            sendCommandForm.submitted && descriptionCtrl.invalid
+                                            ) {
+                                            <div
+                                              >
+                                              @if (descriptionCtrl.errors?.['required']) {
+                                                <span
+                                                  class="field-error"
+                                                  >Discription is required</span
+                                                  >
+                                                }
+                                                @if (descriptionCtrl?.errors?.['minlength']) {
+                                                  <span
+                                                    class="field-error"
+                                                    >
+                                                    Discription must be at least 3 characters.
+                                                  </span>
+                                                }
+                                                @if (descriptionCtrl?.errors?.['maxlength']) {
+                                                  <span
+                                                    class="field-error"
+                                                    >
+                                                    Discription cannot exceed 100 characters.
+                                                  </span>
+                                                }
+                                              </div>
+                                            }
+                                          </div>
+                                        </div>
+
+                                        <!-- Command  -->
+                                        <div class="col-md-6">
+                                          <div class="form-group">
+                                            <label for="command">
+                                              Command <span class="mandetory">*</span>
+                                            </label>
+
+                                            <textarea
+                                              type="text"
+                                              class="form-control"
+                                              id="command"
+                                              placeholder="Enter command"
+                                              [(ngModel)]="command"
+                                              name="command"
+                                              #commandCtrl="ngModel"
+                                              maxlength="20"
+                                              required
+                        [class.is-invalid]="
+                          sendCommandForm.submitted && commandCtrl.invalid
+                        "
+                                            ></textarea>
+
+                                            @if (sendCommandForm.submitted && commandCtrl.invalid) {
+                                              <div
+                                                class="field-error"
+                                                >
+                                                @if (commandCtrl.errors?.['required']) {
+                                                  <div
+                                                    class="field-error"
+                                                    >
+                                                    Command is required.
+                                                  </div>
+                                                }
+                                              </div>
+                                            }
+                                          </div>
+                                        </div>
+                                        <!-- Remark -->
+                                        <!-- Remark -->
+                                        @if (isEditMode) {
+                                          <div class="col-md-6">
+                                            <div class="form-group">
+                                              <label>
+                                                Remark <span class="mandetory">*</span>
+                                              </label>
+                                              <textarea
+                                                class="form-control"
+                                                [(ngModel)]="updateRemark"
+                                                name="updateRemark"
+                                                placeholder="Enter update remark"
+                                                rows="2"
+                                                required
+                                              ></textarea>
+                                            </div>
+                                          </div>
+                                        }
+
+                                        <!-- Full Width Button Row -->
+                                        <div class="col-md-12 mt-3">
+                                          <div class="d-flex justify-content-end">
+
+                                            <button
+                                              type="submit"
+                                              class="btn-save me-2"
+                                              [disabled]="loading"
+                                              style="background:#0b58b9"
+                                              >
+                                              <i
+                                                class="fa"
+        [ngClass]="
+          loading
+            ? 'fa-spinner fa-spin'
+            : isEditMode
+              ? 'fa-edit'
+              : 'fa-upload'
+        "
+                                              ></i>
+
+                                              {{
+                                              loading
+                                              ? "..."
+                                              : isEditMode
+                                              ? "Update Command"
+                                              : "Save Command"
+                                              }}
+                                            </button>
+
+                                            <button
+                                              type="reset"
+                                              class="btn-save"
+                                              style="background:#8f8f8f"
+                                              (click)="resetForm()"
+                                              >
+                                              Reset
+                                            </button>
+
+                                          </div>
+                                        </div>
+                                        <!-- Submit Button -->
+                                        <!-- <div class="col-md-3 pt-4  text-center d-flex justify-content-center align-items-center">
+
+                                        <div class="mx-2">
+                                          <button
+                                            type="submit"
+                                            class="btn-save"
+                                            [disabled]="loading"
+                                            style="background: #0b58b9"
+                                            >
+                                            <i
+                                              class="fa"
+        [ngClass]="
+          loading
+            ? 'fa-spinner fa-spin'
+            : isEditMode
+              ? 'fa-edit'
+              : 'fa-upload'
+        "
+                                            ></i>
+
+                                            {{
+                                            loading
+                                            ? "..."
+                                            : isEditMode
+                                            ? "Update Command"
+                                            : "Save Command"
+                                            }}
+                                          </button>
+                                        </div>
+
+                                        <div class="mx-2">
+                                          <button
+                                            type="reset"
+                                            class="btn-save"
+                                            style="background: #8f8f8f"
+                                            (click)="resetForm()"
+                                            >
+                                            Reset
+                                          </button>
+                                        </div>
+
+                                      </div> -->
+                                    </div>
+                                  </div>
+                                  <!-- <div class="col-md-7 right-border">
+
+                                </div> -->
+                                <div class="col-md-5  ">
+                                  <div class="row ">
+                                    @for (item of noOfVariable; track item; let i = $index) {
+                                      <!-- Parameter Name -->
+                                      <div class="col-md-6">
+                                        <div class="form-group">
+                                          <label [for]="'param' + i">
+                                            Parameter Name <span class="mandetory">*</span>
+                                          </label>
+                                          <input
+                                            type="text"
+                                            class="form-control"
+                                            [id]="'param' + i"
+                                            [name]="'param' + i"
+                                            placeholder="Enter parameter name"
+                                            [(ngModel)]="params[i]"
+                                            #paramCtrl="ngModel"
+                                            minlength="3"
+                                            maxlength="100"
+                                            required
+                                            (keyup)="createCommand()"
+                                            />
+                                          @if (sendCommandForm.submitted && paramCtrl.invalid) {
+                                            <div
+                                              >
+                                              @if (paramCtrl.errors?.['required']) {
+                                                <span
+                                                  class="field-error"
+                                                  >
+                                                  Parameter name is required
+                                                </span>
+                                              }
+                                              @if (paramCtrl.errors?.['minlength']) {
+                                                <span
+                                                  class="field-error"
+                                                  >
+                                                  Parameter name must be at least 3 characters.
+                                                </span>
+                                              }
+                                              @if (paramCtrl.errors?.['maxlength']) {
+                                                <span
+                                                  class="field-error"
+                                                  >
+                                                  Parameter name cannot exceed 100 characters.
+                                                </span>
+                                              }
+                                            </div>
+                                          }
+                                        </div>
+                                      </div>
+                                      <!-- Data Type -->
+                                      <div class="col-md-6">
+                                        <div class="form-group">
+                                          <label>
+                                            Data Type <span class="mandetory">*</span>
+                                          </label>
+                                          <ng-select
+                                            [items]="paramDataTypeList"
+                                            bindLabel="param1"
+                                            [(ngModel)]="dateTypeArr[i]"
+                                            #dataTypeCtrl="ngModel"
+                                            [name]="'dataType' + i"
+                                            placeholder="Select Data Type"
+                                            required
+                                            [clearable]="true"
+                                            style="font-size: 0.8rem"
+                                            >
+                                          </ng-select>
+                                          @if (
+                                            sendCommandForm.submitted && dataTypeCtrl.invalid
+                                            ) {
+                                            <div
+                                              >
+                                              @if (dataTypeCtrl.errors?.['required']) {
+                                                <span
+                                                  class="field-error"
+                                                  >
+                                                  Data type is required
+                                                </span>
+                                              }
+                                            </div>
+                                          }
+                                        </div>
+                                      </div>
+                                    }
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>

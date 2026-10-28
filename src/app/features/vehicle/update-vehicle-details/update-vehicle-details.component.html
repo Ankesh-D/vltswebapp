@@ -1,0 +1,510 @@
+<!-- <div class="content-i">
+<div class="content-box">
+  <div class="element-wrapper">
+    <div class="element-box">
+      <div class="page-tabs-wrapper">
+        <div class="page-title">
+          <i class="fa fa-truck"></i> Update Vehicle Details
+        </div>
+        <ul class="modern-tabs-track">
+          <li class="tab-slider" [style.width.px]="sliderWidth" [style.left.px]="sliderLeft"></li>
+          <li>
+            <a routerLink="/vehicle/update" class="modern-tab-item" routerLinkActive="active" #vehicleTab
+              (click)="updateSlider($event, vehicleTab)">
+              <i class="fa fa-truck"></i><span>Vehicle</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/sim/update-validity" routerLinkActive="active" #simTab
+              (click)="updateSlider($event, simTab)" class="modern-tab-item">
+              <i class="fa fa-calendar"></i><span>Sim Validity</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/customer/update" routerLinkActive="active" #custTab
+              (click)="updateSlider($event, custTab)" class="modern-tab-item">
+              <i class="fa fa-user"></i><span>Customer</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/dealer/update" routerLinkActive="active" #dealerTab
+              (click)="updateSlider($event, dealerTab)" class="modern-tab-item">
+              <i class="fa fa-handshake-o"></i><span>Dealer</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/device/update" routerLinkActive="active" #deviceTab
+              (click)="updateSlider($event, deviceTab)" class="modern-tab-item">
+              <i class="fa fa-laptop"></i><span>Device</span>
+            </a>
+          </li>
+
+        </ul>
+      </div> -->
+
+      <!-- <div class="search-form-container">
+      <div class="search-form-left">
+        <span class="search-label">Search :</span>
+        <div class="search-input-group">
+          <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input"
+            id="searchby" placeholder="Type here..." autocomplete="disabled" maxlength="50" [(ngModel)]="searchText"
+            (keyup.enter)="getSearchDetails()" name="searchby">
+          <button class="btn-search" id="searchbtn" (click)="getSearchDetails()">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+        <button class="btn-reload" (click)="reloadData()">
+          <span *ngIf="!loading">Reload</span>
+          <span *ngIf="loading">Loading...</span>
+        </button>
+      </div>
+      <div class="search-form-right">
+        <div class="rows-group">
+          <span class="rows-label">Show Rows :</span>
+          <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
+            <option *ngFor="let size of pageSizeOptions" [value]="size === totalCount ? 'All' : size">
+              {{size === totalCount ? 'All' : size}}
+            </option>
+          </select>
+        </div>
+        <div class="records-pill">
+          <i class="fa fa-database"></i>
+          <span>Total : {{pageCount}} of {{totalCount}}</span>
+        </div>
+      </div>
+    </div> -->
+    <div class="table-responsive">
+      <form autocomplete="off" class="top-controls-row">
+
+        <!-- LEFT SIDE -->
+        <div class="left-controls">
+
+          <label class="topbar-label">Search :</label>
+
+          <div class="search-box">
+            <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input inner"
+              id="searchby" placeholder="Type here and press button...." autocomplete="disabled" maxlength="50"
+              [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" />
+
+            <button class="search-inner-btn" (click)="getSearchDetails()">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+
+          <!-- RELOAD -->
+          <button class="reload-btn" (click)="reloadData()">
+            @if (!loading) {
+              <span>Reload</span>
+            }
+            @if (loading) {
+              <span>Reloading...</span>
+            }
+          </button>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="right-controls">
+
+          <div class="total-records-text">Show Rows :</div>
+
+          <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
+
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size === totalCount ? totalCount : size">
+                {{ size === totalCount ? totalCount : size }}
+              </option>
+            }
+
+          </select>
+
+          <div class="total-records-text">
+            Total Records : {{pageCount}} of {{totalCount}}
+          </div>
+
+        </div>
+
+      </form>
+      <table class="table table-striped app-table mb-1"
+        style="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;">
+        <thead>
+          <tr>
+            <th style="width:40px;">#</th>
+            <th (click)="sort('param7')" style="cursor: pointer;">
+              Vehicle No.
+              <hr>Chassis No.
+                @if (sortKey === 'param7') {
+                  <span class="sorting"
+                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                }
+              </th>
+              <th (click)="sort('param9')" style="cursor: pointer;">
+                Engine No.
+                @if (sortKey === 'param9') {
+                  <span class="sorting"
+                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                }
+              </th>
+              <th (click)="sort('param15')" style="cursor: pointer;">
+                Vehicle Type
+                @if (sortKey === 'param15') {
+                  <span class="sorting"
+                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                }
+              </th>
+              <th (click)="sort('param12')" style="cursor: pointer;">
+                Mfg Year
+                @if (sortKey === 'param12') {
+                  <span class="sorting"
+                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                }
+              </th>
+              <th (click)="sort('param13')" style="cursor: pointer;">
+                State Code
+                @if (sortKey === 'param13') {
+                  <span class="sorting"
+                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                }
+              </th>
+              <th (click)="sort('param14')" style="cursor: pointer;">
+                RTO Name
+                @if (sortKey === 'param14') {
+                  <span class="sorting"
+                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                }
+              </th>
+              <th (click)="sort('param26')" style="cursor: pointer;">
+                Make Name
+                @if (sortKey === 'param26') {
+                  <span class="sorting"
+                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                }
+              </th>
+              <th (click)="sort('param27')" style="cursor: pointer;">
+                Model Name
+                @if (sortKey === 'param27') {
+                  <span class="sorting"
+                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                }
+              </th>
+              <th (click)="sort('param21')" style="cursor: pointer;">
+                Activation Status
+                @if (sortKey === 'param21') {
+                  <span class="sorting"
+                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
+                }
+              </th>
+              <th>Activity</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (vehicleDetails.length === 0 && !loading) {
+              <tr>
+                <td style="font-weight: bold; text-align: center;" colspan="100">NO DATA FOUND</td>
+              </tr>
+            }
+            @for (vehicle of getPaginatedData(); track vehicle) {
+              <tr>
+                <td>{{vehicle.param1 || 'NA'}}</td>
+                <td>{{vehicle.param7 || 'NA'}}<br>{{vehicle.param8 || 'NA'}}</td>
+                <td>{{vehicle.param9 || 'NA'}}</td>
+                <td>{{vehicle.param15 || 'NA'}}</td>
+                <td>{{vehicle.param12 || 'NA'}}</td>
+                <td>{{vehicle.param13 || 'NA'}}</td>
+                <td>{{vehicle.param14 || 'NA'}}</td>
+                <td>{{vehicle.param26 || 'NA'}}</td>
+                <td>{{vehicle.param27 || 'NA'}}</td>
+                <td>
+                  <font style="font-weight:bold;">{{vehicle.param21}}</font>
+                  @if (vehicle.param21 === 'Activated') {
+                    <span><br>{{vehicle.param10 || 'NA'}}</span>
+                  }
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn-edit" type="button" (click)="openEditModal(vehicle)">
+                      Edit
+                    </button>
+                    &nbsp;
+                    <button class="btn-delete" type="button" (click)="openDeleteModal(vehicle)">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <!-- Pagination Controls -->
+        <div class="float-end">
+          @if (totalCount > pageSize) {
+            <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+              [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+              [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+            </ngb-pagination>
+          }
+        </div>
+        <!-- Pagination -->
+        <!-- <div *ngIf="totalCount > pageSize" class="pagination-wrapper">
+        <ul class="pagination"
+          style="display: flex; gap: 5px; list-style: none; padding: 0; margin: 0; align-items: center; justify-content: flex-end;">
+          <li [class.disabled]="currentPage === 1">
+            <button type="button" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
+              class="btn btn-sm shadow-sm"
+              style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
+              <i class="fa fa-angle-left" style="margin-right: 4px;"></i> Previous
+            </button>
+          </li>
+
+          <li *ngFor="let page of getPageNumbers()">
+            <span *ngIf="page === -1" style="font-size: 12px; color: #6c757d; padding: 0 5px; font-weight: bold;">...</span>
+            <button type="button" *ngIf="page !== -1" (click)="onPageChange(page)" class="btn btn-sm shadow-sm"
+              [style.background]="currentPage === page ? '#0b58b9' : '#fff'"
+              [style.color]="currentPage === page ? '#fff' : '#0b58b9'"
+              style="font-size: 11px; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1px solid #dee2e6; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+              {{ page }}
+            </button>
+          </li>
+
+          <li [class.disabled]="currentPage >= getTotalPages()">
+            <button type="button" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()"
+              class="btn btn-sm shadow-sm"
+              style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
+              Next <i class="fa fa-angle-right" style="margin-left: 4px;"></i>
+            </button>
+          </li>
+        </ul>
+      </div> -->
+    </div>
+
+
+  <!-- </div>
+</div>
+</div>
+</div> -->
+
+<!-- Edit Vehicle Modal (Angular overlay, legacy layout) -->
+@if (showEditModal) {
+  <div class="modal-overlay update-vehicle-modal" (click)="back()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header" id="updatemodelheader">
+        <h5 class="modal-title">Update</h5>
+        <button type="button" class="close" (click)="back()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label style="font-size: 11px;font-weight: bold;">Vehicle No.:</label>
+              <input type="text" class="form-control ignorespecialcharacter" id="vehno" [(ngModel)]="editVehicleNo"
+                (keyup)="checkVehicle()" name="vehicleNo">
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label>Chassis No.:<span class="mandetory">*</span></label>
+              <input class="form-control ignorespecialcharacter" id="cheno" [(ngModel)]="editChassisNo"
+                (keyup)="forChassis()" name="chassisNo">
+              @if (msgValid) {
+                <div style="color:red;font-size:11px;">{{msgValid}}</div>
+              }
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label>Engine No.:<span class="mandetory">*</span></label>
+              <input class="form-control ignorespecialcharacter" id="engno" type="text" maxlength="20"
+                [(ngModel)]="editEngineNo" (keyup)="forEngine()" name="engineNo">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label>Vehicle Type:<span class="mandetory">*</span></label>
+              <ng-select [(ngModel)]="editVehicleType" id="vehicletype" name="vehicletype"
+                placeholder="Select vehicle type" required #vehicleTypeCtrl="ngModel" >
+                <ng-option value="OLD">OLD</ng-option>
+                <ng-option value="NEW">NEW</ng-option>
+              </ng-select>
+              <!-- <select class="form-control" id="vehtype" [(ngModel)]="editVehicleType" name="vehicleType">
+              <option value="NEW">NEW</option>
+              <option value="OLD">OLD</option>
+            </select> -->
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label>Manufacture Year:<span class="mandetory">*</span></label>
+            <ng-select [(ngModel)]="editMfgYear" id="yearlist" name="mfgYear"
+              placeholder="Select mfg year" required #mfgYearCtrl="ngModel"
+              id="manfactureyrnew" >
+              @for (year of yearList; track year) {
+                <ng-option [value]="year">{{year}}</ng-option>
+              }
+            </ng-select>
+            <!-- <select class="form-control" id="manfactureyrnew" [(ngModel)]="editMfgYear" name="mfgYear">
+            <option *ngFor="let year of yearList" [value]="year">{{year}}</option>
+          </select> -->
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="form-group">
+          <label>State:<span class="mandetory">*</span></label>
+          <ng-select [(ngModel)]="stateObj" id="statelist" name="statelist"
+            placeholder="Select State" required #statelistCtrl="ngModel" (change)="onStateChange()">
+            @for (item of stateList; track item) {
+              <ng-option [value]="item">{{item.param2}}</ng-option>
+            }
+          </ng-select>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-4">
+        <div class="form-group">
+          <label>RTO Name:<span class="mandetory">*</span></label>
+          <ng-select [(ngModel)]="rtoObj" id="rtolist" name="rtolist"
+            placeholder="Select RTO" required #rtoCtrl="ngModel">
+            @for (item of rtoList; track item) {
+              <ng-option [value]="item">{{item.param2}}</ng-option>
+            }
+          </ng-select>
+          <!-- <select class="form-control" id="rtoname" [(ngModel)]="rtoObj" name="rtoId">
+          <option *ngFor="let rto of rtoList" [value]="rto">{{rto.param2}}</option>
+        </select> -->
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="form-group">
+        <label>Make:<span class="mandetory">*</span></label>
+        <ng-select [(ngModel)]="makeObj" name="makelist"
+          (change)="onVehicleMakeChange();"
+          placeholder="Select make" required #makeCtrl="ngModel">
+          @for (item of vehicleMakeList; track item) {
+            <ng-option [value]="item">{{item.param2}}</ng-option>
+          }
+        </ng-select>
+        <!-- <select class="form-control" id="make" [(ngModel)]="makeObj" (change)="onVehicleMakeChange()"
+        name="makeId">
+        <option *ngFor="let make of vehicleMakeList" [value]="make">{{make.param2}}</option>
+      </select> -->
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="form-group">
+      <label>Model:<span class="mandetory">*</span></label>
+      <ng-select [(ngModel)]="modelObj" name="modellist"
+        placeholder="Select Model" required #modelCtrl="ngModel" >
+        @for (item of vehicleModelList; track item) {
+          <ng-option [value]="item">{{item.param2}}</ng-option>
+        }
+      </ng-select>
+      <!-- <select class="form-control" id="setmodel" [(ngModel)]="modelObj" name="modelId">
+      <option *ngFor="let model of vehicleModelList" [value]="model">{{model.param2}}</option>
+    </select> -->
+  </div>
+</div>
+</div>
+<div class="row">
+  <div class="col-sm-4">
+    <div class="form-group">
+      <label>Vehicle Class:<span class="mandetory">*</span></label>
+      <ng-select [(ngModel)]="classObj" name="classlist"
+        placeholder="Select Class" required #classCtrl="ngModel" >
+        @for (item of vehicleClassList; track item) {
+          <ng-option [value]="item">{{item.param2}}</ng-option>
+        }
+      </ng-select>
+      <!-- <select class="form-control" id="classid" [(ngModel)]="classObj" name="classId">
+      <option *ngFor="let vclass of vehicleClassList" [value]="vclass">{{vclass.param2}}</option>
+    </select> -->
+  </div>
+</div>
+<div class="col-sm-4">
+  <div class="form-group">
+    <label>Activation Date:<span class="mandetory">*</span></label>
+    <input
+      id="activationdate"
+      type="text"
+      ngxDaterangepickerMd
+      [(ngModel)]="editActivationDate"
+      class="form-control filter-input"
+      [singleDatePicker]="true"
+      [autoApply]="true"
+      [locale]="{ format: 'DD-MMM-YYYY' }"
+      name="date"
+      [opens]="'center'"
+      [drops]="'up'"
+      autocomplete="off"/>
+  </div>
+</div>
+<div class="col-sm-4">
+  <div class="form-group">
+    <label>Remark:<span class="mandetory">*</span></label>
+    <textarea class="form-control ignorespecialcharacter_address" id="remark" placeholder="Reason"
+      [(ngModel)]="editRemark" (keyup)="checkEditRemark()" name="remark" rows="4"
+    [ngClass]="{'border-danger': isEditRemarkInvalid, 'border-success': !isEditRemarkInvalid && editRemark.length >= 10}"></textarea>
+    @if (isEditRemarkInvalid) {
+      <div style="color: red; font-size: 11px;">
+        Remark must be at least 10 characters.
+      </div>
+    }
+  </div>
+</div>
+</div>
+</div>
+<div id="updatemodelheaderbutton" class="modelbtnstyle">
+  <button (click)="updateVehicle()" [disabled]="isEditRemarkInvalid || loading">
+    {{loading ? 'Updating...' : 'Submit'}}
+  </button>
+  <button type="reset" id="btnstyle" (click)="back()">Back</button>
+</div>
+</div>
+</div>
+}
+
+<!-- Delete Vehicle Modal (Angular overlay) -->
+@if (showDeleteModal) {
+  <div class="modal-overlay update-vehicle-modal" (click)="back()">
+    <div class="modal-content" style="width: 300px;" (click)="$event.stopPropagation()">
+      <div class="modal-header" id="deletemodelheader">
+        <h5 class="modal-title" id="deletemodeltitle">Delete</h5>
+        <button type="button" class="close" (click)="back()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <span style="font-size: 11px;">Vehicle No : <font>{{deleteVehicleNo}}</font></span>
+        <form #deleteForm>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <textarea class="form-control ignoresymbol_name" id="deleteremarks" placeholder="Remark"
+                  style="background: white; color: black;height: 140px; resize: none;" maxlength="150" [(ngModel)]="deleteRemark"
+                  (keyup)="checkDeleteRemark()" name="deleteRemark"
+                  rows="6"
+                [ngClass]="{'border-danger': isDeleteRemarkInvalid, 'border-success': !isDeleteRemarkInvalid && deleteRemark.length >= 150}"></textarea>
+              </div>
+              @if (isDeleteRemarkInvalid) {
+                <div style="color: red; font-size: 11px;">
+                  Remark must be at least 10 characters.
+                </div>
+              }
+            </div>
+            <div class="col-md-12">
+              <div class="float-end">
+                <button class="btn btn-sm btn-secondary mx-2" type="reset" (click)="back()">Back</button>
+                <button class="btn btn-sm btn-danger" type="submit" (click)="deleteVehicle()" [disabled]="isDeleteRemarkInvalid || loading">
+                  {{loading ? 'Deleting...' : 'Submit'}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

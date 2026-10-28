@@ -1,0 +1,277 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <button class="pagebtn" style="margin-right: 10px;">
+            <a routerLink="/poi/entry"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add New</a>
+          </button>
+          <div class="pagetitlestyle"><span><i class="fa fa-map-marker"></i>&nbsp;&nbsp;POI Details</span></div>
+        </div>
+
+        <!-- Search and Pagination Controls -->
+        <form autocomplete="off">
+          <div class="top-controls-row">
+            <!-- Left Side: Search and Reload -->
+            <div class="left-controls">
+              <span class="search-label">Search :</span>
+              <div class="search-box">
+                <input
+                  type="search"
+                  readonly
+                  onfocus="this.removeAttribute('readonly');"
+                  class="search-input-inner"
+                  id="searchby"
+                  placeholder="Type here..."
+                  autocomplete="off"
+                  maxlength="50"
+                  [(ngModel)]="searchText"
+                  (keyup.enter)="getSearchDetails()"
+                  name="searchby">
+                <button type="button" class="search-inner-btn" (click)="getSearchDetails()" title="Search">
+                  <i class="fa fa-search"></i>
+                </button>
+              </div>
+              <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading">
+                <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-refresh'"></i>
+                <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
+              </button>
+            </div>
+
+            <!-- Right Side: Download, Page Size and Count -->
+            <div class="right-controls">
+              <div class="control-item">
+                <label for="excelpdfdownload">Download :</label>
+                <select name="excelpdfdownload" id="excelpdfdownload" class="rows-select">
+                  <option value="Select">Select</option>
+                  <!-- <option value="Excel" id="downloadexcel">Excel</option> -->
+                  <option>Excel</option>
+                </select>
+              </div>
+              <div class="control-item">
+                <label>Show Rows :</label>
+                <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize" class="rows-select">
+                  @for (size of pageSizeOptions; track size) {
+                    <option [value]="size === totalCount ? totalCount : size">
+                      {{size === totalCount ? totalCount : size}}
+                    </option>
+                  }
+                </select>
+              </div>
+              <div class="total-records-text">
+                Total Records : {{pageCount}} of {{totalCount}}
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <ng-template #poiCell let-poi let-column="column">
+          @if (column.key === 'icon') {
+            @if (poi.param5 || poi.param4) {
+              <img [src]="poi.param5 || poi.param4" style="height:17px;" alt="POI Icon" />
+            }
+          } @else {
+            {{ poiTable.cellValue(poi, column) }}
+          }
+        </ng-template>
+        <app-common-table #poiTable [columns]="tableColumns" [rows]="pois" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="poiCell"
+          tableClass="table table-striped app-table" tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
+          emptyMessage="NO DATA FOUND" (sortChange)="sort($event)">
+        </app-common-table>
+
+        <!-- Pagination Controls -->
+        <div class="float-end">
+          @if (totalCount > pageSize) {
+            <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+              [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+              [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+            </ngb-pagination>
+          }
+        </div>
+        <!-- <div *ngIf="totalCount > 0" class="app-pagination">
+        <ul class="app-pagination-list">
+
+          <li>
+            <button
+              class="app-page-btn nav-btn"
+              (click)="onPageChange(currentPage - 1)"
+              [disabled]="currentPage === 1">
+              <i class="fa fa-angle-left"></i>
+              Previous
+            </button>
+          </li>
+
+          <li *ngFor="let page of getPageNumbers()">
+
+            <span *ngIf="page === -1" class="app-page-dots">...</span>
+
+            <button
+              *ngIf="page !== -1"
+              class="app-page-btn"
+              [class.active]="currentPage === page"
+              (click)="onPageChange(page)">
+              {{ page }}
+            </button>
+
+          </li>
+
+          <li>
+            <button
+              class="app-page-btn nav-btn"
+              (click)="onPageChange(currentPage + 1)"
+              [disabled]="currentPage >= getTotalPages()">
+              Next
+              <i class="fa fa-angle-right"></i>
+            </button>
+          </li>
+
+        </ul>
+      </div> -->
+
+      @if (errorMessage) {
+        <div class="alert alert-danger" style="margin-top: 10px;">
+          {{errorMessage}}
+        </div>
+      }
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Edit Modal -->
+@if (showEditModal) {
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fa fa-map-marker"></i>&nbsp;&nbsp;Edit POI</h5>
+        <button type="button" class="close" (click)="closeEditModal()">&times;</button>
+      </div>
+      <div class="modal-body p-4">
+        <form (ngSubmit)="submitEdit()" #editForm="ngForm" autocomplete="off">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="form-group mb-3">
+                <label class="fw-bold text-dark">POI Name <span class="mandetory">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="editPoiName" name="editPoiName"
+                  #poiName="ngModel"
+                  required placeholder="Enter POI name" minlength="3" maxlength="100"
+                  [class.is-invalid]="(editForm.submitted || poiName.touched || poiName.dirty) && poiName.invalid"
+                  (input)="onPoiNameInput($event)">
+                @if ((editForm.submitted || poiName.touched) && poiName.invalid) {
+                  <div class="invalid-feedback">
+                    @if (poiName.errors?.['required']) {
+                      <span>POI Name is required.</span>
+                    }
+                    @if (poiName.errors?.['minlength']) {
+                      <span>POI Name must be at least 3 characters.</span>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group mb-3">
+                <label class="fw-bold text-dark">POI Icon <span class="mandetory">*</span></label>
+                <div class="d-flex align-items-center">
+                  <select class="form-control form-control-sm me-2" [(ngModel)]="editPoiIcon"
+                    (change)="onEditPoiIconChange()" name="editPoiIcon" required>
+                    <option value="" disabled>-- Select --</option>
+                    @for (icon of poiIcons; track icon) {
+                      <option [value]="icon.value">{{icon.label}}</option>
+                    }
+                  </select>
+                  <div class="icon-preview border rounded d-flex align-items-center justify-content-center bg-light"
+                    style="width: 31px; height: 31px; min-width: 31px;">
+                    @if (editImageUrl) {
+                      <img [src]="editImageUrl" style="width: 24px; height: 24px;" alt="Preview" />
+                    }
+                    @if (!editImageUrl) {
+                      <i class="fa fa-image text-muted"></i>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-md-4">
+              <div class="form-group mb-3">
+                <label class="fw-bold text-dark">Latitude <span class="mandetory">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="editLatitude" name="editLatitude"
+                  minlength="4" maxlength="10" required placeholder="0.000000" (input)="onLatitudeInput($event)">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group mb-3">
+                <label class="fw-bold text-dark">Longitude <span class="mandetory">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="editLongitude" name="editLongitude"
+                  minlength="4" maxlength="10" required placeholder="0.000000" (input)="onLongitudeInput($event)" >
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group mb-3">
+                <label class="fw-bold text-dark">Range (Km) <span class="mandetory">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="editRange" name="editRange"
+                  minlength="1" maxlength="5" required placeholder="Range" (input)="onRangeInput($event)">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-11">
+              <div class="form-group mb-3">
+                <label class="fw-bold text-dark">Remark <span class="mandetory">*</span></label>
+                <textarea class="form-control" [(ngModel)]="editRemark" name="editRemark" rows="3"
+                minlength="2" maxlength="100" required placeholder="Describe the reason for update..."></textarea>
+                @if (editRemark && editRemark.length < 10) {
+                  <small class="text-muted">
+                    Remaining: {{ 10 - editRemark.length }} more characters required.
+                  </small>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top-0 pt-0">
+            <button type="button" class="btn btn-sm btn-secondary px-4 shadow-sm" (click)="closeEditModal()">Cancel</button>
+            <button type="submit" class="btn btn-sm btn-success px-4 shadow-sm" [disabled]="loading || editForm.invalid">
+              <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+              &nbsp;{{ loading ? 'Updating...' : 'Update POI' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Delete Modal -->
+@if (showDeleteModal) {
+  <div class="modal-overlay">
+    <div class="modal-content" style=" max-width: 347px;">
+      <div class="modal-header" style=" background-color: #e81e50; color: white;">
+        <h5 class="modal-title">Delete POI</h5>
+        <button type="button" class="close" (click)="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body" style=" font-size: 13px;">
+        <p>Are you sure you want to delete POI: <strong>{{selectedPOI?.param3}}</strong>?</p>
+        <div class="form-group">
+          <label>Remark:</label><label class="mandetory">*</label>
+          <textarea class="form-control" [(ngModel)]="deleteRemark" name="deleteRemark"
+          rows="3" minlength="10" required style=" max-height: 65px;"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="poiDeletebtn" (click)="submitDelete()" [disabled]="loading || deleteRemark.length < 10">Delete</button>
+          <button type="button" class="poiDeleteBackbtn" (click)="closeDeleteModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success"
+  (closed)="successMessage = null"></app-toast>
+}

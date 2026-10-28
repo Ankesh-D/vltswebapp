@@ -1,0 +1,903 @@
+/* =====================================================
+   GLOBAL
+===================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =====================================================
+   MAIN WRAPPER
+===================================================== */
+
+.main-wrapper {
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  overflow-x: hidden;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.top-header {
+  flex-shrink: 0;
+
+  padding: 10px 15px 6px;
+
+  background: #ffffff;
+}
+
+.gov-logo img {
+  height: 70px;
+  max-width: 100%;
+
+  object-fit: contain;
+}
+
+.webel-logo img {
+  height: 70px;
+  max-width: 100%;
+
+  object-fit: contain;
+}
+
+
+.main-title {
+  font-size: 28px;
+
+  font-weight: 700;
+
+  color: #000000;
+
+  line-height: 1.2;
+}
+
+.sub-title {
+  font-size: 20px;
+
+  color: #222222;
+
+  margin-top: 3px;
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+.nav-links {
+  flex-shrink: 0;
+
+  border-top: 2px solid #7b95d8;
+  border-bottom: 2px solid #7b95d8;
+
+  padding: 6px 0;
+
+  font-size: 13px;
+
+  background: #ffffff;
+}
+
+.nav-links a {
+  color: #885000;
+
+  text-decoration: none;
+
+  margin: 0 20px;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: #ffa700;
+}
+
+.nav-other {
+  color: #ffa700 !important;
+
+  font-weight: 700 !important;
+}
+
+
+/* =====================================================
+   MAIN CONTENT
+===================================================== */
+
+.main-content {
+  flex: 1;
+
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: 0;
+
+  padding-bottom: 10px;
+}
+
+
+/* =====================================================
+   PAGE HEADING
+===================================================== */
+
+.page-heading-wrapper {
+  flex-shrink: 0;
+
+  text-align: center;
+}
+
+.page-heading {
+  font-family: "Trebuchet MS", Arial, sans-serif;
+
+  margin-top: 18px;
+  margin-bottom: 18px;
+
+  font-size: 30px;
+
+  color: #885000;
+
+  font-weight: 500;
+}
+
+
+/* =====================================================
+   ANNOUNCEMENT
+===================================================== */
+
+.announcement-section {
+  width: 100%;
+
+  max-width: 1200px;
+
+  margin: 0 auto 15px;
+
+  padding: 0 15px;
+
+  box-sizing: border-box;
+}
+
+.news-marquee {
+  width: 100%;
+
+  overflow: hidden;
+
+  white-space: nowrap;
+
+  background: #ffffff;
+
+  border: 3px solid #f9af00;
+
+  padding: 8px 0;
+
+  position: relative;
+}
+
+.news-text {
+  display: inline-block;
+
+  padding-left: 100%;
+
+  animation: scrollText 15s linear infinite;
+
+  font-size: 16px;
+
+  color: #000000;
+}
+
+@keyframes scrollText {
+
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+
+}
+
+
+/* =====================================================
+   MENU CONTAINER
+===================================================== */
+
+.containers {
+  width: 85%;
+
+  max-width: 1300px;
+
+  margin: auto;
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+}
+
+
+/* =====================================================
+   MENU ROW
+===================================================== */
+
+.menu-row {
+  width: 100%;
+
+  margin-left: 0;
+  margin-right: 0;
+}
+
+
+/* =====================================================
+   SHUTTER BOX
+===================================================== */
+
+.shutter-box {
+  position: relative;
+
+  width: 100%;
+
+  height: 120px;
+
+  background: #885000;
+
+  overflow: hidden;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  font-size: 24px;
+
+  font-weight: 600;
+
+  color: #ffffff;
+
+  transition: color 0.5s ease;
+}
+
+
+/* =====================================================
+   TOP SHUTTER
+===================================================== */
+
+.shutter-box::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 50%;
+
+  background: #ffa700;
+
+  transform: translateY(-100%);
+
+  transition: transform 0.5s ease;
+
+  z-index: 1;
+}
+
+
+/* =====================================================
+   BOTTOM SHUTTER
+===================================================== */
+
+.shutter-box::after {
+  content: "";
+
+  position: absolute;
+
+  bottom: 0;
+  left: 0;
+
+  width: 100%;
+  height: 50%;
+
+  background: #ffa700;
+
+  transform: translateY(100%);
+
+  transition: transform 0.5s ease;
+
+  z-index: 1;
+}
+
+
+/* =====================================================
+   HOVER
+===================================================== */
+
+.shutter-box:hover::before {
+  transform: translateY(0);
+}
+
+.shutter-box:hover::after {
+  transform: translateY(0);
+}
+
+.shutter-box:hover {
+  color: #ffffff;
+}
+
+
+/* Text stays above shutter */
+
+.shutter-box .text {
+  position: relative;
+
+  z-index: 2;
+
+  color: #ffffff;
+
+  text-decoration: none;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.footer {
+  flex-shrink: 0;
+
+  width: 100%;
+
+  border-top: 2px solid #7b95d8;
+
+  padding: 8px 15px;
+
+  font-size: 12px;
+
+  display: grid;
+
+  grid-template-columns: 1fr auto 1fr;
+
+  align-items: center;
+
+  background: #ffffff;
+
+  box-sizing: border-box;
+}
+
+.footer-center {
+  text-align: center;
+
+  color: #333333;
+}
+
+.footer-right {
+  text-align: right;
+
+  color: #0d6efd;
+
+  font-weight: 700;
+}
+
+.footer-left {
+  min-width: 1px;
+}
+
+
+/* =====================================================
+   VENDOR TABLE
+===================================================== */
+
+.vendor-tbl {
+  width: 100%;
+
+  margin-bottom: 0 !important;
+
+  border-collapse: collapse !important;
+}
+
+.vendor-tbl thead {
+  position: sticky;
+
+  top: 0;
+
+  z-index: 10;
+}
+
+.vendor-tbl thead th {
+  background: #885000;
+
+  color: #ffffff;
+
+  font-weight: 600;
+
+  border: none;
+
+  padding: 10px 8px !important;
+
+  text-align: left;
+
+  font-size: 14px;
+}
+
+.vendor-tbl tbody {
+  max-height: 350px;
+
+  overflow-y: auto;
+}
+
+.vendor-tbl tbody td {
+  padding: 10px 8px !important;
+
+  font-size: 13px;
+
+  color: #333333;
+
+  border-bottom: 1px solid #e0e0e0;
+
+  word-break: break-word;
+
+  overflow-wrap: break-word;
+}
+
+.vendor-tbl tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.modal-content {
+  border-radius: 4px;
+}
+
+.modal-header .btn-close {
+  box-shadow: none;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 992px) {
+
+  .main-title {
+    font-size: 23px;
+  }
+
+  .sub-title {
+    font-size: 17px;
+  }
+
+  .page-heading {
+    font-size: 27px;
+  }
+
+  .containers {
+    width: 90%;
+  }
+
+  .shutter-box {
+    height: 100px;
+
+    font-size: 20px;
+  }
+
+  .nav-links a {
+    margin: 0 10px;
+  }
+
+}
+
+
+/* =====================================================
+   TABLET / MOBILE
+===================================================== */
+
+@media (max-width: 768px) {
+
+  .main-wrapper {
+    min-height: 100vh;
+  }
+
+  .top-header {
+    padding: 8px 10px;
+  }
+
+  .gov-logo img,
+  .webel-logo img {
+    height: 50px;
+  }
+
+  .main-title {
+    font-size: 19px;
+  }
+
+  .sub-title {
+    font-size: 14px;
+  }
+
+  .nav-links {
+    padding: 7px 5px;
+  }
+
+  .nav-links a {
+    display: inline-block;
+
+    margin: 3px 7px;
+
+    font-size: 12px;
+  }
+
+  .page-heading {
+    font-size: 23px;
+
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  .containers {
+    width: 92%;
+
+    margin: auto;
+  }
+
+  .shutter-box {
+    height: 85px;
+
+    font-size: 18px;
+  }
+
+  .footer {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+    text-align: center;
+  }
+
+  .footer-center,
+  .footer-right {
+    text-align: center;
+  }
+
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 576px) {
+
+  .top-header .col-2 {
+    width: 18%;
+  }
+
+  .top-header .col-8 {
+    width: 64%;
+  }
+
+  .gov-logo img,
+  .webel-logo img {
+    height: 42px;
+  }
+
+  .main-title {
+    font-size: 15px;
+  }
+
+  .sub-title {
+    font-size: 11px;
+  }
+
+  .nav-links a {
+    margin: 3px 5px;
+
+    font-size: 11px;
+  }
+
+  .page-heading {
+    font-size: 20px;
+  }
+
+  .news-text {
+    font-size: 13px;
+  }
+
+  .containers {
+    width: 94%;
+  }
+
+  .shutter-box {
+    height: 75px;
+
+    font-size: 16px;
+  }
+
+  .footer {
+    font-size: 10px;
+
+    padding: 7px;
+  }
+
+}
+/* =====================================================
+   VENDOR MODAL - MATCH LIVE UI
+===================================================== */
+
+.vendor-modal-dialog {
+  width: 500px !important;
+  max-width: 500px !important;
+  margin: 0 auto;
+}
+
+.vendor-modal-dialog .modal-content {
+  width: 500px;
+  max-width: 500px;
+
+  border-radius: 4px;
+  border: 0;
+  overflow: hidden;
+}
+
+
+/* ================= HEADER ================= */
+
+.vendor-modal-dialog .modal-header {
+  height: 42px;
+
+  padding: 5px 10px !important;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #ddd;
+
+  display: flex;
+  align-items: center;
+}
+
+.vendor-modal-dialog .modal-title {
+  font-size: 16px;
+
+  font-weight: 400;
+
+  color: #333;
+
+  margin: 0;
+
+  line-height: 30px;
+}
+
+.vendor-modal-dialog .btn-close {
+  width: 14px;
+  height: 14px;
+
+  padding: 0;
+
+  margin-left: auto;
+
+  opacity: 0.55;
+
+  box-shadow: none;
+}
+
+.vendor-modal-dialog .btn-close:hover {
+  opacity: 1;
+}
+
+
+/* ================= BODY ================= */
+
+.vendor-modal-dialog .modal-body {
+  padding: 0 !important;
+
+  overflow: hidden;
+}
+
+
+/* ================= TABLE ================= */
+
+.vendor-tbl {
+  width: 100% !important;
+
+  margin: 0 !important;
+
+  border-collapse: collapse !important;
+
+  table-layout: fixed;
+}
+
+
+/* Header */
+
+.vendor-tbl thead {
+  display: table;
+
+  width: 100%;
+
+  table-layout: fixed;
+
+  background: #a45a00;
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 10;
+}
+
+.vendor-tbl thead th {
+  background: #a45a00 !important;
+
+  color: #ffffff !important;
+
+  border: none !important;
+
+  padding: 10px 8px !important;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  text-align: left;
+
+  white-space: nowrap;
+}
+
+
+/* Body scrolling */
+
+.vendor-tbl tbody {
+  display: block;
+
+  width: 100%;
+
+  max-height: 390px;
+
+  overflow-y: auto;
+
+  overflow-x: hidden;
+}
+
+.vendor-tbl tbody tr {
+  display: table;
+
+  width: 100%;
+
+  table-layout: fixed;
+
+  border-bottom: 1px solid #ddd;
+}
+
+.vendor-tbl tbody td {
+  padding: 9px 8px !important;
+
+  font-size: 12px;
+
+  color: #333;
+
+  vertical-align: top;
+
+  word-break: break-word;
+
+  overflow-wrap: break-word;
+
+  white-space: normal;
+}
+
+
+/* ================= COLUMN WIDTHS ================= */
+
+/* # */
+.vendor-tbl th:nth-child(1),
+.vendor-tbl td:nth-child(1) {
+  width: 50px;
+}
+
+/* Vendor */
+.vendor-tbl th:nth-child(2),
+.vendor-tbl td:nth-child(2) {
+  width: 145px;
+}
+
+/* Contact */
+.vendor-tbl th:nth-child(3),
+.vendor-tbl td:nth-child(3) {
+  width: 135px;
+}
+
+/* Email */
+.vendor-tbl th:nth-child(4),
+.vendor-tbl td:nth-child(4) {
+  width: auto;
+}
+
+
+/* ================= SCROLLBAR ================= */
+
+.vendor-tbl tbody::-webkit-scrollbar {
+  width: 8px;
+}
+
+.vendor-tbl tbody::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.vendor-tbl tbody::-webkit-scrollbar-thumb {
+  background: #999;
+
+  border-radius: 5px;
+}
+
+.vendor-tbl tbody::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+
+/* ================= HOVER ================= */
+
+.vendor-tbl tbody tr:hover {
+  background: #f5f5f5;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 576px) {
+
+  .vendor-modal-dialog {
+    width: calc(100% - 20px) !important;
+    max-width: calc(100% - 20px) !important;
+  }
+
+  .vendor-modal-dialog .modal-content {
+    width: 100%;
+  }
+
+  .vendor-tbl th:nth-child(2),
+  .vendor-tbl td:nth-child(2) {
+    width: 130px;
+  }
+
+  .vendor-tbl th:nth-child(3),
+  .vendor-tbl td:nth-child(3) {
+    width: 105px;
+  }
+
+}

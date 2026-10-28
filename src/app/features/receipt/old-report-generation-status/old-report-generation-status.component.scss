@@ -1,0 +1,247 @@
+.main-card {
+  border: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.soft-bg {
+  background: linear-gradient(135deg, #f1fff0, #f9fff7);
+}
+
+.title-text {
+  color: #1a237e;
+}
+
+.search-card {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.info-card {
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  height: 100%;
+}
+
+.info-title {
+  padding: 8px 12px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.bg-vehicle {
+  background: #1976d2;
+}
+
+.bg-device {
+  background: #6a1b9a;
+}
+
+.bg-connectivity {
+  background: #2e7d32;
+}
+
+.info-body {
+  padding: 10px 12px;
+}
+
+.info-body p {
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.info-body span {
+  font-weight: 600;
+  color: #37474f;
+}
+
+.map-link {
+  font-weight: 600;
+  color: #1565c0;
+}
+
+.bx {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.pdficon{
+  font-size: 24px;
+  color: #e53935;
+}
+
+::ng-deep .mapboxgl-popup-content {
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+    padding: 10px 10px 15px;
+    pointer-events: auto;
+    position: relative;
+    width: 330px;
+}
+
+
+.sorting {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+}
+
+.sorting_asc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #000;
+}
+
+.sorting_desc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #000;
+}
+
+.pagination-wrapper {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pagination {
+  display: inline-flex;
+  list-style: none;
+  padding: 0;
+}
+
+.pagination li {
+  margin: 0 5px;
+}
+
+.pagination li button {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  background-color: white;
+  cursor: pointer;
+}
+
+.pagination li.active button {
+  background-color: #027c08;
+  color: white;
+  border-color: #027c08;
+}
+
+.pagination li.disabled button {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.activate-btn {
+  background: blue;
+  color: white;
+  margin: 28px 0px 0px 0px;
+border-radius: 4px;
+  cursor: pointer;
+}
+.btn-approve {
+  background: linear-gradient(135deg, #27ae60, #027c08);
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.btn-map-view {
+  background: linear-gradient(135deg, #0288d1, #0277bd);
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  float: right;
+}
+.btn-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+  background: linear-gradient(135deg, #bdbdbd, #e0e0e0);
+  font-size: 12px;
+}
+
+.search-btn {
+    border: 1px solid #0b58b9;
+    background: white;
+    color: #0b58b9;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    /* cursor: pointer; */
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+}
+.label-style {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgb(62 70 79);
+}
+.btn-compliance {
+    background: linear-gradient(135deg, #27a5ae, #027c76);
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 1px 5px;
+}
+.value-style {
+    font-size: 13px;
+    font-weight: 500;
+    color: black;
+}
+.edit-btn-wrapper{
+  position: relative;
+  display: inline-block;
+}
+
+.edit-tooltip-bubble{
+  position: absolute;
+  top: -38px;
+  right: -15px;
+  background: #07515a;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  white-space: nowrap;
+  animation: bubbleFade 5s forwards;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.edit-tooltip-bubble::after{
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 20px;
+  width: 10px;
+  height: 10px;
+  background: #07515a;
+  transform: rotate(45deg);
+}
+
+@keyframes bubbleFade {
+
+  0%{
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  10%{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  85%{
+    opacity: 1;
+  }
+
+  100%{
+    opacity: 0;
+    visibility: hidden;
+  }
+
+}

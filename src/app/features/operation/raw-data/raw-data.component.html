@@ -1,0 +1,179 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+
+        <!-- PAGE HEADER -->
+        <div class="col-md-12 pagetitleborder">
+          <div class="page-header-row">
+            <div class="pagetitlestyle">Raw Data</div>
+            <div class="header-actions">
+              <button type="button" class="header-btn" (click)="goToEmergencyRawData()">
+                <i class="fa fa-plus"></i> Emergency Raw Data
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FILTER FORM -->
+        <div class="filter-section">
+          <form class="filter-form">
+            <div class="filter-row">
+
+              <div class="filter-field">
+                <label class="filter-label">Select Date <span class="req">*</span></label>
+                <input
+                  type="text"
+                  ngxDaterangepickerMd
+                  [(ngModel)]="selectedRange"
+                  class="form-control filter-input"
+                  [singleDatePicker]="true"
+                  [autoApply]="true"
+                  [locale]="{ format: 'DD-MMM-YYYY' }"
+                  name="date"
+                  required />
+              </div>
+
+              @if (showVendorList) {
+                <div class="filter-field">
+                  <label class="filter-label">Select Vendor <span class="req">*</span></label>
+                  <select class="form-control filter-select" id="vendor_obj_id"
+                    [(ngModel)]="selectedVendor" (change)="onVendorChange()" name="vendor">
+                    <option value="">Select Vendor</option>
+                    @for (item of companyList; track item) {
+                      <option [value]="item.param1">{{item.param2}}</option>
+                    }
+                  </select>
+                </div>
+              }
+
+              <div class="filter-field">
+                <label class="filter-label">IMEI No. <span class="req">*</span></label>
+                <ng-select
+                  id="imei_obj_id"
+                  name="device"
+                  [items]="deviceList"
+                  bindLabel="param2"
+                  bindValue="param1"
+                  placeholder="Select IMEI No."
+                  [(ngModel)]="selectedDevice"
+                  [virtualScroll]="true"
+                  [bufferAmount]="10"
+                  [searchable]="true"
+                  [clearable]="true"
+                  [disabled]="deviceList.length === 0"
+                  class="imei-ng-select">
+                </ng-select>
+              </div>
+
+              <div class="d-flex justify-content-end align-items-end">
+                <div>
+                  <button type="button"
+                    class="header-btn search-btn float-end mx-2"
+                    (click)="searchFlag=true; searchRawData(1)">
+
+                    Search
+                  </button>
+                </div>
+                <div>
+                  <button type="reset" class="header-btn float-end ms-2" (click)="resetFilters()">
+                    <i class="fa fa-refresh"></i> Reset
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </form>
+        </div>
+
+        <!-- TABLE SECTION -->
+        @if (showDetailsFlag) {
+          <div class="table-section">
+            <!-- TOP CONTROLS -->
+            <form autocomplete="off" class="top-controls-row">
+              <div class="left-controls">
+                <span class="search-label">Search :</span>
+                <div class="search-box">
+                  <input type="search" readonly onfocus="this.removeAttribute('readonly');"
+                    class="search-input inner" id="searchby" placeholder="Search..."
+                    maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" />
+                  <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
+                    <i class="fa fa-search"></i>
+                  </button>
+                </div>
+                <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading">
+                  {{ loading ? 'Reloading...' : 'Reload' }}
+                </button>
+              </div>
+              <div class="right-controls">
+                <div class="control-item">
+                  <label>Show Rows :</label>
+                  <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
+                    @for (size of pageSizeOptions; track size) {
+                      <option [value]="size === totalCount ? 'All' : size">
+                        {{ size === totalCount ? 'All' : size }}
+                      </option>
+                    }
+                  </select>
+                </div>
+                <div class="total-records-text">Total Records : {{pageCount}} of {{totalCount}}</div>
+              </div>
+            </form>
+            <!-- DATA TABLE -->
+            <div class="table-responsive">
+              <table class="table table-striped app-table" id="devicetable">
+                <thead class="rd-thead">
+                  <tr>
+                    <th style="width:40px;">#</th>
+                    <th (click)="sort('param4')" class="sortable">
+                      Raw String
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey==='param4', 'sorting_asc': !reverse && sortKey==='param4'}"></span>
+                    </th>
+                    <th (click)="sort('param3')" class="sortable" style="width:180px;">
+                      Server Polled Time
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey==='param3', 'sorting_asc': !reverse && sortKey==='param3'}"></span>
+                    </th>
+                    <th (click)="sort('param5')" class="sortable" style="width:140px;">
+                      Device IP
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey==='param5', 'sorting_asc': !reverse && sortKey==='param5'}"></span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (rawData.length === 0 && !loading) {
+                    <tr>
+                      <td colspan="4" class="no-data text-center">NO DATA FOUND</td>
+                    </tr>
+                  }
+                  @for (raw of getPaginatedData(); track raw) {
+                    <tr>
+                      <td>{{raw.param1}}</td>
+                      <td class="raw-string-cell">{{raw.param4}}</td>
+                      <td>{{raw.param3}}</td>
+                      <td>{{raw.param5}}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <!-- PAGINATION -->
+            @if (getTotalPages() > 1) {
+              <div class="pagination-wrapper">
+                <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+                @for (page of getPageNumbers(); track page) {
+                  <button
+                    (click)="onPageChange(page)"
+                    [class.active]="currentPage === page">
+                    {{page}}
+                  </button>
+                }
+                <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,112 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="pagetitlestyle"><span><i class="fa fa-map-marker"></i>&nbsp;&nbsp;POI Entry</span></div>
+                <button class="pagebtn" routerLink="/poi">
+                  <i class="fa fa-list"></i>&nbsp;&nbsp;Details
+                </button>
+              </div>
+            </div>
+
+            <form name="inserdealerform" autocomplete="off" style="     border: 1px solid #c5c2c2;">
+              <div class="form-desc mb-3">
+                <span class="badge badge-light border text-secondary px-2 py-1">
+                  <strong>NOTE :</strong> <span class="mandetory">*</span> Are Mandatory Fields.
+                </span>
+              </div>
+
+              <div class="entrypagediv border rounded p-3 soft-bg">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label class="fw-bold text-dark">POI Name <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm clearable ignorespecialcharacter"
+                        [class.error]="getFieldError('poiName')" minlength="3" maxlength="100" placeholder="POI Name"
+                        id="poiname" type="text" [(ngModel)]="poiName" (input)="onPoiNameInput($event)" name="poiName">
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="fw-bold text-dark">POI Icon <span class="mandetory">*</span></label>
+                      <div class="d-flex align-items-center">
+                        <select class="form-control form-control-sm me-2" [(ngModel)]="poiIcon" id="poiIcon"
+                          (change)="onPoiIconChange()" name="poiIcon" [class.error]="getFieldError('poiIcon')">
+                          <option value="" disabled>-- Select Icon --</option>
+                          @for (icon of poiIcons; track icon) {
+                            <option [value]="icon.value">{{icon.label}}</option>
+                          }
+                        </select>
+                        <div
+                          class="icon-preview border rounded d-flex align-items-center justify-content-center bg-white"
+                          style="width: 31px; height: 31px; min-width: 31px;">
+                          @if (imageUrl) {
+                            <img [src]="imageUrl" id="poishowimage" style="width: 24px; height: 24px;" />
+                          }
+                          @if (!imageUrl) {
+                            <i class="fa fa-image text-muted"></i>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mt-2">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="fw-bold text-dark">Latitude <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm clearable masklatlong"
+                        [class.error]="getFieldError('latitude')" placeholder="Latitude" id="lat" type="text"
+                        maxlength="10" [(ngModel)]="latitude" (input)="onLatitudeInput($event)" name="latitude">
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="fw-bold text-dark">Longitude <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm clearable masklatlong"
+                        [class.error]="getFieldError('longitude')" placeholder="Longitude" id="long" type="text"
+                        maxlength="10" [(ngModel)]="longitude" (input)="onLongitudeInput($event)" name="longitude">
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="fw-bold text-dark">Range <small>(Km)</small> <span
+                    class="mandetory">*</span></label>
+                    <input class="form-control form-control-sm clearable acceptnumeric_decimal"
+                      [class.error]="getFieldError('range')" placeholder="Range" id="range" type="text" maxlength="5"
+                      [(ngModel)]="range" (input)="onRangeInput($event)" (blur)="checkRange()" name="range">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-buttons-w text-center mt-4 pt-3 border-top">
+              <button type="button" class="btn btn-sm btn-success shadow-sm px-4" (click)="poiInsert()"
+                [disabled]="loading">
+                <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+                &nbsp;{{loading ? 'Submitting...' : 'Submit POI'}}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success"
+  (closed)="successMessage = null"></app-toast>
+}

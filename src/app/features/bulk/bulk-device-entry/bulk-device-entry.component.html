@@ -1,0 +1,369 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder mb-0">
+              <div class="pagetitlestyle">
+                <span>Multiple Device Entry</span>
+              </div>
+            </div>
+
+            <form id="bulkDeviceEntryForm" autocomplete="off" class="entrypagediv">
+              <div class="d-flex justify-content-between">
+
+                <div class="form-desc" style="font-size: 11px; margin-bottom: 6px; color: #666;">
+                  <strong>NOTE :</strong> <span class="mandetory">*</span> Are Mandatory Fields.
+                </div>
+                <div class="float-end">
+                  <a (click)="viewExcelFormat()">
+                    <img
+                      class="me-2"
+                      src="assets/images/appimages/excel-format/viewexcel.png"
+                      title="View Excel Format File"
+                      style="width: 25px; height: 25px; cursor: pointer"
+                      aria-hidden="true"
+                      />
+                  </a>
+
+                  <a
+                    href="/assets/excelformat/deviceuploadformat.xlsx"
+                    download
+                    >
+                    <img
+                      src="assets/images/appimages/excel-format/downloadexcel1.png"
+                      style="width: 25px; height: 25px"
+                      title="Download Excel Format File"
+                      />
+                  </a>
+                </div>
+              </div>
+              <div class="row">
+                @if (roleId == '10' || roleId == '64') {
+                  <div class="col-sm-3"
+                    >
+                    <div class="form-group">
+                      <label for="vendor_obj_id">Vendor:</label
+                        ><label class="mandetory">*</label>
+                        <ng-select
+                          id="vendor_obj_id"
+                          placeholder="Select Vendor"
+                          [(ngModel)]="selectedVendor"
+                          (change)="onVendorChange()"
+                          name="vendor">
+                          @for (item of vendorList; track item) {
+                            <ng-option [value]="item">{{item.param2}}</ng-option>
+                          }
+                        </ng-select>
+                      </div>
+                    </div>
+                  }
+                  @if (roleId=='10' || roleId=='64') {
+                    <div class="col-sm-3" id="list_for_distributor">
+                      <div class="form-group">
+                        <label for="">Distributor:</label>
+                        <ng-select
+                          id="distributor_obj_id"
+                          placeholder="Select Distributor"
+                          [(ngModel)]="selectedDistributor"
+                          (change)="onDistributorChange()"
+                          name="distributor">
+                          @for (item of distributorList; track item) {
+                            <ng-option [value]="item">{{item.param2}}</ng-option>
+                          }
+                        </ng-select>
+                      </div>
+                    </div>
+                  }
+                  @if (roleId=='10' || roleId=='64') {
+                    <div class="col-sm-3" id="list_for_dealer">
+                      <div class="form-group">
+                        <label for="dealer">Dealer:</label>
+                        <ng-select
+                          id="dealer_obj_id"
+                          placeholder="Select Dealer"
+                          [(ngModel)]="selectedDealer"
+                          name="dealer">
+                          @for (item of dealerList; track item) {
+                            <ng-option [value]="item">{{item.param2}}</ng-option>
+                          }
+                        </ng-select>
+                      </div>
+                    </div>
+                  }
+
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label for="modelid">Esim Provider:</label
+                        ><label class="mandetory">*</label>
+                        <ng-select
+                          [items]="m2mProviders"
+                          bindLabel="param2"
+                          [(ngModel)]="selectedM2M"
+                          [ngModelOptions]="{ standalone: true }"
+                          placeholder="Select Esim Provider"
+                          >
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-sm-3">
+                      <div class="form-group">
+                        <label for="modelid">Model Code:</label
+                          ><label class="mandetory">*</label>
+                          <ng-select
+                            [items]="deviceModelList"
+                            bindLabel="param2"
+                            [(ngModel)]="selectedModel"
+                            [ngModelOptions]="{ standalone: true }"
+                            placeholder="Select Model"
+                            >
+                          </ng-select>
+                        </div>
+                      </div>
+
+                      <div class="col-sm-4 pt-2">
+                        <div class="form-group">
+                          <label for="fileInput" class="d-block">
+                            Select Excel File: <span class="mandetory">*</span>
+                          </label>
+
+                          <div class="custom-file">
+                            <input
+                              type="file"
+                              class="custom-file-input"
+                              id="fileInput"
+                              (change)="onFileSelected($event)"
+                              accept=".xls,.xlsx"
+                              />
+
+                            <label class="custom-file-label" for="fileInput">
+                              {{ selectedFileName || "Choose file..." }}
+                            </label>
+                          </div>
+
+                          <small class="form-text text-muted mt-1">
+                            {{ msg }}
+                          </small>
+
+                          <!-- ✅ NEW WARNING -->
+                          <small class="text-danger d-block">
+                            ⚠ Maximum 200 rows allowed in Excel file
+                          </small>
+                        </div>
+                      </div>
+
+                      <div class="col-sm-5 pt-4">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-primary me-2"
+                          (click)="uploadFile()"
+                          [disabled]="loading"
+                          >
+                          @if (loading) {
+                            <span>Uploading...</span>
+                          }
+                          @if (!loading) {
+                            <span>Upload</span>
+                          }
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-secondary"
+                          (click)="resetForm()"
+                          [disabled]="loading"
+                          >
+                          Reset
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- <div class="row">
+                    <div class="col-md-12">
+                      <div class="entrypagediv">
+                        <div class="row">
+
+
+
+                        </div>
+
+                        <div class="row">
+                          <div class="col-sm-12 text-center"></div>
+                        </div>
+
+                        <div class="row" *ngIf="errorMessage">
+                          <div class="col-sm-12">
+                            <div class="alert alert-danger">{{ errorMessage }}</div>
+                          </div>
+                        </div>
+                        <div class="row" *ngIf="successMessage">
+                          <div class="col-sm-12">
+                            <div class="alert alert-success">
+                              {{ successMessage }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div> -->
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for viewing Excel file format image -->
+    <div
+      class="modal fade"
+      id="excelFormatModal"
+      tabindex="-1"
+      aria-labelledby="excelFormatModalLabel"
+      aria-hidden="true"
+      >
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="excelFormatModalLabel">
+              Excel Format Example
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body text-center">
+            <img
+              src="assets/images/excelformat-bulkdeviceview.png"
+              alt="Excel Format Example"
+              class="img-fluid"
+              />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="excelFormatModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+      >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">...</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="excelFormatModal" tabindex="-1">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content custom-excel-modal">
+          <div class="modal-header">
+            <h5 class="modal-title">Excel Format Preview</h5>
+            <button
+              type="button"
+              class="close custom-close"
+              data-dismiss="modal"
+              aria-label="Close"
+              >
+              <span>&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body text-center">
+            <img
+              src="assets/images/excelformat-bulkdeviceview.png"
+              class="img-fluid preview-image"
+              alt="Excel Format"
+              />
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Validation Modal -->
+    <!-- ===== Validation Modal ===== -->
+    @if (showValidationModal) {
+      <div class="validation-modal-overlay">
+        <div class="validation-modal-container">
+          <!-- Header -->
+          <div class="validation-modal-header">
+            <div class="title">Validation Result</div>
+            <button class="close-btn" (click)="closeValidationModal()">✕</button>
+          </div>
+          <!-- Body -->
+          <div class="validation-modal-body">
+            <div class="validation-table-wrapper">
+              <table class="validation-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Device No</th>
+                    <th>IMEI</th>
+                    <th>ICCID</th>
+                    <th>Message</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of validationList; track item; let i = $index) {
+                    <tr>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ item.param1 }}</td>
+                      <td>{{ item.param2 }}</td>
+                      <td>{{ item.param3 }}</td>
+                      <td class="error-text">{{ item.validationMessage }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Footer -->
+          <div class="validation-modal-footer">
+            <button class="btn-close" (click)="closeValidationModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    }
+    <!-- ===== Full Screen Loader ===== -->
+    @if (loading) {
+      <div class="global-loader">
+        <div class="loader-box">
+          <div class="spinner"></div>
+          <div class="loader-text">Uploading, please wait...</div>
+        </div>
+      </div>
+    }

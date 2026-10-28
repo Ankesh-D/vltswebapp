@@ -1,0 +1,376 @@
+<div class="content-i vendor-entry-page">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+
+            <!-- Page Title -->
+            <div class="col-md-12 pagetitleborder d-flex justify-content-between align-items-center vendor-entry-heading">
+              <div class="pagetitlestyle"><span>Vendor Entry</span></div>
+              <button class="btn btn-sm btn-outline-primary header-btn" type="button" (click)="goBack()">
+                <i class="fa fa-arrow-left"></i> Back
+              </button>
+            </div>
+
+            <form id="VendorEntryForm" class="vendor-entry-form" #vendorForm="ngForm" autocomplete="off" (ngSubmit)="vendorEntry()">
+              <div class="form-desc" style="font-size: 11px; margin-bottom: 6px; color: #666;">
+                <strong>NOTE :</strong> <span class="mandetory">*</span> Are Mandatory Fields.
+              </div>
+
+              <!-- ── VENDOR DETAILS ─────────────────────────────── -->
+              <div class="entrypagediv">
+                <legend class="section-legend">Vendor Details</legend>
+                <div class="row">
+
+                  <!-- Vendor Name -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">Vendor Name <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(vendorNameRef.invalid && (vendorNameRef.touched || submitted)) || getFieldError('vendorName')"
+                        maxlength="100" placeholder="Vendor Name" type="text"
+                        [(ngModel)]="vendorName" (input)="allowAlphaNumericSpace($event)"
+                        name="vendorName" #vendorNameRef="ngModel" required autocomplete="off">
+                      @if ((vendorNameRef.invalid && (vendorNameRef.touched || submitted)) || getFieldError('vendorName')) {
+                        <div class="field-error">
+                          Vendor Name is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- MFG Code -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">MFG Code <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(mfgCodeRef.invalid && (mfgCodeRef.touched || submitted))" minlength="2"
+                        maxlength="5" placeholder="MFG Code" type="text"
+                        [(ngModel)]="mfgCode"
+                        name="mfgCode" #mfgCodeRef="ngModel" required
+                        autocomplete="off"
+                        style="text-transform: uppercase;">
+                      @if ((mfgCodeRef.invalid && (mfgCodeRef.touched || submitted))) {
+                        <div class="field-error">
+                          MFG Code is required (2-5 alphanumeric characters).
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- CIN No -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">CIN No. <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(cinNumberRef.invalid && (cinNumberRef.touched || submitted)) || getFieldError('cinNumber')"
+                        placeholder="CIN No." type="text"
+                        [(ngModel)]="cinNumber" (input)="onAlphaNumericInput($event, 'cinNumber')"
+                        name="cinNumber" #cinNumberRef="ngModel" required maxlength="21" autocomplete="off">
+                      @if ((cinNumberRef.invalid && (cinNumberRef.touched || submitted)) || getFieldError('cinNumber')) {
+                        <div class="field-error">
+                          CIN No. is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- GST No -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">GST No. <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(gstNoRef.invalid && (gstNoRef.touched || submitted)) || getFieldError('gstNo')"
+                        maxlength="15" placeholder="GST No." type="text"
+                        [(ngModel)]="gstNo" (input)="onAlphaNumericInput($event, 'gstNo')"
+                        name="gstNo" #gstNoRef="ngModel" required
+                        (keyup)="validateGST()" autocomplete="off">
+                      @if ((gstNoRef.invalid && (gstNoRef.touched || submitted)) || getFieldError('gstNo')) {
+                        <div class="field-error">
+                          {{ gstMessage || 'GST No. is required.' }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- PAN No -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">PAN No. <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(panNoRef.invalid && (panNoRef.touched || submitted)) || getFieldError('panNo')"
+                        maxlength="10" placeholder="PAN No." type="text"
+                        [(ngModel)]="panNo" (input)="onAlphaNumericInput($event, 'panNo')"
+                        name="panNo" #panNoRef="ngModel" required
+                        (blur)="validatePAN()" autocomplete="off">
+                      @if ((panNoRef.invalid && (panNoRef.touched || submitted)) || getFieldError('panNo')) {
+                        <div class="field-error">
+                          PAN No. is required (format: ABCDE1234F).
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Address -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">Address <span class="mandetory">*</span></label>
+                      <textarea class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(addressRef.invalid && (addressRef.touched || submitted)) || getFieldError('address')"
+                        placeholder="Address" [(ngModel)]="address"
+                        name="address" #addressRef="ngModel" required minlength="10" maxlength="100"
+                        (blur)="validateAddress()" autocomplete="off"
+                      style="resize: none; height: 28px;"></textarea>
+                      @if ((addressRef.invalid && (addressRef.touched || submitted)) || getFieldError('address')) {
+                        <div class="field-error">
+                          Address is required (10-100 characters).
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Contact No -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">Contact No. <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(contactNoRef.invalid && (contactNoRef.touched || submitted)) || getFieldError('contactNo')"
+                        placeholder="Contact No." type="text"
+                        [(ngModel)]="contactNo" (input)="allowOnlyNumbers($event, 'contactNo')"
+                        name="contactNo" #contactNoRef="ngModel" required maxlength="10"
+                        autocomplete="off">
+                      @if ((contactNoRef.invalid && (contactNoRef.touched || submitted)) || getFieldError('contactNo')) {
+                        <div class="field-error">
+                          Contact No. is required (10 digits).
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Email ID -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">Email ID <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(emailIdRef.invalid && (emailIdRef.touched || submitted)) || getFieldError('emailId')"
+                        maxlength="50" placeholder="Email ID" type="email"
+                        [(ngModel)]="emailId" name="emailId" #emailIdRef="ngModel" required
+                        (keyup)="validateEmail()" autocomplete="off">
+                      @if ((emailIdRef.invalid && (emailIdRef.touched || submitted)) || getFieldError('emailId')) {
+                        <div class="field-error">
+                          {{ emailMessage || 'Email ID is required.' }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- State -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">State <span class="mandetory">*</span></label>
+                      <ng-select [items]="statelist" bindLabel="param2" bindValue="param1"
+                        placeholder="Select State"
+                        [class.is-invalid]="(!selectedStateId && submitted) || getFieldError('stateName')"
+                        [(ngModel)]="selectedStateId" (change)="onStateChange()"
+                        name="stateName" [clearable]="true" [searchable]="true">
+                      </ng-select>
+                      @if ((!selectedStateId && submitted) || getFieldError('stateName')) {
+                        <div class="field-error">
+                          State is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- City -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">City <span class="mandetory">*</span></label>
+                      <ng-select [items]="citylist" bindLabel="param2" bindValue="param1"
+                        placeholder="Select City"
+                        [class.is-invalid]="(!selectedCityId && submitted) || getFieldError('cityName')"
+                        [(ngModel)]="selectedCityId" (change)="onCityChange()"
+                        name="cityName" [clearable]="true" [searchable]="true">
+                      </ng-select>
+                      @if ((!selectedCityId && submitted) || getFieldError('cityName')) {
+                        <div class="field-error">
+                          City is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Pincode -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">Pincode <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="pincodeRef.invalid && (pincodeRef.touched || submitted)"
+                        placeholder="Pincode" type="text" maxlength="6"
+                        (input)="allowOnlyNumbers($event, 'pincode')"
+                        [(ngModel)]="pincode" name="pincode" #pincodeRef="ngModel"
+                        required pattern="^[0-9]{6}$" autocomplete="off">
+                      @if (pincodeRef.invalid && (pincodeRef.touched || submitted)) {
+                        <div class="field-error">
+                          Valid 6-digit Pincode is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Contact Person -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">Contact Person <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(contactPersonRef.invalid && (contactPersonRef.touched || submitted)) || getFieldError('contactPerson')"
+                        maxlength="50" placeholder="Contact Person" type="text"
+                        [(ngModel)]="contactPerson" name="contactPerson" #contactPersonRef="ngModel"
+                        required autocomplete="off">
+                      @if ((contactPersonRef.invalid && (contactPersonRef.touched || submitted)) || getFieldError('contactPerson')) {
+                        <div class="field-error">
+                          Contact Person is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Mobile No -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">Mobile No. <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(mobileNoRef.invalid && (mobileNoRef.touched || submitted)) || getFieldError('mobileNo')"
+                        maxlength="10" placeholder="Mobile No." type="text"
+                        [(ngModel)]="mobileNo" (input)="allowOnlyNumbers($event, 'mobileNo')"
+                        name="mobileNo" #mobileNoRef="ngModel" required
+                        (blur)="validateMobileNo()" autocomplete="off">
+                      @if ((mobileNoRef.invalid && (mobileNoRef.touched || submitted)) || getFieldError('mobileNo')) {
+                        <div class="field-error">
+                          Valid 10-digit Mobile No. is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Contact Person Email -->
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">Contact Person Email <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(cpEmailRef.invalid && (cpEmailRef.touched || submitted)) || getFieldError('contactpersonemail')"
+                        placeholder="Contact Person Email" type="email" maxlength="50"
+                        [(ngModel)]="contactpersonemail" name="contactpersonemail" #cpEmailRef="ngModel"
+                        required (keyup)="validateContactPersonEmail()" autocomplete="off">
+                      @if ((cpEmailRef.invalid && (cpEmailRef.touched || submitted)) || getFieldError('contactpersonemail')) {
+                        <div class="field-error">
+                          {{ contactPersonEmailMessage || 'Contact Person Email is required.' }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- ── LOGIN DETAILS ──────────────────────────────── -->
+              <div class="entrypagediv" style="margin-top: 8px;">
+                <legend class="section-legend">Login Details</legend>
+                <div class="row">
+
+                  <div class="col-sm-3">
+                    <!-- (keyup)="validateUsername()" (blur)="validateUsername()" -->
+                    <div class="form-group">
+                      <label class="field-label">Username <span class="mandetory">*</span></label>
+                      <input class="form-control form-control-sm shadow-sm"
+                        [class.is-invalid]="(usernameRef.invalid && (usernameRef.touched || submitted)) || getFieldError('username')"
+                        maxlength="50" placeholder="Username" type="text"
+                        [(ngModel)]="username" name="username" #usernameRef="ngModel"
+                        required  autocomplete="off">
+                      @if ((usernameRef.invalid && (usernameRef.touched || submitted)) || getFieldError('username')) {
+                        <div class="field-error">
+                          {{ usernameMessage || 'Username is required.' }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">Password <span class="mandetory">*</span></label>
+                      <div class="input-icon-wrap">
+                        <input class="form-control form-control-sm shadow-sm"
+                          [class.is-invalid]="(passwordRef.invalid && (passwordRef.touched || submitted)) || getFieldError('password')"
+                          maxlength="50" placeholder="Password" [type]="passwordFieldType"
+                          [(ngModel)]="password" name="password" #passwordRef="ngModel"
+                          required (keyup)="validatePasswordMatch()" autocomplete="new-password">
+                        <button type="button" class="icon-btn" (click)="togglePasswordVisibility('password')">
+                          <i class="fa" [ngClass]="passwordFieldType === 'password' ? 'fa-eye' : 'fa-eye-slash'"></i>
+                        </button>
+                      </div>
+                      @if (passwordRef.invalid && (passwordRef.touched || submitted)) {
+                        <div class="field-error">
+                          Password is required.
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="col-sm-3">
+                    <div class="form-group">
+                      <label class="field-label">Confirm Password <span class="mandetory">*</span></label>
+                      <div class="input-icon-wrap">
+                        <input class="form-control form-control-sm shadow-sm"
+                          [class.is-invalid]="(confirmPasswordRef.invalid && (confirmPasswordRef.touched || submitted)) || !!passwordMatchMessage"
+                          maxlength="50" placeholder="Confirm Password" [type]="confirmPasswordFieldType"
+                          [(ngModel)]="confirmPassword" name="confirmPassword" #confirmPasswordRef="ngModel"
+                          required (keyup)="validatePasswordMatch()" autocomplete="new-password">
+                        <button type="button" class="icon-btn" (click)="togglePasswordVisibility('confirm')">
+                          <i class="fa" [ngClass]="confirmPasswordFieldType === 'password' ? 'fa-eye' : 'fa-eye-slash'"></i>
+                        </button>
+                      </div>
+                      @if ((confirmPasswordRef.invalid && (confirmPasswordRef.touched || submitted)) || passwordMatchMessage) {
+                        <div class="field-error">
+                          {{ passwordMatchMessage || 'Confirm Password is required.' }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- ── SUBMIT ──────────────────────────────────────── -->
+              <div class="form-buttons-w text-center" style="margin-top: 10px;">
+                <button type="reset" class="btn btn-secondary shadow-sm"
+                  (click)="resetForm()"
+                  style="font-size: 12px; padding: 6px 30px; font-weight: bold; border-radius: 4px; background: #6c757d; border: none; margin-right: 10px;">
+                  <i class="fa fa-redo" style="margin-right: 5px;"></i> Reset
+                </button>
+                <button type="submit" [disabled]="loading" class="btn btn-primary shadow-sm"
+                  style="font-size: 12px; padding: 6px 30px; font-weight: bold; border-radius: 4px; background: #0b58b9; border: none;">
+                  <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-check'" style="margin-right: 5px;"></i>
+                  @if (!loading) {
+                    <span>Submit</span>
+                  }
+                  @if (loading) {
+                    <span>Submitting...</span>
+                  }
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success" (closed)="successMessage = null"></app-toast>
+}

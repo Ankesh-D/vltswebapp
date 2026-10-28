@@ -1,0 +1,1215 @@
+.content-i {
+  padding: 20px;
+}
+
+.pagetitleborder {
+  border-bottom: 2px solid #0c04a7;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+
+.button {
+  float: left;
+  margin: 0 5px 0 0;
+  width: 100px;
+  height: 40px;
+  position: relative;
+}
+
+.button label,
+.button input {
+  display: block;
+  position: absolute;
+}
+
+.button input[type="radio"] {
+  opacity: 0.01;
+  z-index: 100;
+}
+
+.button input[type="radio"]:checked+label {
+  background: #20b8be;
+  border-radius: 10px;
+  color: white;
+}
+
+.button label {
+  cursor: pointer;
+  z-index: 90;
+  line-height: 1.8em;
+  width: 100%;
+  text-align: center;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #d9e7d8;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+  background-color: #fcfcfc;
+}
+
+thead {
+  font-size: 9px;
+  background: #aacda8;
+  color: #212529;
+  font-family: serif;
+}
+
+.table th {
+  text-align: left;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 11px !important;
+  border: 0.5px solid #d3a130;
+  padding: 8px;
+}
+
+.table td {
+  text-align: left;
+  border: 0.5px solid #d3a130;
+  padding: 8px;
+  font-size: 11px;
+}
+
+.sorting {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+}
+
+.sorting_asc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #000;
+}
+
+.sorting_desc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #000;
+}
+
+.pagination-wrapper {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pagination {
+  display: inline-flex;
+  list-style: none;
+  padding: 0;
+}
+
+.pagination li {
+  margin: 0 5px;
+}
+
+.pagination li button {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  background-color: white;
+  cursor: pointer;
+}
+
+.pagination li.active button {
+  background-color: #0c04a7;
+  color: white;
+  border-color: #0c04a7;
+}
+
+.pagination li.disabled button {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+thead th {
+  font-size: 9px;
+  background: #aacda8;
+  color: #212529;
+  font-family: serif;
+}
+
+::ng-deep .content-box {
+  padding: 3px 10px;
+}
+
+.today-alert-tabs-header {
+  display: flex;
+  align-items: center;
+
+  .home-button {
+    margin-left: auto;
+    /* This pushes the button to the right */
+    cursor: pointer;
+    font-size: 22px;
+    padding: 0 15px;
+    color: #555;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #0b58b9;
+      /* Using a color from your existing styles */
+    }
+  }
+}
+
+/* Alert Type Dropdown - Compact & Attractive */
+.alert-type-dropdown {
+  min-width: 180px;
+  max-width: 220px;
+
+  ::ng-deep .ng-select {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: #fff;
+    font-size: 12px;
+    min-height: 28px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #0b58b9;
+    }
+
+    &.ng-select-focused {
+      border-color: #0b58b9;
+      box-shadow: 0 0 0 2px rgba(11, 88, 185, 0.1);
+    }
+
+    .ng-select-container {
+      min-height: 23px;
+      padding: 0 25px 0 8px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+
+      .ng-value-container {
+        padding: 0;
+
+        .ng-placeholder {
+          color: #999;
+          font-size: 12px;
+        }
+
+        .ng-value {
+          background: #e8f0fe;
+          border: 1px solid #c5d9f1;
+          border-radius: 3px;
+          margin: 2px 2px 2px 0;
+
+          .ng-value-label {
+            font-size: 11px;
+            color: #0b58b9;
+            padding: 2px 5px;
+          }
+
+          .ng-value-icon {
+            color: #0b58b9;
+            font-size: 12px;
+
+            &:hover {
+              color: #d32f2f;
+            }
+          }
+        }
+
+        .ng-input {
+          input {
+            font-size: 12px;
+            height: 26px;
+          }
+        }
+      }
+
+      .ng-arrow-wrapper {
+        .ng-arrow {
+          border-color: #666 transparent transparent;
+          border-style: solid;
+          border-width: 5px 4px 0;
+        }
+      }
+    }
+
+    .ng-dropdown-panel {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 2px;
+
+      .ng-dropdown-panel-items {
+        .ng-option {
+          font-size: 12px;
+          padding: 6px 10px;
+          min-height: 32px;
+
+          &.ng-option-marked {
+            background: #e8f0fe;
+            color: #0b58b9;
+          }
+
+          &.ng-option-selected {
+            background: #0b58b9;
+            color: #fff;
+          }
+
+          &:hover {
+            background: #f0f6ff;
+          }
+        }
+      }
+    }
+  }
+}
+
+.map-header-controls {
+  padding: 4px 15px;
+  /* background: #f8f9fa; */
+  /* border: 1px solid #0956a2; */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: absolute;
+  z-index: 9;
+  width: 100%;
+
+  .alert-type-dropdown {
+    &.compact {
+      min-width: 160px;
+      max-width: 180px;
+
+      ::ng-deep .ng-select {
+        font-size: 11px;
+        min-height: 26px;
+
+        .ng-select-container {
+          min-height: 26px;
+          padding: 0 22px 0 6px;
+
+          .ng-value-container {
+            .ng-placeholder {
+              font-size: 11px;
+            }
+
+            .ng-value {
+              margin: 1px 1px 1px 0;
+
+              .ng-value-label {
+                font-size: 10px;
+                padding: 1px 4px;
+              }
+            }
+
+            .ng-input input {
+              font-size: 11px;
+              height: 24px;
+            }
+          }
+        }
+
+        .ng-dropdown-panel {
+          .ng-dropdown-panel-items {
+            .ng-option {
+              font-size: 11px;
+              padding: 4px 8px;
+              min-height: 28px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .alert-type-option {
+    i {
+      font-size: 11px;
+    }
+
+    span {
+      font-size: 11px;
+    }
+  }
+}
+
+
+.single-alert-info-panel {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 262px;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 1001;
+  transition: all 0.3s ease;
+  border: 1px solid #ccc;
+}
+
+.single-alert-body {
+  position: relative;
+}
+
+.single-alert-map-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.single-alert-layers-control {
+  position: absolute;
+  top: 12px;
+  right: 47px;
+  z-index: 1002;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.single-alert-layers-btn {
+  position: relative;
+  z-index: 1003;
+}
+
+.single-alert-layers-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0 !important;
+  width: 190px;
+  z-index: 1004;
+}
+
+/* main container */
+.compact-timepicker {
+  width: 95px !important;
+  display: inline-flex !important;
+  align-items: center;
+}
+
+.compact-timepicker ::ng-deep input.form-control {
+  width: 32px !important;
+  height: 24px !important;
+  padding: 0 !important;
+  font-size: 12px !important;
+  text-align: center;
+}
+
+
+/* remove table spacing */
+.compact-timepicker ::ng-deep table {
+  margin: 0 !important;
+}
+
+.compact-timepicker ::ng-deep td {
+  padding: 0 !important;
+}
+
+/* hour and minute input */
+.compact-timepicker ::ng-deep input.form-control {
+  width: 28px !important;
+  height: 22px !important;
+  padding: 0 !important;
+  font-size: 11px !important;
+  text-align: center;
+}
+
+/* VERY IMPORTANT: fix AM PM column */
+.compact-timepicker ::ng-deep td:last-child {
+  min-width: 55px !important;
+  width: 55px !important;
+}
+
+/* AM PM input */
+.compact-timepicker ::ng-deep td:last-child input {
+  width: 55px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+}
+
+/* spinner buttons compact */
+.compact-timepicker ::ng-deep button {
+  padding: 0 !important;
+  font-size: 8px !important;
+  height: 16px !important;
+  margin-left: -1.2rem;
+}
+
+::ng-deep .md-drppicker {
+  top: -4rem !important;
+  left: 0.2rem !important;
+  right: auto !important;
+}
+
+::ng-deep .md-drppicker .btn {
+  position: relative;
+  overflow: hidden;
+  border-width: 0;
+  outline: none;
+  padding: 0 6px;
+  cursor: pointer;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px #0009 !important;
+  background-color: #1a1e30 !important;
+  color: #ecf0f1 !important;
+  font-size: 12px;
+  transition: background-color .4s;
+  height: auto;
+  text-transform: uppercase;
+  line-height: 18px;
+  border: none !important;
+}
+
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+  height: 10px;
+}
+
+
+.expand-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.35s ease,
+    opacity 0.3s ease,
+    padding 0.3s ease;
+
+  opacity: 0;
+}
+
+.expand-wrapper.expanded {
+  max-height: 500px;
+  opacity: 1;
+}
+
+.inner-content {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+//////////////////////////////////////////////////////
+
+.toggle-box {
+  display: flex;
+  width: 100%;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.toggle-box:hover {
+  transform: scale(1.03);
+}
+
+.toggle-box.active {
+  background: #ffffff;
+  color: #c5221f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-container {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #c7d2fe;
+  /* light blue border */
+  width: fit-content;
+  background: #eef2ff;
+  /* light blue bg */
+}
+
+.toggle-option {
+  padding: 6px 16px;
+  /* 🔥 थोड़ा बड़ा */
+  font-size: 12px;
+  /* 🔥 readable */
+  font-weight: 500;
+  cursor: pointer;
+  color: blue; //#4f46e5;
+  /* blue text */
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.toggle-option:not(:last-child) {
+  border-right: 1px solid #c7d2fe;
+}
+
+.toggle-option:hover {
+  background: #e0e7ff;
+  /* hover blue */
+}
+
+.toggle-option.active {
+  background: blue; //#4f46e5;
+  /* 🔥 active blue */
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.modern-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #c7d2fe;
+  width: fit-content;
+  background: #eef2ff;
+}
+
+.modern-toggle .toggle-option {
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: blue; //#4f46e5;
+  background: transparent;
+  border: none;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.modern-toggle .toggle-option:not(:last-child) {
+  border-right: 1px solid #c7d2fe;
+}
+
+.modern-toggle .toggle-option:hover {
+  background: #e0e7ff;
+}
+
+.modern-toggle .toggle-option.active {
+  background: blue; //#4f46e5;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+// ==========================================
+// Alert Popup Styles - Compact & Attractive
+// ==========================================
+
+.alert-popup-container {
+  width: 280px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid #e0e0e0;
+  position: relative;
+
+  // Header Section
+  .popup-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, #0b58b9 0%, #1a7fd0 100%);
+    color: white;
+    gap: 10px;
+
+    .alert-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+
+      i {
+        color: #fff;
+      }
+    }
+
+    .header-info {
+      flex: 1;
+      min-width: 0;
+
+      .vehicle-number {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .alert-type {
+        font-size: 11px;
+        opacity: 0.9;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  // Details Grid
+  .popup-details {
+    padding: 8px 12px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+
+      .detail-label {
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+
+        i {
+          font-size: 10px;
+          color: #0b58b9;
+        }
+      }
+
+      .detail-value {
+        font-weight: 600;
+        color: #333;
+        font-size: 12px;
+        text-align: right;
+        max-width: 60%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        // Ignition status colors
+        &.ignition-on {
+          color: #28a745;
+        }
+
+        &.ignition-off {
+          color: #dc3545;
+        }
+      }
+    }
+  }
+
+  // Footer with Buttons
+  .popup-footer {
+    display: flex;
+    gap: 6px;
+    padding: 8px 12px 12px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+
+    button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+
+      i {
+        font-size: 12px;
+      }
+    }
+
+    .btn-history {
+      background: #0b58b9;
+      color: white;
+
+      &:hover {
+        background: #0950a0;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(11, 88, 185, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+
+    .btn-live {
+      background: #28a745;
+      color: white;
+
+      &:hover {
+        background: #218838;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  // Close Button
+  .popup-close {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+:host ::ng-deep .alert-map-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  background: transparent;
+  border-radius: 8px;
+  box-shadow: none;
+  overflow: visible;
+}
+
+:host ::ng-deep .alert-map-popup .leaflet-popup-tip {
+  border-top-color: #f8f9fa;
+}
+
+:host ::ng-deep .alert-map-popup .leaflet-popup-close-button {
+  top: 6px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 18px;
+  line-height: 24px;
+  z-index: 20;
+}
+
+:host ::ng-deep .alert-map-popup .leaflet-popup-close-button:hover {
+  background: rgba(255, 255, 255, 0.34);
+}
+
+
+/* Modern Layers Toggle Styling */
+.layers-overlay {
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  right: 11rem;
+}
+
+.layers-btn {
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #495057;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.layers-btn:hover {
+  background: #f8f9fa;
+  border-color: #0b58b9;
+  color: #0b58b9;
+}
+
+.layers-btn.active {
+  background: #0b58b9;
+  color: #fff;
+  border-color: #0b58b9;
+}
+
+.layers-dropdown {
+  position: absolute;
+  top: 86%;
+  right: 20rem;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  width: 180px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: layersSlideDown 0.2s ease-out;
+}
+
+.layers-header {
+  background: #f8f9fa;
+  padding: 6px 10px;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #343a40;
+}
+
+.layers-body {
+  padding: 5px 0;
+}
+
+.layer-item {
+  padding: 4px 12px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #495057;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+@keyframes layersSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.today-alert-map-shell {
+  position: relative;
+}
+
+.today-alert-cluster-legend {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 50;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 6px;
+  pointer-events: auto;
+  transition: opacity 0.22s ease;
+}
+
+.today-alert-cluster-legend.collapsed {
+  gap: 0;
+}
+
+.today-alert-cluster-legend .cluster-legend-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border: 0;
+  border-radius: 8px 0 0 8px;
+  color: #215a9a;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 6px 16px rgba(16, 39, 77, 0.18);
+  cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.today-alert-cluster-legend .cluster-legend-toggle:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.today-alert-cluster-legend .cluster-legend-panel {
+  width: 112px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 12px 24px rgba(17, 40, 74, 0.18);
+  transform-origin: left center;
+  border: 1px solid rgba(38, 99, 175, 0.12);
+  pointer-events: auto;
+  transition: max-width 0.24s ease, opacity 0.2s ease, transform 0.24s ease;
+}
+
+.today-alert-cluster-legend .cluster-legend-header {
+  display: flex;
+  flex-direction: column;
+  padding: 7px 10px 5px;
+  border-bottom: 1px solid rgba(38, 99, 175, 0.1);
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fbff 100%);
+}
+
+.today-alert-cluster-legend .cluster-legend-header span {
+  font-size: 10px;
+  font-weight: 800;
+  color: #174a86;
+  line-height: 1.1;
+}
+
+.today-alert-cluster-legend .cluster-legend-header small {
+  margin-top: 2px;
+  font-size: 8px;
+  color: #6780a3;
+  line-height: 1.2;
+}
+
+.today-alert-cluster-legend .cluster-legend-list {
+  padding: 6px 8px 7px;
+}
+
+.today-alert-cluster-legend .cluster-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 18px;
+}
+
+.today-alert-cluster-legend .cluster-legend-item + .cluster-legend-item {
+  margin-top: 4px;
+}
+
+.today-alert-cluster-legend .cluster-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex: 0 0 8px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85);
+}
+
+.today-alert-cluster-legend .cluster-legend-text {
+  font-size: 9px;
+  font-weight: 700;
+  color: #2f425c;
+  line-height: 1.2;
+}
+
+:host ::ng-deep .police-station-popup .leaflet-popup-content-wrapper {
+  width: 224px !important;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 14px 30px rgba(45, 68, 134, 0.26);
+}
+
+:host ::ng-deep .police-station-popup .leaflet-popup-tip {
+  border-top-color: #ffffff !important;
+}
+
+:host ::ng-deep .police-station-popup .leaflet-popup-close-button {
+  top: 6px !important;
+  right: 8px !important;
+  color: #ffffff !important;
+  font-size: 18px;
+  z-index: 3;
+  opacity: 0.95;
+}
+
+:host ::ng-deep .police-station-map-marker {
+  border-radius: 50%;
+  filter: drop-shadow(0 6px 10px rgba(220, 38, 38, 0.22));
+}
+
+:host ::ng-deep .police-popup-card {
+  width: 224px;
+  overflow: hidden;
+  border: 1px solid #d7e5ff;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+:host ::ng-deep .police-popup-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 30px 8px 10px;
+  background: linear-gradient(135deg, #2458d3 0%, #7c3aed 100%);
+}
+
+:host ::ng-deep .police-popup-card__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.22);
+}
+
+:host ::ng-deep .police-popup-card__badge img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+:host ::ng-deep .police-popup-card__heading {
+  min-width: 0;
+  flex: 1;
+}
+
+:host ::ng-deep .police-popup-card__heading strong {
+  display: block;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .police-popup-card__heading small {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 8.5px;
+  line-height: 1.2;
+}
+
+:host ::ng-deep .police-popup-card__body {
+  padding: 10px 10px 11px;
+  background: #ffffff;
+}
+
+:host ::ng-deep .police-popup-card__row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 25px;
+  border-bottom: 1px dashed #d8e3fb;
+}
+
+:host ::ng-deep .police-popup-card__row + .police-popup-card__row {
+  margin-top: 2px;
+}
+
+:host ::ng-deep .police-popup-card__row span {
+  color: #5a6981;
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+:host ::ng-deep .police-popup-card__row b {
+  color: #1f4297;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+:host ::ng-deep .police-popup-card__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  margin-top: 10px;
+  border-radius: 7px;
+  color: #ffffff;
+  background: linear-gradient(180deg, #1d76f2 0%, #0f4cae 100%);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 6px 14px rgba(29, 118, 242, 0.24);
+}
+
+:host ::ng-deep .police-popup-card__action:hover {
+  color: #ffffff;
+  text-decoration: none;
+  filter: brightness(1.03);
+}
+
+:host ::ng-deep .leaflet-powered-by-dimts {
+  color: #000;
+  background: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+:host ::ng-deep .today-alert-cluster span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+}
+:host ::ng-deep .today-route-arrow span {
+  display: block;
+  color: #fff;
+  text-shadow: 0 0 2px #015c2f, 0 0 3px #015c2f;
+}
+:host ::ng-deep .alert-map-popup .leaflet-popup-content { margin: 0; }
+:host ::ng-deep .today-alert-marker { background: transparent; border: 0; }
+.single-alert-map-shell:fullscreen { width: 100%; height: 100%; background: #fff; }
+
+:host ::ng-deep .police-station-popup .leaflet-popup-content { margin: 0; width: 224px !important; }
+:host ::ng-deep .leaflet-bottom { top: auto !important; bottom: 0 !important; }
+.alert-widget-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+.alert-widget-heading > button {
+  margin-left: auto;
+  flex-shrink: 0;
+}

@@ -1,0 +1,581 @@
+<style>
+  /* ============================================================
+  COMPACT & ANIMATED STYLES FOR VENDOR DETAILS
+  ============================================================ */
+  .vendor-details-wrapper {
+  font-family: 'Poppins', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  color: #495057;
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpFade {
+from {
+opacity: 0;
+transform: translateY(20px);
+}
+
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+.content-box {
+padding: 10px 15px;
+}
+
+/* Modern Panel Card Style */
+.panel-card {
+background: #ffffff;
+border-radius: 10px;
+box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+padding: 20px;
+border: 1px solid #eff2f7;
+position: relative;
+overflow: hidden;
+}
+
+/* Top Gradient Accent */
+.panel-card::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 3px;
+background: linear-gradient(90deg, #5e72e4, #825ee4);
+z-index: 1;
+}
+
+/* --- Header --- */
+.page-header-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 15px;
+border-bottom: 1px solid #e9ecef;
+padding-bottom: 10px;
+}
+
+.pagetitlestyle {
+font-size: 16px;
+font-weight: 700;
+color: #32325d;
+display: flex;
+align-items: center;
+}
+
+.pagetitlestyle::before {
+content: '';
+display: inline-block;
+width: 4px;
+height: 18px;
+background: #5e72e4;
+margin-right: 10px;
+border-radius: 2px;
+}
+
+/* --- Controls Bar --- */
+.top-controls-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+background: #f6f9fc;
+padding: 10px;
+border-radius: 6px;
+margin-bottom: 15px;
+border: 1px solid #eef2f7;
+}
+
+.left-controls,
+.right-controls {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.search-label {
+font-size: 12px;
+font-weight: 600;
+color: #525f7f;
+}
+
+.search-box {
+position: relative;
+display: flex;
+align-items: center;
+}
+
+.search-input {
+border: 1px solid #dee2e6;
+border-radius: 4px;
+padding: 5px 30px 5px 10px;
+font-size: 12px;
+height: 30px;
+width: 200px;
+transition: all 0.3s ease;
+background: #fff;
+}
+
+.search-input:focus {
+border-color: #5e72e4;
+box-shadow: 0 0 0 3px rgba(94, 114, 228, 0.1);
+outline: none;
+}
+
+.search-inner-btn {
+position: absolute;
+right: 5px;
+top: 50%;
+transform: translateY(-50%);
+background: none;
+border: none;
+color: #8898aa;
+cursor: pointer;
+padding: 4px;
+font-size: 13px;
+}
+
+.search-inner-btn:hover {
+color: #5e72e4;
+}
+
+.reload-btn {
+background: #fff;
+border: 1px solid #dee2e6;
+color: #525f7f;
+border-radius: 4px;
+padding: 0 12px;
+font-size: 12px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.2s;
+height: 30px;
+display: flex;
+align-items: center;
+gap: 6px;
+}
+
+.reload-btn:hover:not(:disabled) {
+background: #5e72e4;
+color: #5e72e4;
+color: #fff;
+border-color: transparent;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.control-item {
+display: flex;
+align-items: center;
+gap: 6px;
+font-size: 12px;
+color: #525f7f;
+}
+
+.control-item select {
+border: 1px solid #dee2e6;
+border-radius: 4px;
+padding: 0 20px 0 8px;
+font-size: 12px;
+height: 30px;
+background-color: #fff;
+cursor: pointer;
+outline: none;
+}
+
+.control-item select:focus {
+border-color: #5e72e4;
+}
+
+.total-records-text {
+font-weight: 700;
+color: #5e72e4;
+font-size: 12px;
+background: rgba(94, 114, 228, 0.1);
+padding: 5px 10px;
+border-radius: 4px;
+}
+
+/* --- Table --- */
+.table-container {
+border-radius: 6px;
+overflow: hidden;
+border: 1px solid #e9ecef;
+position: relative;
+background: #fff;
+}
+
+.table {
+width: 100%;
+margin-bottom: 0;
+border-collapse: collapse;
+}
+
+
+
+.sortable {
+cursor: pointer;
+transition: background-color 0.2s;
+}
+
+.sorting {
+display: inline-block;
+margin-left: 5px;
+vertical-align: middle;
+opacity: 0.8;
+}
+
+thead {
+font-size: 9px;
+background: #aacda8;
+color: #212529;
+font-family: serif;
+}
+
+.table td,
+.table th {
+padding: 0em 0.5em;
+}
+
+.table tbody tr {
+transition: background-color 0.2s, transform 0.2s;
+border-bottom: 1px solid #e9ecef;
+}
+
+.table tbody tr:hover {
+background-color: #f6f9fc !important;
+}
+
+.table tbody td {
+padding: 0px 0px;
+vertical-align: middle;
+font-size: 11px;
+color: #525f7f;
+}
+
+.table tbody tr:nth-of-type(odd) {
+background-color: #ffffff;
+}
+
+.table tbody tr:nth-of-type(even) {
+background-color: #fcfcfc;
+}
+
+/* Subtle separators in cells */
+.table hr {
+display: none;
+}
+
+/* Data cell styling */
+.data-primary {
+font-weight: 600;
+color: #32325d;
+font-size: 12px;
+}
+
+.data-secondary {
+color: #4e647d;
+font-size: 11px;
+margin-top: 2px;
+}
+
+.data-tertiary {
+color: #61778d;
+font-size: 10px;
+margin-top: 1px;
+}
+
+.status-active {
+font-weight: 600;
+color: #2dce89;
+}
+
+.badge {
+font-size: 10px;
+padding: 4px 8px;
+font-weight: 600;
+border-radius: 4px;
+display: inline-block;
+}
+
+.badge-success {
+background-color: rgba(45, 206, 137, 0.1);
+color: #2dce89;
+border: 1px solid rgba(45, 206, 137, 0.2);
+}
+
+.badge-danger {
+background-color: rgba(245, 54, 92, 0.1);
+color: #f5365c;
+border: 1px solid rgba(245, 54, 92, 0.2);
+}
+
+.badge-warning {
+background-color: rgba(251, 99, 64, 0.1);
+color: #fb6340;
+border: 1px solid rgba(251, 99, 64, 0.2);
+}
+
+/* --- Pagination --- */
+.pagination-wrapper {
+display: flex;
+justify-content: flex-end;
+align-items: center;
+padding: 15px 0 0;
+gap: 5px;
+}
+
+.btnleft5 {
+background: #fff;
+border: 1px solid #dee2e6;
+color: #5e72e4;
+padding: 0;
+font-size: 12px;
+border-radius: 4px;
+cursor: pointer;
+transition: all 0.2s;
+font-weight: 600;
+min-width: 28px;
+height: 28px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.btnleft5:hover:not(:disabled) {
+background: #5e72e4;
+color: #fff;
+border-color: #5e72e4;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btnleft5.active {
+background: #5e72e4;
+color: #fff;
+border-color: #5e72e4;
+}
+
+.btnleft5:disabled {
+color: #adb5bd;
+cursor: not-allowed;
+background: #f6f9fc;
+}
+
+.pagination-wrapper .fa {
+font-size: 14px;
+}
+
+/* --- Alert --- */
+.custom-alert {
+padding: 12px 15px;
+margin-bottom: 20px;
+border-radius: 8px;
+color: #fff;
+background: linear-gradient(87deg, #fb6340 0, #fbb140 100%);
+font-size: 13px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+box-shadow: 0 4px 10px rgba(251, 99, 64, 0.3);
+animation: fadeIn 0.3s;
+}
+
+.alert-close {
+background: none;
+border: none;
+font-size: 20px;
+line-height: 1;
+color: #fff;
+cursor: pointer;
+opacity: 0.8;
+transition: opacity 0.2s;
+}
+
+.alert-close:hover {
+opacity: 1;
+}
+</style>
+
+<div class="content-i vendor-details-wrapper">
+  <div class="content-box">
+    <div class="element-wrapper" style="padding-bottom: 0;">
+      <div class="panel-card">
+
+        <!-- HEADER -->
+        <div class="col-md-12" style="padding: 0;">
+          <div class="page-header-row">
+            <!-- TITLE -->
+            <div class="pagetitlestyle">
+              Vendor Wise Details
+            </div>
+
+            <!-- Home button added here -->
+            <div class="today-alert-tab-item home-button" (click)="goToAdminDashboard()"
+              title="Go to Admin Dashboard"
+              style="background: #0b58b9; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+              <i class="fa fa-home"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- ERROR MESSAGE -->
+        @if (errorMessage) {
+          <div class="custom-alert">
+            <span><strong>Warning:</strong> {{ errorMessage }}</span>
+            <button type="button" class="alert-close" (click)="errorMessage = ''">
+              &times;
+            </button>
+          </div>
+        }
+
+        <!-- SEARCH + CONTROLS -->
+        <form autocomplete="off" class="top-controls-row">
+
+          <!-- LEFT SEARCH -->
+          <div class="left-controls">
+            <span class="search-label">Search:</span>
+            <div class="search-box">
+              <input type="search" readonly onfocus="this.removeAttribute('readonly');"
+                class="search-input inner" placeholder="Type to search..." maxlength="50"
+                [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" />
+              <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+            <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading">
+              <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+              {{ loading ? 'Reloading...' : 'Reload' }}
+            </button>
+          </div>
+
+          <!-- RIGHT CONTROLS -->
+          <div class="right-controls">
+            <!-- DOWNLOAD -->
+            <div class="control-item">
+              <label>Download:</label>
+              <select>
+                <option>Select</option>
+                <option>Excel</option>
+              </select>
+            </div>
+
+            <!-- SHOW ROWS -->
+            <div class="control-item">
+              <label>Rows:</label>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize">
+                @for (size of pageSizeOptions; track size) {
+                  <option
+                    [value]="size === totalCount ? 'All' : size">
+                    {{ size === totalCount ? 'All' : size }}
+                  </option>
+                }
+              </select>
+            </div>
+
+            <!-- TOTAL RECORDS -->
+            <div class="total-records-text">
+              Records: {{ pageCount }} / {{ totalCount }}
+            </div>
+          </div>
+        </form>
+
+        <!-- TABLE -->
+        <div class="table-responsive table-container">
+          <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4"
+            style="padding: 0;">
+            <div class="col-sm-12" style="padding: 0;">
+              <ng-template #deviceRows let-rows>
+                @for (d of rows; track d; let i = $index) {
+                  <tr>
+                    <td style="text-align: center;">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+                    <td>
+                      <div class="data-primary">{{ d['param12'] || 'NA' }}</div>
+                      <div class="data-secondary">{{ d['param11'] || 'NA' }}</div>
+                    </td>
+                    <td>{{ d['param13'] || 'NA' }}</td>
+                    <td>
+                      <div class="data-primary">{{ d['param5'] || 'NA' }}</div>
+                      <div class="data-secondary">{{ d['param4'] || 'NA' }}</div>
+                      <div class="data-tertiary">{{ d['param6'] || 'NA' }}</div>
+                    </td>
+                    <td>
+                      <div class="data-primary">{{ d['param19'] || 'NA' }}</div>
+                      <div class="data-secondary">{{ d['param42'] || 'NA' }}</div>
+                    </td>
+                    <td>
+                      <div class="data-primary">{{ d['param40'] || 'NA' }}</div>
+                      <div class="data-secondary">{{ d['param41'] || 'NA' }}</div>
+                    </td>
+                    <td>{{ d['param43'] || 'NA' }}</td>
+                    <td>
+                      <div class="data-primary">{{ d['param28'] || 'NA' }}</div>
+                      <div class="data-secondary">{{ d['param29'] || 'NA' }}</div>
+                    </td>
+                    <td>
+                      <div class="data-primary">{{ d['param8'] || 'NA' }}</div>
+                      <div class="data-secondary">({{ d['param7'] || 'NA' }})</div>
+                    </td>
+                    <td>{{ d['param18'] || 'NA' }}</td>
+                    <td style="text-align:center;">
+                      <span class="badge text-white" [ngClass]="{
+                        'bg-success': (d?.param45 || '').toLowerCase() === 'connected',
+                        'bg-danger': (d?.param45 || '').toLowerCase() === 'not connected'
+                      }">{{ d?.param45 || 'NA' }}</span>
+                      <div class="data-secondary mt-1">{{ d?.param14 || 'NA' }}</div>
+                    </td>
+                    <td style="text-align: center;">
+                      <span class="badge" [class.badge-success]="isConnected($safeNavigationMigration(d?.param45))"
+                        [class.badge-danger]="!isConnected($safeNavigationMigration(d?.param45))">
+                        {{ d?.param45 || 'NA' }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </ng-template>
+              <app-common-table [columns]="tableColumns" [rows]="devices" [loading]="loading"
+                [sortKey]="sortKey" [reverse]="reverse" [bodyTemplate]="deviceRows"
+                emptyMessage="NO DATA FOUND" tableClass="table" tableId="devicetable"
+                headerClass="device-thead" (sortChange)="sort($event)">
+              </app-common-table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        @if (totalCount > pageSize) {
+          <div class="pagination-wrapper">
+            @if (currentPage > 1) {
+              <button (click)="onPageChange(currentPage - 1)" [disabled]="loading"
+                class="btnleft5" title="Previous Page">
+                <i class="fa fa-angle-left"></i>
+              </button>
+            }
+            @for (page of getPageNumbers(); track page) {
+              <span>
+                @if (page === -1) {
+                  <span style="margin: 0 5px; color: #8898aa;">...</span>
+                }
+                @if (page !== -1) {
+                  <button (click)="onPageChange(page)"
+                    [disabled]="loading || page === currentPage" [class.active]="page === currentPage"
+                    class="btnleft5">
+                    {{page}}
+                  </button>
+                }
+              </span>
+            }
+            @if (currentPage < getTotalPages()) {
+              <button (click)="onPageChange(currentPage + 1)"
+                [disabled]="loading" class="btnleft5" title="Next Page">
+                <i class="fa fa-angle-right"></i>
+              </button>
+            }
+          </div>
+        }
+
+        <br>
+        </div>
+      </div>
+    </div>
+  </div>

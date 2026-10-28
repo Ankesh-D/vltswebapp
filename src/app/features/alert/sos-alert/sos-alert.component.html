@@ -1,0 +1,516 @@
+<div class="content-i">
+  <div class="content-box" id="viewid">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle"><span>SOS Alert</span></div>
+        </div>
+
+        <div class="top-controls-row">
+          <div class="left-controls">
+            <label class="search-label">Search:</label>
+            <div class="search-box">
+              <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input inner"
+                id="searchby" placeholder="Search vehicle no..." autocomplete="disabled" maxlength="50"
+                [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby">
+              <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+            <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading">
+              @if (!loading) {
+                <span>Reload <i class="fa fa-refresh"></i></span>
+              }
+              @if (loading) {
+                <span>Reloading... <i class="fa fa-spinner fa-spin"></i></span>
+              }
+            </button>
+          </div>
+
+          <div class="right-controls">
+            <div class="control-item">
+              <div class="toggle-container modern-toggle">
+                <button class="toggle-option" [class.active]="vehicleType === 'NEW'"
+                  (click)="setView('NEW')">
+                  NEW
+                </button>
+                <button class="toggle-option" [class.active]="vehicleType === 'OLD'"
+                  (click)="setView('OLD')">
+                  OLD
+                </button>
+              </div>
+            </div>
+            <div  class="control-item">
+              <div style="display: flex; align-items: center;">
+                <label class="control-label"
+                  style="color: #0b58b9; margin-bottom: 0; margin-right: 5px; font-size: 12px; font-weight: bold;">Download
+                :</label>
+                <select
+                  (change)="downloadPDFExcel($event)"
+                  style="height: 25px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;">
+                  <option value="Select">Select</option>
+                  <!-- <option value="Excel">Excel</option> -->
+                  <option value="">Excel</option>
+                  <!-- <option value="Pdf">Pdf</option> -->
+                </select>
+              </div>
+            </div>
+            <div class="control-item">
+              <label>Show Rows:</label>
+              <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size === totalCount ? 'All' : size">
+                    {{size === totalCount ? 'All' : size}}
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="total-records-text">
+              Total Records: {{pageCount}} of {{totalCount}}
+            </div>
+          </div>
+      </div>
+
+      <div class="table-responsive">
+        <ng-template #sosRows let-rows>
+          @for (alert of rows; track alert) {
+            <tr>
+              <td>{{alert.param1 || 'NA'}}</td>
+              <td>{{alert.param10 || 'NA'}}<br>{{alert.param11 || 'NA'}}</td>
+              <td>{{alert.param8 || 'NA'}}</td>
+              <td>{{alert.param5 || 'NA'}}<br>{{alert.param4 || 'NA'}}</td>
+              <td>{{alert.param6 || 'NA'}}</td>
+              <td>{{alert.param18 || 'NA'}}</td>
+              <td style="width: 85px;">{{alert.param22 || 'NA'}}</td>
+              <td>
+                <div class="btn-group">
+                  <button (click)="alertmapopen(alert)" class="btn btn-sm shadow-sm"
+                    style="cursor: pointer; background-color: #0b58b9; color: white; font-size: 10px; padding: 2px 10px; border-radius: 20px; border: none; font-weight: bold; display: inline-flex; align-items: center; gap: 4px; transition: all 0.3s ease;"
+                    title="Click to view on map">
+                    <i class="fa fa-map-marker"></i> View Map
+                  </button>
+                  <button (click)="openRawStringModal(alert.param55)" class="btn btn-sm shadow-sm ms-1"
+                    style="cursor: pointer; background-color: #6c757d; color: white; font-size: 10px; padding: 2px 10px; border-radius: 20px; border: none; font-weight: bold;"
+                    title="View Raw String" data-toggle="modal" data-target="#installcust">
+                    <i class="fa fa-code"></i> Raw
+                  </button>
+                </div>
+              </td>
+              <td><b>{{alert.param27 || 'NA'}}</b><br>
+                <span [style.color]="alert.param29 === 'ON' ? 'green' : 'red'" style="font-weight: bold;">
+                  {{alert.param29 || '-'}}
+                </span>
+              </td>
+            </tr>
+          }
+        </ng-template>
+        <app-common-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" [bodyTemplate]="sosRows" emptyMessage="NO DATA FOUND"
+          tableClass="table table-striped app-table"
+          tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;"
+          (sortChange)="sort($event)">
+        </app-common-table>
+      </div>
+
+      @if (getTotalPages() > 1) {
+        <div class="pagination-wrapper" style="display: flex; justify-content: flex-end; margin-top: 15px; padding-right: 5px;">
+          <ul class="pagination" style="list-style: none; display: flex; align-items: center; gap: 4px; padding: 0; margin: 0;">
+            <li [class.disabled]="currentPage === 1">
+              <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
+                style="min-width: 30px; height: 28px; padding: 0 10px; border: 1px solid #0b58b9; background: #fff; color: #0b58b9; font-size: 10px; border-radius: 4px; cursor: pointer; transition: 0.2s; font-weight: 600; display: flex; align-items: center; gap: 4px;"
+                [style.opacity]="currentPage === 1 ? '0.5' : '1'">
+                <i class="fa fa-angle-left"></i> Previous
+              </button>
+            </li>
+            @for (page of getPageNumbers(); track page) {
+              <li [class.active]="currentPage === page">
+                @if (page === '...') {
+                  <span style="min-width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; color: #0b58b9; font-weight: 600; font-size: 10px;">...</span>
+                } @else {
+                  <button (click)="onPageChange($any(page))"
+                    [style.background]="currentPage === page ? '#0b58b9' : '#fff'"
+                    [style.color]="currentPage === page ? '#fff' : '#0b58b9'"
+                    style="min-width: 28px; height: 28px; padding: 0 8px; border: 1px solid #0b58b9; font-size: 10px; border-radius: 4px; cursor: pointer; transition: 0.2s; font-weight: 600; display: flex; align-items: center; justify-content: center;">
+                    {{page}}
+                  </button>
+                }
+              </li>
+            }
+            <li [class.disabled]="currentPage >= getTotalPages()">
+              <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()"
+                style="min-width: 30px; height: 28px; padding: 0 10px; border: 1px solid #0b58b9; background: #fff; color: #0b58b9; font-size: 10px; border-radius: 4px; cursor: pointer; transition: 0.2s; font-weight: 600; display: flex; align-items: center; gap: 4px;"
+                [style.opacity]="currentPage >= getTotalPages() ? '0.5' : '1'">
+                Next <i class="fa fa-angle-right"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Raw String Modal (#installcust) -->
+<div class="modal fade" id="installcust" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document" style="min-width: 90%;">
+    <div class="modal-content">
+      <div class="modal-header" style="padding: 0.5rem; background-color: #ccd9e8;">
+        <h5 class="modal-title mb-0" style="font-size: 17px;">
+          Live Emergency Vehicle Raw String
+        </h5>
+
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+          style="font-size: 11px;">
+        </button>
+      </div>
+      <div class="modal-body" style="height: auto; min-height: 100px;">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th style="background-color: #ccd9e8; width: 150px;">Raw String</th>
+                <th style="background: #fbe4a070; word-break: break-all; font-family: monospace;">
+                  {{ pctstr || 'NA' }}
+                </th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Panic Map Modal (#openMapViewModalPanic) -->
+<div class="modal fade" id="openMapViewModalPanic" tabindex="-1" role="dialog" aria-hidden="true"
+  data-backdrop="static" data-keyboard="false" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-xl" style="max-width: 98% !important; width: 98%; margin: 10px auto;" role="document">
+    <div class="modal-content" style="max-width: 100% !important; width: 100% !important;">
+      <div class="modal-header sos-panic-modal-header" style=" background-color: #c9c6c8; padding: 2px 10px;" >
+        <h5 class="modal-title" style="color: #000000 !important;">Emergency Location View</h5>
+        <div class="sos-panic-header-actions">
+          <div class="single-alert-layers-control">
+            <button type="button" class="layers-btn single-alert-layers-btn" (click)="toggleLayers()"
+              [class.active]="isLayersVisible">
+              <i class="fa fa-layer-group"></i> <span>Layers</span>
+            </button>
+            @if (isLayersVisible) {
+              <div class="layers-dropdown single-alert-layers-dropdown">
+                <div class="layers-header">
+                  <i class="fa fa-eye"></i>
+                  <span>Map Layers</span>
+                  <a href="javascript:void(0)" class="ml-auto text-muted" (click)="toggleLayers()">&times;</a>
+                </div>
+                <div class="layers-body">
+                  <app-map-layer-options [active]="currentStyle" (selected)="changeMapStyle($event)"></app-map-layer-options>
+                  <label class="layer-item" for="panic_alert_police_stations">
+                    <input type="checkbox" id="panic_alert_police_stations" [(ngModel)]="showPoliceStations"
+                      (change)="togglePoliceStations()"> Police Stations
+                    </label>
+                  </div>
+                </div>
+              }
+            </div>
+            <button type="button" class="close" data-bs-dismiss="modal" style="color: rgb(184, 1, 1);" (click)="closeMapModal()">&times;</button>
+          </div>
+        </div>
+        <div class="modal-body" style="padding: 0; overflow: hidden; position: relative;">
+          <div id="maptrack1" style="width: 100%;">
+            <div id="map1" class="map-container"></div>
+          </div>
+
+          <!-- Collapsible Side Panel for Detailed Information (Inside Modal) -->
+          @if (selectedEmergency && isInfoPanelVisible) {
+            <div
+              class="sos-detail-panel"
+              [class.collapsed]="isInfoPanelCollapsed"
+              style="position: absolute; bottom: 20px; right: 20px; z-index: 1000; margin: 0;">
+            <div class="panel-header" (click)="toggleInfoPanel()">
+              <h6><i class="fa fa-info-circle"></i> Emergency Details: {{selectedEmergency.param10}}</h6>
+              <div class="controls">
+                <i class="fa" [class.fa-chevron-down]="!isInfoPanelCollapsed" [class.fa-chevron-up]="isInfoPanelCollapsed"></i>
+                <!-- <i class="fa fa-times" (click)="closeInfoPanel(); $event.stopPropagation()"></i> -->
+              </div>
+            </div>
+            <div class="panel-body" style="padding: 8px; font-size: 11px;">
+              <!-- Section Header: Vehicle Details -->
+              <div style="background: #eef2ff; color: #1e3a8a; padding: 0px 10px; font-weight: 700; border-radius: 4px; font-size: 10px; margin-bottom: 1px; display: flex; align-items: center; gap: 5px;">
+                <i class="fa fa-car"></i> VEHICLE & DEVICE INFORMATION
+              </div>
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 0px;">
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">Vehicle No</td><td style="padding: 2px 0; text-align: right; font-weight: 600;">{{singleAlertInfoPanelData?.vehicleno || selectedEmergency.param10}}</td></tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">Owner</td><td style="padding: 2px 0; text-align: right; font-weight: 600;">{{selectedEmergency.param18}}</td></tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">Mobile</td><td style="padding: 2px 0; text-align: right; font-weight: 600;">{{selectedEmergency.param19 || 'NA'}}</td></tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">RTO</td><td style="padding: 2px 0; text-align: right; font-weight: 600;">{{selectedEmergency.param15 || 'NA'}}</td></tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">Device SN</td><td style="padding: 2px 0; text-align: right; font-weight: 600;">{{selectedEmergency.param5 || 'NA'}}</td></tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">IMEI</td><td style="padding: 2px 0; text-align: right; font-weight: 600;">{{selectedEmergency.param4 || 'NA'}}</td></tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">ICCID</td><td style="padding: 2px 0; text-align: right; font-weight: 600;">{{selectedEmergency.param6}}</td></tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">GPS Status</td><td style="padding: 2px 0; text-align: right; font-weight: 600;" [style.color]="['Valid', 'Active'].includes($safeNavigationMigration(singleAlertInfoPanelData?.gpsStatus)) ? '#28a745' : '#dc3545'">{{singleAlertInfoPanelData?.gpsStatus}}</td></tr>
+              </table>
+              <!-- Section Header: Alert Info -->
+              <div style="background: #eef2ff; color: #1e3a8a; padding: 0px 10px; font-weight: 700; border-radius: 4px; font-size: 10px; margin-bottom: 1px; display: flex; align-items: center; gap: 5px;">
+                <i class="fa fa-bullhorn"></i> ALERT TIMELINES
+              </div>
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 0px;">
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">Event DateTime</td><td style="padding: 2px 0; text-align: right; font-weight: 600;">{{singleAlertInfoPanelData?.pollingdate}}</td></tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">Speed</td><td style="padding: 2px 0; text-align: right; font-weight: 600;">{{singleAlertInfoPanelData?.speed}} km/hr</td></tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">Location</td><td style="padding: 2px 0; text-align: right; font-weight: 600;">{{Number(singleAlertInfoPanelData?.latitude || 0).toFixed(5)}}, {{Number(singleAlertInfoPanelData?.longitude || 0).toFixed(5)}}</td></tr>
+                <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 2px 0; color: #666; font-weight: 500;">Ignition</td><td style="padding: 2px 0; text-align: right; font-weight: 600;" [style.color]="['On', 'ON', '1'].includes($safeNavigationMigration(singleAlertInfoPanelData?.ignition)) ? '#28a745' : '#dc3545'">{{singleAlertInfoPanelData?.ignition}}</td></tr>
+              </table>
+              <div style="padding-top: 3px;">
+                <button style="width: 100%; background: #ffc107; border: none; padding: 3px; border-radius: 4px; font-weight: 700; cursor: pointer; color: #000; font-size: 11px;"
+                  (click)="openGoogleMaps(selectedEmergency.param25, selectedEmergency.param26)">
+                  <i class="fa fa-external-link"></i> View Google Maps
+                </button>
+              </div>
+              <!-- History Track Section (Panic Modal Side Panel) -->
+              @if (poiData.type === 'history') {
+                <div class="card border-0 m-0 mt-3">
+                  <div class="card-header p-1 pl-2 bg-light">
+                    <button class="btn btn-link btn-sm p-0 text-dark fw-bold text-decoration-none"
+                      style="font-size: 12px; color: #004ea3;" title="Playback Controls">
+                      <i class="fa fa-play-circle"></i> History Track Section
+                    </button>
+                  </div>
+                  <div class="card-footer p-2 border-top" style="background: #f8f9fa;">
+                    <div class="border-top pt-1">
+                      <input type="text" ngxDaterangepickerMd [singleDatePicker]="true" [drops]="'up'"
+                        [locale]="{format: 'DD-MMM-YYYY'}" class="form-control form-control-sm mb-2"
+                        placeholder="Select Date" [(ngModel)]="poiData.historyDate" style="font-size: 11px;">
+                      <div class="d-flex align-items-center">
+                        <div class="compact-timepicker me-1">
+                          <timepicker [(ngModel)]="poiData.fromTime" [showMeridian]="true" [showSpinners]="true"
+                          [hourStep]="1" [minuteStep]="1"></timepicker>
+                        </div>
+                        <div class="compact-timepicker">
+                          <timepicker [(ngModel)]="poiData.toTime" [showMeridian]="true" [showSpinners]="true"></timepicker>
+                        </div>
+                        <button class="btn btn-sm btn-primary mt-2"
+                          (click)="showHistoryTrack($safeNavigationMigration(selectedSingleAlert?.param9))" [disabled]="historyLoading"
+                          style="font-size: 11px; min-width: 32px;">
+                          <i class="fa" [ngClass]="historyLoading ? 'fa-spinner fa-spin' : 'fa-history'" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="row mt-3 mb-2">
+                      <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                          <span style="font-size: 10px; color: #004ea3; white-space: nowrap;"><i
+                          class="fa fa-play-circle"></i> Playback</span>
+                          <div class="d-flex align-items-center" style="flex-grow: 1; margin-left: 1rem;">
+                            <span class="me-2 text-muted fw-bold" style="font-size: 9px;">Slow</span>
+                            <input type="range" class="custom-range" min="1" max="20" step="1" [value]="speedSliderValue"
+                              (input)="onSpeedChange($event)" style="height: 4px; cursor: pointer;">
+                            <span class="ms-2 text-muted fw-bold" style="font-size: 9px;">Fast</span>
+                          </div>
+                        </div>
+                        <!-- Control Buttons -->
+                        <div class="d-flex justify-content-center align-items-center">
+                          <button
+                            class="btn btn-light border shadow-sm rounded-circle mx-2 d-flex align-items-center justify-content-center"
+                            (click)="stopHistory()" title="Stop"
+                            style="width: 30px; height: 30px;background-color: burlywood;">
+                            <i class="fa fa-stop text-danger" style="font-size: 10px;"></i>
+                          </button>
+                          <button class="btn shadow rounded-circle mx-2 d-flex align-items-center justify-content-center"
+                            [ngClass]="isHistoryPlaying ? 'btn-warning' : 'btn-primary'"
+                            (click)="isHistoryPlaying ? pauseHistory() : playHistory()"
+                            title="{{isHistoryPlaying ? 'Pause' : 'Play'}}"
+                            style="width: 30px; height: 30px; transition: all 0.2s;">
+                            <i class="fa" [ngClass]="isHistoryPlaying ? 'fa-pause' : 'fa-play'"
+                            style="font-size: 12px; color: white;"></i>
+                          </button>
+                          <button
+                            class="btn btn-light border shadow-sm rounded-circle mx-2 d-flex align-items-center justify-content-center"
+                          (click)="restartHistory()" title="Restart" style="width: 30px; height: 30px; background-color: yellow;
+                            color: black;">
+                            <i class="fa fa-refresh text-info" style="font-size: 10px;"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <button (click)="backToLiveTrack()" class="btn btn-sm btn-success btn-block mt-2" style="font-size: 10px; font-weight: bold;">
+                      <i class="fa fa-play-circle"></i> BACK TO LIVE TRACK
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Single Alert Map Modal -->
+@if (showSingleAlertModal) {
+  <div class="single-alert-modal-overlay">
+    <div class="single-alert-modal-content" style=" width: 95%; height: 98%;">
+      <div class="single-alert-header">
+        <span><i class="fa fa-map-marker" style="margin-right: 8px;"></i>{{selectedSingleAlert?.param9}}</span>
+        <span style=" font-size: 12px; color: rgb(48, 65, 51);">Event Time : {{selectedSingleAlert?.param3}}
+          <span class="ms-3" style=" font-size: 12px; color: rgb(48, 65, 51);">Location :
+            {{singleAlertInfoPanelData?.latitude || selectedSingleAlert?.param6}}, {{singleAlertInfoPanelData?.longitude
+          || selectedSingleAlert?.param7}}</span></span>
+          <div class="single-alert-header-actions">
+            <div class="single-alert-layers-control">
+              <button type="button" class="layers-btn single-alert-layers-btn" (click)="toggleLayers()"
+                [class.active]="isLayersVisible">
+                <i class="fa fa-layer-group"></i> <span>Layers</span>
+              </button>
+              @if (isLayersVisible) {
+                <div class="layers-dropdown single-alert-layers-dropdown">
+                  <div class="layers-header">
+                    <i class="fa fa-eye"></i>
+                    <span>Map Layers</span>
+                    <a href="javascript:void(0)" class="ml-auto text-muted" (click)="toggleLayers()">&times;</a>
+                  </div>
+                  <div class="layers-body">
+                    <app-map-layer-options [active]="singleAlertStyle" (selected)="changeSingleAlertMapStyle($event)"></app-map-layer-options>
+                    <label class="layer-item" for="single_alert_police_stations">
+                      <input type="checkbox" id="single_alert_police_stations" [(ngModel)]="showPoliceStations"
+                        (change)="togglePoliceStations()"> Police Stations
+                      </label>
+                    </div>
+                  </div>
+                }
+              </div>
+              <button class="close-btn" (click)="closeSingleAlertModal()">&times;</button>
+            </div>
+          </div>
+          <div class="single-alert-body">
+            <div class="single-alert-map-shell">
+              <div id="singleAlertMap" style="width: 100%; height: 100%;"></div>
+            </div>
+            <!-- Collapsible Info Panel -->
+            @if (isVehiclePlotted) {
+              <div class="single-alert-info-panel" [class.collapsed]="isSingleInfoCollapsed">
+                <div class="panel-header" (click)="toggleSingleInfoPanel()">
+                  <span><i class="fa fa-info-circle"></i> Alert Info</span>
+                  <i class="fa" [ngClass]="isSingleInfoCollapsed ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </div>
+                @if (!isSingleInfoCollapsed) {
+                  <div class="panel-content">
+                    @if (singleAlertModalMode === 'history') {
+<button (click)="backToLiveTrack()" style="width: 100%; background: linear-gradient(135deg, #28a745, #1e7e34); color: white; border: none;
+              padding: 8px 12px; border-radius: 5px; font-size: 12px; font-weight: 700; cursor: pointer; 
+              display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 15px; 
+              box-shadow: 0 4px 6px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+                      <i class="fa fa-play-circle" style="font-size: 14px;"></i> LIVE TRACK MODE
+                    </button>
+                  }
+                  <div class="info-row"><strong>Time:</strong> {{ singleAlertInfoPanelData?.pollingdate ||
+                selectedSingleAlert?.param3 }}</div>
+                <div class="info-row"><strong>Speed:</strong> {{ singleAlertInfoPanelData?.speed ||
+              selectedSingleAlert?.param21 || '0' }} km/h</div>
+              <div class="info-row"><strong>Ignition:</strong>
+              <span
+                [style.color]="(singleAlertInfoPanelData?.ignition === 'On' || singleAlertInfoPanelData?.ignition === '1' || selectedSingleAlert?.param20 == '1') ? 'green' : 'red'">
+                {{ (singleAlertInfoPanelData?.ignition === 'On' || singleAlertInfoPanelData?.ignition === '1' ||
+                selectedSingleAlert?.param20 == '1') ? 'ON' : 'OFF' }}
+              </span>
+            </div>
+            <div class="info-row"><strong>Location:</strong>
+            {{ (singleAlertInfoPanelData?.latitude || selectedSingleAlert?.param6) | number:'1.4-4' }},
+            {{ (singleAlertInfoPanelData?.longitude || selectedSingleAlert?.param7) | number:'1.4-4' }}
+          </div>
+          <!-- History Track Section -->
+          <div class="card border-0 m-0">
+            <div class="card-header p-1 pl-2 bg-light" id="headingTwo">
+              <button class="btn btn-link btn-sm p-0 text-dark fw-bold text-decoration-none collapsed"
+                data-toggle="collapse" style="font-size: 12px; color: #004ea3;"
+                title="Click here for history tracking">
+                <i class="fa fa-play-circle"></i> History Track Section
+              </button>
+            </div>
+            <div>
+              <!-- Attractive History Playback Footer -->
+              <div class="card-footer p-2 border-top" style="background: #f8f9fa;">
+                <!-- History Controls for Live/Cluster -->
+                <div class="border-top pt-1">
+                  <input type="text" ngxDaterangepickerMd [singleDatePicker]="true" [drops]="'up'"
+                    [locale]="{format: 'DD-MMM-YYYY'}" class="form-control form-control-sm mb-2" id="historydate"
+                    placeholder="Select Date" [(ngModel)]="poiData.historyDate" style="font-size: 11px; ">
+                  <div class="d-flex align-items-center">
+                    <div class="compact-timepicker me-1">
+                      <timepicker [(ngModel)]="poiData.fromTime" [showMeridian]="true" [showSpinners]="true"
+                      [hourStep]="1" [minuteStep]="1"></timepicker>
+                    </div>
+                    <div class="compact-timepicker">
+                      <timepicker [(ngModel)]="poiData.toTime" [showMeridian]="true" [showSpinners]="true">
+                      </timepicker>
+                    </div>
+                    <button class="btn btn-sm btn-primary mt-2"
+                      (click)="showHistoryTrack($safeNavigationMigration(selectedSingleAlert?.param9))" [disabled]="historyLoading"
+                      style="font-size: 11px; min-width: 32px;">
+                      <i class="fa" [ngClass]="historyLoading ? 'fa-spinner fa-spin' : 'fa-history'"
+                      aria-hidden="true"></i>
+                    </button>
+                  </div>
+                  <div class="row">
+                    <div class="col-12 ">
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-3 mb-4">
+                  <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <span style="font-size: 10px; color: #004ea3; white-space: nowrap;"><i
+                      class="fa fa-play-circle"></i> Playback</span>
+                      <div class="d-flex align-items-center" style="flex-grow: 1; margin-left: 1rem;">
+                        <span class="me-2 text-muted fw-bold" style="font-size: 9px;">Slow</span>
+                        <input type="range" class="custom-range" min="1" max="20" step="1" [value]="speedSliderValue"
+                          (input)="onSpeedChange($event)" style="height: 4px; cursor: pointer;">
+                        <span class="ms-2 text-muted fw-bold" style="font-size: 9px;">Fast</span>
+                      </div>
+                    </div>
+                    <!-- Control Buttons -->
+                    <div class="d-flex justify-content-center align-items-center">
+                      <button
+                        class="btn btn-light border shadow-sm rounded-circle mx-2 d-flex align-items-center justify-content-center"
+                        (click)="stopHistory()" title="Stop"
+                        style="width: 30px; height: 30px;background-color: burlywood;">
+                        <i class="fa fa-stop text-danger" style="font-size: 10px;"></i>
+                      </button>
+                      <button class="btn shadow rounded-circle mx-2 d-flex align-items-center justify-content-center"
+                        [ngClass]="isHistoryPlaying ? 'btn-warning' : 'btn-primary'"
+                        (click)="isHistoryPlaying ? pauseHistory() : playHistory()"
+                        title="{{isHistoryPlaying ? 'Pause' : 'Play'}}"
+                        style="width: 30px; height: 30px; transition: all 0.2s;">
+                        <i class="fa" [ngClass]="isHistoryPlaying ? 'fa-pause' : 'fa-play'"
+                        style="font-size: 12px; color: white;"></i>
+                      </button>
+                      <button
+                        class="btn btn-light border shadow-sm rounded-circle mx-2 d-flex align-items-center justify-content-center"
+                          (click)="restartHistory()" title="Restart" style="width: 30px; height: 30px; background-color: yellow;
+                            color: black;">
+                        <i class="fa fa-refresh text-info" style="font-size: 10px;"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+</div>
+</div>
+}
+
+@if (errorMessage) {
+  <app-toast [message]="errorMessage" type="error" (closed)="errorMessage = null"></app-toast>
+}
+@if (successMessage) {
+  <app-toast [message]="successMessage" type="success"
+  (closed)="successMessage = null"></app-toast>
+}
+</div>

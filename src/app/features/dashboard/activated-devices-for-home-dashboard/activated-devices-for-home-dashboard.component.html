@@ -1,0 +1,286 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <!-- Home Button -->
+      <!-- <button style="background: #2bdc16;border-color: #2bdc16;" class="btn btn-primary returnbtn">
+      <i class="fa fa-angle-double-left" style="width: 20px;"></i>
+      <a style="float: right;" (click)="goHome()" style="cursor: pointer;">Home</a>
+    </button>	 -->
+
+    <div class="element-box">
+      <!-- HEADER -->
+      <div class="table-responsive">
+        <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+          <div class="col-md-12 pagetitleborder">
+            <div class="page-header-row d-flex mt-1">
+
+              <!-- TITLE -->
+              <div class="pagetitlestyle">
+                {{ filterType }} Details
+              </div>
+
+              <!-- Home button added here -->
+              <div class="today-alert-tab-item home-button" (click)="goToAdminDashboard()"
+                title="Go to Admin Dashboard" style="margin-left: auto; cursor: pointer; background: #0b58b9; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa fa-home"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- ERROR MESSAGE -->
+          <!-- <div *ngIf="errorMessage" class="custom-alert">
+          <strong>Warning:</strong> {{ errorMessage }}
+          <button type="button" class="alert-close" (click)="errorMessage = ''">
+            &times;
+          </button>
+        </div> -->
+
+        <!-- SEARCH + CONTROLS -->
+        <form autocomplete="off" class="top-controls-row" style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-wrap: wrap; gap: 1rem; padding: 10px 0;">
+
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div class="search-box" style="display: flex; align-items: center; border: 1px solid #ced4da; border-radius: 4px; overflow: hidden; background: #fff;">
+              <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input inner"
+                placeholder="Search..." maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()"
+                name="searchby" style="border: none; outline: none; padding: 6px 12px; font-size: 13px; width: 200px;" />
+
+              <button type="button" class="search-inner-btn" (click)="getSearchDetails()" style="background-color: #007bff; color: white; border: none; padding: 7px 12px; cursor: pointer;">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+
+            <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading" style="background-color: #17a2b8; color: white; border: none; padding: 7px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+              {{ loading ? 'Reloading...' : 'Reload' }}
+            </button>
+          </div>
+
+          <!-- DOWNLOAD -->
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <!-- <div class="control-item">
+            <select>
+              <option>Download</option>
+              <option>Excel</option>
+            </select>
+          </div> -->
+
+          <!-- SHOW ROWS -->
+          <div class="control-item" style="display: flex; align-items: center; gap: 0.25rem;">
+            <label>Show:</label>
+            <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize">
+              @for (size of pageSizeOptions; track size) {
+                <option [value]="size === totalCount ? totalCount : size">
+                  {{ size === totalCount ? totalCount : size }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- TOTAL RECORDS -->
+          <div class="total-records-text">
+            Total: {{ pageCount }} of {{ totalCount }}
+          </div>
+        </div>
+      </form>
+
+
+
+      <div class="col-sm-12 px-0">
+        <table class="table-striped app-table table app-table mb-1"
+          style="border-top: 1px solid black; border-bottom: 1px solid black;margin-left: 0px;" id="devicetable">
+          <thead class="device-thead">
+            <tr>
+              <th style="width:35px;">#</th>
+
+              <th (click)="sort('param5')" class="sortable">
+                IMEI No.
+                <hr style="margin: 1px 0;">
+                Serial No.
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param5',
+                    'sorting_asc': !reverse && sortKey=='param5'}">
+                </span>
+              </th>
+
+              <th (click)="sort('param7')" class="sortable">
+                ICCID No.
+                <hr style="margin: 1px 0;">
+                M2M Code
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param7',
+                    'sorting_asc': !reverse && sortKey=='param7'}">
+                </span>
+              </th>
+
+              <th (click)="sort('param8')" class="sortable">
+                Mobile N/W 1
+                <hr style="margin: 1px 0;">
+                Mobile N/W 2
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param8',
+                    'sorting_asc': !reverse && sortKey=='param8'}">
+                </span>
+              </th>
+
+              <th (click)="sort('param9')" class="sortable">
+                Mobile No. 1
+                <hr style="margin: 1px 0;">
+                Mobile No. 2
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param9',
+                    'sorting_asc': !reverse && sortKey=='param9'}">
+                </span>
+              </th>
+
+              <th style="width:130px;" (click)="sort('param50')" class="sortable">
+                Mobile No. 1 Validity
+                <hr style="margin: 1px 0;">Mobile No. 2 Validity
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param50',
+                    'sorting_asc': !reverse && sortKey=='param50'}">
+                </span>
+              </th>
+
+              <!-- <th style="width:145px;" (click)="sort('param67')" class="sortable">
+              IMSI Primary No
+              <hr style="margin: 1px 0;">
+              IMSI Secondary No
+              <span class="sorting"
+        [ngClass]="{'sorting_desc': reverse && sortKey=='param67',
+                    'sorting_asc': !reverse && sortKey=='param67'}">
+              </span>
+            </th> -->
+
+            <th style="width:160px;" (click)="sort('param16')" class="sortable">
+              Dealer
+              <hr style="margin: 1px 0;">
+              Vendor
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param16',
+                    'sorting_asc': !reverse && sortKey=='param16'}">
+              </span>
+            </th>
+
+            <th (click)="sort('param47')" class="sortable">
+              Vehicle Status
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param47',
+                    'sorting_asc': !reverse && sortKey=='param47'}">
+              </span>
+            </th>
+
+            <th (click)="sort('param34')" class="sortable">
+              Activation Status
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param34',
+                    'sorting_asc': !reverse && sortKey=='param34'}">
+              </span>
+            </th>
+
+            <th (click)="sort('param48')" class="sortable">
+              Polling Status
+                      <span class="sorting" [ngClass]="{'sorting_desc': reverse && sortKey=='param48',
+                    'sorting_asc': !reverse && sortKey=='param48'}">
+              </span>
+            </th>
+
+            <!-- <th>Download Receipt</th> -->
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- NO DATA -->
+          @if (devices.length === 0) {
+            <tr>
+              <td colspan="12" style="text-align:center;font-weight:bold;">
+                NO DATA FOUND
+              </td>
+            </tr>
+          }
+
+          <!-- DATA ROWS -->
+          @for (d of devices; track d) {
+            <tr>
+              <td>{{ d['param1'] || 'NA' }}</td>
+              <td>
+                {{ d['param5'] || 'NA' }}<br>
+                {{ d['param6'] || 'NA' }}
+              </td>
+              <td>
+                {{ d['param7'] || 'NA' }}<br>
+                {{ d['param14'] || 'NA' }}
+              </td>
+              <td>
+                {{ d['param10'] || 'NA' }}<br>
+                {{ d['param11'] || 'NA' }}
+              </td>
+              <td>
+                {{ d['param8'] || 'NA' }}<br>
+                {{ d['param9'] || 'NA' }}
+              </td>
+              <td>
+                {{ d['param50'] || 'NA' }}<br>
+                {{ d['param51'] || 'NA' }}
+              </td>
+              <td>
+                {{ d['param15'] || 'NA' }}<br>
+                {{ d['param16'] || 'NA' }}
+              </td>
+              <td>
+                {{ d['param47'] || 'NA' }}<br>
+                {{ d['param20'] || 'NA' }}
+              </td>
+              <td>
+                {{ d['param34'] || 'NA' }}<br>
+                @if (d['param34'] === 'Activated') {
+                  <span>
+                    {{ d['param54'] }}
+                    <!-- this is installation date after add new field change  -->
+                  </span>
+                } @else {
+                  -
+                }
+              </td>
+              <td>
+                {{ d['param48'] || 'NA' }}<br>
+                {{ d['param60'] || 'NA' }}
+              </td>
+              <!-- RECEIPT -->
+              <!-- <td style="text-align:center;">
+              <button class="btn btn-sm btn-outline-dark" (click)="printReceipt(d)" [disabled]="d['param48']=='Never Connected'">Print</button>
+            </td> -->
+          </tr>
+        }
+      </tbody>
+
+
+    </table>
+    <!-- Pagination Controls -->
+    <div class="float-end">
+      @if (totalCount > pageSize) {
+        <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
+          [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
+          [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
+        </ngb-pagination>
+      }
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- <div *ngIf="totalCount > 0" class="pagination-wrapper" style="display: flex; justify-content: flex-end; gap: 5px; margin-top: 15px; align-items: center;">
+<button *ngIf="currentPage > 1" (click)="onPageChange(currentPage - 1)" [disabled]="loading" style="padding: 5px 10px; font-size: 12px; border: 1px solid #dee2e6; background-color: #fff; color: #007bff; border-radius: 4px; cursor: pointer;">
+  Previous
+</button>
+
+<span *ngFor="let page of getPageNumbers()">
+  <span *ngIf="page === -1" style="margin: 0 5px; font-size: 12px; color: #6c757d;">...</span>
+  <button *ngIf="page !== -1" (click)="onPageChange(page)" [disabled]="loading || page === currentPage"
+    [style.background-color]="page === currentPage ? '#007bff' : '#fff'" [style.color]="page === currentPage ? '#fff' : '#007bff'" style="padding: 5px 10px; font-size: 12px; border: 1px solid #dee2e6; border-radius: 4px; cursor: pointer; min-width: 30px;">
+    {{page}}
+  </button>
+</span>
+
+<button *ngIf="currentPage < getTotalPages()" (click)="onPageChange(currentPage + 1)" [disabled]="loading"
+  style="padding: 5px 10px; font-size: 12px; border: 1px solid #dee2e6; background-color: #fff; color: #007bff; border-radius: 4px; cursor: pointer;">
+  Next
+</button>
+</div> -->
+
+<br>
+</div>
+</div>
+</div>
+</div>

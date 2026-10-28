@@ -1,0 +1,7 @@
+@if (totalPages > 1) {
+  <ngb-pagination [collectionSize]="totalRecords" [page]="page" [pageSize]="pageSize"
+    [maxSize]="maxSize" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
+    [disabled]="disabled" (pageChange)="onPageChange($event)"
+    size="sm" class="d-flex justify-content-center mt-2 mb-1 app-pagination">
+  </ngb-pagination>
+}

@@ -1,0 +1,1054 @@
+.btn-outline-secondary:not(:disabled):not(.disabled).active,
+.btn-outline-secondary:not(:disabled):not(.disabled):active,
+.show>.btn-outline-secondary.dropdown-toggle {
+  color: #fff;
+  background-color: #004888;
+  border-color: #0863b3;
+}
+
+:host ::ng-deep .tracking-alert-popup .mapboxgl-popup-content {
+  padding: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .22);
+}
+
+:host ::ng-deep .tracking-alert-popup .mapboxgl-popup-close-button {
+  color: #fff;
+  font-size: 17px;
+  right: 3px;
+  top: 1px;
+  z-index: 2;
+}
+
+:host ::ng-deep .compact-alert-card {
+  width: 218px;
+  font: 11px/1.3 Roboto, Arial, sans-serif;
+  color: #1f2937;
+  background: #fff;
+}
+
+:host ::ng-deep .compact-alert-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  color: #fff;
+  background: linear-gradient(135deg, #dc3545, #f28b96);
+}
+
+:host ::ng-deep .compact-alert-card__badge {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 800;
+  background: rgba(255, 255, 255, .2);
+  border: 1px solid rgba(255, 255, 255, .55);
+}
+
+:host ::ng-deep .compact-alert-card__header strong,
+:host ::ng-deep .compact-alert-card__header small {
+  display: block;
+}
+
+:host ::ng-deep .compact-alert-card__header strong {
+  font-size: 12px;
+}
+
+:host ::ng-deep .compact-alert-card__header small {
+  opacity: .86;
+  font-size: 9px;
+}
+
+:host ::ng-deep .compact-alert-card__body {
+  padding: 6px 10px 8px;
+}
+
+:host ::ng-deep .compact-alert-card__body div {
+  display: grid;
+  grid-template-columns: 55px 1fr;
+  gap: 6px;
+  padding: 3px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+:host ::ng-deep .compact-alert-card__body div:last-child {
+  border: 0;
+}
+
+:host ::ng-deep .compact-alert-card__body span {
+  color: #64748b;
+}
+
+:host ::ng-deep .compact-alert-card__body b {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+::ng-deep .btn-group-toggle .btn-outline-secondary:hover {
+  background-color: #0622c0 !important;
+  color: #fff !important;
+  border-color: #3f51b5 !important;
+}
+
+::ng-deep .md-drppicker .btn {
+  height: 17px !important;
+  padding: 2px 10px !important;
+  line-height: 15px !important;
+  font-size: 12px !important;
+}
+
+:host ::ng-deep .alert-date-picker-wrapper .md-drppicker {
+  position: absolute !important;
+  font-family: Roboto, sans-serif;
+  color: inherit;
+  border-radius: 4px;
+  width: 243px !important;
+  padding: 4px;
+  margin-top: 4px !important;
+  margin-left: 0 !important;
+  overflow: visible;
+  z-index: 1000;
+  font-size: 14px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px #00000029, 0 2px 8px #0000001f;
+}
+
+:host ::ng-deep .history-date-picker-wrapper .md-drppicker {
+  position: absolute !important;
+  font-family: Roboto, sans-serif;
+  color: inherit;
+  border-radius: 4px;
+  width: 232px !important;
+  padding: 4px;
+  margin-top: 4px !important;
+  margin-left: 0 !important;
+  overflow: visible;
+  z-index: 1000;
+  font-size: 14px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px #00000029, 0 2px 8px #0000001f;
+}
+
+//////////////////////////////////////////////////////
+
+/* Calendar weekday styling - reduce gap and show all days */
+:host ::ng-deep .alert-date-picker-wrapper .md-drppicker .md-days,
+:host ::ng-deep .history-date-picker-wrapper .md-drppicker .md-days,
+:host ::ng-deep .alert-date-picker-wrapper .md-drppicker .md-calendar thead,
+:host ::ng-deep .history-date-picker-wrapper .md-drppicker .md-calendar thead {
+  gap: 1px !important;
+}
+
+:host ::ng-deep .alert-date-picker-wrapper .md-drppicker .md-days th,
+:host ::ng-deep .history-date-picker-wrapper .md-drppicker .md-days th,
+:host ::ng-deep .alert-date-picker-wrapper .md-drppicker .md-calendar thead th,
+:host ::ng-deep .history-date-picker-wrapper .md-drppicker .md-calendar thead th {
+  padding: 2px 0 !important;
+  font-size: 11px !important;
+  text-align: center !important;
+}
+
+:host ::ng-deep .alert-date-picker-wrapper .md-drppicker .calendar,
+:host ::ng-deep .history-date-picker-wrapper .md-drppicker .calendar {
+  overflow: visible !important;
+}
+
+//////////////////////////////////////////////////////
+
+.toggle-box {
+  display: flex;
+  width: 100%;
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.toggle-box:hover {
+  transform: scale(1.03);
+}
+
+.toggle-box.active {
+  background: #ffffff;
+  color: #c5221f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-container {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #c7d2fe;
+  /* light blue border */
+  width: fit-content;
+  background: #eef2ff;
+  /* light blue bg */
+}
+
+.toggle-option {
+  padding: 6px 16px;
+
+  font-size: 12px;
+  /* 🔥 readable */
+  font-weight: 500;
+  cursor: pointer;
+  color: #4f46e5;
+  /* blue text */
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.toggle-option:not(:last-child) {
+  border-right: 1px solid #c7d2fe;
+}
+
+.toggle-option:hover {
+  background: #e0e7ff;
+  /* hover blue */
+}
+
+.toggle-option.active {
+  background: #4f46e5;
+  /* 🔥 active blue */
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.modern-toggle {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #c7d2fe;
+  width: fit-content;
+  background: #eef2ff;
+}
+
+.modern-toggle .toggle-option {
+  padding: 0px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #4f46e5;
+  background: transparent;
+  border: none;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.modern-toggle .toggle-option:not(:last-child) {
+  border-right: 1px solid #c7d2fe;
+}
+
+.modern-toggle .toggle-option:hover {
+  background: #e0e7ff;
+}
+
+.modern-toggle .toggle-option.active {
+  background: #4f46e5;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+::ng-deep .ng-select.ng-select-single .ng-select-container {
+  height: 27px;
+  min-height: 21px;
+}
+
+.geofence-option-group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.geofence-option-btn {
+  min-height: 25px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.geofence-option-btn i {
+  font-size: 13px;
+}
+
+.geofence-option-btn:hover {
+  border-color: #2563eb;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.geofence-option-btn.active {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.25);
+}
+
+.geofence-cluster-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.geofence-toggle-btn {
+  min-height: 25px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.geofence-toggle-btn:hover {
+  border-color: #059669;
+  color: #047857;
+  background: #ecfdf5;
+}
+
+.geofence-toggle-btn.active {
+  color: #ffffff;
+  background: #059669;
+  border-color: #059669;
+  box-shadow: 0 4px 10px rgba(5, 150, 105, 0.22);
+}
+
+.route-vehicle-filter {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.route-filter-btn {
+  min-height: 27px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+}
+
+.route-filter-btn:hover:not(:disabled) {
+  border-color: #2563eb;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.route-filter-btn.active {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
+.route-filter-btn:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+::ng-deep .vehicle-cluster-map-popup .mapboxgl-popup-content {
+  padding: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.28);
+}
+
+::ng-deep .vehicle-cluster-leaflet-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.28);
+}
+
+::ng-deep .vehicle-cluster-leaflet-popup .leaflet-popup-content {
+  margin: 0;
+  width: 255px !important;
+}
+
+::ng-deep .vehicle-cluster-leaflet-popup .leaflet-popup-tip {
+  background: #f8fafc;
+}
+
+::ng-deep .vehicle-cluster-map-popup .mapboxgl-popup-close-button {
+  color: #ffffff;
+  font-size: 18px;
+  right: 6px;
+  top: 4px;
+}
+
+::ng-deep {
+  .vehicle-popup-card {
+    width: 255px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    color: #1e293b;
+    font-size: 12px;
+  }
+
+  .vehicle-popup-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 46px;
+    padding: 9px 34px 9px 10px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb 0%, #0f766e 100%);
+  }
+
+  .vehicle-popup-card__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .vehicle-popup-card__icon {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  }
+
+  .vehicle-popup-card__header strong {
+    display: block;
+    max-width: 175px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    line-height: 15px;
+  }
+
+  .vehicle-popup-card__header small {
+    display: block;
+    margin-top: 1px;
+    color: rgba(255, 255, 255, 0.76);
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .vehicle-popup-card__gps {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+    font-size: 9px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .vehicle-popup-card__gps i {
+    font-size: 9px;
+  }
+
+  .vehicle-popup-card__chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding: 9px 9px 7px;
+  }
+
+  .vehicle-popup-card__chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 0;
+    height: 28px;
+    padding: 0 7px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+  }
+
+  .vehicle-popup-card__chip i {
+    font-size: 11px;
+  }
+
+  .vehicle-popup-card__chip b {
+    overflow: hidden;
+    color: #0f172a;
+    font-size: 11px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .vehicle-popup-card__chip.is-on {
+    color: #047857;
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+  }
+
+  .vehicle-popup-card__chip.is-off,
+  .vehicle-popup-card__chip.is-stop {
+    color: #be123c;
+    background: #fff1f2;
+    border-color: #fecdd3;
+  }
+
+  .vehicle-popup-card__chip.is-moving {
+    color: #0369a1;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+
+  .vehicle-popup-card__chip.is-fast {
+    color: #b45309;
+    background: #fffbeb;
+    border-color: #fde68a;
+  }
+
+  .vehicle-popup-card__coord {
+    display: grid;
+    grid-template-columns: 14px 48px 1fr;
+    align-items: center;
+    gap: 5px;
+    margin: 0 9px 8px;
+    padding: 7px 8px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+  }
+
+  .vehicle-popup-card__coord i {
+    color: #2563eb;
+  }
+
+  .vehicle-popup-card__coord span {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .vehicle-popup-card__coord b {
+    overflow: hidden;
+    color: #0f172a;
+    font-size: 11px;
+    text-align: right;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .vehicle-popup-card__track {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: calc(100% - 18px);
+    height: 31px;
+    margin: 0 9px 9px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #16a34a, #059669);
+    border: 0;
+    border-radius: 7px;
+    cursor: pointer;
+    box-shadow: 0 6px 12px rgba(5, 150, 105, 0.22);
+  }
+
+  .vehicle-popup-card__track:hover {
+    background: linear-gradient(135deg, #15803d, #047857);
+  }
+}
+
+/* Compact, colorful police-station popup. */
+:host ::ng-deep .police-station-popup .mapboxgl-popup-content {
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, .24);
+}
+
+:host ::ng-deep .police-station-popup .mapboxgl-popup-tip {
+  border-top-color: #fff !important;
+}
+
+:host ::ng-deep .police-station-popup .mapboxgl-popup-content {
+  width: 214px !important;
+  margin: 0;
+  font: 10px/1.3 Roboto, Arial, sans-serif;
+}
+
+:host ::ng-deep .police-station-popup .mapboxgl-popup-close-button {
+  top: 2px !important;
+  right: 4px !important;
+  color: #fff !important;
+  font-size: 16px;
+  z-index: 3;
+}
+
+:host ::ng-deep .police-station-map-marker {
+  position: relative;
+  border-radius: 999px;
+  filter: drop-shadow(0 7px 10px rgba(220, 38, 38, .26));
+}
+
+:host ::ng-deep .police-station-map-marker::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 2px solid rgba(255, 255, 255, .95);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+:host ::ng-deep .police-popup-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 8px 28px 8px 9px;
+  color: #fff;
+  background: linear-gradient(135deg, #dc2626, #1d4ed8);
+}
+
+:host ::ng-deep .police-popup-card__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, .15);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
+}
+
+:host ::ng-deep .police-popup-card__header img {
+  width: 23px;
+  height: 23px;
+  flex: 0 0 23px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .22));
+}
+
+:host ::ng-deep .police-popup-card__title {
+  min-width: 0;
+  flex: 1;
+}
+
+:host ::ng-deep .police-popup-card__header strong {
+  display: block;
+  overflow: hidden;
+  color: #fff;
+  font-size: 11px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .police-popup-card__header small {
+  display: block;
+  margin-top: 2px;
+  color: rgba(239, 246, 255, .92);
+  font-size: 8px;
+}
+
+:host ::ng-deep .police-popup-card__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .18);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .police-popup-card__chip i {
+  font-size: 9px;
+}
+
+:host ::ng-deep .police-popup-card__body {
+  padding: 7px 9px 9px;
+  background:
+    radial-gradient(circle at top right, rgba(191, 219, 254, .4), transparent 34%),
+    linear-gradient(180deg, #f8fafc, #eff6ff);
+}
+
+:host ::ng-deep .police-popup-card__row {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 0;
+  border-bottom: 1px dashed #dbeafe;
+}
+
+:host ::ng-deep .police-popup-card__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #64748b;
+  font-size: 9px;
+}
+
+:host ::ng-deep .police-popup-card__label i {
+  width: 11px;
+  color: #dc2626;
+  text-align: center;
+}
+
+:host ::ng-deep .police-popup-card__body b {
+  overflow-wrap: anywhere;
+  color: #1e3a8a;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-align: right;
+}
+
+:host ::ng-deep .police-popup-card__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 29px;
+  margin-top: 7px;
+  border-radius: 8px;
+  color: #fff;
+  background: linear-gradient(135deg, #2563eb, #0f172a);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 8px 14px rgba(37, 99, 235, .24);
+}
+
+:host ::ng-deep .police-popup-card__action:hover {
+  color: #fff;
+  filter: brightness(1.06);
+}
+
+.info-panel-card {
+  position: absolute;
+  top: 7.8rem;
+  right: 5px;
+  bottom: auto;
+  z-index: 1200;
+  width: 279px;
+  max-height: calc(100% - 64px);
+  border: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(186, 230, 253, .45), transparent 28%),
+    linear-gradient(160deg, rgba(255, 255, 255, .98), rgba(248, 250, 252, .98));
+  box-shadow: 0 16px 30px rgba(15, 23, 42, .2);
+  backdrop-filter: blur(10px);
+}
+
+.info-panel-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 35px;
+  padding: 4px 10px;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, #0f172a, #1d4ed8 60%, #06b6d4);
+}
+
+.info-panel-card__heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.info-panel-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .16);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
+  font-size: 12px;
+}
+
+.info-panel-card__heading strong {
+  display: block;
+  max-width: 150px;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.info-panel-card__heading small {
+  display: block;
+  overflow: hidden;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, .8);
+  font-size: 9px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.info-panel-card__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .14);
+  font-size: 9px;
+}
+
+.info-panel-card__body {
+  overflow-y: auto;
+  max-height: calc(98vh - 250px);
+  padding: 3px;
+  scrollbar-width: thin;
+  scrollbar-color: #06b6d4 rgba(219, 234, 254, .9);
+}
+
+.info-panel-card__body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.info-panel-card__body::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, rgba(219, 234, 254, .95), rgba(224, 242, 254, .9));
+  border-radius: 999px;
+}
+
+.info-panel-card__body::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #2563eb, #06b6d4, #14b8a6);
+  border-radius: 999px;
+}
+
+.info-panel-card__body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #1d4ed8, #0891b2, #0f766e);
+}
+
+.info-panel-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.info-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.info-chip.is-green {
+  color: #047857;
+  background: #dcfce7;
+}
+
+.info-chip.is-red {
+  color: #be123c;
+  background: #ffe4e6;
+}
+
+.info-chip.is-blue {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.info-panel-card__meta {
+  margin-top: 0px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, .88);
+}
+
+.mini-info-row {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 6px;
+  align-items: start;
+  padding: 2px 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.mini-info-row:last-child {
+  border-bottom: 0;
+}
+
+.mini-info-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #547cb7;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.mini-info-row i {
+  color: #2563eb;
+}
+
+.mini-info-row b {
+  overflow-wrap: anywhere;
+  color: #000000;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.info-panel-card__device {
+  display: grid;
+  gap: 2px;
+  margin-top: 0px;
+}
+
+.device-pill {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 13px;
+  padding: 0 8px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #000000;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.device-pill i {
+  color: #0ea5e9;
+}
+
+.history-mini-card {
+  margin-top: 0px;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid #dbeafe;
+  background:
+    radial-gradient(circle at top right, rgba(191, 219, 254, .35), transparent 30%),
+    linear-gradient(180deg, #ffffff, #eff6ff);
+}
+
+.history-mini-card__head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+  color: #1d4ed8;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.history-card__date {
+  height: 30px;
+  border-radius: 9px;
+  border-color: #cbd5e1;
+  font-size: 10px !important;
+  box-shadow: none;
+}
+
+.history-mini-card__time-row {
+  display: flex;
+  gap: 5px;
+  margin-top: 0px;
+}
+
+.history-mini-card__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 25px;
+  margin-top: 0px;
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #0f766e, #14b8a6);
+  box-shadow: 0 10px 16px rgba(20, 184, 166, .2);
+}
+
+.history-mini-card__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mini-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 10px;
+  box-shadow: 0 8px 14px rgba(15, 23, 42, .16);
+}
+
+.mini-control--stop {
+  background: linear-gradient(135deg, #fb7185, #f97316);
+}
+
+.mini-control--play {
+  background: linear-gradient(135deg, #2563eb, #0ea5e9);
+}
+
+.mini-control--play.is-paused {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+}
+
+.mini-control--restart {
+  background: linear-gradient(135deg, #22c55e, #14b8a6);
+}

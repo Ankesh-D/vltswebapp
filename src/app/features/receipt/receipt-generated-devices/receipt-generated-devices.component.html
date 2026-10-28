@@ -1,0 +1,87 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle"><span>Receipt Generated Devices</span></div>
+        </div>
+
+        <form autocomplete="off">
+          <div class="row entrypagediv">
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>From Date:</label>
+                <label class="mandetory">*</label>
+                <input type="text" class="form-control datepick" id="fromDate" [(ngModel)]="fromDate" name="fromDate" readonly>
+              </div>
+            </div>
+
+            <div class="col-sm-2">
+              <div class="form-group">
+                <label>To Date:</label>
+                <label class="mandetory">*</label>
+                <input type="text" class="form-control datepick" id="toDate" [(ngModel)]="toDate" name="toDate" readonly>
+              </div>
+            </div>
+
+            <div class="col-sm-2">
+              <div class="form-group">
+                <button type="button" (click)="getSearchDetails()" style="margin-top: 25px;">View Data</button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div class="table-responsive">
+          <ng-template #receiptRows let-rows>
+            @for (cir of rows; track cir) {
+              <tr>
+                <td>{{cir.param1 ? toString(cir.param1) : 'NA'}}</td>
+                <td>{{cir.param7 && toString(cir.param7).length > 0 ? cir.param7 : 'NA'}}</td>
+                <td>{{cir.param11 && toString(cir.param11).length > 0 ? cir.param11 : 'NA'}}<br>{{cir['param12'] && toString(cir['param12']).length > 0 ? cir['param12'] : 'NA'}}</td>
+                <td>{{cir.param5 && toString(cir.param5).length > 0 ? cir.param5 : 'NA'}}</td>
+                <td>{{cir.param4 && toString(cir.param4).length > 0 ? cir.param4 : 'NA'}}</td>
+                <td>{{cir.param6 && toString(cir.param6).length > 0 ? cir.param6 : 'NA'}}</td>
+                <td>{{cir.param28 && toString(cir.param28).length > 0 ? cir.param28 : 'NA'}}<br>{{cir.param29 && toString(cir.param29).length > 0 ? cir.param29 : 'NA'}}</td>
+                <td>{{cir.param19 && toString(cir.param19).length > 0 ? cir.param19 : 'NA'}}</td>
+                <td>{{cir['param16'] && toString(cir['param16']).length > 0 ? cir['param16'] : 'NA'}}</td>
+                <td>{{cir.param14 && toString(cir.param14).length > 0 ? cir.param14 : 'NA'}}</td>
+                <td>{{cir['param53'] && toString(cir['param53']).length > 0 ? cir['param53'] : 'NA'}}</td>
+              </tr>
+            }
+          </ng-template>
+          <app-common-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
+            [sortKey]="sortKey" [reverse]="reverse" [bodyTemplate]="receiptRows"
+            tableClass="table table-striped app-table"
+            tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;"
+            (sortChange)="sort($event)">
+          </app-common-table>
+        </div>
+        @if (totalCount > pageSize) {
+          <div class="pagination-wrapper">
+            <ul class="pagination" style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+              <li [class.disabled]="currentPage === 1">
+                <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+              </li>
+              @for (page of getPageNumbers(); track page) {
+                <li [class.active]="currentPage === page">
+                  <button (click)="onPageChange(page)">{{page}}</button>
+                </li>
+              }
+              <li [class.disabled]="currentPage >= getTotalPages()">
+                <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
+              </li>
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (loading) {
+  <app-loading></app-loading>
+}
+@if (errorMessage) {
+  <app-error-message [message]="errorMessage"></app-error-message>
+}

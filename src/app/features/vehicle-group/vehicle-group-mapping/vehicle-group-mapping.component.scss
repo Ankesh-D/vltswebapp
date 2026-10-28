@@ -1,0 +1,350 @@
+.vehicle-group-mapping-page {
+  .mapping-shell {
+    padding: 3px;
+    border: 0;
+    border-radius: 10px;
+    background:
+      radial-gradient(circle at top left, rgba(12, 74, 110, 0.1), transparent 34%),
+      linear-gradient(180deg, #ffffff 0%, #f7fafc 100%);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  }
+
+  .page-header-card,
+  .page-title-block,
+  .page-actions,
+  .form-note,
+  .selection-stats,
+  .form-actions,
+  .stat-pill,
+  .header-action-btn,
+  .submit-btn,
+  .secondary-btn {
+    display: flex;
+    align-items: center;
+  }
+
+  .page-header-card,
+  .form-actions {
+    justify-content: space-between;
+  }
+
+  .page-header-card {
+    gap: 16px;
+    margin-bottom: 2px;
+    padding: 1px 18px;
+    border: 1px solid #d9e6ec;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #fefefe 0%, #eef7fb 100%);
+  }
+
+  .page-title-block {
+    gap: 12px;
+  }
+
+  .page-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 12px;
+    background: linear-gradient(135deg, #0b4f6c, #0f766e);
+    box-shadow: 0 10px 24px rgba(11, 79, 108, 0.25);
+  }
+
+  .page-title {
+    margin: 0;
+    color: #17344d;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .page-subtitle {
+    margin: 4px 0 0;
+    color: #617588;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .page-actions {
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .header-action-btn,
+  .submit-btn,
+  .secondary-btn {
+    gap: 8px;
+    text-decoration: none;
+    border: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+  }
+
+  .header-action-btn:hover,
+  .submit-btn:hover,
+  .secondary-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .header-action-btn {
+    padding: 4px 4px;
+  }
+
+  .header-action-btn.primary {
+    color: #fff;
+    background: linear-gradient(135deg, #0f766e, #115e59);
+    box-shadow: 0 10px 22px rgba(15, 118, 110, 0.22);
+  }
+
+  .header-action-btn.secondary {
+    color: #194760;
+    background: #e8f3f9;
+    border: 1px solid #cfe1ea;
+  }
+
+  .mapping-form-card {
+    padding: 16px 18px;
+    border: 1px solid #dfeaf0;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+  }
+
+  .form-note {
+    gap: 8px;
+    margin-bottom: 0px;
+    color: #5f7285;
+    font-size: 11px;
+  }
+
+  .form-note i {
+    color: #0f766e;
+  }
+
+  .mapping-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(180px, 1fr));
+    gap: 14px;
+  }
+
+  .field-card label {
+    display: inline-block;
+    margin-bottom: 0px;
+    color: #23435b;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .input-shell {
+    position: relative;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 12px;
+    top: 5px;
+    width: 18px;
+    height: 18px;
+    display: grid;
+    place-items: center;
+    color: #6e8091;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .selection-stats {
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+
+  .stat-pill {
+    gap: 7px;
+    padding: 8px 12px;
+    border: 1px solid #dbe7ed;
+    border-radius: 999px;
+    background: #f7fbfd;
+    color: #4e6377;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .stat-pill i {
+    color: #0f766e;
+  }
+
+  .form-actions {
+    margin-top: 16px;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .secondary-btn,
+  .submit-btn {
+    padding: 5px 7px;
+  }
+
+  .secondary-btn {
+    color: #10151a;
+    background: #b2b9bd;
+  }
+
+  .submit-btn {
+    color: #fff;
+    background: linear-gradient(135deg, #04d137, #00962d);
+    box-shadow: 0 12px 26px rgba(249, 115, 22, 0.2);
+  }
+
+  .mandetory {
+    color: #dc2626;
+  }
+
+  ::ng-deep .compact-ng-select {
+    .ng-select-container {
+      min-height: 25px;
+      border: 1px solid #b0b8be;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: none;
+      padding-left: 36px;
+      font-size: 12px;
+      color: #263c50;
+    }
+
+    &.ng-select-focused .ng-select-container,
+    .ng-select-container:hover {
+      border-color: #0f766e;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
+
+    &.ng-select-multiple .ng-select-container {
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+
+    .ng-value-container {
+      padding-left: 0;
+      gap: 4px;
+    }
+
+    .ng-placeholder {
+      color: #6b7d8d;
+    }
+
+    .ng-input {
+      padding-left: 0 !important;
+    }
+
+    .ng-arrow-wrapper {
+      padding-right: 12px;
+    }
+
+    .ng-clear-wrapper {
+      color: #8394a2;
+    }
+
+    .ng-value {
+      border-radius: 999px !important;
+      background: #e7f6f4 !important;
+      color: #155e59 !important;
+      font-size: 11px !important;
+      padding: 2px 6px !important;
+    }
+
+    .ng-value-icon {
+      border-right: 0 !important;
+      padding-right: 4px !important;
+    }
+  }
+
+  ::ng-deep .ng-dropdown-panel {
+    border: 1px solid #d7e3ea;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+    font-size: 12px;
+  }
+
+  ::ng-deep .ng-dropdown-panel .ng-option {
+    padding: 9px 12px;
+  }
+
+  ::ng-deep .ng-dropdown-panel .ng-option.ng-option-marked {
+    background: #edf7f6;
+    color: #174b63;
+  }
+
+  ::ng-deep .ng-dropdown-panel .ng-option.ng-option-selected {
+    background: #dff3f0;
+    color: #0f766e;
+  }
+
+  ::ng-deep .ng-dropdown-panel .ng-dropdown-header,
+  ::ng-deep .ng-dropdown-panel .ng-select-searchable {
+    padding: 8px;
+  }
+
+  ::ng-deep .compact-ng-select .ng-dropdown-panel .ng-dropdown-panel-items .ng-option,
+  ::ng-deep .compact-ng-select .ng-select-container .ng-value-container .ng-input > input {
+    font-size: 12px;
+  }
+
+  @media (max-width: 1199px) {
+    .mapping-grid {
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+    }
+  }
+
+  @media (max-width: 991px) {
+    .page-header-card {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .page-actions {
+      justify-content: flex-start;
+    }
+
+    .mapping-grid {
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+  }
+
+  @media (max-width: 767px) {
+    .mapping-shell {
+      padding: 12px;
+      border-radius: 18px;
+    }
+
+    .page-header-card,
+    .mapping-form-card {
+      padding: 14px;
+    }
+
+    .page-title {
+      font-size: 19px;
+    }
+
+    .mapping-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+      justify-content: stretch;
+    }
+
+    .secondary-btn,
+    .submit-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

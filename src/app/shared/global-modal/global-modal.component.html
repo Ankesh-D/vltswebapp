@@ -1,0 +1,35 @@
+@if (show) {
+  <div class="modal-overlay">
+    <div class="custom-modal">
+      <div class="modal-header">
+        {{title}}
+      </div>
+      <div class="modal-body">
+        {{message}}
+      </div>
+      <div class="modal-footer">
+        @if (button1) {
+          <button
+            class="btn cancel-btn"
+            (click)="action1.emit()">
+            {{button1}}
+          </button>
+        }
+        @if (button2) {
+          <button
+            class="btn ok-btn"
+            (click)="action2.emit()">
+            {{button2}}
+          </button>
+        }
+        @if (button3) {
+          <button
+            class="btn ok-btn"
+            (click)="action3.emit()">
+            {{button3}}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

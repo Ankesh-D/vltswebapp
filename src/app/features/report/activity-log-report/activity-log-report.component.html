@@ -1,0 +1,212 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-box">
+      <!-- PAGE TITLE -->
+      <div class="pagetitlestyle">
+        <span>Activity Logs</span>
+      </div>
+
+      <!-- MAIN LAYOUT -->
+      <div class="overspeed-layout">
+        <!-- LEFT FILTER PANEL -->
+        <div class="left-filter-panel entrypagediv">
+          <div class="date-row">
+            <div class="date-col" style="width: 100%">
+              <label class="control-label"
+                >Select Date Range<span style="color: red">*</span>
+              </label>
+              <input
+                placeholder="Select Date Range"
+                type="text"
+                class="form-control"
+                ngxDaterangepickerMd
+                [(ngModel)]="selectedDateRange"
+                [maxDate]="today"
+                [opens]="'right'"
+                [drops]="'down'"
+                [locale]="{ format: 'DD-MMM-YYYY' }"
+                (applyDaterangepicker)="onDateRangeChange($event)"
+                id="dateRangePicker"
+                />
+            </div>
+          </div>
+
+          <div class="date-row">
+            <div class="date-col">
+              <label class="control-label"
+                >From Time<span style="color: red">*</span></label
+                >
+                <input
+                  type="time"
+                  class="form-control"
+                  [(ngModel)]="fromTime"
+                  step="60"
+                  />
+              </div>
+
+              <div class="date-col">
+                <label class="control-label"
+                  >To Time<span style="color: red">*</span></label
+                  >
+                  <input
+                    type="time"
+                    class="form-control"
+                    [(ngModel)]="toTime"
+                    step="60"
+                    />
+                </div>
+              </div>
+              <!-- SEARCH -->
+              <div class="search-btn-row">
+                <button class="search-btn-full" (click)="getAlertOverview()">
+                  <i class="fa fa-search"></i> Search
+                </button>
+              </div>
+            </div>
+            <!-- *ngIf="showSummary" -->
+            <!-- RIGHT REPORT PANEL -->
+            <div class="right-report-panel">
+              <!-- 🔹 TOP CONTROLS BAR -->
+              <div class="top-controls-row">
+                <!-- LEFT SIDE -->
+                <div class="left-controls">
+                  <!-- 🔍 SEARCH BOX -->
+                  <div class="search-box">
+                    <input
+                      type="search"
+                      class="search-input inner"
+                      placeholder="Search Page Name  / Activity..."
+                      maxlength="50"
+                      [(ngModel)]="searchText"
+                      (keyup.enter)="getSearchDetails()"
+                      />
+
+                    <button class="search-inner-btn" (click)="getSearchDetails()">
+                      <i class="fa fa-search"></i>
+                    </button>
+                  </div>
+
+                  <!-- 🔄 RELOAD BUTTON -->
+                  <button
+                    class="reload-btn"
+                    (click)="reloadData()"
+                    [disabled]="loading"
+                    >
+                    <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+                    <span>{{ loading ? "Reloading..." : "Reload" }}</span>
+                  </button>
+                </div>
+
+                <!-- RIGHT SIDE -->
+                <div class="right-controls">
+                  <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                    [showPageSize]="false" [showTotal]="false" (excelExport)="exportToExcel()">
+                  </app-common-data-toolbar>
+                  <div class="total-records-text">Show Rows :</div>
+                  <!-- ROWS SELECT -->
+                  <select
+                    class="rows-select"
+                    [(ngModel)]="pageSize"
+                    (change)="onPageSizeChanged(pageSize)"
+                    >
+                    @for (size of pageSizeOptions; track size) {
+                      <option
+                        [value]="size === totalCount ? 'All' : size"
+                        >
+                        {{ size === totalCount ? "All" : size }}
+                      </option>
+                    }
+                  </select>
+
+                  <!-- TOTAL RECORD TEXT -->
+                  <div class="total-records-text">
+                    Total Records : {{ pageCount }} of {{ totalCount }}
+                  </div>
+                </div>
+              </div>
+              <!-- TABLE -->
+              <div class="table-wrapper">
+                <ng-template #reportTableRows let-rows>
+@if (alertData.length === 0) {
+                      <tr>
+                        <td colspan="10" class="no-data">NO DATA FOUND</td>
+                      </tr>
+                    }
+                    @for (d of rows; track d) {
+                      <tr>
+                        <td>{{ d.param1 }}</td>
+                        <td class="text-left">
+                          {{ d.param14 }}<br />
+                          {{ d.param16 == "" ? "" : "(" + d.param16 + ")" }}
+                        </td>
+                        <!-- User Name -->
+                        <td>{{ d.param2 }}</td>
+                        <!-- Page Name -->
+                        <td>{{ d.param4 }}</td>
+                        <!-- Activity -->
+                        <td class="wrap-text">{{ d.param13 }}</td>
+                        <!-- Request -->
+                        <td class="wrap-text">{{ d.param6 }}</td>
+                        <td>{{ d.param5 }}</td>
+                        <!-- Date Time -->
+                        <td>{{ d.param7 }}</td>
+                        <!-- Exception -->
+                      </tr>
+                    }
+</ng-template>
+<app-common-table [columns]="tableColumns" [rows]="alertData" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table-grid"></app-common-table>
+              </div>
+              @if (totalCount > pageSize || page > 1) {
+                <div
+                  class="custom-pagination"
+                  style="display: flex; justify-content: end"
+                  >
+                  <button
+                    class="pg-btn"
+                    (click)="changePage(page - 1)"
+                    [disabled]="page === 1"
+                    >
+                    Prev
+                  </button>
+                  @if (page > 3) {
+                    <span class="pg-dots">...</span>
+                  }
+                  @if (page > 2) {
+                    <button
+                      class="pg-num"
+                      (click)="changePage(page - 1)"
+                      >
+                      {{ page - 1 }}
+                    </button>
+                  }
+                  <button class="pg-num active">
+                    {{ page }}
+                  </button>
+                  @if (page < totalPages - 1) {
+                    <button
+                      class="pg-num"
+                      (click)="changePage(page + 1)"
+                      >
+                      {{ page + 1 }}
+                    </button>
+                  }
+                  @if (page < totalPages - 2) {
+                    <span class="pg-dots">...</span>
+                  }
+                  <button class="pg-num" (click)="changePage(totalPages)">
+                    {{ totalPages }}
+                  </button>
+                  <button
+                    class="pg-btn"
+                    (click)="changePage(page + 1)"
+                    [disabled]="page === totalPages"
+                    >
+                    Next
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

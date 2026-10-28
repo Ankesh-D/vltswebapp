@@ -1,0 +1,253 @@
+<!-- vehicle-class-wise-installation-report.component.html -->
+
+<div class="content-i">
+
+  <div class="content-box">
+
+    <div class="element-wrapper">
+
+      <div class="element-box">
+
+        <!-- HEADER -->
+        <div class="table-responsive">
+
+          <div
+            id="dataTable1_wrapper"
+            class="dataTables_wrapper container-fluid dt-bootstrap4"
+            >
+
+            <!-- PAGE TITLE -->
+            <div class="col-md-12 pagetitleborder">
+
+              <div class="page-header-row">
+
+                <!-- TITLE -->
+                <div class="pagetitlestyle">
+                  Vehicle Class Wise Installation Report
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- TOP CONTROLS -->
+            <form
+              autocomplete="off"
+              class="top-controls-row"
+              >
+
+              <!-- LEFT CONTROLS -->
+              <div class="left-controls">
+
+                <span class="search-label" class="total-records-text">
+                  Search :
+                </span>
+
+                <div class="search-box">
+
+                  <input
+                    type="search"
+                    class="search-input inner"
+                    placeholder="Search..."
+                    maxlength="50"
+                    [(ngModel)]="searchBy"
+                    name="searchBy"
+                    (keyup.enter)="searchReport()"
+                    />
+
+                  <button
+                    type="button"
+                    class="search-inner-btn"
+                    (click)="searchReport()"
+                    >
+                    <i class="fa fa-search"></i>
+                  </button>
+
+                </div>
+
+                <button
+                  type="button"
+                  class="reload-btn"
+                  (click)="resetFilters()"
+                  >
+                  Reload
+                </button>
+
+              </div>
+
+              <!-- RIGHT CONTROLS -->
+              <div class="right-controls">
+                <!-- =============================
+                ADD THIS BEFORE DOWNLOAD
+                ============================= -->
+
+                <div class="control-item">
+
+                  <label class="total-records-text">
+                    Vehicle Class :
+                  </label>
+
+                  <select
+                    [(ngModel)]="selectedVehicleClass"
+                    name="selectedVehicleClass"
+                    (change)="searchReport()"
+                    >
+
+                    <option value="">
+                      All
+                    </option>
+
+                    @for (
+                      item of vehicleClassList
+                      ; track
+                      item) {
+                      <option
+                        [value]="item.param1"
+                        >
+                        {{ item.param2 }}
+                      </option>
+                    }
+
+                  </select>
+
+                </div>
+                <!-- DOWNLOAD -->
+                <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                  [showPageSize]="false" [showTotal]="false" (excelExport)="downloadReport()">
+                </app-common-data-toolbar>
+
+                <!-- SHOW ROWS -->
+                <div class="control-item">
+
+                  <label class="total-records-text" >
+                    Show Rows :
+                  </label>
+
+                  <select
+                    [(ngModel)]="itemPerPage"
+                    name="itemPerPage"
+                    (change)="getReport()"
+                    >
+
+                    <option [value]="10">10</option>
+                    <option [value]="20">20</option>
+                    <option [value]="50">50</option>
+                    <option [value]="100">100</option>
+
+                  </select>
+
+                </div>
+
+                <!-- TOTAL RECORD -->
+                <div class="total-records-text">
+
+                  Total Records :
+                  {{ totalRecords }}
+
+                </div>
+
+              </div>
+
+            </form>
+
+            <!-- TABLE -->
+            <div class="col-sm-12">
+
+              <ng-template #reportTableRows let-rows>
+<!-- NO DATA -->
+                @if (reportList.length === 0) {
+                  <tr>
+                    <td
+                      colspan="8"
+                      class="no-data"
+                      >
+                      NO DATA FOUND
+                    </td>
+                  </tr>
+                }
+
+                <!-- DATA -->
+                @for (
+                  d of rows; track
+                  d; let i = $index) {
+                  <tr
+                    >
+                    <td >
+                      {{ d.param1 || 'NA' }}
+                    </td>
+                    <td style="text-align: left; padding-left: 10px;">
+                      {{ d.param3 || 'NA' }}
+                    </td>
+                    <td style="text-align: right; padding-right: 10px;">
+                      {{ d.param4 || '0' }}
+                    </td>
+                    <td style="text-align: right; padding-right: 10px;">
+                      {{ d.param9 || '0' }}
+                    </td>
+                    <td style="text-align: right; padding-right: 10px;">
+                      {{ d.param5 || '0' }}
+                    </td>
+                    <td style="text-align: right; padding-right: 10px;">
+                      {{ d.param6 || '0' }}
+                    </td>
+                    <td style="text-align: right; padding-right: 10px;">
+                      {{ d.param7 || '0' }}
+                    </td>
+                    <!-- <td style="text-align: right; padding-right: 10px;">
+                    {{ d.param8 || '0' }}
+                  </td> -->
+                </tr>
+              }
+</ng-template>
+<app-common-table [columns]="tableColumns" [rows]="reportList" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table-striped table app-table" headerClass="device-thead" tableStyle="border-top: 1px solid black;
+                  border-bottom: 1px solid black;
+                  margin-left: 0px;"></app-common-table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- PAGINATION -->
+    @if (totalRecords > 0) {
+      <div
+        class="pagination-wrapper"
+        >
+        <ul class="pagination">
+          <!-- PREV -->
+          <li
+            [class.disabled]="pageNo === 1"
+            >
+            <button
+              (click)="changePage(pageNo - 1)"
+              [disabled]="pageNo === 1"
+              >
+              Prev
+            </button>
+          </li>
+          <!-- PAGE NUMBER -->
+          <li class="active">
+            <button>
+              {{ pageNo }}
+            </button>
+          </li>
+          <!-- NEXT -->
+          <li>
+            <button
+              (click)="changePage(pageNo + 1)"
+              >
+              Next
+            </button>
+          </li>
+        </ul>
+      </div>
+    }
+
+  </div>
+
+</div>
+
+</div>
+
+</div>

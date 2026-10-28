@@ -1,0 +1,90 @@
+<div>
+  <div class="content-box">
+    <div class="element-box">
+      <!-- PAGE TITLE -->
+      <div class="pagetitlestyle">
+        <span>Alert Summary Graphical View</span>
+      </div>
+
+      <div class="filter-section">
+        <form #filterForm="ngForm">
+          <div class="row align-items-center">
+            <div class="col-sm-12 col-md-6 col-lg-2">
+              <div class="form-group">
+                <label for="datepicker" class="field-label">Select Date Range</label>
+                <input class="form-control form-control-sm" type="text" name="date" id="datepicker" required
+                  placeholder="Select Date"/>
+              </div>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-2">
+              <div class="form-group">
+                <label for="alertType" class="field-label">Select Alert Type</label>
+                <ng-select
+                  placeholder="Select Alert Type"
+                  [(ngModel)]="selectedAlertType"
+                  name="alertType"
+                  [clearable] = "false"
+                  (change)="onAlertTypeChange($event)"
+
+                  >
+                  @for (alertType of alertTypeList; track alertType) {
+                    <ng-option
+                      [value]="alertType"
+                      >
+                      {{ alertType.param2 }}
+                    </ng-option>
+                  }
+                </ng-select>
+              </div>
+            </div>
+            <!-- <div class="col-sm-12 col-md-6 col-lg-2">
+            <div class="toggle-container modern-toggle">
+              <button class="toggle-option" [class.active]="vehicleType === 'NEW'"
+                (click)="setView('NEW')" title="New Vehicle Alerts" [disabled]="!eventChartFlag">
+                NEW
+              </button>
+              <button class="toggle-option" [class.active]="vehicleType === 'OLD'"
+                (click)="setView('OLD')">
+                OLD
+              </button>
+            </div>
+          </div> -->
+          <div class="col-sm-12 col-md-6 col-lg-3">
+            <button type="button" class="btn btn-secondary shadow-sm"
+              (click)="resetFilters()"
+              style="font-size: 12px; padding: 4px 16px; font-weight: bold; border-radius: 4px; background: #6c757d; border: none; margin-right: 10px;">
+              <i class="fa fa-redo" style="margin-right: 5px;"></i> Reset
+            </button>
+            <button class="btn btn-info shadow-sm" type="button"
+              (click)="getEventChartData()"
+              style="font-size: 12px; padding: 4px 16px; font-weight: bold; border-radius: 4px; background: #007bff; border: none; margin-right: 10px;">
+              <i class="fa fa-sync" style="margin-right: 5px;"></i> Refresh
+            </button>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-2">
+            <div class="float-end">
+              <!-- toggleChartView() -->
+              <button class="header-btn" [ngStyle]="{'display': !eventChartFlag ? 'block': 'none'}" (click)="resetFilters(); ">
+                <i class="fas" [ngClass]="{'fa-chart-bar': !eventChartFlag, 'fa-arrow-left': eventChartFlag}"></i>
+                {{ eventChartFlag ? 'Show Date Wise Chart' : 'Back To Event Wise Chart' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="graph-container">
+      <div class="graph-view">
+        <div [ngStyle]="{'display': (eventChartFlag && eventData.length == 0) ? 'block': 'none'}" class="no-data-message">
+          <p>No data available for the selected filters.</p>
+        </div>
+        <div [ngStyle]="{'display': (eventChartFlag) ? 'block': 'none'}" id="eventChart" style="width:100%;height:450px;"></div>
+        <div [ngStyle]="{'display': !eventChartFlag ? 'block': 'none'}" id="dateChart" style="width:100%;height:450px;">
+          <div class="item-title">
+            <span>{{ AlertName }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

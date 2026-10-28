@@ -1,0 +1,65 @@
+<div class="query-page">
+
+  <div class="query-card">
+
+    <h3 class="title">Query Check</h3>
+
+    <!-- Operation -->
+    <div class="form-group">
+      <label>Operation</label>
+
+      <select class="form-control" [(ngModel)]="param1">
+        <option value="select">SELECT</option>
+        <option value="insert">INSERT</option>
+        <option value="update">UPDATE</option>
+        <option value="execute">EXECUTE</option>
+      </select>
+    </div>
+
+    <!-- Query -->
+    <div class="form-group mt-3">
+      <label>Query</label>
+
+      <textarea
+        class="form-control query-box"
+        [(ngModel)]="param2"
+        placeholder="Enter SQL Query Here..."
+      ></textarea>
+    </div>
+
+    <!-- Button -->
+    <div class="d-flex gap-2 mt-3">
+
+      <button class="btn btn-primary" (click)="submitQuery()">
+        Submit
+      </button>
+
+      <!-- <button
+      class="btn btn-sm btn-success"
+      *ngIf="responseData"
+      (click)="copyResponse()"
+      >
+      Copy Response
+    </button> -->
+
+  </div>
+
+  <!-- Response -->
+  <!-- Response -->
+  @if (responseData) {
+    <div class="response-wrapper mt-4">
+      <div class="response-header">
+        <span>Response JSON</span>
+        <i
+          class="fa fa-copy copy-icon"
+          title="Copy Response"
+          (click)="copyResponse()"
+        ></i>
+      </div>
+      <pre>{{ responseData | json }}</pre>
+    </div>
+  }
+
+</div>
+
+</div>

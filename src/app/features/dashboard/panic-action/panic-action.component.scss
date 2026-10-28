@@ -1,0 +1,17 @@
+:host { position: fixed; inset: 0; z-index: 13000; font-size: 12px; color: #253126; }
+.action-backdrop { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: #17261c88; }
+.action-dialog { width: 690px; max-width: 100%; max-height: 90dvh; overflow-y: auto; background: white; border-radius: 12px; box-shadow: 0 18px 60px #10231955; animation: appear .18s ease-out; }
+header { display: flex; align-items: center; justify-content: space-between; padding: 1px 16px; border-bottom: 1px solid #dce5d8; background: #dee2d8; }
+h2 { margin: 0; font-size: 14px; font-weight: 700; } h2 i { color: #b07517; margin-right: 7px; }
+button { border: 0; border-radius: 5px; padding: 7px 12px; background: #47784a; color: white; cursor: pointer; font-size: 12px; } header button { background: transparent; color: #8c3939; }
+.vehicle-details { margin: 10px 16px; padding: 9px; border: 1px solid #dce5d8; border-radius: 8px; background: #fafcf7; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px 14px; }
+.vehicle-details span { display: block; font-size: 11px; color: #445347; margin-bottom: 3px; } strong { font-weight: 600; overflow-wrap: anywhere; } a { color: #246849; font-weight: 600; }
+.form-fields { padding: 0 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; } label { font-weight: 600; } em { color: #b33c43; } input, select, textarea { display: block; box-sizing: border-box; width: 100%; border: 1px solid #aebdad; border-radius: 5px; padding: 7px 9px; margin-top: 6px; font: inherit; font-weight: 400; color: #253126; background: white; } .remark { grid-column: 1 / -1; } textarea { resize: vertical; } input:focus, select:focus, textarea:focus { outline: 2px solid #86a779; outline-offset: 1px; }
+.service-note { margin: 12px 16px; font-size: 11px; color: #695026; } footer { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid #dce5d8; } .cancel { background: #e7ece4; color: #253126; } button:disabled { opacity: .6; cursor: not-allowed; }
+@keyframes appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@media(max-width: 480px) { .vehicle-details, .form-fields { grid-template-columns: 1fr; } }
+@media(prefers-reduced-motion: reduce) { .action-dialog { animation: none; } }
+
+.contact-note { margin: 7px 16px; color: #394839; font-size: 10px; }
+@media (max-height: 620px) and (min-width: 650px) { header, footer { padding: 8px 14px; } .vehicle-details { gap: 5px 12px; margin: 8px 14px; padding: 7px; } .vehicle-details span { margin-bottom: 1px; } .service-note, .contact-note { margin-top: 5px; margin-bottom: 5px; } }
+@media (min-width: 650px) { .form-fields { grid-template-columns: minmax(0, 0.5fr) minmax(0, 1fr); align-items: start; } .remark { grid-column: auto; } }

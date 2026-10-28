@@ -1,0 +1,1008 @@
+<style>
+  /* main container */
+  .compact-timepicker {
+  width: 122px !important;
+  display: inline-flex !important;
+  align-items: center;
+  flex: 0 0 122px;
+}
+
+.compact-timepicker ::ng-deep input.form-control {
+width: 32px !important;
+height: 24px !important;
+padding: 0 !important;
+font-size: 12px !important;
+text-align: center;
+}
+
+
+/* remove table spacing */
+.compact-timepicker ::ng-deep table {
+margin: 0 !important;
+width: auto !important;
+}
+
+.compact-timepicker ::ng-deep td {
+padding: 0 !important;
+}
+
+/* hour and minute input */
+.compact-timepicker ::ng-deep input.form-control {
+width: 28px !important;
+height: 22px !important;
+padding: 0 !important;
+font-size: 11px !important;
+text-align: center;
+}
+
+/* Keep the meridian control inside each time picker. */
+.compact-timepicker ::ng-deep td:last-child {
+min-width: 36px !important;
+width: 36px !important;
+}
+
+/* AM PM input */
+.compact-timepicker ::ng-deep td:last-child input {
+width: 36px !important;
+font-size: 12px !important;
+font-weight: 600 !important;
+text-align: center !important;
+}
+
+/* spinner buttons compact */
+.compact-timepicker ::ng-deep button {
+padding: 0 !important;
+font-size: 8px !important;
+height: 16px !important;
+margin-left: 0 !important;
+}
+
+.compact-timepicker ::ng-deep td:last-child .btn {
+width: 36px !important;
+min-width: 36px !important;
+}
+
+::ng-deep .md-drppicker .btn {
+position: relative;
+overflow: hidden;
+border-width: 0;
+outline: none;
+padding: 0 6px;
+cursor: pointer;
+border-radius: 2px;
+box-shadow: 0 1px 4px #0009 !important;
+background-color: #1a1e30 !important;
+color: #ecf0f1 !important;
+font-size: 12px;
+transition: background-color .4s;
+height: auto;
+text-transform: uppercase;
+line-height: 18px;
+border: none !important;
+}
+
+.modern-legend {
+position: absolute;
+bottom: 0px;
+left: 19rem;
+z-index: 1000;
+background: rgba(255, 255, 255, 0.95);
+padding: 4px 6px;
+border-radius: 30px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+border: 1px solid #ced4da;
+display: flex;
+align-items: center;
+gap: 3px;
+backdrop-filter: blur(4px);
+}
+
+.legend-item {
+display: flex;
+align-items: center;
+gap: 5px;
+cursor: default;
+}
+
+.legend-item span {
+font-size: 10px;
+font-weight: 700;
+color: #333;
+white-space: nowrap;
+}
+
+.cluster-legend-group {
+display: flex;
+align-items: center;
+gap: 3px;
+border-left: 1px solid #dee2e6;
+padding-left: 5px;
+
+}
+
+.cluster-item {
+display: flex;
+align-items: center;
+gap: 4px;
+}
+
+.cluster-circle {
+width: 10px;
+height: 10px;
+border-radius: 50%;
+border: 1px solid #fff;
+box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Fix for history date picker dropdown overflow */
+.history-date-picker-wrapper {
+position: relative !important;
+}
+
+.history-date-picker-wrapper ::ng-deep .md-drppicker {
+z-index: 2147483647 !important;
+left: auto !important;
+right: 0.1% !important;
+}
+
+.history-date-picker-wrapper ::ng-deep .md-drppicker.drops-down {
+top: 100% !important;
+bottom: auto !important;
+}
+
+.history-date-picker-wrapper ::ng-deep .md-drppicker.drops-up {
+bottom: 100% !important;
+top: auto !important;
+}
+
+/* Alert date picker wrapper styles */
+.alert-date-picker-wrapper {
+position: relative !important;
+}
+
+.alert-date-picker-wrapper ::ng-deep .md-drppicker {
+position: fixed !important;
+z-index: 2147483647 !important;
+left: auto !important;
+right: auto !important;
+}
+
+.alert-date-picker-wrapper ::ng-deep .md-drppicker.drops-down {
+top: 100% !important;
+bottom: auto !important;
+}
+
+/* Calendar weekday styling - reduce gap and show all days */
+.history-date-picker-wrapper ::ng-deep .md-drppicker .md-days,
+.alert-date-picker-wrapper ::ng-deep .md-drppicker .md-days,
+.history-date-picker-wrapper ::ng-deep .md-drppicker .md-calendar thead,
+.alert-date-picker-wrapper ::ng-deep .md-drppicker .md-calendar thead {
+gap: 1px !important;
+}
+
+.history-date-picker-wrapper ::ng-deep .md-drppicker .md-days th,
+.alert-date-picker-wrapper ::ng-deep .md-drppicker .md-days th,
+.history-date-picker-wrapper ::ng-deep .md-drppicker .md-calendar thead th,
+.alert-date-picker-wrapper ::ng-deep .md-drppicker .md-calendar thead th {
+padding: 2px 0 !important;
+font-size: 11px !important;
+text-align: center !important;
+}
+
+/* Ensure all parent containers allow dropdown overflow - very comprehensive */
+.info-panel-card,
+.info-panel-card .card-body,
+.info-panel-card .card-footer,
+.info-panel-card .card,
+.info-panel-card .card .card-body,
+.info-panel-card .card .card-footer,
+.card.shadow-lg,
+.card.shadow-lg .card-body,
+.card.shadow-lg .card-footer,
+.card.shadow-lg .card,
+.card.shadow-lg .card .card-body,
+.card.shadow-lg .card .card-footer,
+.card-body,
+.card-footer,
+.card {
+overflow: visible !important;
+}
+
+/* Modern Layers Toggle Styling */
+.layers-overlay {
+position: absolute;
+z-index: 1000;
+top: 10px;
+right: 17rem;
+}
+
+.layers-btn {
+background: #fff;
+border: 1px solid #ced4da;
+border-radius: 4px;
+padding: 4px 10px;
+font-size: 11px;
+font-weight: 600;
+color: #495057;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 6px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+transition: all 0.2s;
+}
+
+.layers-btn:hover {
+background: #f8f9fa;
+border-color: #0b58b9;
+color: #0b58b9;
+}
+
+.layers-btn.active {
+background: #0b58b9;
+color: #fff;
+border-color: #0b58b9;
+}
+
+.layers-dropdown {
+position: absolute;
+top: 100%;
+left: 0;
+margin-top: 5px;
+background: #fff;
+border: 1px solid #ced4da;
+border-radius: 6px;
+width: 180px;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+overflow: hidden;
+animation: layersSlideDown 0.2s ease-out;
+}
+
+.layers-header {
+background: #f8f9fa;
+padding: 6px 10px;
+border-bottom: 1px solid #dee2e6;
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 11px;
+font-weight: 700;
+color: #343a40;
+}
+
+.layers-body {
+padding: 5px 0;
+}
+
+.layer-item {
+padding: 4px 12px;
+font-size: 10.5px;
+font-weight: 500;
+color: #495057;
+display: flex;
+align-items: center;
+gap: 8px;
+cursor: pointer;
+}
+
+@keyframes layersSlideDown {
+from {
+opacity: 0;
+transform: translateY(-10px);
+}
+
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+</style>
+<div style="position: relative; width: 100%; height: 78vh;top:2.2vh">
+  <div #mapContainer id="map" style="width: 100%; height: 100%;"></div>
+
+  <!-- Legend -->
+  <div class="modern-legend">
+    <div class="legend-item" title="Vehicle">
+      <img style="width: 20px; height: 20px;" src="assets/mapimages/car/green.png">
+      <span>Vehicle</span>
+    </div>
+    <div class="legend-item" title="POI's">
+      <img style="height: 18px; width: 18px;" src="assets/images/mapimages/markers/marker_new.png">
+      <span>POI</span>
+    </div>
+    <div class="legend-item" title="Route">
+      <i class="fa fa-minus" style="font-size: 14px; color: #BF93E4; transform: rotate(-45deg);"></i>
+      <span>Route</span>
+    </div>
+    <div class="legend-item" title="History Route">
+      <i class="fa fa-minus" style="font-size: 14px; color: orange; transform: rotate(-45deg);"></i>
+      <span>History</span>
+    </div>
+    <div class="legend-item" title="Direction">
+      <img style="width: 20px; height: 20px;" src="assets/mapimages/newarrow.png">
+      <span>Direction</span>
+    </div>
+
+    <!-- Cluster Legend Section -->
+    <div class="cluster-legend-group">
+      <span
+        style="font-size: 8.5px; font-weight: bold; color: #004ea3; margin-bottom: 2px; text-align: center;">Clusters
+      (Vehicle Count)</span>
+      <div class="cluster-item" title="Small Radius: Less than 100 vehicles">
+        <div class="cluster-circle" style="background-color: #51bbd6;"></div>
+        <span class="cluster-label" style="font-size: 9px;">&lt; 100</span>
+      </div>
+      <div class="cluster-item" title="Medium Radius: 100 to 750 vehicles">
+        <div class="cluster-circle" style="background-color: #f1f075;"></div>
+        <span class="cluster-label" style="font-size: 9px;">100-750</span>
+      </div>
+      <div class="cluster-item" title="Large Radius: More than 750 vehicles">
+        <div class="cluster-circle" style="background-color: #f28cb1;"></div>
+        <span class="cluster-label" style="font-size: 9px;">&gt; 750</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layers Toggle -->
+  <div class="layers-overlay d-flex align-items-center">
+    <!-- View Toggle -->
+    <div class="toggle-container modern-toggle d-flex pr-2 me-2" style="border-right: 1px solid #dee2e6;">
+      <button class="toggle-option" [class.active]="viewType === 'NEW-activated'"
+        (click)="viewType = 'NEW-activated'; clusterDataFun()">
+        NEW
+      </button>
+      <button class="toggle-option" [class.active]="viewType === 'OLD-activated'"
+        (click)="viewType = 'OLD-activated'; clusterDataFun()">
+        OLD
+      </button>
+    </div>
+
+    <button class="layers-btn" (click)="toggleLayers()" [class.active]="isLayersVisible">
+      <i class="fa fa-layer-group"></i> <span>Layers</span>
+    </button>
+    @if (isLayersVisible) {
+      <div class="layers-dropdown">
+        <div class="layers-header">
+          <i class="fa fa-eye"></i>
+          <span>Map Layers</span>
+          <a href="javascript:void(0)" class="ml-auto text-muted" (click)="toggleLayers()">&times;</a>
+        </div>
+        <div class="layers-body">
+          <app-map-layer-options [active]="currentStyle" (selected)="changeMapStyle($event)"></app-map-layer-options>
+          <label class="layer-item" for="Police_Stations">
+            <input type="checkbox" id="Police_Stations" [(ngModel)]="showPoliceStations"
+              (change)="togglePoliceStations()"> Police Stations
+            </label>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- All Vehicles Button -->
+    <div style="position: absolute; z-index: 1000; top: 10px; right: 50px;">
+      <button class="btn btn-sm btn-success" (click)="loadDefaultVehicleClusters()">All</button>
+    </div>
+
+    <!-- Open Sidepanel Button -->
+    <button class="openbtn btn btn-dark btn-sm" (click)="openNav()"
+      style="position: absolute; top: 0.2rem; left: 0; z-index: 1000; font-size: 11px;">&nbsp;&nbsp;<i
+    class="fa fa-road"></i>&nbsp;&nbsp;&nbsp;Tracking Options</button>
+
+    <!-- Side Panel -->
+    <div id="mySidepanel" class="sidepanel" [style.width]="isSidePanelOpen ? '350px' : '0'"
+        style="height: calc(100% - 0.5rem); width: 0;
+  position: absolute; z-index: 2000; top: 2.2rem; left: 0; background-color: rgb(208 218 214); overflow-x: hidden; transition: 0.5s; box-shadow: 1px 1px 14px 1px black;">
+    <div
+            style="padding: 0px 7px; background: #afc3ad;; display: flex; 
+            justify-content: space-between; align-items: center; font-size: 11px; ">
+      <span class="fw-bold"><i class="fa fa-road"></i>&nbsp;Tracking Options</span>
+      <a href="javascript:void(0)" class="closebtn" (click)="closeNav()"
+      style="font-size: 24px; text-decoration: none; color: #000;">&times;</a>
+    </div>
+
+    <div class="p-1" style=" font-size: 11px;">
+      <div class="d-flex justify-content-between">
+                <ng-select [items]="[
+            {id: 'vehicle', name: 'Vehicle Tracking'},
+            {id: 'group', name: 'Group Tracking'},
+            {id: 'district', name: 'District Filter'},
+            {id: 'alert', name: 'Alert Filter'},
+            {id: 'poi', name: 'POI Details'},
+            {id: 'route', name: 'Route Details'},
+            {id: 'geofence', name: 'Geofence Tracking'},
+        ]" bindLabel="name" bindValue="id" [(ngModel)]="trackingOption" (change)="onTrackingOptionChange($event)"
+          [clearable]="false" style="width: 190px;">
+        </ng-select>
+
+        <div class="toggle-container modern-toggle">
+          <button class="toggle-option" [class.active]="tblviewType === 'NEW'"
+            (click)="tblviewType = 'NEW'; getAllVehicles()">
+            NEW
+          </button>
+          <button class="toggle-option" [class.active]="tblviewType === 'OLD'"
+            (click)="tblviewType = 'OLD'; getAllVehicles()">
+            OLD
+          </button>
+        </div>
+      </div>
+
+      <!-- Vehicle Tracking -->
+      @if (trackingOption === 'vehicle') {
+        <div class="mt-1">
+          <div class="d-flex align-items-center mb-2">
+            <input type="text" class="form-control form-control-sm flex-grow-1" [(ngModel)]="searchVehicleText"
+              placeholder="Search..">
+            <button class="btn btn-sm btn-success ms-1 px-2" (click)="pageNo=1; getAllVehicles()"><i
+            class="fa fa-search"></i></button>
+            <button class="btn btn-sm btn-success ms-1 px-2" (click)="refreshVehicle()"><i
+            class="fa fa-refresh"></i></button>
+            <div class="ml-auto d-flex align-items-center">
+              <button class="btn btn-sm btn-light px-1" [disabled]="pageNo===1" (click)="prevPage()"><i
+              class="fa fa-chevron-left"></i></button>
+              <span class="mx-1" style="font-size: 10px; white-space: nowrap;">{{firstRowCount}} -
+              {{lastRowCount}} / {{totalCount}}</span>
+              <button class="btn btn-sm btn-light px-1" [disabled]="pageNo===lastPageNo || totalCount===0"
+                (click)="nextPage()"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+            <div class="table-responsive" style="max-height: 60vh;">
+              <table class="table table-sm table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Vehicle No</th>
+                    <th>Timestamp</th>
+                    <th>Speed</th>
+                    <th>Live</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (vehiclesData.length === 0) {
+                    <tr>
+                      <td colspan="4" class="text-center text-danger">No data found</td>
+                    </tr>
+                  }
+                  @for (item of vehiclesData; track item) {
+                    <tr>
+                      <td style=" padding: 1px 0px 4px 5px;">{{item.param3}}</td>
+                      <td style="font-size: 9px; padding: 1px 0px 4px 5px;">
+                        {{item.param24}}<br>{{item.param25}}</td>
+                        <td style=" padding: 1px 0px 4px 5px;"
+                          [ngClass]="{'text-success': item.param7 === 'ON', 'text-danger': item.param7 !== 'ON'}">
+                        {{item.param6}} - {{item.param7}} </td>
+                        <td style=" padding: 1px 0px 4px 5px;">
+                          <!-- Coordinate and Status validation check -->
+                          @if (item.param21 && item.param22 && item.param21 != '0' && item.param22 != '0' && item.param21 != '0.0' && item.param22 != '0.0' && (item.param8 == 'Valid' || item.param8 == 'Invalid')) {
+                            @if (item.param8=='Valid') {
+                              <a href="javascript:void(0)"
+                              (click)="showLiveTrack(item)" class="text-success fw-bold">Live</a>
+                            }
+                            @if (item.param8=='Invalid') {
+                              <a href="javascript:void(0)"
+                                (click)="showLiveTrack(item)" class="text-danger fw-bold"
+                              title="Invalid GPS">Live</a>
+                            }
+                          } @else {
+                            <span class="text-muted fw-bold"
+                              style="cursor: not-allowed; opacity: 0.5;"
+                            title="Live tracking disabled: No valid coordinates or status found">Live</span>
+                          }
+                          <!-- Disabled state if coordinates are null, zero or blank -->
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+
+          <!-- Group Tracking -->
+          @if (trackingOption === 'group') {
+            <div class="mt-1">
+              <div class="d-flex mb-2">
+                <ng-select [items]="groupList" bindLabel="param3" bindValue="param2" [(ngModel)]="selectedGroupId"
+                placeholder="Select Group" class="flex-grow-1"></ng-select>
+                <button class="btn btn-sm btn-success btn-sm ms-2" (click)="getGroupVehicles()">View</button>
+              </div>
+              <!-- Table similar to vehicle -->
+              <div class="table-responsive" style="max-height: 60vh;">
+                <table class="table table-sm table-striped">
+                  <thead>
+                    <tr>
+                      <th>Vehicle No</th>
+                      <th>Timestamp</th>
+                      <th>Speed</th>
+                      <th>Live</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @if (vehiclesGroupData.length === 0) {
+                      <tr>
+                        <td colspan="4" class="text-center text-danger">No data found</td>
+                      </tr>
+                    }
+                    @for (item of vehiclesGroupData; track item) {
+                      <tr>
+                        <td style=" padding: 1px 0px 4px 5px;">{{item.param3}}</td>
+                        <td style="font-size: 9px; padding: 1px 0px 4px 5px;">
+                          {{item.param24}}<br>{{item.param25}}</td>
+                          <td style=" padding: 1px 0px 4px 5px;"
+                            [ngClass]="{'text-success': item.param7 === 'ON', 'text-danger': item.param7 !== 'ON'}">
+                          {{item.param6}} - {{item.param7}}</td>
+                          <td style=" padding: 1px 0px 4px 5px;">@if (item.param8=='Valid') {
+                            <a
+                            href="javascript:void(0)" (click)="showLiveTrack(item)">Live</a>
+                          }</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+            <!-- District Filter -->
+            @if (trackingOption === 'district') {
+              <div class="mt-1">
+                <div class="mb-4">
+                  <ng-select [items]="DistrictList" bindLabel="param2" bindValue="param1" [(ngModel)]="selectedDistrictId"
+                  placeholder="Select District" (change)="onDistrictChange($event)"></ng-select>
+                </div>
+                <!-- <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Select</th>
+                    <th>Type</th>
+                    <th>Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style=" padding: 1px 0px 4px 5px;"><input type="checkbox" id="insidestate"
+                    (change)="stateFilterData('insidestate')" [disabled]="stateCount==0"></td>
+                    <td>State Vehicles</td>
+                    <td>{{stateCount}}</td>
+                  </tr>
+                  <tr>
+                    <td style=" padding: 1px 0px 4px 5px;"><input type="checkbox" id="outsidestate"
+                    (change)="stateFilterData('outsidestate')" [disabled]="outstateCount==0"></td>
+                    <td style=" padding: 1px 0px 4px 5px;">Outside State Vehicles</td>
+                    <td style=" padding: 1px 0px 4px 5px;">{{outstateCount}}</td>
+                  </tr>
+                </tbody>
+              </table> -->
+            </div>
+          }
+
+          <!-- Alert Filter -->
+          @if (trackingOption === 'alert') {
+            <div class="mt-1">
+              <ng-select [items]="alertTypeList" bindLabel="param2" bindValue="param1" [(ngModel)]="selectedAlertId"
+              placeholder="Select Alert"></ng-select>
+              <div class="d-flex mt-2">
+                <div class="alert-date-picker-wrapper flex-grow-1">
+                  <input type="text" ngxDaterangepickerMd [(ngModel)]="alertDate" [singleDatePicker]="true"
+                    [drops]="'down'" [opens]="'right'" [locale]="{format: 'DD-MMM-YYYY'}"
+                    class="form-control form-control-sm">
+                </div>
+                <button class="btn btn-sm btn-success btn-sm ms-2" [disabled]="isAlertLoading"
+                  (click)="getEmergencyAlert()">
+                  @if (isAlertLoading) {
+                    <i class="fa fa-spinner fa-spin"></i>
+                  }
+                  @if (!isAlertLoading) {
+                    <span>View</span>
+                  }
+                </button>
+              </div>
+              <!-- Search and Pagination -->
+              <div class="d-flex mt-2 mb-2">
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="searchAlertText"
+                  placeholder="Search.." style=" width: 150px;">
+                <button class="btn btn-sm btn-success ms-1" [disabled]="isAlertLoading"
+                  (click)="pageNo=1; getEmergencyAlert()">
+                  <i class="fa" [ngClass]="isAlertLoading ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+                </button>
+                <div class="ml-auto">
+                  <button class="btn btn-sm btn-success" [disabled]="isAlertLoading || pageNo===1"
+                    (click)="prevPage()">
+                    <i class="fa" [ngClass]="isAlertLoading ? 'fa-spinner fa-spin' : 'fa-chevron-left'"></i>
+                  </button>
+                  <span style="font-size: 10px;">{{firstRowCount}} - {{lastRowCount}} / {{totalCount}}</span>
+                  <button class="btn btn-sm btn-success"
+                    [disabled]="isAlertLoading || pageNo===lastPageNo || totalCount===0" (click)="nextPage()">
+                    <i class="fa" [ngClass]="isAlertLoading ? 'fa-spinner fa-spin' : 'fa-chevron-right'"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                  <thead>
+                    <tr>
+                      <th>Vehicle No</th>
+                      <th>Alert</th>
+                      <th>Time</th>
+                      <th>Track</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @if (alertSearchTriggered && isAlertLoading) {
+                      <tr>
+                        <td colspan="4" class="text-center text-success">
+                          <i class="fa fa-spinner fa-spin"></i> Loading...
+                        </td>
+                      </tr>
+                    }
+                    @if (alertSearchTriggered && !isAlertLoading && alertData.length === 0) {
+                      <tr>
+                        <td colspan="4" class="text-center text-danger">No data found</td>
+                      </tr>
+                    }
+                    @for (item of alertData; track item) {
+                      <tr>
+                        <td style=" padding: 1px 0px 4px 5px;">{{item.param9}}</td>
+                        <td style=" padding: 1px 0px 4px 5px;">{{item.param8}}</td>
+                        <td style=" padding: 1px 0px 4px 5px;">{{item.param3}}</td>
+                        <td><a href="javascript:void(0)" (click)="trackAlert(item)">
+                          <i class="fa fa-map-marker"
+                          style=" text-align: center !important; font-size: 17px;"></i></a></td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+
+            <!-- POI Details -->
+            @if (trackingOption === 'poi') {
+              <div class="mt-1">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>POI Details</span>
+                </div>
+                <div class="mb-4">
+                  <ng-select [items]="poiDetails" bindLabel="param3" bindValue="param1" [(ngModel)]="selectedPoiId"
+                  placeholder="Select POI" (change)="onPoiChange($event)"></ng-select>
+                </div>
+              </div>
+            }
+
+            <!-- Route Details -->
+            @if (trackingOption === 'route') {
+              <div class="mt-1">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Route Details</span>
+                </div>
+                <div class="mb-2">
+                  <ng-select [items]="routeDetails" bindLabel="param3" bindValue="param2"
+                  [(ngModel)]="selectedRouteId" placeholder="Select Route" (change)="onRouteChange($event)"></ng-select>
+                </div>
+                <div class="route-vehicle-filter mb-2">
+                  <button type="button" class="route-filter-btn"
+                    [class.active]="routeVehicleFilter === 'onroute'"
+                    [disabled]="!selectedRouteId"
+                    (click)="setRouteVehicleFilter('onroute')">
+                    On-route
+                  </button>
+                  <button type="button" class="route-filter-btn"
+                    [class.active]="routeVehicleFilter === 'offroute'"
+                    [disabled]="!selectedRouteId"
+                    (click)="setRouteVehicleFilter('offroute')">
+                    Off-route
+                  </button>
+                </div>
+                @if (selectedRouteId) {
+                  <div class="d-flex justify-content-end align-items-center mb-1">
+                    <button class="btn btn-sm btn-light px-1" [disabled]="pageNo === 1" (click)="prevPage()">
+                      <i class="fa fa-chevron-left"></i>
+                    </button>
+                    <span class="mx-1" style="font-size:10px;white-space:nowrap;">
+                      {{firstRowCount}} - {{lastRowCount}} / {{totalCount}}
+                    </span>
+                    <button class="btn btn-sm btn-light px-1"
+                      [disabled]="pageNo === lastPageNo || totalCount === 0" (click)="nextPage()">
+                      <i class="fa fa-chevron-right"></i>
+                    </button>
+                  </div>
+                }
+                @if (selectedRouteId) {
+                  <div class="table-responsive" style="max-height: 52vh;">
+                    <table class="table table-sm table-striped table-hover">
+                      <thead>
+                        <tr>
+                          <th>Vehicle No</th>
+                          <th>Timestamp</th>
+                          <th>Speed</th>
+                          <th>Live</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @if (vehiclesData.length === 0) {
+                          <tr>
+                            <td colspan="4" class="text-center text-danger">No data found</td>
+                          </tr>
+                        }
+                        @for (item of vehiclesData; track item) {
+                          <tr>
+                            <td style="padding:1px 0 4px 5px;">{{item.param3}}</td>
+                            <td style="font-size:9px;padding:1px 0 4px 5px;">
+                              {{item.param24}}<br>{{item.param25}}
+                            </td>
+                            <td style="padding:1px 0 4px 5px;"
+                              [ngClass]="{'text-success': item.param7 === 'ON', 'text-danger': item.param7 !== 'ON'}">
+                              {{item.param6}} - {{item.param7}}
+                            </td>
+                            <td style="padding:1px 0 4px 5px;">
+                              @if (item.param21 && item.param22 && item.param21 != '0' && item.param22 != '0' && item.param21 != '0.0' && item.param22 != '0.0' && (item.param8 === 'Valid' || item.param8 === 'Invalid')) {
+                                <a href="javascript:void(0)" (click)="showLiveTrack(item)"
+                                  [ngClass]="item.param8 === 'Valid' ? 'text-success' : 'text-danger'"
+                                class="fw-bold">Live</a>
+                              } @else {
+                                <span class="text-muted fw-bold" style="cursor:not-allowed;opacity:.5;">Live</span>
+                              }
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Geofence Details -->
+            @if (trackingOption === 'geofence') {
+              <div class="mt-1">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Geofence Details</span>
+                </div>
+                <div class="geofence-option-group mb-3">
+                  <button type="button" class="geofence-option-btn" [class.active]="geofenceOption === 'poi'"
+                    (click)="selectGeofenceOption('poi')">
+                    <i class="fa fa-map-marker"></i>
+                    <span>POI</span>
+                  </button>
+                  <button type="button" class="geofence-option-btn" [class.active]="geofenceOption === 'geofence'"
+                    (click)="selectGeofenceOption('geofence')">
+                    <i class="fa fa-object-group"></i>
+                    <span>Polygon</span>
+                  </button>
+                  <button type="button" class="geofence-option-btn" [class.active]="geofenceOption === 'route'"
+                    (click)="selectGeofenceOption('route')">
+                    <i class="fa fa-road"></i>
+                    <span>Route</span>
+                  </button>
+                </div>
+                @if (geofenceOption === 'poi') {
+                  <div class="mb-4">
+                    <ng-select [items]="geoPoiDetails" bindLabel="param3" bindValue="param2"
+                      [(ngModel)]="selectedGeofencePoiId" placeholder="Select POI"
+                    (change)="onGeofencePoiChange($event)"></ng-select>
+                    <div id="toggle" class="geofence-cluster-toggle mt-2">
+                      <button type="button" class="geofence-toggle-btn"
+                        [class.active]="geofenceClusterMode === 'inside'"
+                        (click)="setGeofenceClusterMode('inside')">
+                        Inside
+                      </button>
+                      <button type="button" class="geofence-toggle-btn"
+                        [class.active]="geofenceClusterMode === 'outside'"
+                        (click)="setGeofenceClusterMode('outside')">
+                        Outside
+                      </button>
+                    </div>
+                  </div>
+                }
+                @if (geofenceOption === 'geofence') {
+                  <div class="mb-4">
+                    <ng-select [items]="polygonDetails" bindLabel="param2" bindValue="param1"
+                    [(ngModel)]="selectedPolygonId" placeholder="Select Geofence" (change)="onPolygonChange()"></ng-select>
+                    <div id="toggle" class="geofence-cluster-toggle mt-2">
+                      <button type="button" class="geofence-toggle-btn"
+                        [class.active]="geofenceClusterMode === 'inside'"
+                        (click)="setGeofenceClusterMode('inside')">
+                        Inside
+                      </button>
+                      <button type="button" class="geofence-toggle-btn"
+                        [class.active]="geofenceClusterMode === 'outside'"
+                        (click)="setGeofenceClusterMode('outside')">
+                        Outside
+                      </button>
+                    </div>
+                  </div>
+                }
+                @if (geofenceOption === 'route') {
+                  <div class="mb-4">
+                    <ng-select [items]="geoRouteDetails" bindLabel="param3" bindValue="param2"
+                      [(ngModel)]="selectedGeofenceRouteId" placeholder="Select Route"
+                    (change)="onGeofenceRouteChange()"></ng-select>
+                    <div id="toggle" class="geofence-cluster-toggle mt-2">
+                      <button type="button" class="geofence-toggle-btn"
+                        [class.active]="geofenceClusterMode === 'inside'"
+                        (click)="setGeofenceClusterMode('inside')">
+                        Inside
+                      </button>
+                      <button type="button" class="geofence-toggle-btn"
+                        [class.active]="geofenceClusterMode === 'outside'"
+                        (click)="setGeofenceClusterMode('outside')">
+                        Outside
+                      </button>
+                    </div>
+                  </div>
+                }
+                @if (selectedGeofenceClusterId) {
+                  <div class="d-flex justify-content-end align-items-center mb-1">
+                    <button class="btn btn-sm btn-light px-1" [disabled]="pageNo === 1"
+                      (click)="prevPage()">
+                      <i class="fa fa-chevron-left"></i>
+                    </button>
+                    <span class="mx-1" style="font-size:10px;white-space:nowrap;">
+                      {{firstRowCount}} - {{lastRowCount}} / {{totalCount}}
+                    </span>
+                    <button class="btn btn-sm btn-light px-1"
+                      [disabled]="pageNo === lastPageNo || totalCount === 0"
+                      (click)="nextPage()">
+                      <i class="fa fa-chevron-right"></i>
+                    </button>
+                  </div>
+                  <div class="table-responsive" style="max-height: 36vh;">
+                    <table class="table table-sm table-striped table-hover">
+                      <thead>
+                        <tr>
+                          <th>Vehicle No</th>
+                          <th>Timestamp</th>
+                          <th>Speed</th>
+                          <th>Live</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @if (vehiclesData.length === 0) {
+                          <tr>
+                            <td colspan="4" class="text-center text-danger">No data found</td>
+                          </tr>
+                        }
+                        @for (item of vehiclesData; track item) {
+                          <tr>
+                            <td style="padding:1px 0 4px 5px;">{{item.param3}}</td>
+                            <td style="font-size:9px;padding:1px 0 4px 5px;">
+                              {{item.param24}}<br>{{item.param25}}
+                            </td>
+                            <td style="padding:1px 0 4px 5px;"
+                              [ngClass]="{'text-success': item.param7 === 'ON', 'text-danger': item.param7 !== 'ON'}">
+                              {{item.param6}} - {{item.param7}}
+                            </td>
+                            <td style="padding:1px 0 4px 5px;">
+                              @if (item.param21 && item.param22 && item.param21 != '0' && item.param22 != '0' && item.param21 != '0.0' && item.param22 != '0.0' && (item.param8 === 'Valid' || item.param8 === 'Invalid')) {
+                                <a href="javascript:void(0)" (click)="showLiveTrack(item)"
+                                  [ngClass]="item.param8 === 'Valid' ? 'text-success' : 'text-danger'"
+                                class="fw-bold">Live</a>
+                              } @else {
+                                <span class="text-muted fw-bold"
+                                style="cursor:not-allowed;opacity:.5;">Live</span>
+                              }
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Modern GPS Legend Box -->
+            <div class="p-1 rounded shadow-sm border"
+              style="background: #f8f9fa; border-left: 4px solid #17a2b8 !important; font-size: 10px; margin-bottom: 10px;">
+              <div class="d-flex justify-content-around">
+                <span class="d-flex align-items-center">
+                  <span class="badge badge-success me-1"
+                  style="width: 8px; height: 8px; border-radius: 50%; padding: 0; display: inline-block;">&nbsp;</span>
+                  Valid: <span class="text-success fw-bold ms-1">Live</span>
+                </span>
+                <span class="d-flex align-items-center">
+                  <span class="badge badge-danger me-1"
+                  style="width: 8px; height: 8px; border-radius: 50%; padding: 0; display: inline-block;">&nbsp;</span>
+                  Invalid: <span class="text-danger fw-bold ms-1">Live</span>
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Info Panel (Popup Replacement) -->
+        @if (poiData && (poiData.type === 'live' || poiData.type === 'history' || poiData.type === 'cluster' || poiData.type === 'poi' || poiData.type === 'alert')) {
+          <div
+            class="card shadow-lg info-panel-card">
+            <div class="info-panel-card__header" (click)="isPanelCollapsed = !isPanelCollapsed">
+              <div class="info-panel-card__heading">
+                <span class="info-panel-card__icon">
+                  <i class="fa" [ngClass]="poiData.type === 'poi' ? 'fa-map-marker' : 'fa-car'"></i>
+                </span>
+                <div>
+                  <strong>{{ poiData.vehicleno || poiData.poiname || 'Vehicle Details' }}</strong>
+                  <small>{{ poiData.type === 'poi' ? 'Point Overview' : 'Live Vehicle Snapshot' }}</small>
+                </div>
+              </div>
+              <span class="info-panel-card__toggle">
+                <i class="fa" [ngClass]="isPanelCollapsed ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+              </span>
+            </div>
+            <div class="info-panel-card__body" [hidden]="isPanelCollapsed">
+              <div class="info-panel-card__chips">
+                <span class="info-chip" [ngClass]="poiData.ignition === 'On' ? 'is-green' : 'is-red'">
+                  <i class="fa fa-bolt"></i> {{ poiData.ignition || 'N/A' }}
+                </span>
+                <span class="info-chip is-blue">
+                  <i class="fa fa-tachometer"></i> {{ poiData.speed ?? 0 }} km/hr
+                </span>
+                <span class="info-chip" [ngClass]="poiData.gpsStatus === 'Active' ? 'is-green' : 'is-red'">
+                  <i class="fa fa-signal"></i> {{ poiData.gpsStatus || 'Inactive' }}
+                </span>
+              </div>
+              <div class="info-panel-card__meta">
+                @if (poiData.pollingdate) {
+                  <div class="mini-info-row">
+                    <span><i class="fa fa-clock-o"></i> Polling</span>
+                    <b>{{ poiData.pollingdate }}</b>
+                  </div>
+                }
+                <div class="mini-info-row">
+                  <span><i class="fa fa-user"></i> Customer</span>
+                  <b>{{ poiData.customerName || 'N/A' }}</b>
+                </div>
+                @if (poiData.latitude) {
+                  <div class="mini-info-row">
+                    <span><i class="fa fa-map-pin"></i> Location</span>
+                    <b>{{poiData.latitude | number:'1.4-4'}}, {{poiData.longitude | number:'1.4-4'}}</b>
+                  </div>
+                }
+              </div>
+              <div class="info-panel-card__device">
+                <div class="device-pill"><i class="fa fa-microchip"></i> {{poiData.serialNo || 'N/A'}}</div>
+                <div class="device-pill"><i class="fa fa-mobile"></i> {{poiData.imeiNo || 'N/A'}}</div>
+                <div class="device-pill"><i class="fa fa-building"></i> {{poiData.vendor || 'N/A'}}</div>
+              </div>
+              <div class="history-mini-card">
+                <div class="history-mini-card__head">
+                  <i class="fa fa-history"></i>
+                  <span>History Track</span>
+                </div>
+                <div class="history-date-picker-wrapper">
+                  <input type="text" ngxDaterangepickerMd [singleDatePicker]="true"
+                    [drops]="'down'" [opens]="'right'" [locale]="{format: 'DD-MMM-YYYY'}"
+                    class="form-control form-control-sm history-card__date" id="historydate"
+                    placeholder="Select Date" [(ngModel)]="poiData.historyDate">
+                </div>
+                <div class="history-mini-card__time-row">
+                  <div class="compact-timepicker">
+                    <timepicker [(ngModel)]="poiData.fromTime" [showMeridian]="true"
+                    [showSpinners]="true" [hourStep]="1" [minuteStep]="1"></timepicker>
+                  </div>
+                  <div class="compact-timepicker">
+                    <timepicker [(ngModel)]="poiData.toTime" [showMeridian]="true"
+                    [showSpinners]="true"></timepicker>
+                  </div>
+                </div>
+                <button class="history-mini-card__action" (click)="showHistoryTrack(poiData.vehicleno)">
+                  <i class="fa fa-location-arrow"></i>
+                  <span>Show Track</span>
+                </button>
+                <div class="history-mini-card__controls">
+                  <button class="mini-control mini-control--stop" (click)="stopHistory()" title="Stop">
+                    <i class="fa fa-stop"></i>
+                  </button>
+                  <button class="mini-control mini-control--play"
+                    [ngClass]="isHistoryPlaying ? 'is-paused' : ''"
+                    (click)="isHistoryPlaying ? pauseHistory() : playHistory()"
+                    title="{{isHistoryPlaying ? 'Pause' : 'Play'}}">
+                    <i class="fa" [ngClass]="isHistoryPlaying ? 'fa-pause' : 'fa-play'"></i>
+                  </button>
+                  <button class="mini-control mini-control--restart" (click)="restartHistory()" title="Restart">
+                    <i class="fa fa-refresh"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div id="coordinates" class="coordinates" style="display:none;"></div>
+          </div>
+        }

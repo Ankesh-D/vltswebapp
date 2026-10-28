@@ -1,0 +1,191 @@
+<div class="content-box">
+  <div class="element-wrapper">
+    <div class="element-box">
+      <!-- PAGE TITLE -->
+      <div class="col-md-12 pagetitleborder"
+        style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="pagetitlestyle"><span>{{pageTitle}}</span></div>
+        <div class="modern-nav-group">
+          <a class="nav-pill-item pointer" [ngClass]="{'active': tabTitle=='newVehicle'}"
+            (click)="tabTitle='newVehicle'; pageTitle='Vendor Status Details For New Vehicles'; getDetails(1);" style=" z-index: 99 !important; cursor: pointer;">
+            <i class="fa fa-car"></i><span>New Installation</span>
+          </a>
+          <a class="nav-pill-item pointer" [ngClass]="{'active': tabTitle=='renewalVehicle'}"
+            (click)="tabTitle='renewalVehicle'; pageTitle='Vendor Status Details For Renewal Vehicles'; getDetails(1);" style=" z-index: 99 !important; cursor: pointer;">
+            <i class="fa fa-refresh"></i><span>Renewal Vehicle</span>
+          </a>
+
+        </div>
+      </div>
+      <!-- <div class="pagetitlestyle">
+      <span>Vendor Status Details For New Vehicles</span>
+    </div> -->
+
+    <!-- MAIN LAYOUT -->
+    <div class="overspeed-layout">
+      <!-- LEFT FILTER PANEL -->
+
+      <!-- *ngIf="showSummary" -->
+      <!-- RIGHT REPORT PANEL -->
+      <div class="right-report-panel">
+        <!-- 🔹 TOP CONTROLS BAR -->
+        <div class="top-controls-row">
+          <!-- LEFT SIDE -->
+          <div class="left-controls">
+            <!-- 🔍 SEARCH BOX -->
+            <div class="search-box">
+              <input
+                type="search"
+                class="search-input inner"
+                placeholder="Search Here..."
+                maxlength="50"
+                [(ngModel)]="searchText"
+                (keyup.enter)="getSearchDetails()"
+                />
+
+              <button class="search-inner-btn" (click)="getSearchDetails()">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+
+            <!-- 🔄 RELOAD BUTTON -->
+            <button
+              class="reload-btn"
+              (click)="reloadData()"
+              [disabled]="loading"
+              >
+              <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
+              <span>{{ loading ? "Reloading..." : "Reload" }}</span>
+            </button>
+          </div>
+          <!-- CENTER SECTION -->
+          <div class="d-flex justify-content-">
+            <div style="width: 200px; margin-right: 10px;">
+              <ng-select class="searchable full-control" id="rtoname"
+                [(ngModel)]="selectedRTO"
+                (change)="onRTOChange()"
+                #rtoSelectCtrl="ngModel"
+                name="rtoname"
+                [clearable]="false"
+                placeholder="Select RTO"
+                required>
+                @for (rto of rtoList; track rto) {
+                  <ng-option [value]="rto">{{rto.param2}}</ng-option>
+                }
+              </ng-select>
+            </div>
+            <div style="width: 200px; margin-right: 10px;">
+              <input
+                class="form-control form-control-sm"
+                type="text"
+                name="date"
+                id="datepicker"
+                required
+                placeholder="Select Date"
+              /></div>
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="right-controls">
+              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                [showPageSize]="false" [showTotal]="false" (excelExport)="exportDoc()">
+              </app-common-data-toolbar>
+              <!-- <div class="total-records-text">Show Rows :</div> -->
+              <!-- ROWS SELECT -->
+              <!-- <select
+              class="rows-select"
+              [(ngModel)]="pageSize"
+              (change)="onPageSizeChange(pageSize)"
+              >
+            <option
+              *ngFor="let size of pageSizeOptions"
+              [value]="size === totalCount ? 'All' : size"
+              >
+              {{ size === totalCount ? "All" : size }}
+            </option>
+          </select> -->
+
+          <!-- TOTAL RECORD TEXT {{ pageCount }} of -->
+          <div class="total-records-text">
+            Total Records :  {{ totalCount }}
+          </div>
+        </div>
+      </div>
+      <!-- TABLE -->
+      <ng-template #vendorStatusHeader>
+        <tr>
+          <th rowspan="2">#</th>
+          <th>Vendor Name</th>
+          <th class="text-end">{{ tabTitle === 'newVehicle' ? 'Installed' : 'Renewal Installed' }}</th>
+          <th class="text-end">{{ tabTitle === 'newVehicle' ? 'Activated(from installation)' : 'Renewed(from Renewal Installed)' }}</th>
+          <th class="text-end">{{ tabTitle === 'newVehicle' ? 'Total Activation' : 'Total Renewed' }}</th>
+          <th class="text-end">Received/ Active (Sending Data)</th>
+          <th class="text-end">Not Received (Time period)</th>
+        </tr>
+        <tr>
+          <th>Total</th>
+          <th class="text-end">{{ totalinstalled }}</th>
+          <th class="text-end">{{ totalActivated }}</th>
+          <th class="text-end">{{ tatalallactivated }}</th>
+          <th class="text-end">{{ totalReceived }}</th>
+          <th class="text-end">{{ totalNot_Received }}</th>
+        </tr>
+      </ng-template>
+      <app-common-table [columns]="tableColumns" [rows]="reportData" [loading]="loading"
+        [headerRowsTemplate]="vendorStatusHeader" tableClass="table-grid table-striped"
+        wrapperClass="table-wrapper" emptyMessage="NO DATA FOUND">
+      </app-common-table>
+      <!-- <div
+      class="custom-pagination"
+      style="display: flex; justify-content: end"
+      *ngIf="totalCount > pageSize || page > 1"
+      >
+      <button
+        class="pg-btn"
+        (click)="changePage(page - 1)"
+        [disabled]="page === 1"
+        >
+        Prev
+      </button>
+
+      <span *ngIf="page > 3" class="pg-dots">...</span>
+
+      <button
+        *ngIf="page > 2"
+        class="pg-num"
+        (click)="changePage(page - 1)"
+        >
+        {{ page - 1 }}
+      </button>
+
+      <button class="pg-num active">
+        {{ page }}
+      </button>
+
+      <button
+        *ngIf="page < totalPages - 1"
+        class="pg-num"
+        (click)="changePage(page + 1)"
+        >
+        {{ page + 1 }}
+      </button>
+
+      <span *ngIf="page < totalPages - 2" class="pg-dots">...</span>
+
+      <button class="pg-num" (click)="changePage(totalPages)">
+        {{ totalPages }}
+      </button>
+
+      <button
+        class="pg-btn"
+        (click)="changePage(page + 1)"
+        [disabled]="page === totalPages"
+        >
+        Next
+      </button>
+    </div> -->
+  </div>
+</div>
+</div>
+</div>
+</div>

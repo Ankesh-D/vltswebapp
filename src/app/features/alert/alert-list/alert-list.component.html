@@ -1,0 +1,75 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <!-- Home Button -->
+      <button style="background: #2bdc16;border-color: #2bdc16;" class="btn btn-primary returnbtn">
+        <i class="fa fa-angle-double-left" style="width: 20px;"></i>
+        <a style="float: right;" (click)="goHome()" style="cursor: pointer;">Home</a>
+      </button>
+
+      <div class="element-box">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle">
+            <span>Current Day Alerts</span>
+          </div>
+        </div>
+
+        <!-- Error Message Display -->
+        @if (errorMessage) {
+          <div class="alert alert-warning" style="margin: 10px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
+            <strong>Warning:</strong> {{errorMessage}}
+            <button type="button" class="close" (click)="errorMessage = ''" style="float: right; background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+          </div>
+        }
+
+        <app-common-data-toolbar
+          variant="device"
+          searchPlaceholder="Type here and press button...."
+          searchLabel="Search :"
+          [searchText]="searchText"
+          (searchTextChange)="searchText = $event"
+          (search)="getSearchDetails()"
+          (reload)="reloadData()"
+          [loading]="loading"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [displayedCount]="pageCount"
+          [totalRecords]="totalCount"
+          (pageSizeChange)="onPageSizeChange($event)"
+          pageSizeLabel="Show Rows"
+          totalLabel="Total Records"
+          countSeparator="of">
+        </app-common-data-toolbar>
+
+        <app-common-table
+          [columns]="tableColumns"
+          [rows]="alerts"
+          [loading]="loading"
+          [sortKey]="sortKey"
+          [reverse]="reverse"
+          [cellTemplate]="alertCell"
+          tableClass="table table-striped app-table"
+          tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
+          (sortChange)="sort($event)">
+          <ng-template #alertCell let-alert let-column="column">
+            @if (column.key === 'param28') {
+              {{ alert.param28 || 'NA' }}<br>{{ alert.param29 || 'NA' }}
+            } @else {
+              {{ alert[column.key] || 'NA' }}
+            }
+          </ng-template>
+        </app-common-table>
+
+        <app-common-pagination
+          [totalRecords]="totalCount"
+          [page]="currentPage"
+          [pageSize]="pageSize"
+          [disabled]="loading"
+          (pageChange)="onPageChange($event)">
+        </app-common-pagination>
+
+        <br>
+        </div>
+      </div>
+    </div>
+  </div>

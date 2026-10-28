@@ -1,0 +1,128 @@
+<div class="content-i device-list-page" [class.device-ux4g-error]="!!ux4gStylesError">
+  <div class="content-box px-0">
+    <div class="element-wrapper">
+      <!-- Home Button -->
+      <!-- <button style="background: #2bdc16;border-color: #2bdc16;" class="btn btn-primary returnbtn">
+      <i class="fa fa-angle-double-left" style="width: 20px;"></i>
+      <a style="float: right;" (click)="goHome()" style="cursor: pointer;">Home</a>
+    </button>	 -->
+
+    <div class="element-box px-0">
+      <!-- HEADER -->
+      <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
+          <div class="col-md-12 pagetitleborder p-0">
+            <div class="page-header-row">
+
+              <!-- TITLE -->
+              <h1 class="pagetitlestyle">
+                {{ filterType }} Details
+              </h1>
+
+              <!-- ACTION BUTTONS -->
+              @if (roleId=='10' || roleId=='12' ||roleId=='61' || roleId=='13' || roleId=='64') {
+                <div class="header-actions">
+                  <button type="button" class="ux4g-btn ux4g-btn-primary ux4g-btn-l header-btn" (click)="redirectInsert()">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                    Add New
+                  </button>
+                  @if (roleId == '10' ||roleId=='61' || roleId=='12' || roleId=='13' || roleId=='64') {
+                    <button type="button" class="ux4g-btn ux4g-btn-outline-primary ux4g-btn-l header-btn" routerLink="/bulk-device-entry">
+                      <i class="fa fa-plus" aria-hidden="true"></i>
+                      Add Multiple
+                    </button>
+                  }
+                </div>
+              }
+
+            </div>
+          </div>
+
+          <!-- ERROR MESSAGE -->
+          <!-- <div *ngIf="errorMessage" class="custom-alert">
+          <strong>Warning:</strong> {{ errorMessage }}
+          <button type="button" class="alert-close" (click)="errorMessage = ''">
+            &times;
+          </button>
+        </div> -->
+
+        <app-common-data-toolbar variant="device" searchPlaceholder="Search..."
+          searchLabel="Search :" [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
+          (reload)="reloadData()" [loading]="loading" [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
+          (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows"
+          totalLabel="Total Records" countSeparator="of">
+        </app-common-data-toolbar>
+
+        @if (ux4gStylesError) {
+          <p class="device-list-design-system-error" role="alert">{{ ux4gStylesError }}</p>
+        }
+
+        <div class="col-sm-12 device-table-section">
+          <ng-template #deviceHeader let-column>
+            @switch (column.key) {
+              @case ('param5') { <span>IMEI No.</span><span class="device-header-subtitle">Serial No.</span> }
+              @case ('param7') { <span>ICCID No.</span><span class="device-header-subtitle">M2M Code</span> }
+              @case ('param8') { <span>Mobile N/W 1</span><span class="device-header-subtitle">Mobile N/W 2</span> }
+              @case ('param9') { <span>Mobile No. 1</span><span class="device-header-subtitle">Mobile No. 2</span> }
+              @case ('param50') { <span>Mobile No. 1 Validity</span><span class="device-header-subtitle">Mobile No. 2 Validity</span> }
+              @case ('param16') { <span>Dealer</span><span class="device-header-subtitle">Vendor</span> }
+              @default { {{ column.label }} }
+            }
+          </ng-template>
+          <ng-template #deviceCell let-d let-column="column">
+            @switch (column.key) {
+              @case ('index') { {{ d['param1'] || 'NA' }} }
+              @case ('param5') { {{ d['param5'] || 'NA' }}<br>{{ d['param6'] || 'NA' }} }
+              @case ('param7') { {{ d['param7'] || 'NA' }}<br>{{ d['param14'] || 'NA' }} }
+              @case ('param8') { {{ d['param10'] || 'NA' }}<br>{{ d['param11'] || 'NA' }} }
+              @case ('param9') { {{ d['param8'] || 'NA' }}<br>{{ d['param9'] || 'NA' }} }
+              @case ('param50') { {{ d['param50'] || 'NA' }}<br>{{ d['param51'] || 'NA' }} }
+              @case ('param16') { {{ d['param16'] || 'NA' }}<br>{{ d['param15'] || 'NA' }} }
+              @case ('param47') {
+                <span class="ux4g-tag-s" [ngClass]="{'ux4g-tag-filled-success': d['param47'] == 'Assigned', 'ux4g-tag-filled-error': d['param47'] != 'Assigned'}">
+                  {{ d['param47'] || 'NA' }}
+                </span>
+                <span class="device-cell-detail">{{ d['param20'] || 'NA' }}</span>
+              }
+              @case ('param54') { {{ d['param54'] }} }
+              @case ('param34') {
+                <span class="ux4g-tag-s" [ngClass]="{
+                  'ux4g-tag-filled-success': d['param34'] == 'Activated',
+                  'ux4g-tag-filled-warning': d['param34'] == 'Pending OTP',
+                  'ux4g-tag-filled-error': d['param34'] != 'Activated' && d['param34'] != 'Pending OTP'
+                }">
+                  {{ d['param34'] || 'NA' }}
+                </span>
+                @if (d['param34'] === 'Activated') {
+                  <span class="device-cell-detail">{{ d['param23'] }}</span>
+                } @else { - }
+              }
+              @case ('param48') {
+                <span class="ux4g-tag-s" [ngClass]="{'ux4g-tag-filled-success': d['param48'] == 'Received', 'ux4g-tag-filled-error': d['param48'] != 'Received'}">
+                  {{ d['param48'] || 'NA' }}
+                </span>
+                <span class="device-cell-detail">{{ d['param60'] || 'NA' }}</span>
+              }
+            }
+          </ng-template>
+          @if (errorMessage) {
+            <p class="device-list-error" role="alert">{{ errorMessage }}</p>
+          }
+          <app-common-table class="device-table" [columns]="tableColumns" [rows]="devices" [loading]="loading"
+            [sortKey]="sortKey" [reverse]="reverse" [headerTemplate]="deviceHeader" [cellTemplate]="deviceCell"
+            tableClass="ux4g-table ux4g-table-m ux4g-table-column-dividers ux4g-table-zebra-rows device-table__table"
+            wrapperClass="ux4g-table-responsive ux4g-table-rounded"
+            tableId="devicetable" headerClass="device-thead" (sortChange)="sort($event)">
+          </app-common-table>
+          <div class="float-end">
+            <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+              [disabled]="loading" (pageChange)="onPageChange($event)">
+            </app-common-pagination>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>

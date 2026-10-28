@@ -1,0 +1,82 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="element-wrapper">
+          <div class="element-box">
+            <div class="col-md-12 pagetitleborder">
+              <div class="pagetitlestyle"><span>Assign Device to Dealer</span></div>
+            </div>
+
+            <form id="assignDeviceForm" autocomplete="off">
+              <div class="form-desc">
+                <strong>NOTE :</strong><label for="" class="mandetory">*</label> Are Mandatory Fields.
+              </div>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="entrypagediv">
+                    <div class="row">
+                      <div class="col-sm-6">
+                        <div class="form-group">
+                          <label for="deviceid">Device:</label><label class="mandetory">*</label>
+                          <select id="deviceid" class="form-control searchable" style="width:100%;"
+                            [(ngModel)]="selectedDevice" name="device">
+                            <option value="">Select Device</option>
+                            <option *ngFor="let device of deviceList" [value]="device.param1">{{device.param2 || device.param3}} - {{device.param4 || device.param5}}</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="col-sm-6">
+                        <div class="form-group">
+                          <label for="dealerid">Dealer:</label><label class="mandetory">*</label>
+                          <select id="dealerid" class="form-control searchable" style="width:100%;"
+                            [(ngModel)]="selectedDealer" name="dealer">
+                            <option value="">Select Dealer</option>
+                            <option *ngFor="let dealer of dealerList" [value]="dealer.param1">{{dealer.param3}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <div class="form-group">
+                          <label for="remark">Remark:</label>
+                          <textarea id="remark" class="form-control" rows="3" [(ngModel)]="remark" name="remark" placeholder="Enter remark (optional)"></textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm-12 text-center">
+                        <button type="button" class="btn btn-primary" (click)="assignDevice()" [disabled]="loading">
+                          <span *ngIf="loading">Assigning...</span>
+                          <span *ngIf="!loading">Assign Device</span>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-secondary" (click)="resetForm()" [disabled]="loading">Reset</button>
+                      </div>
+                    </div>
+
+                    <div class="row" *ngIf="errorMessage">
+                      <div class="col-sm-12">
+                        <div class="alert alert-danger">{{ errorMessage }}</div>
+                      </div>
+                    </div>
+                    <div class="row" *ngIf="successMessage">
+                      <div class="col-sm-12">
+                        <div class="alert alert-success">{{ successMessage }}</div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

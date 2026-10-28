@@ -1,0 +1,304 @@
+<style>
+  
+</style>
+<div class="content-i">
+  <div class="content-box pt-0">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <div class="content-body">
+          <div class="container-fluid px-0">
+            <div class="card main-card">
+              <div class="card-body">
+
+                <!-- Title -->
+               <div class="row">
+                <div class="col-md-12 pagetitleborder">
+                    <div class="pagetitlestyle"><span>Renewal Devices Details</span></div>
+                </div>
+            </div>
+
+                <!-- <p class="text-center text-muted small">
+                  Search by IMEI, Serial No, ICCID, Vehicle No, Chassis No, Engine No
+                </p> -->
+
+                <div class="soft-bg rounded">
+                  <!-- 📦 DETAILS -->
+
+                  <div class="row fade-in-up" *ngIf="detailsflag">
+
+                    <div class="col-12 text-center mb-3 px-0">
+                      <div id="activatedTable">
+                         <div
+                          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px 10px;">
+                          <!-- Left Side: Search and Reload -->
+                          <div style="display: flex; align-items: center;">
+                            <span style="font-weight: bold; font-size: 12px; margin-right: 10px;">Search :</span>
+
+                            <div
+                              style="display: flex; align-items: center; border: 1px solid #0b58b9; border-radius: 4px; overflow: hidden; background: white; margin-right: 10px;">
+                              <input type="search" readonly (focus)="searchInput.removeAttribute('readonly')"
+                                #searchInput class="tabletitlesearch" id="searchby" placeholder="Type here..."
+                                style="border: none; height: 24px; width: 180px; padding: 0 8px; outline: none; font-size: 11px;"
+                                autocomplete="off" maxlength="50" [(ngModel)]="searchBy"
+                                (keyup.enter)="getSearchDetails()">
+                              <button id="searchbtn" (click)="getSearchDetails()"
+                                style="background: #0b58b9; color: white; border: none; height: 24px; width: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa fa-search" style="font-size: 12px;"></i>
+                              </button>
+                            </div>
+
+                            <button (click)="reloadData()"
+                              style="background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+                              <i class="fa fa-refresh" [class.fa-spin]="!isVehicleListLoaded"
+                                style="margin-right: 5px;"></i>
+                              <span *ngIf="isVehicleListLoaded">Reload</span>
+                              <span *ngIf="!isVehicleListLoaded">Reloading...</span>
+                            </button>
+                          </div>
+
+                          <!-- Right Side: Download, Page Size, Count -->
+                          <div style="display: flex; align-items: center; font-size: 11px;">
+                            <div style="display: flex; align-items: center; margin-right: 15px;">
+                              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                                [showPageSize]="false" [showTotal]="false" [exportLoading]="isExporting"
+                                (excelExport)="selectedDownloadType = 'Excel'; onDownloadChange()"></app-common-data-toolbar>
+                            </div>
+
+
+                            <div style="display: flex; align-items: center; margin-right: 15px;">
+                              <label style="margin: 0 5px 0 0; font-weight: bold; color: #333;">Show Rows:</label>
+                              <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)"
+                                style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; color: #333; outline: none; background: white;">
+                                <option *ngFor="let size of pageSizeOptions" [value]="size">
+                                  {{ size }}
+                                </option>
+                              </select>
+                            </div>
+
+                            <div style="font-weight: bold; color: #0b58b9;">
+                              Total Records : {{ pageCount }} of {{ totalCount }}
+                            </div>
+                          </div>
+                        </div>
+
+                        <ng-template #vehicleRows let-rows>
+                          @for (detail of rows; track detail) {
+                            <tr>
+                              <td>{{ detail.param1 }}</td>
+                              @if (task != 11) {
+                                <td>{{ detail.param7 === '' || detail.param7 === '0' ? 'NA' : detail.param7 }}</td>
+                              }
+                              <td>{{ detail.param11 || 'NA' }}<br *ngIf="detail.param12">{{ detail.param12 }}</td>
+                              <td>{{ detail.param5 || 'NA' }}</td>
+                              <td>{{ detail.param4 || 'NA' }}</td>
+                              <td>{{ detail.param6 || 'NA' }}</td>
+                              <td>{{ detail.param28 || 'NA' }}<br *ngIf="detail.param29">{{ detail.param29 }}</td>
+                              <td>{{ detail.param19 || 'NA' }}</td>
+                              <td>{{ detail.param16 || 'NA' }}</td>
+                              <td>{{ detail.param14 || 'NA' }}</td>
+                              <td>{{ detail.param64 || 'NA' }}</td>
+                              <td>{{ detail.param75 || 'NA' }}</td>
+                              <td>
+                                <button [disabled]="!isButtonEnabled(detail.param64)" (click)="onSearch(detail)"
+                                  class="btn btn-sm btn-success btn-search" type="submit">
+                                  <i class="bx bx-search"></i>
+                                </button>
+                              </td>
+                            </tr>
+                          }
+                        </ng-template>
+                        <app-common-table [columns]="tableColumns" [rows]="vehicleDetails"
+                          [loading]="!isVehicleListLoaded" [sortKey]="sortKey" [reverse]="reverse"
+                          [bodyTemplate]="vehicleRows" tableClass="table table-striped app-table"
+                          tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;"
+                          (sortChange)="sort($event)">
+                        </app-common-table>
+                        <div class="pagination-wrapper" *ngIf="getTotalPages() > 1">
+                          <ul class="pagination"
+                            style="list-style: none; display: flex; justify-content: center; gap: 5px;">
+                            <li [class.disabled]="currentPage === 1">
+                              <button (click)="onPageChange(currentPage - 1)"
+                                [disabled]="currentPage === 1">Previous</button>
+                            </li>
+                            <li *ngFor="let page of getPageNumbers()" [class.active]="currentPage === page">
+                              <button (click)="onPageChange(page)">{{page}}</button>
+                            </li>
+                            <li [class.disabled]="currentPage >= getTotalPages()">
+                              <button (click)="onPageChange(currentPage + 1)"
+                                [disabled]="currentPage >= getTotalPages()">Next</button>
+                            </li>
+                          </ul>
+                        </div>
+                        <br>
+                      </div>
+                    </div>
+
+                  </div>
+                  <!--  -->
+                  <div class="row fade-in-up" *ngIf="receiptstatusflag">
+                        <div class="col-md-12 mb-3" style="display: flex; justify-content: flex-end;">
+                          <button (click)="BackToDetails()" style="border: 1px solid #0b58b9; background: white; color: #0b58b9; 
+                            border-radius: 4px; padding: 2px 8px; font-size: 11px; cursor: pointer; 
+                            font-weight: bold; display: inline-flex; align-items: center; font-size: 12px;"
+                            title="Back To Details">
+                            <i class="bx bx-arrow-out-left-circle-half"></i> Back To Details
+                          </button>
+                        </div>
+                    <!-- 🚗 Vehicle Details -->
+                    <div class="col-md-4">
+                      <div class="info-card">
+                        <div class="info-title bg-vehicle">
+                          <i class="bx bx-car"></i> Vehicle Details
+                        </div>
+
+                        <div class="info-body">
+                          <p><span>Vehicle No</span> {{ responseData.param13 }}</p>
+                          <p><span>Chassis No</span> {{ responseData.param14 }}</p>
+                          <p><span>Engine No</span> {{ responseData.param15 }}</p>
+                          <p><span>Customer Name</span> {{ responseData.param23 }}</p>
+                          <p><span>Mobile No.</span> {{ responseData.param24 }}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 📟 Device Details -->
+                    <div class="col-md-4">
+                      <div class="info-card">
+                        <div class="info-title bg-device">
+                          <i class="bx bx-chip"></i> Device Details
+                        </div>
+
+                        <div class="info-body">
+                          <p><span>Activation No</span> {{ responseData.param17 || responseData.param17 == '0' ? responseData.param17 : '-' }}</p>
+                          <p><span>Activation Date</span> {{ responseData.param16 ? responseData.param16 : 'N/A' }}</p>
+                          <p><span>IMEI No</span> {{ responseData.param4 ? responseData.param4 : 'N/A' }}</p>
+                          <p><span>ICCID No</span> {{ responseData.param6 ? responseData.param6 : 'N/A' }}</p>
+                          <p><span>Serial No</span> {{ responseData.param5 ? responseData.param5 : 'N/A' }}</p>
+                          <p><span>Model Name</span> {{ responseData.param10 ? responseData.param10 : 'N/A' }}</p>
+                          <p><span>Manufacturer</span> {{ responseData.param9 ? responseData.param9 : 'N/A' }}</p>
+                          <p><span>Vendor</span> {{ responseData.param8 ? responseData.param8 : 'N/A' }}</p>
+                          <p><span>Esim Provider</span> {{ responseData.param43 ? responseData.param43 : 'N/A' }}</p>
+                          <p><span>M2M Code</span> {{ responseData.param42 ? responseData.param42 : 'N/A' }}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 📡 Connectivity Details -->
+                    <div class="col-md-4">
+                      <div class="info-card">
+                        <div class="info-title bg-connectivity">
+                          <i class="bx bx-wifi"></i> Connectivity Details
+                        </div>
+
+                        <div class="info-body">
+                          <div class="d-flex align-items-center justify-content-between">
+                            <div>SIM Validity</div>
+                            <div class="d-flex align-items-center justify-content-between">
+                              <span>{{ responseData.param27 ? responseData.param27 : 'N/A' }}</span>
+                              <button class="btn btn-sm btn-approve ms-2" (click)="updateSimValidity()">Update</button>
+                            </div>
+                            
+                          </div>
+                          <p><span>Backend Validity</span> {{ responseData.param30 }}</p>
+                          <p><span>Polling Time</span> {{ responseData.param26 }}</p>
+
+                          <p>
+                            <span>Status</span>
+                            <span class="{{ responseData.statuscolorparam1 }} ms-1 text-white status-badge">{{
+                              responseData.param25 }}</span>
+                          </p>
+
+                            <div class="d-flex justify-content-between">
+                              <div class="fw-bold" style="font-size: 12px;"> Map</div>
+                              <div>
+                                <button 
+                                  [ngClass]="{'btn btn-sm btn-disabled': responseData.param25=='Never Connected', 'btn btn-sm btn-map-view': responseData.param25!='Never Connected'}"
+                                  (click)="openMapModal(responseData.param12)" 
+                                  [disabled]="responseData.param25=='Never Connected'"
+                                  style="margin-left: 8px;">
+                                  <i class="bx bx-map-alt"></i> View on Map
+                                </button>
+                              </div>
+                            </div>
+                          
+
+                          <p><span>Alert Name</span> {{ responseData.param31 }}</p>
+                          <p><span>Last Alert</span> {{ responseData.param32 }}</p>
+                          <!-- <p><span>Approved By</span> {{ responseData.param40 }}</p>
+                          <p><span>Approved Time</span> {{ responseData.param41 }}</p> -->
+                          <p>
+                            <!-- <i class="fa fa-file-pdf-o pdficon" (click)="DownloadReport()"></i> -->
+                            <!-- <button *ngIf="task === '19' || task === '10'" class="btn btn-approve" 
+                              (click)="approveReport()">Approve</button> -->
+                            <button class="btn btn-approve" (click)="sendOTP()" *ngIf="!showActivation && (task == '11' || task === '19' || task === '10')" [disabled]="sendOtpBtnDisabled() || responseData.param27 == undefined">
+                              Send OTP For Renewal
+                            </button>
+
+                          </p>
+                          <div>
+                            <div class="col-md-12" style="padding:10px;" id="vehicleactivation" *ngIf="showActivation">
+                              
+                              <div class="row" style="padding: 10px;">
+                                <!-- <label class="col-md-12" id="output">{{outputMessage}}</label> -->
+                                
+                                <div class="col-md-7" *ngIf="otpResponseCode == '200'">
+                                  <div class="form-group mb-0">
+                                    <label class="fontstyle">OTP: </label><label for="" class="mandetory">*</label>
+                                    <input placeholder="Enter OTP" type="text"
+                                      class="form-control acceptnumeric_nodecimal" maxlength="6" id="otp"
+                                      [(ngModel)]="otp" name="otp">
+                                  </div>
+                                  <p *ngIf="otpTimerFlag">
+                                    Resend OTP with in {{ timerText }}
+                                    <button [disabled]="otpTimerFlag" class="btn btn-link p-0 ms-2" (click)="sendOTP()" style="font-size: 12px;">
+                                      Resend OTP
+                                    </button>
+                                  </p>
+                                </div>
+                                <div class="col-md-5">
+                                  <div >
+                                    <button class="activate-btn" [disabled]="otpResponseCode != '200'"
+                                      (click)="activateVehicle()">Activate</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header py-0" style=" background-color:#07515a;">
+        <h5 class="modal-title py-0 float-end" id="staticBackdropLabel" style="color:white;">Map View</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0">
+        <div id="mapContainer" style="width: 100%; height: 600px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<app-toast *ngIf="errorMessage" [message]="errorMessage" [type]="msgType" (closed)="errorMessage = null"></app-toast>

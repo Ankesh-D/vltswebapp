@@ -1,0 +1,798 @@
+<div [ngStyle]="{ padding: isVisible ? '20px' : null }">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box">
+        <!-- TITLE BAR -->
+        @if (isVisible) {
+          <div class="page-header-row">
+            <!-- TITLE -->
+            <div class="pagetitlestyle">Business Rule Master</div>
+            <!-- ADD NEW BUTTON -->
+            <button
+              type="button"
+              class="add-new-btn"
+              (click)="openAddNewModal()"
+              >
+              <i class="fa fa-plus"></i>
+              <span>Add New</span>
+            </button>
+          </div>
+        }
+
+        <!-- SEARCH + CONTROLS BAR -->
+        <div class="top-controls-row">
+          <!-- LEFT SEARCH -->
+          <div class="left-controls">
+            <!-- SEARCH WITH INNER BUTTON -->
+            <div class="search-box">
+              <input
+                type="search"
+                class="search-input inner"
+                placeholder="Type here and press button...."
+                maxlength="50"
+                [(ngModel)]="searchText"
+                (keyup.enter)="getSearchDetails()"
+                name="searchTextBox"
+                />
+
+              <button
+                type="button"
+                class="search-inner-btn"
+                (click)="getSearchDetails()"
+                >
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+
+            <!-- RELOAD -->
+            <button
+              (click)="reloadData()"
+              [disabled]="loading"
+              style="
+                margin-left: 10px;
+                background: #fff;
+                border: 1px solid #0b58b9;
+                color: #0b58b9;
+                border-radius: 4px;
+                height: 26px;
+                padding: 0 12px;
+                font-size: 11px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                font-weight: bold;
+              "
+              >
+              <i
+                class="fa fa-refresh"
+                [class.fa-spin]="loading"
+                style="margin-right: 5px"
+              ></i>
+              <span>{{ loading ? "Reloading..." : "Reload" }}</span>
+            </button>
+          </div>
+
+          <!-- RIGHT CONTROLS -->
+          <div class="right-controls">
+            <div style="display: flex; align-items: center; margin-right: 15px">
+              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
+                [showPageSize]="false" [showTotal]="false" [exportLoading]="isExporting"
+                (excelExport)="exportToExcel()"></app-common-data-toolbar>
+            </div>
+            <select
+              class="rows-select"
+              [(ngModel)]="pageSize"
+              (change)="onPageSizeChange(pageSize)"
+              >
+              @for (size of pageSizeOptions; track size) {
+                <option
+                  [value]="size === totalCount ? 'All' : size"
+                  >
+                  {{ size === totalCount ? "All" : size }}
+                </option>
+              }
+            </select>
+
+            <div class="total-records-text">
+              Total Records : {{ pageCount }} of {{ totalCount }}
+        </div>
+        </div>
+
+        <!-- TABLE -->
+        <app-common-table [columns]="tableColumns" [rows]="detailsData" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="businessRuleCell"
+          tableClass="table app-table" tableId="devicetable" tableStyle="font-size: 11px;"
+          (sortChange)="sort($event)">
+        </app-common-table>
+        <ng-template #businessRuleCell let-data let-column="column">
+          @if (column.key === 'actions') {
+            <div class="action-cell" style="display: flex; gap: 5px; justify-content: center">
+              <button type="button" class="btn btn-sm btn-outline-primary shadow-sm"
+                style="font-size: 10px; padding: 3px 10px; border-radius: 20px; transition: all 0.3s ease; display: flex; align-items: center;"
+                (click)="openEditModal(data, 'edit')">
+                <i class="fa fa-pencil" style="margin-right: 3px"></i>Edit
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger shadow-sm"
+                style="font-size: 10px; padding: 3px 10px; border-radius: 20px; transition: all 0.3s ease; display: flex; align-items: center;"
+                (click)="openEditModal(data, 'delete')">
+                <i class="fa fa-trash" style="margin-right: 3px"></i>Delete
+              </button>
+            </div>
+          } @else {
+            {{column.value ? column.value(data) : ''}}
+          }
+        </ng-template>
+
+        <!-- Pagination -->
+        @if (totalCount > pageSize) {
+          <div class="pagination-wrapper">
+            <ul
+              class="pagination"
+              style="
+                display: flex;
+                gap: 5px;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                align-items: center;
+                justify-content: flex-end;
+              "
+              >
+              <li [class.disabled]="currentPage === 1">
+                <button
+                  type="button"
+                  (click)="onPageChange(currentPage - 1)"
+                  [disabled]="currentPage === 1"
+                  class="btn btn-sm shadow-sm"
+                  style="
+                    font-size: 11px;
+                    padding: 5px 12px;
+                    border-radius: 20px;
+                    border: 1px solid #dee2e6;
+                    background: #fff;
+                    color: #0b58b9;
+                    transition: all 0.3s ease;
+                    font-weight: bold;
+                    display: flex;
+                    align-items: center;
+                  "
+                  >
+                  <i class="fa fa-angle-left" style="margin-right: 4px"></i>
+                  Previous
+                </button>
+              </li>
+              @for (page of getPageNumbers(); track page) {
+                <li>
+                  @if (page === -1) {
+                    <span
+                  style="
+                    font-size: 12px;
+                    color: #6c757d;
+                    padding: 0 5px;
+                    font-weight: bold;
+                  "
+                      >...</span
+                      >
+                    }
+                    @if (page !== -1) {
+                      <button
+                        type="button"
+                        (click)="onPageChange(page)"
+                        class="btn btn-sm shadow-sm"
+                        [style.background]="currentPage === page ? '#0b58b9' : '#fff'"
+                        [style.color]="currentPage === page ? '#fff' : '#0b58b9'"
+                  style="
+                    font-size: 11px;
+                    width: 30px;
+                    height: 30px;
+                    padding: 0;
+                    border-radius: 50%;
+                    border: 1px solid #dee2e6;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                  "
+                        >
+                        {{ page }}
+                      </button>
+                    }
+                  </li>
+                }
+                <li [class.disabled]="currentPage >= getTotalPages()">
+                  <button
+                    type="button"
+                    (click)="onPageChange(currentPage + 1)"
+                    [disabled]="currentPage >= getTotalPages()"
+                    class="btn btn-sm shadow-sm"
+                  style="
+                    font-size: 11px;
+                    padding: 5px 12px;
+                    border-radius: 20px;
+                    border: 1px solid #dee2e6;
+                    background: #fff;
+                    color: #0b58b9;
+                    transition: all 0.3s ease;
+                    font-weight: bold;
+                    display: flex;
+                    align-items: center;
+                  "
+                    >
+                    Next
+                    <i class="fa fa-angle-right" style="margin-left: 4px"></i>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Master Modal Start -->
+<div class="modal fade"
+  id="masterModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="masterModalLabel"
+  aria-hidden="true"
+  data-backdrop="static"
+  data-keyboard="false">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="masterModalLabel">{{ modalTitle }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form #masterForm="ngForm" (ngSubmit)="onSubmit()">
+          <!-- Add your form fields here -->
+          <div class="form-group">
+            <label for="businessRuleName">Business Rule Name <span class="required">*</span></label>
+            <input type="text"
+              class="form-control"
+              id="businessRuleName"
+              #businessRuleNameModel="ngModel"
+              name="businessRuleName"
+              [(ngModel)]="businessRuleName"
+              minlength="3"
+              maxlength="50"
+              required
+              placeholder="Enter business rule name">
+            @if (businessRuleNameModel.invalid && (businessRuleNameModel.dirty || businessRuleNameModel.touched)) {
+              <div class="text-danger">
+                @if (businessRuleNameModel.errors?.['required']) {
+                  <div>
+                    Business Rule Name is required.
+                  </div>
+                }
+                @if (businessRuleNameModel.errors?.['minlength']) {
+                  <div>
+                    Business Rule Name must be at least 3 characters long.
+                  </div>
+                }
+                @if (businessRuleNameModel.errors?.['maxlength']) {
+                  <div>
+                    Business Rule Name cannot exceed 50 characters.
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          <div class="form-group">
+            <label for="ruleDescription">Rule Description <span class="required">*</span></label>
+            <textarea class="form-control" id="ruleDescription" rows="3" placeholder="Enter rule description"
+              #ruleDescriptionModel="ngModel"
+              name="ruleDescription"
+              [(ngModel)]="ruleDescription"
+              minlength="10"
+              maxlength="200"
+            required></textarea>
+            @if (ruleDescriptionModel.invalid && (ruleDescriptionModel.dirty || ruleDescriptionModel.touched)) {
+              <div class="text-danger">
+                @if (ruleDescriptionModel.errors?.['required']) {
+                  <div>
+                    Rule Description is required.
+                  </div>
+                }
+                @if (ruleDescriptionModel.errors?.['minlength']) {
+                  <div>
+                    Rule Description must be at least 10 characters long.
+                  </div>
+                }
+                @if (ruleDescriptionModel.errors?.['maxlength']) {
+                  <div>
+                    Rule Description cannot exceed 200 characters.
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          @if (opType === 'edit') {
+            <div class="form-group">
+              <label for="ruleRemarks">Rule Remarks</label>
+              <textarea class="form-control" id="ruleRemarks" rows="2" placeholder="Enter rule remarks"
+                #ruleRemarksModel="ngModel"
+                name="ruleRemarks"
+                [(ngModel)]="ruleRemarks"
+              maxlength="100"></textarea>
+              @if (ruleRemarksModel.invalid && (ruleRemarksModel.dirty || ruleRemarksModel.touched)) {
+                <div class="text-danger">
+                  @if (ruleRemarksModel.errors?.['maxlength']) {
+                    <div>
+                      Rule Remarks cannot exceed 100 characters.
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary"  data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-sm btn-secondary">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Master Modal End -->
+<!-- Master Delete Modal -->
+<div class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="deleteModalLabel"
+  aria-hidden="true"
+  data-backdrop="static"
+  data-keyboard="false">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Business Rule</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form #deleteForm="ngForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="deleteRemark">Remark <span class="required">*</span></label>
+            <textarea class="form-control" id="deleteRemark" rows="3" placeholder="Enter remark (min 10 characters)"
+              #deleteRemarkModel="ngModel"
+              name="deleteRemark"
+              [(ngModel)]="remarkForDelete"
+              minlength="10"
+              maxlength="100"
+            required></textarea>
+            @if (deleteRemarkModel.invalid && (deleteRemarkModel.dirty || deleteRemarkModel.touched)) {
+              <div class="text-danger">
+                @if (deleteRemarkModel.errors?.['required']) {
+                  <div>
+                    Remark is required.
+                  </div>
+                }
+                @if (deleteRemarkModel.errors?.['minlength']) {
+                  <div>
+                    Remark must be at least 10 characters long.
+                  </div>
+                }
+                @if (deleteRemarkModel.errors?.['maxlength']) {
+                  <div>
+                    Remark cannot exceed 100 characters.
+                  </div>
+                }
+              </div>
+            }
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary"  data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!--  -->
+<!-- EDIT MODAL -->
+<!-- <div
+*ngIf="showEditModal"
+class="dealer-modal-overlay"
+(click)="closeEditModal()"
+>
+<div class="dealer-modal" (click)="$event.stopPropagation()">
+  <div class="dealer-modal-header py-1">
+    <h5 class="dealer-modal-title">
+      <i class="fa fa-pencil-square-o"></i> Update Dealer
+    </h5>
+    <button
+      type="button"
+      class="dealer-modal-close"
+      (click)="closeEditModal()"
+      >
+      &times;
+    </button>
+  </div>
+
+  <div class="dealer-modal-body">
+    <div class="row">
+      <div class="col-sm-4" *ngIf="roleId == '10'">
+        <div class="form-field">
+          <label>Vendor <span class="required">*</span></label>
+          <ng-select
+            [(ngModel)]="vendorObj"
+            name="vendorlist"
+            placeholder="Select Vendor"
+            required
+            #vendorlistCtrl="ngModel">
+            <ng-option *ngFor="let item of vendorlist" [value]="item">{{
+              item.param2
+            }}</ng-option>
+          </ng-select>
+        </div>
+      </div>
+      <div class="col-sm-4" *ngIf="roleId != '12'">
+        <div class="form-group">
+          <label class="field-label"
+            >Select Distributor:<span class="mandetory">*</span></label
+            >
+            <ng-select
+              [(ngModel)]="distributorObj"
+              name="distributorlist"
+              placeholder="Select Distributor"
+              required
+              #distributorlistCtrl="ngModel"
+              >
+              <ng-option
+                *ngFor="let item of distributorList"
+                [value]="item.param1"
+                >{{ item.param2 }}</ng-option
+                >
+              </ng-select>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-field">
+              <label>Dealer Name <span class="required">*</span></label>
+              <input
+                class="form-control"
+                maxlength="250"
+                placeholder="Dealer Name"
+                type="text"
+                [(ngModel)]="dealerName"
+                name="editDealerName"
+                />
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-field">
+              <label>Contact Person <span class="required">*</span></label>
+              <input
+                class="form-control"
+                maxlength="60"
+                placeholder="Contact Person"
+                type="text"
+                [(ngModel)]="contactPerson"
+                name="editContactPerson"
+                />
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-field">
+              <label>Mobile No <span class="required">*</span></label>
+              <input
+                class="form-control"
+                maxlength="10"
+                placeholder="Mobile No"
+                type="text"
+                [(ngModel)]="mobileNo"
+                name="editMobileNo"
+                />
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-field">
+              <label>Alternate No</label>
+              <input
+                class="form-control"
+                maxlength="10"
+                placeholder="Alternate Mobile No"
+                type="text"
+                [(ngModel)]="alternateMobileNo"
+                name="editAltMobileNo"
+                />
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="form-field">
+              <label>Email Id <span class="required">*</span></label>
+              <input
+                class="form-control"
+                placeholder="Email Id"
+                type="text"
+                [(ngModel)]="emailId"
+                name="editEmailId"
+                />
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="form-field">
+              <label>Address <span class="required">*</span></label>
+              <textarea
+                class="form-control"
+                maxlength="80"
+                placeholder="Address"
+                [(ngModel)]="address"
+                name="editAddress"
+              ></textarea>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-field">
+              <label>Remark <span class="required">*</span></label>
+              <textarea
+                class="form-control remark-box"
+                maxlength="100"
+                placeholder="Remark"
+                [(ngModel)]="updateRemark"
+                name="editRemark"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dealer-modal-footer">
+        <button class="btn-submit" (click)="editDealerData()">
+          <i class="fa fa-check"></i> Submit
+        </button>
+        <button class="btn-back" (click)="closeEditModal()">
+          <i class="fa fa-times"></i> Back
+        </button>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- DELETE MODAL -->
+  <!-- <div *ngIf="showDeleteModal" class="modal-overlay" (click)="closeDeleteModal()">
+  <div
+    class="modal-content"
+    style="width: 500px"
+    (click)="$event.stopPropagation()"
+    >
+    <div class="modal-header">
+      <h5 class="modal-title">Delete Dealer</h5>
+      <button type="button" class="close" (click)="closeDeleteModal()">
+        <span>&times;</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        Are you sure you want to delete dealer:
+        <strong>{{ dealerName }}</strong
+          >?
+        </p>
+
+        <div class="form-group">
+          <label>Remark: <span class="mandetory">*</span></label>
+          <textarea
+            class="form-control"
+            placeholder="Enter remark (min 10 characters)"
+            [(ngModel)]="remarkForDelete"
+            name="deleteRemark"
+            maxlength="100"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" (click)="deleteDealerData()">Delete</button>
+        <button type="button" (click)="closeDeleteModal()">Cancel</button>
+      </div>
+    </div>
+  </div> -->
+  <!-- BLOCK / UNBLOCK MODAL -->
+  <!-- <div
+  *ngIf="showBlockModal"
+  class="modal-overlay"
+  (click)="closeBlockModal()"
+  style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+  "
+  >
+  <div
+    class="modal-content"
+    (click)="$event.stopPropagation()"
+    style="
+      width: 350px;
+      border-radius: 12px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+      border: none;
+      overflow: hidden;
+      background: #fff;
+    "
+    >
+    <div
+      class="modal-header"
+      [style.background]="blockUnblock === 'block' ? '#fff5f5' : '#f0fff4'"
+      style="
+        padding: 12px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      "
+      >
+      <h5
+        class="modal-title"
+        [style.color]="blockUnblock === 'block' ? '#e3342f' : '#38c172'"
+        style="
+          font-size: 14px;
+          font-weight: 700;
+          margin: 0;
+          display: flex;
+          align-items: center;
+        "
+        >
+        <i
+          class="fa"
+          [ngClass]="blockUnblock === 'block' ? 'fa-ban' : 'fa-check-circle'"
+          style="margin-right: 8px"
+        ></i>
+        {{ blockUnblock === "block" ? "Block" : "Unblock" }} Dealer
+      </h5>
+      <button
+        type="button"
+        class="close"
+        (click)="closeBlockModal()"
+        style="
+          outline: none;
+          border: none;
+          background: transparent;
+          font-size: 20px;
+          color: #aaa;
+          cursor: pointer;
+          line-height: 1;
+        "
+        >
+        <span>&times;</span>
+      </button>
+    </div>
+
+    <div class="modal-body" style="padding: 20px; font-size: 12px; color: #555">
+      <p style="margin-bottom: 15px; line-height: 1.6; text-align: center">
+        Are you sure you want to
+        <strong
+          [style.color]="blockUnblock === 'block' ? '#e3342f' : '#38c172'"
+          style="text-transform: uppercase"
+          >{{ blockUnblock }}</strong
+          >
+          the dealer<br />
+          <strong style="font-size: 14px; color: #333">{{ dealerName }}</strong
+            >?
+          </p>
+
+          <div class="form-group" style="margin-bottom: 0">
+            <label
+          style="
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+            font-size: 11px;
+            color: #777;
+          "
+              >Remark <span class="mandetory" style="color: red">*</span></label
+              >
+              <textarea
+                id="remarkforblock"
+                class="form-control"
+                rows="3"
+                maxlength="100"
+                placeholder="Enter remark (min 10 characters)"
+                [(ngModel)]="remarkForBlock"
+          style="
+            font-size: 11px;
+            resize: none;
+            border-radius: 8px;
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            width: 100%;
+          "
+              ></textarea>
+            </div>
+          </div>
+
+          <div
+            class="modal-footer"
+      style="
+        padding: 12px 20px;
+        background: #fcfcfc;
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      "
+            >
+            <button
+              type="button"
+              class="btn btn-sm shadow-sm"
+              *ngIf="blockUnblock === 'block'"
+              (click)="blockUnblockDetails()"
+        style="
+          background: #e3342f;
+          color: #fff;
+          border: none;
+          border-radius: 20px;
+          padding: 6px 25px;
+          font-size: 11px;
+          font-weight: 600;
+          transition: all 0.3s;
+        "
+              >
+              Block
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-sm shadow-sm"
+              *ngIf="blockUnblock === 'unblock'"
+              (click)="blockUnblockDetails()"
+        style="
+          background: #38c172;
+          color: #fff;
+          border: none;
+          border-radius: 20px;
+          padding: 6px 25px;
+          font-size: 11px;
+          font-weight: 600;
+          transition: all 0.3s;
+        "
+              >
+              Unblock
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-sm shadow-sm"
+              (click)="closeBlockModal()"
+        style="
+          background: #fff;
+          color: #666;
+          border: 1px solid #ddd;
+          border-radius: 20px;
+          padding: 6px 25px;
+          font-size: 11px;
+          font-weight: 600;
+          transition: all 0.3s;
+        "
+              >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div> -->

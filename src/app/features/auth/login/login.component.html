@@ -1,0 +1,201 @@
+<div class="login-page ux4g-bg-neutral-soft" [class.login-ux4g-ready]="ux4gStylesReady">
+  <header class="login-header ux4g-bg-neutral-elevated">
+    <div class="login-header-inner ux4g-d-flex ux4g-ai-center ux4g-jc-between ux4g-gap-x-m">
+      <img [src]="leftLogo" alt="State Emblem of India" class="login-emblem">
+      <div class="login-header-copy">
+        <p class="ux4g-label-m-default ux4g-text-neutral-secondary">Transport Department, Government of West Bengal</p>
+        <p class="ux4g-body-s-default ux4g-text-neutral-primary">AIS-140 VLTD Tracking Platform</p>
+      </div>
+      <img [src]="webelIcon" alt="Webel" class="login-webel-logo">
+    </div>
+  </header>
+
+  <main id="signin" class="login-main">
+    @if (ux4gStylesError) {
+      <p class="login-ux4g-error" role="alert">{{ux4gStylesError}}</p>
+    }
+    <div class="login-layout ux4g-gap-x-l">
+      <section class="login-brand ux4g-bg-primary-stronger ux4g-text-neutral-inverse" aria-labelledby="login-brand-title">
+        <p class="ux4g-label-m-default ux4g-text-neutral-inverse">West Bengal Transport Department</p>
+        <h1 id="login-brand-title" class="ux4g-heading-l-default ux4g-text-neutral-inverse">Vehicle Location Tracking System</h1>
+        <p class="ux4g-body-m-default ux4g-text-neutral-inverse">Secure access to the AIS-140 vehicle tracking platform.</p>
+      </section>
+
+      <section class="login-form-card ux4g-card ux4g-card-solid ux4g-card-vertical" aria-labelledby="signin-title">
+        <div class="ux4g-card-body">
+          <h2 id="signin-title" class="ux4g-heading-m-strong ux4g-text-neutral-primary ux4g-mb-xs">Sign In</h2>
+          <p class="ux4g-body-s-default ux4g-text-neutral-secondary ux4g-mb-l">Enter your account details to continue.</p>
+
+          <form
+            class="login-form ux4g-d-flex ux4g-flex-column ux4g-gap-y-m"
+            [formGroup]="loginForm"
+            (ngSubmit)="onSubmit()"
+            autocomplete="off"
+          >
+            <div class="ux4g-input-container ux4g-input-l"
+              [class.ux4g-input-error]="usernameBorder.includes('red')"
+              [class.ux4g-input-success]="usernameBorder.includes('green')">
+              <label class="ux4g-label-l-default" for="signinname">Sign In Name</label>
+              <div class="ux4g-input">
+                <input
+                  class="ux4g-input-input accept_loginName"
+                  type="text"
+                  name="signinname"
+                  maxlength="35"
+                  id="signinname"
+                  (keypress)="cv.loginNameValidation($event)"
+                  onpaste="return false;"
+                  formControlName="username"
+                  [attr.aria-invalid]="usernameBorder.includes('red') ? 'true' : null"
+                  required
+                >
+              </div>
+            </div>
+
+            <div class="ux4g-input-container ux4g-input-l"
+              [class.ux4g-input-error]="passwordBorder.includes('red')"
+              [class.ux4g-input-success]="passwordBorder.includes('green')">
+              <label class="ux4g-label-l-default" for="signinpassword">Password</label>
+              <div class="ux4g-input">
+                <input
+                  class="ux4g-input-input"
+                  [type]="hidePassword ? 'password' : 'text'"
+                  name="signinpassword"
+                  id="signinpassword"
+                  maxlength="30"
+                  onpaste="return false;"
+                  (keypress)="cv.passwordValidate($event)"
+                  formControlName="password"
+                  [attr.aria-invalid]="passwordBorder.includes('red') ? 'true' : null"
+                  required
+                >
+                <div class="ux4g-input-actions">
+                  <button
+                    type="button"
+                    class="ux4g-input-action-btn login-password-toggle"
+                    [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+                    [attr.aria-pressed]="!hidePassword"
+                    (click)="togglePasswordVisibility()"
+                  >
+                    <span class="ux4g-icon-outlined" aria-hidden="true">{{hidePassword ? 'visibility' : 'visibility_off'}}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="ux4g-input-container ux4g-input-l">
+              <label class="ux4g-label-l-default" for="inputcaptcha">Verification code</label>
+              <div class="captcha-row ux4g-d-flex ux4g-ai-center ux4g-gap-x-s">
+                <div class="ux4g-input">
+                  <input
+                    class="ux4g-input-input acceptnumeric_nodecimal"
+                    type="text"
+                    inputmode="numeric"
+                    id="inputcaptcha"
+                    [(ngModel)]="captchaInput"
+                    [ngModelOptions]="{standalone: true}"
+                    (input)="validateCaptcha()"
+                    (paste)="validateCaptcha()"
+                    maxlength="5"
+                    autocomplete="off"
+                    required
+                  >
+                </div>
+                <span class="captcha-code ux4g-label-l-default" id="captcha-code" [attr.aria-label]="'Verification code ' + txtCaptcha">{{txtCaptcha}}</span>
+                <button
+                  type="button"
+                  class="ux4g-input-action-btn captcha-refresh"
+                  aria-label="Generate a new verification code"
+                  (click)="regenerateCaptcha()"
+                >
+                  <span class="ux4g-icon-outlined" aria-hidden="true">refresh</span>
+                </button>
+              </div>
+            </div>
+
+            @if (attempterror) {
+              <div class="ux4g-alert ux4g-context-alert ux4g-alert-error" role="alert">
+                <span class="ux4g-alert-icon ux4g-icon-outlined" aria-hidden="true">error</span>
+                <div class="ux4g-alert-content">
+                  <p class="ux4g-alert-message">{{attempterror}}</p>
+                </div>
+              </div>
+            }
+
+            <button
+              type="submit"
+              id="loginbutton"
+              class="ux4g-btn-primary ux4g-btn-l ux4g-w-100"
+              [disabled]="!isFormValid() || loading"
+              [attr.aria-busy]="loading"
+            >
+              {{loading ? 'Signing In...' : 'Sign In'}}
+            </button>
+          </form>
+
+          <div class="login-secondary-action">
+            <a class="ux4g-text-link-s" routerLink="/forgotpassword">Forgot password?</a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <nav class="login-service-links ux4g-d-flex ux4g-ai-center ux4g-jc-center ux4g-gap-x-m" aria-label="Manufacturer services">
+      <a class="ux4g-text-link-s" href="https://vlts.wb.gov.in/entityonboarding/" target="_blank" rel="noopener noreferrer">
+        VLTD Manufacturer Onboarding
+      </a>
+      <button type="button" class="ux4g-btn-outline-primary ux4g-btn-l" (click)="openVendorModal()">
+        VLTD Manufacturers Having Access
+      </button>
+    </nav>
+  </main>
+
+  <footer class="login-footer ux4g-body-xs-default ux4g-text-neutral-secondary">
+    <span>&copy; 2025 West Bengal Transport Department</span>
+    <span>v{{appVersion}}</span>
+    <span>Powered by DIMTS</span>
+  </footer>
+</div>
+
+<div class="modal fade" id="vendorModal" tabindex="-1" aria-labelledby="vendorModalTitle" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header py-1">
+        <h2 class="modal-title" id="vendorModalTitle">VLTD Manufacturers Having Access</h2>
+        <button type="button" class="close" aria-label="Close" (click)="authService.closeModal('vendorModal')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body py-0">
+        <div class="table-responsive">
+          <table class="table table-striped app-table vendor-tbl">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Vendor Name</th>
+                <th scope="col">Contact No.</th>
+                <th scope="col">Email Id</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (vendorList.length === 0) {
+                <tr>
+                  <td colspan="4" class="text-center">No VLTD Manufacturers Having Access found.</td>
+                </tr>
+              }
+
+              @for (item of vendorList; track item; let i = $index) {
+                <tr>
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ item.param3 }}</td>
+                  <td>{{ item.param4 }}</td>
+                  <td>{{ item.param5 }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

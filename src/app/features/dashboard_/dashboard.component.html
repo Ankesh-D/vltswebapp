@@ -1,0 +1,2868 @@
+<style>
+  /* VIBRANT & MODERN DASHBOARD STYLES */
+  .dashboard-widgets-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    font-family: "Poppins", "Segoe UI", sans-serif;
+  }
+
+  .widget-card {
+    border-radius: 12px;
+    padding: 5px 8px;
+    flex: 1;
+    min-width: 140px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: 0;
+    color: white;
+    animation: slideUpFade 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .widget-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+  }
+
+  /* VIBRANT GRADIENTS */
+  .card-purple {
+    background: linear-gradient(135deg, #bec7ef 0%, #c48bfe 100%);
+  }
+
+  .card-blue {
+    background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+  }
+
+  .card-orange {
+    background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+  }
+
+  .card-pink {
+    background: linear-gradient(135deg, #ec008c 0%, #fc6767 100%);
+  }
+
+  .card-assets {
+    background: linear-gradient(135deg, #709911 0%, #afef38 100%);
+  }
+
+  .card-green {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  }
+
+  .card-dark {
+    background: linear-gradient(135deg, #cca3a3 0%, #deb1a9 100%);
+  }
+
+  /* Staggered Animation */
+  .widget-card:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+
+  .widget-card:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+
+  .widget-card:nth-child(3) {
+    animation-delay: 0.15s;
+  }
+
+  .widget-card:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+
+  .widget-card:nth-child(5) {
+    animation-delay: 0.25s;
+  }
+
+  .widget-card:nth-child(6) {
+    animation-delay: 0.3s;
+  }
+
+  .widget-card:nth-child(7) {
+    animation-delay: 0.35s;
+  }
+
+  @keyframes slideUpFade {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0px;
+  }
+
+  .widget-title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    opacity: 0.9;
+    color: white;
+  }
+
+  .widget-icon-glass {
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(4px);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .widget-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .widget-loader {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .widget-footer {
+    font-size: 10px;
+    font-weight: 700;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    background: rgb(255 255 255 / 29%);
+    padding: 7px 6px;
+    border-radius: 12px;
+    backdrop-filter: blur(2px);
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .widget-footer .highlight {
+    font-weight: 700;
+    margin-right: 4px;
+    color: rgb(44, 44, 44);
+  }
+
+  /* Specific Layouts */
+  .assets-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    gap: 10px;
+  }
+
+  .asset-col {
+    text-align: center;
+    flex: 1;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+  }
+
+  .asset-val {
+    font-weight: 700;
+    color: white;
+    font-size: 12px;
+  }
+
+  .asset-lbl {
+    font-size: 10px;
+    color: rgba(0, 85, 52, 0.95);
+    text-transform: uppercase;
+  }
+
+  .alert-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0px;
+    padding: 2px 5px;
+    margin-bottom: 0px;
+    border-radius: 8px;
+    font-size: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+  }
+
+  .alert-count {
+    font-weight: 700;
+    margin-right: 5px;
+    font-size: 10px;
+  }
+
+  .chart-widget {
+    flex: 2;
+    min-width: 300px;
+  }
+
+  .chart-container {
+    height: 35px;
+    width: 100%;
+    position: relative;
+  }
+
+  /* ================= NEW VENDOR PANEL STYLES ================= */
+  .panel-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    padding: 0;
+    /* Content handles padding */
+    height: 100%;
+    border: 1px solid #eff2f7;
+    display: flex;
+    flex-direction: column;
+    animation: slideUpFade 0.5s ease-out forwards;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Add a colorful top accent */
+  .panel-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #5e72e4, #825ee4);
+    z-index: 1;
+  }
+
+  .panel-header-modern {
+    background: #f8f9fa;
+    /* Light grey background for header */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 15px;
+    border-bottom: 1px solid #eff2f7;
+  }
+
+  .panel-title-modern {
+    font-size: 14px;
+    font-weight: 700;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .panel-body-modern {
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .icon-box-small {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  .bg-primary-light {
+    background: rgba(94, 114, 228, 0.1);
+    color: #5e72e4;
+  }
+
+  .bg-orange-light {
+    background: rgba(251, 99, 64, 0.1);
+    color: #fb6340;
+  }
+
+  .date-control-group {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #1a6ddf;
+    border-radius: 20px;
+    padding: 2px 10px;
+    height: 28px;
+    flex-wrap: nowrap;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease;
+  }
+
+  .date-control-group:hover {
+    border-color: #b0b0b0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .modern-date-input {
+    border: none;
+    height: 100%;
+    font-size: 11px;
+    width: 150px;
+    color: #495057;
+    outline: none;
+    background: transparent;
+    font-weight: 500;
+  }
+
+  .modern-btn-icon {
+    border: none;
+    background: transparent;
+    color: #5e72e4;
+    cursor: pointer;
+    padding: 0;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    transition: all 0.2s;
+  }
+
+  .modern-btn-icon:hover {
+    background-color: rgba(94, 114, 228, 0.1);
+    color: #233dd2;
+  }
+
+  .control-separator {
+    width: 1px;
+    height: 16px;
+    background-color: #e0e0e0;
+    margin: 0 6px;
+  }
+
+  .badge-pill {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-block;
+    min-width: 24px;
+  }
+
+  .badge-cyan {
+    background: rgb(17 205 239 / 36%);
+    color: #0094af;
+  }
+
+  .badge-cyan-light {
+    background: rgba(17, 205, 239, 0.05);
+    color: #0da5c0;
+  }
+
+  /* Compact ng-select styles */
+  ::ng-deep .custom-ng-select.compact-select .ng-select-container {
+    min-height: 30px !important;
+    height: 30px !important;
+    font-size: 12px !important;
+    border-color: #eff2f7 !important;
+    background-color: #fff;
+    border-radius: 4px !important;
+  }
+
+  ::ng-deep
+    .custom-ng-select.compact-select
+    .ng-select-container
+    .ng-value-container {
+    padding: 0 8px !important;
+    height: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  ::ng-deep
+    .custom-ng-select.compact-select
+    .ng-select-container
+    .ng-value-container
+    .ng-placeholder {
+    top: 0 !important;
+    padding: 0 !important;
+    position: static !important;
+  }
+
+  .modern-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+  }
+
+  .modern-btn-group {
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 2px;
+    display: flex;
+    border: 1px solid #eff2f7;
+  }
+
+  .modern-btn {
+    border: none;
+    background: transparent;
+    padding: 3px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #001cbc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .modern-btn.active {
+    background: #eff2f7;
+    color: #061da4;
+    box-shadow: none;
+  }
+
+  /* Timeline / Stats Flow */
+  .stats-flow {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .stat-item {
+    background: #fff;
+    border-radius: 8px;
+    padding: 0px 2px;
+    text-align: center;
+    transition: all 0.2s ease;
+
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Colorful backgrounds for stats */
+  .stat-item.blue {
+    background-color: #c2d5f4;
+    color: #1967d2;
+  }
+
+  .stat-item.cyan {
+    background-color: #cbf4f9;
+    color: #006064;
+    cursor: pointer;
+  }
+
+  .stat-item.green {
+    background-color: #cbf6c4;
+    color: #137333;
+    cursor: pointer;
+  }
+
+  .stat-item.orange {
+    background-color: #f6d59f;
+    color: #c64600;
+  }
+
+  .stat-item.purple {
+    background-color: #f6cdfb;
+    color: #7b1fa2;
+  }
+
+  .stat-item.red {
+    background-color: #fccfca;
+    color: #c5221f;
+  }
+  .stat-item.blue {
+    background-color: #c2d5f4;
+    color: #1967d2;
+  }
+
+  .stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .stat-val {
+    font-size: 14px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 2px;
+    color: inherit;
+  }
+
+  .stat-lbl {
+    font-size: 9px;
+    color: inherit;
+    opacity: 0.8;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* Modern Table */
+  .modern-table-container {
+    border: 1px solid #eff2f7;
+    border-radius: 8px;
+    overflow: hidden;
+    flex: 1;
+    min-height: 250px;
+  }
+
+  .modern-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .modern-table th {
+    background: #a3a5d1;
+    color: #000000;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 1px 4px;
+    border-bottom: 1px solid #eff2f7;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .modern-table thead tr:nth-child(2) th {
+    /* Offset for the second sticky header row */
+    top: 18px;
+  }
+
+  .modern-table td {
+    padding: 8px 4px;
+    font-size: 11px;
+    color: #22272b;
+    border-bottom: 1px solid #eff2f7;
+    text-align: center;
+  }
+
+  .modern-table tr:hover td {
+    background: #f8f9fe;
+  }
+
+  /* ================= MODERN TABS STYLES ================= */
+  .modern-tabs-container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 1px solid #eff2f7;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modern-tabs-header {
+    display: flex;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eff2f7;
+    padding: 0 15px;
+  }
+
+  .modern-tab-item {
+    padding: 15px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #8898aa;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .modern-tab-item:hover {
+    color: #001dc1;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .modern-tab-item.active {
+    color: #001dc1;
+    background: #fff;
+  }
+
+  .modern-tab-item.active::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #001dc1;
+    border-radius: 3px 3px 0 0;
+  }
+
+  .modern-tab-content {
+    padding: 0;
+    background: #fff;
+    flex: 1;
+  }
+
+  /* Override panel card to fit seamlessly */
+  .modern-tab-content .panel-card {
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+  }
+
+  .modern-tab-content .panel-card::before {
+    display: none;
+  }
+</style>
+
+<!-- <div class="content-i"> -->
+<!-- <div class="content-box"> -->
+<!-- <div class="row"> -->
+<!-- <div class="col-sm-12"> -->
+<!-- <div class="element-wrapper"> -->
+<div class="element-box mt-3">
+  <!-- ================= TOP DASHBOARD ================= -->
+  <div class="dashboard-widgets-container">
+    <!-- VENDOR -->
+    <div class="widget-card card-purple">
+      <div class="widget-header">
+        <div class="widget-title" style="color: #2001a9">Vendor</div>
+        <div
+          class="widget-icon-glass"
+          style="
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          "
+        >
+          <i class="fa fa-users"></i>
+        </div>
+      </div>
+      <div class="widget-value">
+        <i
+          *ngIf="loading"
+          class="fa fa-circle-o-notch fa-spin widget-loader"
+        ></i>
+        <span *ngIf="!loading">{{ counts.vendorTotal }}</span>
+      </div>
+      <div class="widget-footer">
+        <span class="highlight">{{ counts.vendorActive }}</span
+        ><span>Working</span>
+      </div>
+    </div>
+
+    <!-- DEALER -->
+    <div class="widget-card card-blue">
+      <div class="widget-header">
+        <div class="widget-title">Dealer</div>
+        <div class="widget-icon-glass"><i class="fa fa-handshake-o"></i></div>
+      </div>
+      <div class="widget-value">
+        <i
+          *ngIf="loading"
+          class="fa fa-circle-o-notch fa-spin widget-loader"
+        ></i>
+        <span *ngIf="!loading">{{ counts.dealerTotal }}</span>
+      </div>
+      <div class="widget-footer">
+        <span class="highlight">{{ counts.dealerActive }}</span
+        ><span>Working</span>
+      </div>
+    </div>
+
+    <!-- RTO -->
+    <div class="widget-card card-orange">
+      <div class="widget-header">
+        <div class="widget-title">RTO</div>
+        <div class="widget-icon-glass"><i class="fa fa-building"></i></div>
+      </div>
+      <div class="widget-value">
+        <i
+          *ngIf="loading"
+          class="fa fa-circle-o-notch fa-spin widget-loader"
+        ></i>
+        <span *ngIf="!loading">{{ counts.rtoTotal }}</span>
+      </div>
+      <div class="widget-footer">
+        <span class="highlight">{{ counts.rtoActive }}</span
+        ><span>Working</span>
+      </div>
+    </div>
+
+    <!-- DEVICES -->
+    <div class="widget-card card-pink">
+      <div class="widget-header">
+        <div class="widget-title">Devices</div>
+        <div class="widget-icon-glass"><i class="fa fa-microchip"></i></div>
+      </div>
+      <div class="widget-value">
+        <i
+          *ngIf="loading"
+          class="fa fa-circle-o-notch fa-spin widget-loader"
+        ></i>
+        <span *ngIf="!loading">{{ counts.devicesTotal }}</span>
+      </div>
+      <div class="widget-footer">
+        <span class="highlight">{{ counts.totalInstalled }}</span
+        ><span>Installed</span>
+      </div>
+    </div>
+
+    <!-- ASSETS -->
+    <div class="widget-card card-assets">
+      <div class="widget-header">
+        <div class="widget-title">Assets</div>
+        <div class="widget-icon-glass"><i class="fa fa-car"></i></div>
+      </div>
+      <div class="assets-row">
+        <div class="asset-col" style="cursor: pointer">
+          <div class="asset-val">
+            <i
+              *ngIf="loading"
+              class="fa fa-circle-o-notch fa-spin widget-loader"
+              style="font-size: 14px"
+            ></i>
+            <span *ngIf="!loading">{{ counts.oldVehicle }}</span>
+          </div>
+          <div class="asset-lbl">Old</div>
+        </div>
+        <div
+          class="asset-col"
+          style="cursor: pointer"
+          (click)="navigateToVehicle('New')"
+        >
+          <div class="asset-val">
+            <i
+              *ngIf="loading"
+              class="fa fa-circle-o-notch fa-spin widget-loader"
+              style="font-size: 14px"
+            ></i>
+            <span *ngIf="!loading">{{ counts.newVehicle }}</span>
+          </div>
+          <div class="asset-lbl">New</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODAY ALERTS -->
+    <div class="widget-card card-dark">
+      <div class="widget-header">
+        <div class="widget-title">Today Alerts</div>
+        <div class="widget-icon-glass"><i class="fa fa-bell"></i></div>
+      </div>
+      <div
+        class="alert-row"
+        [ngClass]="{ 'active-alert': selectedAlertType === 'emergency' }"
+        style="background: rgb(237 8 39 / 83%); cursor: pointer"
+        (click)="navigateToAlert($event, 'emergency', '' + emergency)"
+      >
+        <span>is Emergency</span>
+        <span class="alert-count">
+          <i
+            *ngIf="loading"
+            class="fa fa-circle-o-notch fa-spin widget-loader"
+            style="font-size: 12px"
+          ></i>
+          <span *ngIf="!loading">{{ emergency }}</span>
+        </span>
+      </div>
+      <div
+        class="alert-row"
+        [ngClass]="{ 'active-alert': selectedAlertType === 'overspeed' }"
+        style="background: rgb(237 173 8 / 86%); cursor: pointer"
+        (click)="navigateToAlert($event, 'overspeed', '' + overdspeedcount)"
+      >
+        <span>is Overspeed</span>
+        <span class="alert-count">
+          <i
+            *ngIf="loading"
+            class="fa fa-circle-o-notch fa-spin widget-loader"
+            style="font-size: 12px"
+          ></i>
+          <span *ngIf="!loading">{{ overdspeedcount }}</span>
+        </span>
+      </div>
+      <div
+        class="alert-row"
+        [ngClass]="{ 'active-alert': selectedAlertType === 'harshBrake' }"
+        style="background: rgb(249 105 0 / 55%); cursor: pointer"
+        (click)="navigateToAlert($event, 'harshBrake', '' + harshbreak)"
+      >
+        <span>is HarshBrake</span>
+        <span class="alert-count">
+          <i
+            *ngIf="loading"
+            class="fa fa-circle-o-notch fa-spin widget-loader"
+            style="font-size: 12px"
+          ></i>
+          <span *ngIf="!loading">{{ harshbreak }}</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="widget-card card-green">
+      <div class="widget-header">
+        <div class="widget-title">Today's Activated</div>
+        <div class="widget-icon-glass"><i class="fa fa-microchip"></i></div>
+      </div>
+      <div class="widget-value">
+        <i
+          *ngIf="loading"
+          class="fa fa-circle-o-notch fa-spin widget-loader"
+        ></i>
+        <span *ngIf="!loading">{{ counts.todaysactivated }}</span>
+      </div>
+      <div class="widget-footer">
+        <span class="highlight">{{ counts.todaysactivated }}</span
+        ><span>Activated</span>
+      </div>
+    </div>
+
+    <!-- LAST 7 DAYS -->
+    <!-- <div class="widget-card chart-widget card-blue">
+      <div class="widget-header">
+        <div class="widget-title">Last 7 Days Activation</div>
+        <div class="widget-icon-glass" style="width: 22px; height: 22px; font-size: 12px;"><i
+            class="fa fa-bar-chart"></i></div>
+      </div>
+      <div class="chart-container">
+        <div *ngIf="loading" style="display: flex; justify-content: center; align-items: center; height: 100%;">
+          <i class="fa fa-circle-o-notch fa-spin widget-loader"></i>
+        </div>
+        <ng-container *ngIf="!loading">
+          <div *ngIf="last7ActivationData.length > 0" id="last7Chart" class="last7-chart"
+            style="width: 100%; height: 100%;"></div>
+          <div *ngIf="last7ActivationData.length === 0" class="widget-footer"
+            style="justify-content: center; margin-top: 10px;">
+            No Data Available
+          </div>
+        </ng-container>
+      </div>
+    </div> -->
+  </div>
+
+  <!-- ================= MIDDLE SECTION ================= -->
+  <div class="row dashboard-middle">
+    <div class="col-md-12">
+      <div class="modern-tabs-container">
+        <div class="modern-tabs-header">
+          <div
+            class="modern-tab-item"
+            [class.active]="middleTab === 'vendor'"
+            (click)="switchMiddleTab('vendor')"
+          >
+            <i class="fa fa-server"></i> Vendor Status
+          </div>
+          <div
+            class="modern-tab-item"
+            [class.active]="middleTab === 'currentdaystatus'"
+            (click)="switchMiddleTab('currentdaystatus')"
+          >
+            <i class="fa fa-server"></i> 1D
+          </div>
+          <div
+            class="modern-tab-item"
+            [class.active]="middleTab === 'vendordevicechart'"
+            (click)="switchMiddleTab('vendordevicechart')"
+          >
+            <i class="fa fa-server"></i> Vendor Device Graphical View
+          </div>
+          <div
+            class="modern-tab-item"
+            [class.active]="middleTab === 'last7Chart'"
+            (click)="switchMiddleTab('last7Chart')"
+          >
+            <i class="fa fa-server"></i> Last 7 Days Activation Graphical View
+          </div>
+          <div
+            class="modern-tab-item"
+            [class.active]="middleTab === 'rto'"
+            (click)="switchMiddleTab('rto')"
+          >
+            <i class="fa fa-building"></i> RTO Summary
+          </div>
+          <div
+            class="modern-tab-item"
+            [class.active]="middleTab === 'polling counts'"
+            (click)="switchMiddleTab('polling counts')"
+          >
+            <i class="fa fa-building"></i> Polling Counts(OLD VLTD)
+          </div>
+        </div>
+
+        <div class="modern-tab-content">
+          <!-- VENDOR STATUS TAB -->
+          <div *ngIf="middleTab === 'vendor'">
+            <div class="panel-card">
+              <div class="panel-body-modern">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    margin-bottom: 12px;
+                  "
+                >
+                  <!-- Summary Timeline/Grid -->
+                  <div class="stats-flow" style="flex: 1; margin-bottom: 0">
+                    <!-- <div class="stat-item blue" (click)="navigateToDevice($event,'TotalDevice','0','0')">
+                    <span class="stat-val">
+                      <i *ngIf="loading" class="fa fa-circle-o-notch fa-spin" style="font-size: 14px;"></i>
+                      <span *ngIf="!loading">{{totaldevice}}</span>
+                    </span>
+                    <span class="stat-lbl">Total</span>
+                  </div> -->
+                    <div
+                      class="stat-item cyan"
+                      (click)="navigateToVehicle('Installed')"
+                    >
+                      <span class="stat-val">
+                        <i
+                          *ngIf="loading"
+                          class="fa fa-circle-o-notch fa-spin"
+                          style="font-size: 14px"
+                        ></i>
+                        <span *ngIf="!loading">{{ totalvehicle }}</span>
+                      </span>
+                      <span class="stat-lbl">Installed</span>
+                    </div>
+                    <div
+                      class="stat-item green"
+                      (click)="navigateToVehicle('Activated')"
+                    >
+                      <span class="stat-val">
+                        <i
+                          *ngIf="loading"
+                          class="fa fa-circle-o-notch fa-spin"
+                          style="font-size: 14px"
+                        ></i>
+                        <span *ngIf="!loading">{{ activatedvehicle }}</span>
+                      </span>
+                      <span class="stat-lbl">Activated</span>
+                    </div>
+                    <!-- <div class="stat-item orange" (click)="navigateToDevice($event,'PENDING','0','0')">
+                      <span class="stat-val">
+                        <i *ngIf="loading" class="fa fa-circle-o-notch fa-spin" style="font-size: 14px;"></i>
+                        <span *ngIf="!loading">{{pendingvehicle}}</span>
+                      </span>
+                      <span class="stat-lbl">Pending</span>
+                    </div> -->
+                    <div class="stat-item purple">
+                      <span class="stat-val">
+                        <i
+                          *ngIf="loading"
+                          class="fa fa-circle-o-notch fa-spin"
+                          style="font-size: 14px"
+                        ></i>
+                        <span *ngIf="!loading">{{ connteceddevice }}</span>
+                      </span>
+                      <span class="stat-lbl">Received</span>
+                    </div>
+                    <div class="stat-item red">
+                      <span class="stat-val">
+                        <i
+                          *ngIf="loading"
+                          class="fa fa-circle-o-notch fa-spin"
+                          style="font-size: 14px"
+                        ></i>
+                        <span *ngIf="!loading">{{ notconnteceddevice }}</span>
+                      </span>
+                      <span class="stat-lbl">Not Received</span>
+                    </div>
+                    <!-- <div class="stat-item blue">
+                      <span class="stat-val">
+                        <i *ngIf="loading" class="fa fa-circle-o-notch fa-spin" style="font-size: 14px;"></i>
+                        <span *ngIf="!loading">{{notconnteceddevice}}</span>
+                      </span>
+                      <span class="stat-lbl">Renewals</span>
+                    </div> -->
+                  </div>
+                  <div class="download-excel-div">
+                     <!-- (click)="exportToExcelFile('vendorgrid')" -->
+                    <span class="fw-bold">Download: </span>
+                    <button
+                      class="btn btn-sm btn-transparent btn-sm"
+                     
+                      title="Export to excel"
+                    >
+                      <i class="fa fa-file-excel-o"></i>
+                    </button>
+                  </div>
+                  <div>
+                    <div class="toggle-container modern-toggle">
+                      <button
+                        class="toggle-option"
+                        [class.active]="viewType === 'New'"
+                        (click)="setView('New')"
+                      >
+                        New
+                      </button>
+
+                      <button
+                        class="toggle-option"
+                        [class.active]="viewType === 'Old'"
+                        (click)="setView('Old')"
+                      >
+                        Old
+                      </button>
+                    </div>
+                  </div>
+                  <ng-select
+                    class="custom-ng-select compact-select"
+                    style="
+                      width: 293px;
+                      font-size: 12px;
+                      border: 1px solid #024cc8;
+                    "
+                    [items]="vendorlist"
+                    bindLabel="param2"
+                    bindValue="param1"
+                    [(ngModel)]="selectedVendorFilter"
+                    (change)="onVendorFilterChangeModel($event)"
+                    placeholder="Select Vendor"
+                    [clearable]="false"
+                  >
+                  </ng-select>
+                </div>
+
+                <!-- Body -->
+                <div
+                  style="
+                    flex: 1;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                  "
+                >
+                  <!-- Loader -->
+                  <div
+                    *ngIf="loading"
+                    style="
+                      flex: 1;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      min-height: 250px;
+                    "
+                  >
+                    <i
+                      class="fa fa-circle-o-notch fa-spin"
+                      style="font-size: 30px; color: #5e72e4"
+                    ></i>
+                  </div>
+
+                  <!-- Chart -->
+                  <div
+                    *ngIf="!loading && !showChart"
+                    style="
+                      flex: 1;
+                      min-height: 250px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                  >
+                    <div
+                      *ngIf="mfgdata.length > 0"
+                      id="vendorTabChart"
+                      style="width: 100%; height: 100%"
+                    ></div>
+                    <div
+                      *ngIf="mfgdata.length === 0"
+                      style="
+                        text-align: center;
+                        color: #8898aa;
+                        font-style: italic;
+                      "
+                    >
+                      <i
+                        class="fa fa-info-circle"
+                        style="font-size: 24px; margin-bottom: 10px"
+                      ></i>
+                      <p style="margin: 0">No Data Available</p>
+                      <p style="font-size: 10px; margin: 0">
+                        There is no data to display for the selected period.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Table -->
+                  <div
+                    *ngIf="!loading"
+                    [hidden]="!showChart"
+                    class="table-responsive modern-table-container table-scroll"
+                    style="flex: none; height: 379px; overflow-y: auto"
+                  >
+                    <table class="modern-table">
+                      <thead>
+                        <tr>
+                          <th rowspan="2">#</th>
+                          <th rowspan="2" style="text-align: left">Vendor</th>
+                          <th
+                            colspan="2"
+                            style="color: #020c7c; font-weight: bold"
+                          >
+                            Devices
+                          </th>
+                          <th
+                            colspan="2"
+                            style="color: #c3002a; font-weight: bold"
+                          >
+                            Polling
+                          </th>
+                        </tr>
+                        <tr>
+                          <!-- <th>Total</th> -->
+                          <th>Installed</th>
+                          <th>Activated</th>
+                          <!-- <th>Pending</th> -->
+                          <th>Received</th>
+                          <th>Not Received</th>
+                          <!-- <th>Never Received</th> -->
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let v of mfgdata; let i = index">
+                          <td>{{ i + 1 }}</td>
+                          <!-- srno -->
+                          <td class="text-uppercase" style="text-align: left; font-weight: 600">
+                            {{ v.param3 }}
+                          </td>
+                          <!-- vendorname -->
+                          <td>{{ v.param6 }}</td>
+                          <!-- installed -->
+                          <td>{{ v.param7 }}</td>
+                          <!-- activated -->
+                          <!-- <td>{{ v.param7 }}</td> -->
+                          <td>{{ v.param9 }}</td>
+                          <!-- received -->
+                          <td>{{ v.param10 }}</td>
+                          <!-- notreceived -->
+                          <!-- <td>{{ v.param11 }}</td> neverreceived -->
+                        </tr>
+                        <tr *ngIf="mfgdata.length === 0">
+                          <td colspan="9" class="text-center py-4">
+                            <i
+                              class="fa fa-info-circle"
+                              style="font-size: 32px; margin-bottom: 10px"
+                            ></i>
+                            <p style="margin: 0; font-size: 16px">
+                              No Data Available
+                            </p>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+         
+         
+
+          <!-- *ngIf="middleTab === 'rto'" -->
+          <!-- RTO SUMMARY TAB -->
+         
+        </div>
+         <div class="modern-tab-content">
+          <!-- VENDOR STATUS TAB -->
+          <div *ngIf="middleTab === 'polling counts'">
+            <div class="panel-card">
+              <div class="panel-body-modern">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    margin-bottom: 12px;
+                  "
+                >
+                  <!-- Summary Timeline/Grid -->
+                  <div class="stats-flow" style="flex: 1; margin-bottom: 0">
+                    <!-- <div class="stat-item blue" (click)="navigateToDevice($event,'TotalDevice','0','0')">
+                    <span class="stat-val">
+                      <i *ngIf="loading" class="fa fa-circle-o-notch fa-spin" style="font-size: 14px;"></i>
+                      <span *ngIf="!loading">{{totaldevice}}</span>
+                    </span>
+                    <span class="stat-lbl">Total</span>
+                  </div> -->
+                    
+                  </div>
+                  <div class="download-excel-div">
+                    <span class="fw-bold">Download: </span>
+                       <!-- (click)="exportToExcelFile('pollingcounts')" -->
+                    <button
+                      class="btn btn-sm btn-transparent btn-sm"
+                   
+                      title="Export to excel"
+                    >
+                      <i class="fa fa-file-excel-o"></i>
+                    </button>
+                  </div>
+                  <!-- <div>
+                    <div class="toggle-container modern-toggle">
+                      <button
+                        class="toggle-option"
+                        [class.active]="viewType === 'New'"
+                        (click)="setView('New')"
+                      >
+                        New
+                      </button>
+
+                      <button
+                        class="toggle-option"
+                        [class.active]="viewType === 'Old'"
+                        (click)="setView('Old')"
+                      >
+                        Old
+                      </button>
+                    </div>
+                  </div> -->
+                  <!-- <ng-select
+                    class="custom-ng-select compact-select"
+                    style="
+                      width: 293px;
+                      font-size: 12px;
+                      border: 1px solid #024cc8;
+                    "
+                    [items]="vendorlist"
+                    bindLabel="param2"
+                    bindValue="param1"
+                    [(ngModel)]="selectedVendorFilter"
+                    (change)="onVendorFilterChangeModel($event)"
+                    placeholder="Select Vendor"
+                    [clearable]="false"
+                  >
+                  </ng-select> -->
+                </div>
+
+                <!-- Body -->
+                <div
+                  style="
+                    flex: 1;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                  "
+                >
+                  <!-- Loader -->
+                  <div
+                    *ngIf="loading"
+                    style="
+                      flex: 1;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      min-height: 250px;
+                    "
+                  >
+                    <i
+                      class="fa fa-circle-o-notch fa-spin"
+                      style="font-size: 30px; color: #5e72e4"
+                    ></i>
+                  </div>
+
+                  <!-- Chart -->
+                  <div
+                    *ngIf="!loading && !showChart"
+                    style="
+                      flex: 1;
+                      min-height: 250px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                  >
+                    <div
+                      *ngIf="mfgdata.length > 0"
+                      id="vendorTabChart"
+                      style="width: 100%; height: 100%"
+                    ></div>
+                    <div
+                      *ngIf="mfgdata.length === 0"
+                      style="
+                        text-align: center;
+                        color: #8898aa;
+                        font-style: italic;
+                      "
+                    >
+                      <i
+                        class="fa fa-info-circle"
+                        style="font-size: 24px; margin-bottom: 10px"
+                      ></i>
+                      <p style="margin: 0">No Data Available</p>
+                      <p style="font-size: 10px; margin: 0">
+                        There is no data to display for the selected period.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Table -->
+                  <div
+                    *ngIf="!loading"
+                    [hidden]="!showChart"
+                    class="table-responsive modern-table-container table-scroll"
+                    style="flex: none; height: 379px; overflow-y: auto"
+                  >
+                    <table class="modern-table">
+                      <thead>
+                        <tr>
+                          <th rowspan="2">#</th>
+                          <th rowspan="2" style="text-align: left">Vendor</th>
+                           <th>Installed(OLD System)</th>
+                          <th>TCP received</th>
+                           <th>TCP Not Recicevd</th>
+                          <th>HTTP Received</th>
+                          <th>Yet To Received</th>
+                      
+                      
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let v of mfgdata; let i = index">
+                          <td>{{ i + 1 }}</td>
+                          <!-- srno -->
+                          <td class="text-uppercase" style="text-align: left; font-weight: 600">
+                            {{ v.param3 }}
+                          </td>
+                          <!-- vendorname -->
+                          <td>{{ v.param6 }}</td>
+                          <!-- installed -->
+                          <td>{{ v.param18 }}</td>
+                          <!-- activated -->
+                          <!-- <td>{{ v.param7 }}</td> -->
+                          <td>{{ v.param19 }}</td>
+                          <!-- received -->
+                          <td>{{ v.param20 }}</td>
+                            <td>{{ v.param22 }}</td>
+                          <!-- notreceived -->
+                          <!-- <td>{{ v.param11 }}</td> neverreceived -->
+                        </tr>
+                        <tr *ngIf="mfgdata.length === 0">
+                          <td colspan="9" class="text-center py-4">
+                            <i
+                              class="fa fa-info-circle"
+                              style="font-size: 32px; margin-bottom: 10px"
+                            ></i>
+                            <p style="margin: 0; font-size: 16px">
+                              No Data Available
+                            </p>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- *ngIf="middleTab === 'currentdaystatus'" -->
+          <div
+            [ngStyle]="{
+              display: middleTab === 'currentdaystatus' ? '' : 'none',
+            }"
+          >
+            <div class="panel-card">
+              <div class="panel-body-modern">
+                <!-- Body -->
+                <div
+                  style="
+                    flex: 1;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 550px;
+                  "
+                >
+                  <!-- Loader -->
+                  <div
+                    *ngIf="loading"
+                    style="
+                      flex: 1;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                    "
+                  >
+                    <i
+                      class="fa fa-circle-o-notch fa-spin"
+                      style="font-size: 40px; color: #5e72e4"
+                    ></i>
+                  </div>
+
+                  <!-- Chart -->
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div
+                        style="
+                          width: 100%;
+                          flex: 1;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                        "
+                      >
+                        <div
+                          *ngIf="mfgdata.length > 0"
+                          id="currentdaystatuschart"
+                          style="width: 100%; height: 430px"
+                        >
+                          <div
+                            class="d-flex justify-content-between align-items-center mb-2"
+                          >
+                            <div></div>
+                            <div class="text-center">
+                              <p class="mb-0 fw-bold">
+                                Current Day Installation
+                              </p>
+                              <p
+                                class="mb-0"
+                                style="
+                                  font-size: 14px;
+                                  color: #5e72e4;
+                                  font-weight: 700;
+                                "
+                              >
+                                Total: {{ totalInstalledCount }}
+                              </p>
+                            </div>
+                            <div class="download-excel-div">
+                              <!-- (click)="
+                                  exportToExcelFile('currentDayInstallation')
+                                " -->
+                              <button
+                                class="btn btn-sm btn-transparent btn-sm"
+                                
+                                title="Export to Excel"
+                              >
+                                <i class="fa fa-file-excel-o"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div *ngIf="mfgdata.length === 0" class="no-data-box">
+                          <i class="fa fa-info-circle"></i>
+                          <p>No Data Available</p>
+                          <small>There is no data to display for today.</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div
+                        style="
+                          width: 100%;
+                          flex: 1;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                        "
+                      >
+                        <div
+                          *ngIf="mfgdata.length > 0"
+                          id="currentdayactivationchart"
+                          style="width: 100%; height: 430px">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div></div>
+                            <div class="text-center">
+                              <p class="mb-0 fw-bold">
+                                Current Day Activation
+                              </p>
+                              <p
+                                class="mb-0"
+                                style="
+                                  font-size: 14px;
+                                  color: #5e72e4;
+                                  font-weight: 700;
+                                "
+                              >
+                                Total: {{ totalActivationCount }}
+                              </p>
+                            </div>
+                            <div class="download-excel-div">
+                                <!-- (click)="exportToExcelFile('currentDayActivation')" -->
+                              <button
+                                class="btn btn-sm btn-transparent btn-sm"
+                              
+                                title="Export to Excel">
+                                <i class="fa fa-file-excel-o"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div *ngIf="mfgdata.length === 0" class="no-data-box">
+                          <i class="fa fa-info-circle"></i>
+                          <p>No Data Available</p>
+                          <small>There is no data to display for today.</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- *ngIf="middleTab === 'vendordevicechart'" -->
+          <div
+            [ngStyle]="{
+              display: middleTab === 'vendordevicechart' ? '' : 'none',
+            }"
+          >
+            <div class="panel-card">
+              <div class="panel-body-modern">
+                <div class="d-flex justify-content-between">
+                  <div class="form-group">
+                <input class="form-control form-control-sm" type="text" name="date" id="datepicker" required
+                                            placeholder="Select Date"/>
+              </div>
+                  <div class="download-excel-div">
+                    <span class="fw-bold">Download: </span>
+                     <!-- (click)="exportToExcelFile('vendordevicechart')" -->
+                    <button
+                      class="btn btn-sm btn-transparent btn-sm"
+                     
+                      title="Export to excel"
+                    >
+                      <i class="fa fa-file-excel-o"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- Body -->
+                <div
+                  style="
+                    flex: 1;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 550px;
+                  "
+                >
+                  <!-- Loader -->
+                  <div
+                    *ngIf="loading"
+                    style="
+                      flex: 1;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                    "
+                  >
+                    <i
+                      class="fa fa-circle-o-notch fa-spin"
+                      style="font-size: 40px; color: #5e72e4"
+                    ></i>
+                  </div>
+
+                  <!-- Chart -->
+                  <div
+                    *ngIf="!loading"
+                    id="vendordevicechart"
+                    style="width: 100%; flex: 1"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- *ngIf="middleTab === 'last7Chart'" -->
+          <div
+            [ngStyle]="{ display: middleTab === 'last7Chart' ? '' : 'none' }"
+          >
+            <div class="panel-card">
+              <div class="panel-body-modern">
+                <div class="d-flex justify-content-end">
+                  <div class="download-excel-div">
+                    <span class="fw-bold">Download: </span>
+                     <!-- (click)="exportToExcelFile('last7DayActivation')" -->
+                    <button
+                      class="btn btn-sm btn-transparent btn-sm"
+                     
+                      title="Export to excel">
+                      <i class="fa fa-file-excel-o"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- Body -->
+                <div
+                  style="
+                    flex: 1;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 550px;
+                  "
+                >
+                  <!-- Loader -->
+                  <div
+                    *ngIf="loading"
+                    style="
+                      flex: 1;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                    "
+                  >
+                    <i
+                      class="fa fa-circle-o-notch fa-spin"
+                      style="font-size: 40px; color: #5e72e4"
+                    ></i>
+                  </div>
+
+                  <!-- Chart -->
+                  <ng-container *ngIf="!loading">
+                    <div
+                      *ngIf="last7ActivationData.length > 0"
+                      id="last7Chart"
+                      style="width: 100%; height: 400px"
+                    ></div>
+
+                    <!-- <div *ngIf="last7ActivationData.length === 0" style="text-align:center;margin-top:5rem;">
+                      No Data Available
+                    </div> -->
+
+                    <div
+                      *ngIf="last7ActivationData.length === 0"
+                      style="
+                        text-align: center;
+                        color: #8898aa;
+                        font-style: italic;
+                      "
+                    >
+                      <i
+                        class="fa fa-info-circle"
+                        style="font-size: 32px; margin-bottom: 10px"
+                      ></i>
+                      <p style="margin: 0; font-size: 16px">
+                        No Data Available
+                      </p>
+                      <p style="font-size: 12px; margin: 0">
+                        There is no data to display for today.
+                      </p>
+                    </div>
+                  </ng-container>
+                  <!-- <div *ngIf="!loading" id="last7Chart" style="width: 100%; flex: 1;"></div> -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- *ngIf="middleTab === 'rto'" -->
+          <!-- RTO SUMMARY TAB -->
+          <div [ngStyle]="{ display: middleTab === 'rto' ? '' : 'none' }">
+            <div class="panel-card">
+              <!-- Header -->
+              <div class="panel-header-modern">
+                <div class="panel-title-modern">
+                  <div class="icon-box-small bg-orange-light">
+                    <i class="fa fa-building"></i>
+                  </div>
+                  <span>RTO Summary</span>
+                </div>
+
+                <div class="toggle-container">
+                  <div
+                    class="toggle-option"
+                    [class.active]="rtoViewType === 'NewVehicle'"
+                    (click)="setRTOView('NewVehicle')"
+                  >
+                    New
+                  </div>
+
+                  <div
+                    class="toggle-option"
+                    [class.active]="rtoViewType === 'OldVehicle'"
+                    (click)="setRTOView('OldVehicle')"
+                  >
+                    Old
+                  </div>
+                </div>
+
+                <!-- Date Picker Group -->
+                <div class="date-control-group">
+                  <input
+                    type="text"
+                    ngxDaterangepickerMd
+                    [(ngModel)]="selectedDateRange"
+                    [locale]="{ format: 'DD-MMM-YYYY' }"
+                    [autoApply]="true"
+                    [showCustomRangeLabel]="false"
+                    [showClearButton]="false"
+                    [linkedCalendars]="false"
+                    class="modern-date-input"
+                    (ngModelChange)="onDateRangeChange($event)"
+                    placeholder="Select Date Range"
+                  />
+
+                  <div class="control-separator"></div>
+
+                  <!-- <div class="control-separator"></div> -->
+
+                  <button
+                    class="modern-btn-icon"
+                    (click)="applyDateFilter()"
+                    title="Search Data"
+                  >
+                    <i class="fa fa-search"></i>
+                  </button>
+
+                  <!-- ✅ EXCEL BUTTON -->
+                  <!-- <button
+                    class="modern-btn-icon"
+                    (click)="downloadRTOExcel()"
+                    title="Download Excel"
+                  >
+                    <i class="fa fa-file-excel-o"></i>
+                  </button> -->
+                </div>
+                <div>
+                  <div class="download-excel-div">
+                    <span class="fw-bold">Download: </span>
+                     <!-- (click)="downloadRTOExcel()" -->
+                    <button
+                      class="btn btn-sm btn-transparent btn-sm"
+                     
+                      title="Export to excel">
+                      <i class="fa fa-file-excel-o"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="modern-controls">
+                  <!-- RTO Select -->
+                  <ng-select
+                    class="custom-ng-select compact-select"
+                    style="
+                      width: 293px;
+                      font-size: 12px;
+                      border: 1px solid #024cc8;
+                    "
+                    [items]="subrtolist"
+                    bindLabel="param2"
+                    bindValue="param1"
+                    [(ngModel)]="selectedRTOFilter"
+                    (change)="onRTOFilterChangeModel($event?.param1)"
+                    placeholder="All RTO"
+                    [clearable]="true"
+                  >
+                  </ng-select>
+                </div>
+              </div>
+
+              <!-- Body -->
+              <div class="panel-body-modern">
+                <!-- Loader -->
+                <div
+                  *ngIf="loading"
+                  style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 250px;
+                  "
+                >
+                  <i
+                    class="fa fa-circle-o-notch fa-spin"
+                    style="font-size: 40px; color: #fb6340"
+                  ></i>
+                </div>
+
+                <div
+                  *ngIf="!loading"
+                  class="table-responsive modern-table-container table-scroll"
+                  style="flex: none; height: 379px; overflow-y: auto"
+                >
+                  <table class="modern-table">
+                    <thead>
+                      <!-- Header Row -->
+                      <tr>
+                        <th rowspan="2" width="40">#</th>
+
+                        <th rowspan="2" style="text-align: left">RTO Name</th>
+
+                        <!-- Devices -->
+                        <th
+                          [attr.colspan]="rtoViewType === 'NewVehicle' ? 5 : 3"
+                          style="color: #000000"
+                        >
+                          Devices
+                        </th>
+
+                        <!-- Polling -->
+                        <th colspan="3" style="color: #000000">
+                          Polling Status
+                        </th>
+                      </tr>
+
+                      <!-- Sub Header -->
+                      <tr>
+                        <!-- SHOW ONLY FOR NEW -->
+                        <ng-container *ngIf="rtoViewType === 'NewVehicle'">
+                          <th>MVI Verified</th>
+                          <th>MVI Pending</th>
+                        </ng-container>
+
+                        <th>Installed</th>
+                        <th>Activated</th>
+
+                        <th>Received</th>
+                        <th>Not Received</th>
+                        <th>Never Received</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      <tr *ngFor="let r of rtowisedevicedetails; let i = index">
+                        <td>{{ r.param1 }}</td>
+
+                        <td
+                          style="
+                            text-align: left;
+                            font-weight: 600;
+                            color: #525f7f;
+                          "
+                        >
+                          {{ formatRTOName(r.param3) }}
+                        </td>
+
+                        <!-- SHOW ONLY WHEN NEW VEHICLE -->
+                        <ng-container *ngIf="rtoViewType === 'NewVehicle'">
+                          <td>
+                            <span>
+                              {{ r.param15 }}
+                            </span>
+                          </td>
+
+                          <td>
+                            <span>
+                              {{ r.param16 }}
+                            </span>
+                          </td>
+                        </ng-container>
+
+                        <!-- Existing -->
+                        <td style="font-weight: 600; color: #000000">
+                          {{ r.param6 }}
+                        </td>
+
+                        <td>
+                          {{ r.param7 }}
+                        </td>
+
+                        <td style="font-weight: 600; color: #000000">
+                          {{ r.param9 }}
+                        </td>
+
+                        <td>
+                          {{ r.param10 }}
+                        </td>
+
+                        <td>
+                          {{ r.param11 }}
+                        </td>
+                      </tr>
+
+                      <tr *ngIf="rtowisedevicedetails.length === 0">
+                        <td
+                          colspan="10"
+                          class="text-center py-4"
+                          style="color: #4e647c; font-style: italic"
+                        >
+                          No Data Available
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- </div> -->
+      <!-- </div> -->
+      <!-- </div> -->
+      <!-- </div> -->
+      <!-- </div> -->
+    </div>
+  </div>
+</div>
+
+
+<style>
+/* =========================================================
+   VEHICLE DETAILS MODAL - UI ONLY
+   No Angular logic/bindings changed
+   ========================================================= */
+
+.modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(15, 23, 42, 0.48) !important;
+  backdrop-filter: blur(2px);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 18px !important;
+  z-index: 9999 !important;
+}
+
+.modal-overlay .modal-content {
+  width: min(96vw, 1700px) !important;
+  max-height: 94vh !important;
+  background: #fff !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .22) !important;
+  border: 1px solid #dfe5ec !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.modal-overlay .modal-header {
+  min-height: 46px !important;
+  padding: 7px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: linear-gradient(90deg, #b5e5b5, #dff4df) !important;
+  border-bottom: 1px solid #b9d8b9 !important;
+}
+
+.modal-overlay .modal-header h6 {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #19351f !important;
+}
+
+.modal-overlay .modal-header button {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  border-radius: 5px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #d71920 !important;
+  color: #fff !important;
+  border: 0 !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  transition: .18s ease;
+}
+
+.modal-overlay .modal-header button:hover {
+  background: #b51218 !important;
+  transform: scale(1.04);
+}
+
+.modal-overlay .modal-body {
+  padding: 0 !important;
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ---------- top controls ---------- */
+.modal-overlay form {
+  flex: 0 0 auto;
+}
+
+.modal-overlay form > .col-md-12 {
+  top: 0 !important;
+  padding: 0 12px !important;
+}
+
+.modal-overlay form > .col-md-12 > div {
+  padding: 10px 0 !important;
+}
+
+.modal-overlay form table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+.modal-overlay form td {
+  vertical-align: middle !important;
+  padding: 4px 6px !important;
+}
+
+.modal-overlay form td:first-child {
+  width: 80px !important;
+  padding-left: 2px !important;
+}
+
+.modal-overlay form td:first-child font {
+  color: #344054 !important;
+  font-size: 11px !important;
+}
+
+.modal-overlay form td:nth-child(2) {
+  width: 42% !important;
+}
+
+.modal-overlay form td:last-child {
+  width: auto !important;
+}
+
+.modal-overlay input.tabletitlesearch {
+  width: 210px !important;
+  height: 30px !important;
+  font-size: 11px !important;
+  color: #344054 !important;
+  background: #fff !important;
+}
+
+.modal-overlay #searchbtn {
+  height: 30px !important;
+  width: 34px !important;
+  background: #0b58b9 !important;
+  border-radius: 0 !important;
+}
+
+.modal-overlay form td:nth-child(2) > div > div:first-child {
+  border: 1px solid #b8c5d6 !important;
+  border-radius: 5px !important;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, .05);
+}
+
+.modal-overlay form td:nth-child(2) > div > button {
+  height: 30px !important;
+  margin-left: 8px !important;
+  border-color: #0b58b9 !important;
+  border-radius: 5px !important;
+  font-size: 11px !important;
+  transition: .18s ease;
+}
+
+.modal-overlay form td:nth-child(2) > div > button:hover:not(:disabled) {
+  background: #0b58b9 !important;
+  color: #fff !important;
+}
+
+.modal-overlay form td:last-child > div {
+  gap: 8px !important;
+  flex-wrap: wrap;
+}
+
+.modal-overlay form td:last-child > div > div {
+  margin-right: 0 !important;
+}
+
+.modal-overlay form label {
+  font-size: 11px !important;
+  color: #475467 !important;
+  white-space: nowrap;
+}
+
+.modal-overlay form select {
+  height: 30px !important;
+  min-width: 82px !important;
+  border: 1px solid #b8c5d6 !important;
+  border-radius: 5px !important;
+  background: #fff !important;
+  color: #344054 !important;
+  padding: 0 7px !important;
+  font-size: 11px !important;
+  outline: none !important;
+}
+
+.modal-overlay form select:focus,
+.modal-overlay form input:focus {
+  border-color: #0b58b9 !important;
+  box-shadow: 0 0 0 2px rgba(11, 88, 185, .10) !important;
+}
+
+.modal-overlay form td:last-child > div > div:last-child {
+  padding-right: 0 !important;
+  color: #0b58b9 !important;
+  font-size: 11px !important;
+  white-space: nowrap;
+}
+
+/* ---------- table ---------- */
+.modal-overlay .table-responsive {
+  width: 100% !important;
+  height: 465px !important;
+  max-height: 465px !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  border-top: 1px solid #dfe5ec;
+  background: #fff;
+  scrollbar-width: thin;
+}
+
+.modal-overlay #devicetable {
+  width: 100% !important;
+  min-width: 1250px;
+  margin: 0 !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  table-layout: auto !important;
+}
+
+.modal-overlay #devicetable thead {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.modal-overlay #devicetable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 31;
+  background: #e8eef7 !important;
+  color: #1f2937 !important;
+  border-bottom: 2px solid #0b58b9 !important;
+  border-right: 1px solid #d6dee9 !important;
+  padding: 7px 6px !important;
+  height: 42px !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+}
+
+.modal-overlay #devicetable thead th:first-child {
+  width: 42px !important;
+}
+
+.modal-overlay #devicetable thead th.sortable {
+  cursor: pointer !important;
+  transition: background .15s ease;
+}
+
+.modal-overlay #devicetable thead th.sortable:hover {
+  background: #dce7f6 !important;
+}
+
+.modal-overlay #devicetable thead th hr {
+  border: 0 !important;
+  border-top: 1px solid #b9c5d5 !important;
+  opacity: 1 !important;
+}
+
+.modal-overlay #devicetable tbody td {
+  padding: 7px 6px !important;
+  height: 40px !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+  color: #344054 !important;
+  background: #fff !important;
+  border-bottom: 1px solid #eaecf0 !important;
+  border-right: 1px solid #f0f2f5 !important;
+  font-size: 10.5px !important;
+  line-height: 1.45 !important;
+  white-space: normal !important;
+}
+
+.modal-overlay #devicetable tbody tr:nth-child(even) td {
+  background: #f8fafc !important;
+}
+
+.modal-overlay #devicetable tbody tr:hover td {
+  background: #eef5ff !important;
+}
+
+.modal-overlay #devicetable tbody td:first-child {
+  font-weight: 700 !important;
+  color: #0b58b9 !important;
+}
+
+.modal-overlay #devicetable tbody td:nth-child(2),
+.modal-overlay #devicetable tbody td:nth-child(4),
+.modal-overlay #devicetable tbody td:nth-child(8),
+.modal-overlay #devicetable tbody td:nth-child(9) {
+  line-height: 1.65 !important;
+}
+
+.modal-overlay #devicetable tbody td span.badge {
+  display: inline-block !important;
+  min-width: 72px !important;
+  padding: 4px 7px !important;
+  border-radius: 12px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}
+
+/* ---------- pagination ---------- */
+.modal-overlay .table-responsive + .row {
+  margin: 0 !important;
+}
+
+.modal-overlay .table-responsive + .row > .col-md-12 {
+  padding: 0 10px !important;
+}
+
+.modal-overlay .table-responsive + .row [style*="justify-content: flex-end"] {
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 2px !important;
+  margin: 8px 0 10px !important;
+  flex-wrap: wrap !important;
+}
+
+.modal-overlay .table-responsive + .row button {
+  min-width: 32px !important;
+  height: 29px !important;
+  padding: 3px 9px !important;
+  margin: 0 !important;
+  border: 1px solid #b8c5d6 !important;
+  border-radius: 5px !important;
+  background: #fff !important;
+  color: #0b58b9 !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  transition: .15s ease;
+}
+
+.modal-overlay .table-responsive + .row button:hover:not(:disabled) {
+  background: #eef5ff !important;
+  border-color: #0b58b9 !important;
+}
+
+.modal-overlay .table-responsive + .row button:disabled {
+  opacity: .65 !important;
+  cursor: default !important;
+}
+
+.modal-overlay .table-responsive + .row span {
+  font-size: 11px !important;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+  .modal-overlay form td:nth-child(2) {
+    width: 35% !important;
+  }
+
+  .modal-overlay form td:last-child > div {
+    justify-content: flex-start !important;
+  }
+
+  .modal-overlay .table-responsive {
+    height: 430px !important;
+    max-height: 430px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 8px !important;
+  }
+
+  .modal-overlay .modal-content {
+    width: 100% !important;
+    max-height: 97vh !important;
+  }
+
+  .modal-overlay form table,
+  .modal-overlay form tbody,
+  .modal-overlay form tr,
+  .modal-overlay form td {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .modal-overlay form td:first-child {
+    padding-bottom: 0 !important;
+  }
+
+  .modal-overlay form td:last-child > div {
+    justify-content: flex-start !important;
+  }
+
+  .modal-overlay .table-responsive {
+    height: 400px !important;
+    max-height: 400px !important;
+  }
+}
+</style>
+
+<div *ngIf="showTrackModal" class="modal-overlay" (click)="closeModal()">
+  <div
+    class="modal-content"
+    style="width: 95%"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal-header" style="background: #b5e5b5">
+      <h6 style="font-size: 14px; margin: 0">Vehicle Details</h6>
+      <button
+        type="button"
+        class="btn btn-sm"
+        (click)="closeModal()"
+        style="
+          color: #fff;
+          background: #db0000;
+          height: 30px;
+          width: 30px;
+          font-weight: bold;
+          cursor: pointer;
+          border: none;
+          padding: 0;
+        "
+      >
+        x
+      </button>
+    </div>
+    <div class="modal-body" style="padding: 0">
+      <form autocomplete="off">
+        <div class="col-md-12" style="top: 10px">
+          <!-- Search and Pagination Controls -->
+          <div style="width: 100%; padding: 10px 0px 10px 0px">
+            <table style="width: 100%">
+              <tbody class="bg-body">
+                <tr>
+                  <td style="width: 75px; padding-top: 0px; padding-left: 9px">
+                    <font style="font-weight: bold">Search : </font>
+                  </td>
+                  <td>
+                    <div style="display: flex; align-items: center">
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          border: 1px solid #0b58b9;
+                          border-radius: 4px;
+                          overflow: hidden;
+                          background: white;
+                        "
+                      >
+                        <input
+                          type="search"
+                          readonly
+                          onfocus="this.removeAttribute('readonly')"
+                          class="tabletitlesearch"
+                          id="searchby"
+                          placeholder="Type here..."
+                          style="
+                            border: none;
+                            height: 24px;
+                            width: 180px;
+                            padding: 0 8px;
+                            outline: none;
+                            font-size: 11px;
+                          "
+                          autocomplete="disabled"
+                          maxlength="50"
+                          [(ngModel)]="searchText"
+                          (keyup.enter)="getSearchDetails()"
+                          name="searchby"
+                        />
+                        <button
+                          id="searchbtn"
+                          (click)="getSearchDetails()"
+                          style="
+                            background: #0b58b9;
+                            color: white;
+                            border: none;
+                            height: 24px;
+                            width: 30px;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                          "
+                        >
+                          <i class="fa fa-search" style="font-size: 12px"></i>
+                        </button>
+                      </div>
+
+                      <button
+                        (click)="reloadData()"
+                        [disabled]="loading"
+                        style="
+                          margin-left: 10px;
+                          background: #fff;
+                          border: 1px solid #0b58b9;
+                          color: #0b58b9;
+                          border-radius: 4px;
+                          height: 26px;
+                          padding: 0 12px;
+                          font-size: 11px;
+                          cursor: pointer;
+                          display: flex;
+                          align-items: center;
+                          font-weight: bold;
+                        "
+                      >
+                        <i
+                          class="fa fa-refresh"
+                          [class.fa-spin]="loading"
+                          style="margin-right: 5px"
+                        ></i>
+                        <span>{{ loading ? "Reloading..." : "Reload" }}</span>
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                        font-size: 11px;
+                      "
+                    >
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          margin-right: 15px;
+                        "
+                      >
+                        <label
+                          for="excelpdfdownload"
+                          style="
+                            margin: 0 5px 0 0;
+                            font-weight: bold;
+                            color: #333;
+                          "
+                          >Download:</label
+                        >
+                        <select
+                          name="excelpdfdownload"
+                          [(ngModel)]="selectedDownloadType"
+                          (change)="onDownloadChange()"
+                          style="
+                            height: 24px;
+                            border: 1px solid #0b58b9;
+                            border-radius: 4px;
+                            font-size: 11px;
+                            padding: 0 5px;
+                            color: #333;
+                            outline: none;
+                            background: white;
+                          "
+                        >
+                          <option value="">Select</option>
+                          <!-- <option value="Excel">Excel</option> -->
+                                   <option value="">Excel</option>
+                        </select>
+                        <span
+                          *ngIf="isExporting"
+                          style="
+                            margin-left: 8px;
+                            font-size: 11px;
+                            color: #0b58b9;
+                          "
+                        >
+                          Generating...
+                        </span>
+                      </div>
+
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          margin-right: 15px;
+                        "
+                      >
+                        <label
+                          style="
+                            margin: 0 5px 0 0;
+                            font-weight: bold;
+                            color: #333;
+                          "
+                          >Show Rows:</label
+                        >
+                        <select
+                          [(ngModel)]="pageSize"
+                          (change)="onPageSizeChange(pageSize)"
+                          name="pageSize"
+                          style="
+                            height: 24px;
+                            border: 1px solid #0b58b9;
+                            border-radius: 4px;
+                            font-size: 11px;
+                            padding: 0 5px;
+                            color: #333;
+                            outline: none;
+                            background: white;
+                          "
+                        >
+                          <option
+                            *ngFor="let size of pageSizeOptions"
+                            [value]="size === totalCount ? 'All' : size"
+                          >
+                            {{ size === totalCount ? "All" : size }}
+                          </option>
+                        </select>
+                      </div>
+
+                      <div
+                        style="
+                          font-weight: bold;
+                          color: #0b58b9;
+                          padding-right: 5px;
+                        "
+                      >
+                        Total Records : {{ pageCount }} of {{ totalCount }}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </form>
+      <div
+        class="table-responsive"
+        style="height: 465px; overflow-y: auto; overflow-x: hidden"
+      >
+        <table
+          class="table-striped table"
+          style="
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            margin-left: 0px;
+          "
+          id="devicetable"
+        >
+          <thead class="device-thead">
+            <tr>
+              <th style="width: 35px">#</th>
+
+              <th (click)="sort('param5')" class="sortable">
+                Chassis No.
+                <hr style="margin: 1px 0" />
+                Vehicle No.
+                <span
+                  class="sorting"
+                  [ngClass]="{
+                    sorting_desc: reverse && sortKey == 'param5',
+                    sorting_asc: !reverse && sortKey == 'param5',
+                  }"
+                >
+                </span>
+              </th>
+
+              <th (click)="sort('param7')" class="sortable">Engine No</th>
+
+              <th (click)="sort('param8')" class="sortable">
+                Serial No.
+                <hr style="margin: 1px 0" />
+                IMEI No.
+                <hr style="margin: 1px 0" />
+                ICCID No.
+                <span
+                  class="sorting"
+                  [ngClass]="{
+                    sorting_desc: reverse && sortKey == 'param8',
+                    sorting_asc: !reverse && sortKey == 'param8',
+                  }"
+                >
+                </span>
+              </th>
+
+              <th (click)="sort('param9')" class="sortable">
+                Vehicle Type
+                <hr style="margin: 1px 0" />
+                Vehicle Class
+                <span
+                  class="sorting"
+                  [ngClass]="{
+                    sorting_desc: reverse && sortKey == 'param9',
+                    sorting_asc: !reverse && sortKey == 'param9',
+                  }"
+                >
+                </span>
+              </th>
+
+              <th
+                style="width: 130px"
+                (click)="sort('param50')"
+                class="sortable"
+              >
+                Make
+                <hr style="margin: 1px 0" />
+                Model
+                <span
+                  class="sorting"
+                  [ngClass]="{
+                    sorting_desc: reverse && sortKey == 'param50',
+                    sorting_asc: !reverse && sortKey == 'param50',
+                  }"
+                >
+                </span>
+              </th>
+
+              <th
+                style="width: 160px"
+                (click)="sort('param16')"
+                class="sortable"
+              >
+                Installation date
+
+                <span
+                  class="sorting"
+                  [ngClass]="{
+                    sorting_desc: reverse && sortKey == 'param16',
+                    sorting_asc: !reverse && sortKey == 'param16',
+                  }"
+                >
+                </span>
+              </th>
+
+              <th (click)="sort('param47')" class="sortable">
+                Customer Details
+                <span
+                  class="sorting"
+                  [ngClass]="{
+                    sorting_desc: reverse && sortKey == 'param47',
+                    sorting_asc: !reverse && sortKey == 'param47',
+                  }"
+                >
+                </span>
+              </th>
+
+              <th (click)="sort('param34')" class="sortable">
+                Dealer
+                <hr style="margin: 1px 0" />
+                (Vendor)
+                <span
+                  class="sorting"
+                  [ngClass]="{
+                    sorting_desc: reverse && sortKey == 'param34',
+                    sorting_asc: !reverse && sortKey == 'param34',
+                  }"
+                >
+                </span>
+              </th>
+
+              <th (click)="sort('param48')" class="sortable">
+                RTO Name
+                <span
+                  class="sorting"
+                  [ngClass]="{
+                    sorting_desc: reverse && sortKey == 'param48',
+                    sorting_asc: !reverse && sortKey == 'param48',
+                  }"
+                >
+                </span>
+              </th>
+              <th (click)="sort('param48')" class="sortable">
+                Activation Status
+                <span
+                  class="sorting"
+                  [ngClass]="{
+                    sorting_desc: reverse && sortKey == 'param48',
+                    sorting_asc: !reverse && sortKey == 'param48',
+                  }"
+                >
+                </span>
+              </th>
+              <th (click)="sort('param48')" class="sortable">
+                Polling Status
+                <span
+                  class="sorting"
+                  [ngClass]="{
+                    sorting_desc: reverse && sortKey == 'param48',
+                    sorting_asc: !reverse && sortKey == 'param48',
+                  }"
+                >
+                </span>
+              </th>
+
+              <!-- <th>Download Receipt</th> -->
+            </tr>
+          </thead>
+
+          <tbody>
+            <!-- NO DATA -->
+            <tr *ngIf="totalCount === 0">
+              <td colspan="12" style="text-align: center; font-weight: bold">
+                NO DATA FOUND
+              </td>
+            </tr>
+
+            <!-- DATA ROWS -->
+            <tr *ngFor="let d of vehicledet">
+              <td>{{ d["param1"] || "NA" }}</td>
+
+              <td>
+                {{ d["param12"] || "NA" }}<br />
+                {{ d["param11"] || "NA" }}
+              </td>
+
+              <td>
+                {{ d["param13"] || "NA" }}
+              </td>
+
+              <td>
+                {{ d["param5"] || "NA" }}<br />
+                {{ d["param4"] || "NA" }}<br />{{ d["param6"] || "NA" }}
+              </td>
+
+              <td>
+                {{ d["param19"] || "NA" }}<br />
+                {{ d["param42"] || "NA" }}
+              </td>
+              <!-- param50make ka hay ab filal pata nhi  -->
+              <td>
+                {{ d["param40"] || "NA" }}<br />
+                {{ d["param41"] || "NA" }}
+              </td>
+
+              <td>
+                {{ d["param43"] || "NA" }}
+              </td>
+
+              <td>
+                {{ d["param28"] || "NA" }}<br />
+                {{ d["param29"] || "NA" }}
+              </td>
+
+              <td>
+                {{ d["param8"] || "NA" }}<br />
+                ({{ d["param7"] || "NA" }})
+              </td>
+
+              <td>
+                {{ d["param18"] || "NA" }}
+              </td>
+
+              <!-- ✅ Activation Status -->
+              <td>
+                <span
+                  [ngClass]="{
+                    'badge badge-success': d['param25'] === 'Activated',
+                    'badge badge-warning':
+                      d['param25'] === 'Pending' ||
+                      d['param25'] === 'Pending OTP',
+                  }"
+                  [style.background-color]="
+                    d['param25'] === 'Pending'
+                      ? 'orange'
+                      : d['param25'] === 'Pending OTP'
+                        ? 'yellow'
+                        : ''
+                  "
+                  [style.color]="
+                    d['param25'] === 'Pending'
+                      ? 'white'
+                      : d['param25'] === 'Pending OTP'
+                        ? 'black'
+                        : ''
+                  "
+                  [style.font-size]="
+                    d['param25'] === 'Activated' ||
+                    d['param25'] === 'Pending' ||
+                    d['param25'] === 'Pending OTP'
+                      ? '11px'
+                      : ''
+                  "
+                >
+                  {{ d["param25"] || "NA" }} </span
+                ><br />
+                {{ d["param14"] || "NA" }}
+              </td>
+
+              <!-- ✅ Polling Status -->
+              <td>
+                {{ d["param45"] || "NA" }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination Controls -->
+        <div class="row">
+          <div class="col-md-12">
+            <div
+              *ngIf="totalCount > 0"
+              style="display: flex; justify-content: flex-end; margin-top: 10px"
+            >
+              <button
+                *ngIf="currentPage > 1"
+                (click)="onPageChange(currentPage - 1)"
+                [disabled]="loading"
+                style="
+                  border: 1px solid #0b58b9;
+                  background: white;
+                  color: #0b58b9;
+                  padding: 5px 10px;
+                  margin: 0 2px;
+                  border-radius: 4px;
+                  cursor: pointer;
+                  font-size: 11px;
+                  font-weight: bold;
+                "
+              >
+                Previous
+              </button>
+
+              <ng-container *ngFor="let page of getPageNumbers()">
+                <span
+                  *ngIf="page === -1"
+                  style="margin: 0 5px; color: #0b58b9; align-self: center"
+                  >...</span
+                >
+                <button
+                  *ngIf="page !== -1"
+                  (click)="onPageChange(page)"
+                  [disabled]="loading || page === currentPage"
+                  [style.background]="
+                    page === currentPage ? '#0b58b9' : 'white'
+                  "
+                  [style.color]="page === currentPage ? 'white' : '#0b58b9'"
+                  style="
+                    border: 1px solid #0b58b9;
+                    padding: 5px 10px;
+                    margin: 0 2px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    font-weight: bold;
+                  "
+                >
+                  {{ page }}
+                </button>
+              </ng-container>
+
+              <button
+                *ngIf="currentPage < getTotalPages()"
+                (click)="onPageChange(currentPage + 1)"
+                [disabled]="loading"
+                style="
+                  border: 1px solid #0b58b9;
+                  background: white;
+                  color: #0b58b9;
+                  padding: 5px 10px;
+                  margin: 0 2px;
+                  border-radius: 4px;
+                  cursor: pointer;
+                  font-size: 11px;
+                  font-weight: bold;
+                "
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

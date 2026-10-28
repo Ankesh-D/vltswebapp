@@ -1,0 +1,187 @@
+.content-i {
+  padding: 0px 0px;
+  .content-box {
+    .element-wrapper {
+      .element-box {
+        padding: 10px;
+
+        .pagetitleborder {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid #ccc;
+          margin-bottom: 0px;
+
+          .modern-nav-group {
+            display: flex;
+            background: #ffffff;
+            padding: 2px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            gap: 2px;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+          }
+
+          .nav-pill-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 11px;
+            color: #4b5563;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 4px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap;
+            position: relative;
+
+            .icon-box {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 24px;
+              height: 24px;
+              transition: transform 0.3s ease;
+            }
+
+            &:hover {
+              color: #1e40af;
+              background: #f3f4f6;
+              transform: translateY(-2px);
+
+              .icon-box {
+                transform: scale(1.2);
+              }
+            }
+
+            &.active {
+              background: linear-gradient(135deg, #b6d1f4 0%, #a6b4e6 100%);
+              color: #000000;
+              box-shadow: 0 10px 15px -3px rgba(11, 88, 185, 0.3);
+
+              .icon-box {
+                color: #ffffff;
+                background: linear-gradient(135deg, #b6d1f4 0%, #a6b4e6 100%);
+                color: #000000;
+              }
+
+              &:hover {
+                transform: translateY(-2px) scale(1.02);
+              }
+            }
+
+            i {
+              font-size: 15px;
+              color: #000000;
+            }
+          }
+
+          .pagebtn {
+            background: #0b58b9;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+
+            a {
+              color: #fff;
+              text-decoration: none;
+              font-size: 12px;
+            }
+
+            &:hover {
+              background: #084a9c;
+            }
+          }
+        }
+
+        .table-responsive {
+          form {
+            padding: 10px 0;
+
+            .tabletitlesearch {
+              border: 1px solid #0b58b9;
+              height: 25px;
+              width: 200px;
+              padding: 0 5px;
+            }
+
+            button {
+              cursor: pointer;
+              font-size: 12px;
+            }
+
+            select {
+              font-size: 10px;
+              height: 23px;
+            }
+
+            .testclassalert {
+              font-weight: bold;
+            }
+          }
+
+          table.table {
+            font-size: 11px;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+
+            th {
+              cursor: pointer;
+              white-space: normal;
+              overflow-wrap: anywhere;
+            }
+
+            td {
+              vertical-align: middle;
+            }
+
+            .action-cell {
+              display: flex;
+              gap: 5px;
+
+              button {
+                padding: 3px 8px;
+                border: none;
+                background: #0b58b9;
+                color: #fff;
+                border-radius: 3px;
+
+                &:hover {
+                  background: #084a9c;
+                }
+              }
+            }
+          }
+        }
+
+        .pagination-wrapper {
+          margin-top: 10px;
+          text-align: center;
+
+          button {
+            margin: 2px;
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+            background: #fff;
+
+            &.active {
+              background: #0b58b9;
+              color: #fff;
+            }
+
+            &:disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+}
+.pointer {
+  cursor: pointer;
+}

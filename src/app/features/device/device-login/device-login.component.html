@@ -1,0 +1,97 @@
+<div class="content-i">
+  <div class="content-box">
+    <div class="element-wrapper">
+      <div class="element-box" style="padding: 1.5rem 0.2rem">
+        <div class="col-md-12 pagetitleborder">
+          <div class="pagetitlestyle"><span>Device Login</span></div>
+        </div>
+        <div class="">
+          <div class="col-sm-12">
+            <div class="row form-row">
+              <!-- Date -->
+              <div class="col-sm-2">
+                <label class="field-label">
+                  Select Date:
+                  <b class="required">*</b>
+                </label>
+                <input
+                  class="form-control datepick"
+                  type="text"
+                  id="daterawdata"
+                  [(ngModel)]="selectedDate"
+                  name="date"
+                  />
+              </div>
+
+              <!-- Vendor -->
+              <div class="form-group col-sm-2 mb-0">
+                <label class="field-label">
+                  Search By Vendor
+                  <b class="required">*</b>
+                </label>
+                <select
+                  class="form-control searchable"
+                  id="vendorselector"
+                  [(ngModel)]="selectedVendor"
+                  name="vendor"
+                  >
+                  @if (vendorList.length > 1) {
+                    <option value="">Select</option>
+                  }
+                  @for (item of vendorList; track item) {
+                    <option [value]="item.param3">
+                      {{ item.param4 }} - {{ item.param2 }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <!-- IMEI -->
+              <div class="form-group col-sm-2 mb-0">
+                <label class="field-label">
+                  Select Imei No.
+                  <b class="required">*</b>
+                </label>
+                <select
+                  class="form-control searchable"
+                  id="imeino"
+                  [(ngModel)]="selectedIMEI"
+                  name="imei"
+                  >
+                  @if (imeiList.length > 1) {
+                    <option value="">Select Imei No.</option>
+                  }
+                  @for (item of imeiList; track item) {
+                    <option [value]="item.param2">
+                      {{ item.param2 }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <!-- Button -->
+              <div class="col-sm-2 btn-wrapper">
+                <button type="button" class="btn btn-sm btn-primary" (click)="getLoginCheck()" [disabled]="loading">
+                  {{ loading ? 'Loading...' : 'View' }}
+                </button>
+              </div>
+            </div>
+
+
+            @if (deviceDataList.length > 0) {
+              <div id="devicelogintable" style="margin-top: 20px;">
+                <div style="text-align: right; font-weight: bold; margin-left: 25px;">
+                  <font class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</font>
+                </div>
+                <app-common-table [columns]="tableColumns" [rows]="deviceDataList" [loading]="loading"
+                  [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
+                  tableClass="table table-striped app-table" emptyMessage="NO DATA FOUND">
+                </app-common-table>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

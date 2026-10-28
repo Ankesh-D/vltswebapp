@@ -1,0 +1,134 @@
+@mixin compact-admin-page {
+  :host {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  :host .content-i {
+    padding: var(--app-spacing);
+  }
+
+  :host .content-box {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  :host .element-wrapper {
+    min-width: 0;
+    margin: 0 auto 8px;
+  }
+
+  :host .element-box {
+    padding: 8px;
+  }
+
+  :host .page-header-row,
+  :host .pagetitleborder {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 32px;
+    margin-bottom: 6px;
+    padding: 4px 0 6px;
+    border-bottom: 1px solid var(--app-border);
+  }
+
+  :host .pagetitlestyle {
+    color: #1f2e43;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-decoration: none;
+  }
+
+  :host .top-controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+    margin: 6px 0;
+    padding: 6px 8px;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: var(--app-surface);
+    font-size: 11px;
+  }
+
+  :host .left-controls,
+  :host .right-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  :host .table-responsive {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  :host .table {
+    margin-bottom: 0;
+    font-size: 11px;
+  }
+
+  :host .table > :not(caption) > * > * {
+    padding: 5px 8px;
+    vertical-align: middle;
+    border-color: var(--app-table-border);
+  }
+
+  :host .table thead th {
+    padding: 7px 8px;
+    border-bottom: 2px solid #63b3ed;
+    background-color: var(--app-table-header-bg);
+    color: var(--app-table-header-text);
+    font-size: 10.5px;
+    font-weight: 650;
+  }
+
+  :host .table-striped tbody tr:nth-of-type(odd) > * {
+    background-color: var(--app-table-row-alt);
+  }
+
+  :host .form-control,
+  :host .form-select,
+  :host select {
+    min-height: var(--app-control-height);
+    padding: 4px 8px;
+    font-size: 11px;
+    border-color: var(--app-border);
+    border-radius: var(--app-radius);
+  }
+
+  :host .form-group {
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 767px) {
+    :host .content-i {
+      padding: 4px;
+    }
+
+    :host .element-box {
+      padding: 6px;
+    }
+
+    :host .page-header-row,
+    :host .pagetitleborder {
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    :host .left-controls,
+    :host .right-controls {
+      flex: 1 1 100%;
+    }
+  }
+}

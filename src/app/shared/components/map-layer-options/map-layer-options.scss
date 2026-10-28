@@ -1,0 +1,23 @@
+.psv-basemap-control { position: relative; font: 12px 'Segoe UI', sans-serif; color: #28372a; }
+.psv-basemap-toggle { padding: 7px 10px; border: 1px solid #d1dcc9; border-radius: 7px; background: #f8fbf4; color: #28372a; cursor: pointer; box-shadow: 0 2px 8px #243c2920; }
+.psv-basemap-panel { width: 225px; max-width: calc(100vw - 40px); margin-top: 5px; border: 1px solid #d1dcc9; border-radius: 8px; background: white; box-shadow: 0 5px 20px #243c2925; overflow-x: hidden; overflow-y: auto; }
+.psv-basemap-panel[hidden] { display: none; }
+.psv-basemap-panel header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: #e8f1dc; font-weight: 600; }
+.psv-basemap-panel header button { border: 0; background: transparent; color: #28372a; font-size: 20px; cursor: pointer; }
+.psv-basemap-options { display: block; padding: 5px; font: 12px 'Segoe UI', sans-serif; }
+.psv-basemap-options .psv-basemap-option { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; margin: 0; padding: 7px; border: 0; border-radius: 6px; background: white; color: #28372a; text-align: left; cursor: pointer; }
+.psv-basemap-options .psv-basemap-option.active, .psv-basemap-options .psv-basemap-option:hover { background: #eff5e7; }
+.psv-basemap-option:focus-visible, .psv-basemap-toggle:focus-visible { outline: 2px solid #467441; outline-offset: -2px; }
+.psv-basemap-icon { display: grid; place-items: center; width: 29px; height: 29px; flex: 0 0 29px; border-radius: 5px; background: #edf3e5; font-size: 17px; }
+.psv-basemap-info { display: block; flex: 1; }
+.psv-basemap-info strong, .psv-basemap-info small { display: block; line-height: 1.4; }
+.psv-basemap-info strong { font-size: 11px; font-weight: 600; }
+.psv-basemap-info small { margin-top: 2px; font-size: 9px; font-weight: 400; }
+.psv-basemap-check { visibility: hidden; font-size: 12px; }
+.psv-basemap-option.active .psv-basemap-check { visibility: visible; }
+.psv-basemap-attribution { display: block; padding: 3px 12px 8px; color: #52604e; font-size: 9px; }
+
+.layer-panel:has(app-map-layer-options), .layers-dropdown:has(app-map-layer-options) { width: 225px; border: 1px solid #d1dcc9; border-radius: 8px; background: #fff; }
+.layer-panel:has(app-map-layer-options) .layer-header, .layer-panel:has(app-map-layer-options) > header, .layers-dropdown:has(app-map-layer-options) .layers-header { background: #e8f1dc; color: #28372a; }
+.layer-body:has(app-map-layer-options), .layers-body:has(app-map-layer-options), .layer-options:has(app-map-layer-options) { padding: 0; }
+app-map-layer-options { display: block; width: 100%; }

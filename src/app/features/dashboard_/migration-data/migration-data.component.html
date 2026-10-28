@@ -1,0 +1,134 @@
+<div class="content-i">
+    <div class="content-box pt-0">
+        <div class="element-wrapper">
+            <div class="element-box">
+                <div class="content-body">
+                    <div class="container-fluid px-0">
+                        <div class="card main-card">
+                            <div class="card-body">
+                                <div class="col-md-12 pagetitleborder">
+                                    <div class="pagetitlestyle"><span>Migration Status</span></div>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0px; padding: 0 10px;">
+                                    <!-- Left Side: Search and Reload -->
+                                    <div style="display: flex; align-items: center;">
+                                        <span style="font-weight: bold; font-size: 12px; margin-right: 10px;">Search
+                                            :</span>
+                                        <ng-select class="vendor-select" [(ngModel)]="selectedVendorFilter"
+                                            (ngModelChange)="onVendorFilterChange($event)" placeholder="All">
+                                            <ng-option *ngFor="let vendor of vendorlist" [value]="vendor.param1">
+                                                {{ vendor.param2 }}
+                                            </ng-option>
+                                        </ng-select>
+
+
+
+                                        <button class="mx-2" (click)="reloadData()"
+                                            style="background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
+                                            <i class="fa fa-refresh" [class.fa-spin]="!listLoaded"
+                                                style="margin-right: 5px;"></i>
+                                            <span *ngIf="listLoaded">Reload</span>
+                                            <span *ngIf="!listLoaded">Reloading...</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- Right Side: Download, Page Size, Count -->
+                                    <div style="display: flex; align-items: center; font-size: 11px;">
+                                        <div style="display: flex; align-items: center; margin-right: 15px;">
+                                            <label style="margin: 0 5px 0 0; font-weight: bold; color: #333;">
+                                                Download:
+                                            </label>
+
+                                            <select [(ngModel)]="selectedDownloadType" (change)="onDownloadChange()"
+                                                [disabled]="isExporting"
+                                                style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; background: white;">
+
+                                                <option value="">Select</option>
+                                                <option value="Excel">Excel</option>
+                                            </select>
+
+                                            <span *ngIf="isExporting"
+                                                style="margin-left:8px; font-size:11px; color:#0b58b9;">
+                                                <i class="fa fa-spinner fa-spin"></i> Generating...
+                                            </span>
+                                        </div>
+
+
+                                        <!-- <div style="display: flex; align-items: center; margin-right: 15px;">
+            <label style="margin: 0 5px 0 0; font-weight: bold; color: #333;">Show Rows:</label>
+            <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)"
+                style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; color: #333; outline: none; background: white;">
+                <option *ngFor="let size of pageSizeOptions" [value]="size">
+                    {{ size }}
+                </option>
+            </select>
+        </div> -->
+                                        <!-- 
+                                        <div style="font-weight: bold; color: #0b58b9;">
+                                            Total Records : {{ totalCount }}
+                                        </div> -->
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive status-table">
+                                    <table class="table table-striped app-table small-table">
+                                        <thead style="margin: 0px;">
+                                            <tr>
+                                                <th class="text-center" rowspan="3">#</th>
+                                                <th class="text-center" rowspan="3">Vendor Name</th>
+
+                                                <!-- Devices -->
+                                                <th colspan="3" class="green py-1 text-end">
+                                                    Devices</th>
+
+                                                <!-- Polling -->
+                                                <th colspan="3" class="yellow py-1 text-end">
+                                                    Polling Status</th>
+                                                <th class="text-end" rowspan="3">Polling Mode HTTP</th>
+                                                <th class="text-end" rowspan="3">Polling Mode TCP</th>
+
+                                            </tr>
+
+                                            <tr>
+                                                <!-- Devices Level 2 -->
+                                                <th class="text-end" rowspan="2">Installed</th>
+                                                <th class="text-center" colspan="2">Migrated</th>
+
+                                                <!-- Polling -->
+                                                <th class="text-end" rowspan="2">Received</th>
+                                                <th class="text-end" rowspan="2">Not Received</th>
+                                                <th class="text-end" rowspan="2">Never Received</th>
+                                            </tr>
+
+                                            <tr>
+                                                <!-- Migrated Breakdown -->
+                                                <th class="text-end">Uploaded</th>
+                                                <th class="text-end">In TCP</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr *ngFor="let v of detailData; let i = index">
+                                                <td>{{ i + 1 }}</td>
+                                                <td>{{ v.param3 }}</td>
+                                                <td class="text-end px-2">{{ v.param4 }}</td>
+                                                <td class="text-end px-2">{{v.param16}}</td>
+                                                <td class="text-end px-2">{{v.param17}}</td> <!-- Installed -->
+                                                <!-- <td>{{ v.param15 }}</td> Migrated -->
+                                                <td class="text-end px-2">{{ v.param9 }}</td> <!-- Received -->
+                                                <td class="text-end px-2">{{ v.param10 }}</td> <!-- Not Received -->
+                                                <td class="text-end px-2">{{ v.param11 }}</td> <!-- Never Received -->
+                                                <td class="text-end px-2">{{ v.param14 }}</td> <!-- Mode HTTP -->
+                                                <td class="text-end px-2">{{ v.param15 }}</td> <!-- Mode TCP -->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
