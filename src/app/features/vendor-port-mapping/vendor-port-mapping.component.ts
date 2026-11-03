@@ -10,6 +10,8 @@ import { ToastService } from '../../core/services/toast.service';
 import { CommonDataToolbarComponent } from '../../shared/components/common-data-toolbar/common-data-toolbar.component';
 import { CommonPaginationComponent } from '../../shared/components/common-pagination/common-pagination.component';
 import { CommonTableColumn, CommonTableComponent } from '../../shared/components/common-table/common-table.component';
+import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
+import { DataTableColumn, DataTableComponent } from '../../shared/components/data-table/data-table.component';
 
 interface Vendor {
   param1: string; // ID
@@ -33,8 +35,8 @@ interface AssignedPort {
 
 @Component({
     selector: 'app-vendor-port-mapping',
-    imports: [CommonModule, FormsModule, ToastComponent, CommonDataToolbarComponent,
-      CommonPaginationComponent, CommonTableComponent],
+    imports: [CommonModule, FormsModule, ToastComponent, CommonDataToolbarComponent, DataTableComponent,
+      PaginationComponent],
     templateUrl: './vendor-port-mapping.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './vendor-port-mapping.component.scss'
@@ -59,11 +61,11 @@ export class VendorPortMappingComponent implements OnInit {
   readonly pageSizeOptions = [20, 50, 100, 200];
   sortKey: string = '';
   reverse: boolean = false;
-  readonly tableColumns: CommonTableColumn<AssignedPort>[] = [
-    { key: 'param1', label: '#' },
-    { key: 'param6', label: 'Vendor Name', sortable: true },
-    { key: 'param4', label: 'Port Number', sortable: true },
-    { key: 'param5', label: 'IP Address', sortable: true }
+  readonly tableColumns: DataTableColumn<AssignedPort>[] = [
+    { key: 'param1', header: '#', width: '50px' },
+    { key: 'param6', header: 'Vendor Name' },
+    { key: 'param4', header: 'Port Number' },
+    { key: 'param5', header: 'IP Address' }
   ];
   vendorList: any[] = [];
   errorMessage: string | null = null;
@@ -85,6 +87,29 @@ export class VendorPortMappingComponent implements OnInit {
   ngOnInit(): void {
     this.loadDropdowns();
     this.loadAssignedPorts();
+  }
+  getPaginatedData(): AssignedPort[] {
+       // API already returns paginated data, so just sort if needed
+       // Note: In a production app, sorting should be done server-side
+       // For now, we do client-side sorting on the current page
+       let sorted = [...this.assignedPorts];
+       if (this.sortKey) {
+         sorted.sort((a: any, b: any) => {
+           const aVal = String(a[this.sortKey] || '').toLowerCase();
+           const bVal = String(b[this.sortKey] || '').toLowerCase();
+           if (this.reverse) {
+             return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+           } else {
+             return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+           }
+         });
+       }
+       return sorted;
+    }
+  onCellClick(event: { row: AssignedPort; column: DataTableColumn<AssignedPort> }) {
+    // if (event.column.header === 'Approval' && event.row.param44 === 'Not Approve') {
+    //   this.openApproveModal(event.row);
+    // }
   }
 
   loadDropdowns(): void {

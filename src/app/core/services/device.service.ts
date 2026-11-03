@@ -5,31 +5,118 @@ import { delay, tap } from 'rxjs/operators';
 import { BackendConnectedDeviceReq, CheckHealthAckDetailsReq, DeviceHealthAckSendReq, smsAcknowledgedetailsReq, UntagRequestDetailsReq } from '../model/request.model';
 import { BackendConnDeviceResponse } from '../model/response.model';
 import { HttpParams } from '@angular/common/http';
+// export interface Device {
+//   param1: string;      // rowNumber
+//   param2?: string;     // Vehicle ID or other
+//   param3?: string;     // Device ID or other
+//   param4: string;      // IMEI No
+//   param5: string;      // Serial No
+//   param6: string;      // ICCID No
+//   param7: string;      // Vendor Name
+//   param8?: string;     // Dealer Name
+//   param10?: string;    // Vehicle ID / mapping ID
+//   param11?: string;    // Vehicle/Chassis No
+//   param12?: string;    // Vehicle No / chassis alternative
+//   param14?: string;    // Activation Date
+//   param18?: string;    // RTO Name
+//   param19?: string;    // Vehicle Type
+//   param25?: string;    // Activation Status
+//   param26: string;     // Activation Status
+//   param27?: string;    // Customer ID / old owner ID when returned
+//   param28?: string;    // Customer Name
+//   param29?: string;    // Customer Mobile
+//   param43?: string;    // Installation Date
+//   param45?: string;    // Polling Status
+//   param56?: string;    // M2M Code
+//   param67?: string;    // Installation Date (alternative format)
+//   [key: string]: any;  // Additional properties for flexible response handling
+// }
 export interface Device {
-  param1: string;      // rowNumber
-  param2?: string;     // Vehicle ID or other
-  param3?: string;     // Device ID or other
-  param4: string;      // IMEI No
-  param5: string;      // Serial No
-  param6: string;      // ICCID No
-  param7: string;      // Vendor Name
-  param8?: string;     // Dealer Name
-  param10?: string;    // Vehicle ID / mapping ID
-  param11?: string;    // Vehicle/Chassis No
-  param12?: string;    // Vehicle No / chassis alternative
-  param14?: string;    // Activation Date
-  param18?: string;    // RTO Name
-  param19?: string;    // Vehicle Type
-  param25?: string;    // Activation Status
-  param26: string;     // Activation Status
-  param27?: string;    // Customer ID / old owner ID when returned
-  param28?: string;    // Customer Name
-  param29?: string;    // Customer Mobile
-  param43?: string;    // Installation Date
-  param45?: string;    // Polling Status
-  param56?: string;    // M2M Code
-  param67?: string;    // Installation Date (alternative format)
-  [key: string]: any;  // Additional properties for flexible response handling
+  param1: string;
+  param2: string;
+  param3: string;
+  param4: string;
+  param5: string;
+  param6: string;
+  param7: string;
+  param8: string;
+  param9: string;
+  param10: string;
+  param11: string;
+  param12: string;
+  param13: string;
+  param14: string;
+  param15: string;
+  param16: string;
+  param17: string;
+  param18: string;
+  param19: string;
+  param20?: string;
+  param21?: string;
+  param22?: string;
+  param23?: string;
+  param24?: string;
+  param25: string;
+  param26: string;
+  param27: string;
+  param28: string;
+  param29: string;
+  param30: string;
+  param31: string;
+  param32: string;
+  param33: string;
+  param34: string;
+  param35: string;
+  param36: string;
+  param37: string;
+  param38: string;
+  param39: string;
+  param40: string;
+  param41: string;
+  param42: string;
+  param43: string;
+  param44: string;
+  param45: string;
+  param46: string;
+  param47: string;
+  param48: string;
+  param49: string;
+  param50: string;
+  param51: string;
+  param52: string;
+  param53: string;
+  param54: string;
+  param55: string;
+  param56: string;
+  param57: string;
+  param58: string;
+  param59: string;
+  param60: string;
+  param61: string;
+  param62: string;
+  param63: string;
+  param64: string;
+  param65: string;
+  param66: string;
+  param67: string;
+  param68: string;
+  param69: string;
+  param70: string;
+  param71: string;
+  param72: string;
+  param73: string;
+  param74: string;
+  param75: string;
+  param76: string;
+  param77: string;
+  param78: string;
+  param79: string;
+  param80: string;
+  param81: string;
+  param82: string;
+  param83: string;
+  param84: string;
+  param85: string;
 }
 
 export interface DeviceListResponse {

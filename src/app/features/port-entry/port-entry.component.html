@@ -62,8 +62,9 @@
               </div>
 
               <!-- Table Section -->
+
               <div class="col-md-9">
-                <div class="d-flex justify-content-end mb-2">
+                <!-- <div class="d-flex justify-content-end mb-2">
                   <div class="d-flex align-items-center bg-white shadow-sm" style="border-radius: 25px; padding: 3px 5px 3px 15px; border: 1px solid #e9ecef; width: 300px; transition: all 0.3s ease;">
                     <input type="text" class="form-control border-0 shadow-none bg-transparent p-0" placeholder="Search..."
                       [(ngModel)]="searchText" (keyup.enter)="loadPorts(1)"
@@ -85,8 +86,14 @@
                       <i class="fa fa-refresh text-success" style="font-size: 0.8rem;"></i>
                     </button>
                   </div>
-                </div>
-
+                </div> -->
+                <!-- <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Search..."
+                  [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="loadPorts(1)"
+                  (reload)="loadPorts(1)" [loading]="loading" [pageSize]="pageSize"
+                  [pageSizeOptions]="pageSizeOptions" [displayedCount]="assignedPorts.length" [totalRecords]="totalCount"
+                  (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows" totalLabel="Total Records"
+                  countSeparator="of">
+                </app-common-data-toolbar> -->
                 <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                   <table class="table table-striped app-table table-bordered table-hover table-sm" style="font-size: 0.85rem;">
                     <thead class="table-light" style="position: sticky; top: 0; z-index: 1;">

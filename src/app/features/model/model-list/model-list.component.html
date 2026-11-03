@@ -13,7 +13,7 @@
 
             <!-- ADD NEW BUTTON -->
             @if (roleId === '10' || roleId === '11') {
-              <button type="button" class="add-new-btn" routerLink="/model/entry">
+              <button type="button" class="btn btn-primary btn-sm header-btn" routerLink="/model/entry">
                 <i class="fa fa-plus"></i>
                 Add New
               </button>
@@ -22,18 +22,39 @@
           </div>
         </div>
 
-        <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here..." [showExcel]="true"
-          [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
-          (reload)="reloadData()" [loading]="loading" [exportLoading]="isExporting" [pageSize]="pageSize"
-          [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
-          (pageSizeChange)="onPageSizeChange($event.toString())" (excelExport)="exportToExcel()" pageSizeLabel="Show Rows"
-          totalLabel="Total Records" countSeparator="of">
+        <app-common-data-toolbar variant="device" 
+          searchLabel="Search :" searchPlaceholder="Type here..." 
+          [showExcel]="true"
+          [searchText]="searchText" 
+          (searchTextChange)="searchText=$event" 
+          (search)="getSearchDetails()"
+          (reload)="reloadData()"
+          [loading]="loading"
+          [exportLoading]="isExporting"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [displayedCount]="pageCount"
+          [totalRecords]="totalCount"
+          (pageSizeChange)="onPageSizeChange($event.toString())"
+          (excelExport)="exportToExcel()"
+          pageSizeLabel="Show Rows"
+          totalLabel="Total Records"
+          countSeparator="of">
           @if (isExporting) {
             <span class="model-exporting"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Generating...</span>
           }
         </app-common-data-toolbar>
+        <app-data-table
+        [columns]="tableColumns"
+        [rows]="getPaginatedModels()"
+        [loading]="loading"
+        [sortKey]="sortKey"
+        [reverse]="reverse"
+        tableClass="table table-striped table-sm table-bordered mb-1"
+        tableId="devicetable"
+        (sort)="sort($event)"></app-data-table>
 
-        <ng-template #modelHeader let-column>
+        <!-- <ng-template #modelHeader let-column>
           @switch (column.key) {
             @case ('param8') { TAC Validity<hr class="my-0">COP Validity }
             @default { {{ column.label }} }
@@ -71,11 +92,14 @@
           [sortKey]="sortKey" [reverse]="reverse" [headerTemplate]="modelHeader" [cellTemplate]="modelCell"
           tableClass="table table-striped app-table mb-1" tableId="modeltable"
           (sortChange)="sort($event)">
-        </app-common-table>
+        </app-common-table> -->
         <div class="d-flex justify-content-end">
-          <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
-            [disabled]="loading" (pageChange)="onPageChange($event)">
-          </app-common-pagination>
+          <app-pagination
+        [totalCount]="totalCount"
+        [page]="currentPage"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)"
+      ></app-pagination>
         </div>
       </div>
     </div>

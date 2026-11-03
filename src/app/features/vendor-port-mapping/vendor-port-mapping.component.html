@@ -63,16 +63,30 @@
           countSeparator="of">
         </app-common-data-toolbar>
 
-        <app-common-table [columns]="tableColumns" [rows]="assignedPorts" [loading]="loading" maxHeight="300px"
-          [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped app-table table-sm table-bordered mb-1"
-          tableId="assigned-ports-table" (sortChange)="sort($event)">
-        </app-common-table>
-
-        <div class="d-flex justify-content-end">
+        <app-data-table
+        [columns]="tableColumns"
+        [rows]="getPaginatedData()"
+        [loading]="loading"
+        [sortKey]="sortKey"
+        [reverse]="reverse"
+        tableClass="table table-striped table-sm table-bordered mb-1"
+        tableId="devicetable"
+        (sort)="sort($event)"
+        (cellClick)="onCellClick($event)"
+      ></app-data-table>
+        <div class="float-end">
+        <app-pagination
+        [totalCount]="totalCount"
+        [page]="currentPage"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)"
+      ></app-pagination>
+      </div>
+        <!-- <div class="d-flex justify-content-end">
           <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
             [disabled]="loading" (pageChange)="onPageChange($event)">
           </app-common-pagination>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

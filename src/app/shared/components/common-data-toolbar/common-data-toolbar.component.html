@@ -18,6 +18,21 @@
           <i class="fa fa-refresh" [class.fa-spin]="loading" aria-hidden="true"></i>
         </button>
       }
+      @if (showOldNew) {
+          <label class="common-data-toolbar__page-size">
+            <select
+              [ngModel]="selectedOldNew"
+              (ngModelChange)="onOldNewChange($event)"
+              aria-label="Select Old or New"
+            >
+              @for (option of OldNewOptions; track option) {
+                <option [ngValue]="option.value">
+                  {{ option.label }}
+                </option>
+              }
+            </select>
+          </label>
+        }
 
       @if (showExcel || showPdf) {
         <div class="common-data-toolbar__exports" role="group" aria-label="Export data">

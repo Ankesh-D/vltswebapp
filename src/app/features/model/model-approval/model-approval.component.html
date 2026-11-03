@@ -5,14 +5,30 @@
         <div class="col-md-12 pagetitleborder">
           <div class="pagetitlestyle"><span>Device Model Approval</span></div>
         </div>
-
+        <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here..." [showExcel]="true"
+          [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
+          (reload)="reloadData()" [loading]="loading" [exportLoading]="isExporting" [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
+          (pageSizeChange)="onPageSizeChange($event)" (excelExport)="exportToExcel()" pageSizeLabel="Show Rows"
+          totalLabel="Total Records" countSeparator="of">
+          @if (isExporting) {
+            <span class="dealer-exporting"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Generating...</span>
+          }
+        </app-common-data-toolbar>
         <!-- Search Controls -->
-        <div class="top-controls-row">
-
-          <!-- LEFT SEARCH -->
+        <app-data-table
+        [columns]="tableColumns"
+        [rows]="getPaginatedData()"
+        [loading]="loading"
+        [sortKey]="sortKey"
+        [reverse]="reverse"
+        tableClass="table table-striped table-sm table-bordered mb-1"
+        tableId="devicetable"
+        (sort)="sort($event)"
+        (cellClick)="onCellClick($event)"
+      ></app-data-table>
+        <!-- <div class="top-controls-row">
           <div class="left-controls">
-
-            <!-- SEARCH -->
             <div class="search-box">
               <input type="search"
                 class="search-input inner"
@@ -25,22 +41,17 @@
                 <i class="fa fa-search"></i>
               </button>
             </div>
-
-            <!-- RELOAD -->
             <button class="reload-btn" (click)="reloadData()" [disabled]="loading">
               <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
               <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
             </button>
 
           </div>
-
-          <!-- RIGHT CONTROLS -->
           <div class="right-controls">
             <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
               [showPageSize]="false" [showTotal]="false" [exportLoading]="isExporting"
               (excelExport)="exportToExcel()"></app-common-data-toolbar>
 
-            <!-- ROWS -->
             <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)">
               @for (size of pageSizeOptions; track size) {
                 <option [value]="size === totalCount ? totalCount : size">
@@ -49,16 +60,15 @@
               }
             </select>
 
-            <!-- TOTAL -->
             <div class="total-records-text">
               Total Records : {{ pageCount }} of {{ totalCount }}
             </div>
 
           </div>
 
-        </div>
+        </div> -->
 
-        <app-common-table [columns]="tableColumns" [rows]="models" [loading]="loading"
+        <!-- <app-common-table [columns]="tableColumns" [rows]="models" [loading]="loading"
           [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="modelApprovalCell"
           tableClass="table table-striped app-table mb-1" tableId="devicetable"
           tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
@@ -106,7 +116,7 @@
               {{column.value ? column.value(model) : 'NA'}}
             }
           }
-        </ng-template>
+        </ng-template> -->
 
         <!-- Pagination Controls -->
         <div class="float-end">
