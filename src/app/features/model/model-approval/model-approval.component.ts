@@ -8,10 +8,11 @@ import { ToastComponent } from '../../assets/inactive-assets/toast.component';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastService } from '../../../core/services/toast.service';
 import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
 
 @Component({
     selector: 'app-model-approval',
-    imports: [CommonModule, FormsModule, RouterModule, CommonDataToolbarComponent, ToastComponent, NgbPaginationModule, CommonTableComponent],
+    imports: [CommonModule, FormsModule, RouterModule, DataTableComponent, ToastComponent, NgbPaginationModule, CommonDataToolbarComponent],
     templateUrl: './model-approval.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./model-approval.component.scss']
@@ -29,18 +30,18 @@ selectedDownloadType: string = '';
   // Sorting
   sortKey: string = '';
   reverse: boolean = false;
-  readonly tableColumns: CommonTableColumn<Model>[] = [
-    { key: 'param1', label: '#', width: '30px' },
-    { key: 'param15', label: 'Vendor Name', sortable: true, value: model => model.param15 || 'NA' },
-    { key: 'param5', label: 'Certification Authority', sortable: true, value: model => model.param5 || 'NA' },
-    { key: 'param4', label: 'Model Name', sortable: true, value: model => model.param4 || 'NA' },
-    { key: 'param3', label: 'Model Code', sortable: true, value: model => model.param3 || 'NA' },
-    { key: 'param8', label: 'TAC Validity', sortable: true, value: model => model.param8 || 'NA' },
-    { key: 'param20', label: 'Status', sortable: true, className: 'text-center' },
-    { key: 'param35', label: 'Pending Reason', sortable: true, value: model => model.param35 || 'NA' },
-    { key: 'param27', label: 'Device IRNSS', sortable: true, value: model => model.param27 || 'NA' },
-    { key: 'activity', label: 'Activity', className: 'text-center' },
-    { key: 'tacValidity', label: 'TAC Validity Approval', className: 'text-center' }
+  readonly tableColumns: DataTableColumn<Model>[] = [
+    { key: 'param1', header: '#', width: '30px' },
+    { key: 'param15', header: 'Vendor Name', value: model => model.param15 || 'NA' },
+    { key: 'param5', header: 'Certification Authority', value: model => model.param5 || 'NA' },
+    { key: 'param4', header: 'Model Name', value: model => model.param4 || 'NA' },
+    { key: 'param3', header: 'Model Code', value: model => model.param3 || 'NA' },
+    { key: 'param8', header: 'TAC Validity', value: model => model.param8 || 'NA' },
+    { key: 'param20', header: 'Status', className: 'text-center' },
+    { key: 'param35', header: 'Pending Reason', value: model => model.param35 || 'NA' },
+    { key: 'param27', header: 'Device IRNSS', value: model => model.param27 || 'NA' },
+    { key: 'activity', header: 'Activity', className: 'text-center' },
+    { key: 'tacValidity', header: 'TAC Validity Approval', className: 'text-center' }
   ];
   
   // Selected model for approval
@@ -67,6 +68,30 @@ selectedDownloadType: string = '';
     this.loadModels();
     this.roleId = sessionStorage.getItem('roleid');
   }
+  getPaginatedData(): Model[] {
+       // API already returns paginated data, so just sort if needed
+       // Note: In a production app, sorting should be done server-side
+       // For now, we do client-side sorting on the current page
+       let sorted = [...this.models];
+       if (this.sortKey) {
+         sorted.sort((a: any, b: any) => {
+           const aVal = String(a[this.sortKey] || '').toLowerCase();
+           const bVal = String(b[this.sortKey] || '').toLowerCase();
+           if (this.reverse) {
+             return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+           } else {
+             return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+           }
+         });
+       }
+       return sorted;
+    }
+  
+    onCellClick(event: { row: Model; column: DataTableColumn<Model> }) {
+        // if (event.column.header === 'Approval' && event.row.param44 === 'Not Approve') {
+        //   this.openApproveModal(event.row);
+        // }
+      }
   updatePageSizeOptions() {
     // Generate page size options based on total count
     const options = [20];

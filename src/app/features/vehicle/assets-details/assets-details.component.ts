@@ -6,6 +6,9 @@ import { DeviceService, Device,  AssetsDetailsRequest } from '../../../core/serv
 import { ToastService } from '../../../core/services/toast.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonDataToolbarComponent, OldNewOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 class RequestData {
   param1 = '';
@@ -24,7 +27,7 @@ class RequestData {
 
 @Component({
     selector: 'app-assets-details',
-    imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule],
+    imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './assets-details.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './assets-details.component.scss'
@@ -66,6 +69,106 @@ deleteRemark: string = '';
   deviceType: string = 'new';
   // Filter type display
   filterType: string = 'Total Device';
+
+readonly tableColumns: DataTableColumn<Device>[] = [
+  {
+    header: '#',
+    key: 'param1',
+    className: 'id-column'
+  },
+  {
+    header: '',
+    headers: ['Chassis No.', 'Vehicle No.'],
+    sortKey: 'param5',
+    value: device =>
+      this.joinValues(device.param12, device.param11),
+    width: '120px'
+  },
+  {
+    header: 'Engine No.',
+    key: 'param13',
+    sortKey: 'param7',
+    width: '120px'
+  },
+  {
+    header: '',
+    headers: ['Serial No.', 'IMEI No.', 'ICCID No.'],
+    width: '140px',
+    sortKey: 'param8',
+    value: device =>
+      this.joinValues(device.param5, device.param4, device.param6)
+  },
+  {
+    header: '',
+    headers: ['Vehicle Type', 'Vehicle Class'],
+    sortKey: 'param9',
+    value: device =>
+      this.joinValues(device.param19, device.param42)
+  },
+  {
+    header: '',
+    headers: ['Make', 'Model'],
+    sortKey: 'param50',
+    width: '130px',
+    value: device =>
+      this.joinValues(device.param40, device.param41)
+  },
+  {
+    header: 'Installation Date',
+    key: 'param43',
+    sortKey: 'param16',
+    width: '160px'
+  },
+  {
+    header: '',
+    headers: ['Customer Name', 'Mobile No.'],
+    sortKey: 'param47',
+    value: device =>
+      this.joinValues(device.param28, device.param29)
+  },
+  {
+    header: '',
+    headers: ['Dealer', '(Vendor)'],
+    sortKey: 'param34',
+    value: device =>
+      this.joinValues(device.param8, device.param7)
+  },
+  {
+    header: 'RTO Name',
+    key: 'param18',
+    sortKey: 'param48'
+  },
+  {
+    header: '',
+    headers: ['Activation Status', 'Activation Details'],
+    key: 'param25',
+    sortKey: 'param25',
+    value: device =>
+      this.joinValues(device.param25, device.param14),
+    className: 'activation-column'
+  },
+  {
+    header: 'Polling Status',
+    key: 'param45',
+    sortKey: 'param45',
+    className: 'polling-column'
+  },
+  {
+    header: 'Action',
+    className: 'action-column',
+    width: '70px',
+    visible: () => this.roleId === '10',
+    actions: [
+      {
+        label: 'Delete',
+        className: 'table-action-btn table-action-delete',
+        run: device => this.openDeleteModal(device),
+        disabled: device => device.param25 === 'Activated'
+      }
+    ]
+  }
+];
+
   
   constructor(
     private toast: ToastService,
@@ -94,10 +197,39 @@ deleteRemark: string = '';
     });
     
   }
+  private joinValues(...values: (string | null | undefined)[]): string {
+  return values
+    .map(value => value == null || value === '' ? 'NA' : value)
+    .join('\n');
+}
+ getPaginatedData(): Device[] {
+    // API already returns paginated data, so just sort if needed
+    // Note: In a production app, sorting should be done server-side
+    // For now, we do client-side sorting on the current page
+    let sorted = [...this.devices];
+    if (this.sortKey) {
+      sorted.sort((a: any, b: any) => {
+        const aVal = String(a[this.sortKey] || '').toLowerCase();
+        const bVal = String(b[this.sortKey] || '').toLowerCase();
+        if (this.reverse) {
+          return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+        } else {
+          return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+        }
+      });
+    }
+    return sorted;
+  }
+  onCellClick(event: { row: Device; column: DataTableColumn<Device> }) {
+      if (event.column.header === 'Approval' && event.row.param44 === 'Not Approve') {
+        // this.openApproveModal(event.row);
+      }
+    }
   redirectInsert() {
     this.router.navigate(['device/entry']);
   }
-onTypeChange() {
+onTypeChange(deviceType: OldNewOption) {
+  this.deviceType = deviceType;
   this.currentPage = 1;
   this.loadDevices();
 }
@@ -621,7 +753,7 @@ submitDelete(){
           }
         });
   }
-
+isExporting: boolean = false;
   exportPDFExcel(type: any) {
      const request: AssetsDetailsRequest = {
   param1: this.searchText,
@@ -633,8 +765,10 @@ submitDelete(){
   param7: '',
   pdfexcel: 'excel' // Add this line to include pdfexcel in the request
 };
+    this.isExporting = true;
     this.deviceService.getAssetsDetails(request).subscribe({
       next: (response) => {
+        this.isExporting = false;
         this.loading = false;
         if(response.statuscode == 200) {
           const fileUrl: string = response?.entity;

@@ -5,7 +5,7 @@ import { Component, EventEmitter, Input, Output, TemplateRef } from '@angular/co
 export type DataTableCellStyle = Record<string, string | number | null | undefined>;
 
 export interface DataTableColumn<T = Record<string, unknown>> {
-  header: string;
+  header?: string;
   headers?: string[];
   cellTemplate?: TemplateRef<{ $implicit: T }>;
   key?: string;

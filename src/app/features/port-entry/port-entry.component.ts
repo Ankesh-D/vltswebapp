@@ -6,25 +6,15 @@ import { RouterModule } from '@angular/router';
 import { trigger, style, animate, transition, query, stagger } from '@angular/animations';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { ToastComponent } from '../assets/inactive-assets/toast.component';
+import { DataTableColumn } from '../../shared/components/data-table/data-table.component';
+import { CommonDataToolbarComponent } from '../../shared/components/common-data-toolbar/common-data-toolbar.component';
 
 @Component({
     selector: 'app-port-entry',
-    imports: [CommonModule, FormsModule, RouterModule, ToastComponent, LoadingComponent],
+    imports: [CommonModule, FormsModule, RouterModule, ToastComponent, LoadingComponent, CommonDataToolbarComponent],
     templateUrl: './port-entry.component.html',
     styleUrl: './port-entry.component.scss',
     changeDetection: ChangeDetectionStrategy.Eager,
-    animations: [
-        trigger('listAnimation', [
-            transition('* <=> *', [
-                query(':enter', [
-                    style({ opacity: 0, transform: 'translateY(-10px)' }),
-                    stagger('30ms', [
-                        animate('300ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-                    ])
-                ], { optional: true })
-            ])
-        ])
-    ]
 })
 export class PortEntryComponent implements OnInit {
   // Form Data
@@ -55,6 +45,12 @@ export class PortEntryComponent implements OnInit {
   private apiUrl = 'https://vlts.wb.gov.in/wbsdcpsvnew';
 
   private http = inject(HttpClient);
+    readonly pageSizeOptions = [20, 50, 100, 200];
+  readonly tableColumns: DataTableColumn<any>[] = [
+      { key: 'param1', header: '#', width: '50px' },
+      { key: 'param3', header: 'Port Number' },
+      { key: 'param4', header: 'IP Address' },
+    ];
 
   ngOnInit(): void {
     this.loadPorts(1);

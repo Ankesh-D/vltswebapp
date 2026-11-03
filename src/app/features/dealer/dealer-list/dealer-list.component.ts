@@ -11,11 +11,12 @@ import { DashboardService } from '../../../core/services/dashboard.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
 import { CommonPaginationComponent } from '../../../shared/components/common-pagination/common-pagination.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 @Component({
     selector: 'app-dealer-list',
     imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, ToastComponent,
-      CommonDataToolbarComponent, CommonPaginationComponent, CommonTableComponent],
+      CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './dealer-list.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./dealer-list.component.scss']
@@ -37,22 +38,30 @@ export class DealerListComponent implements OnInit {
   // Sorting
   sortKey: string = '';
   reverse: boolean = false;
-  readonly tableColumns: CommonTableColumn[] = [
-    { key: 'param1', label: '#', width: '3%' },
-    { key: 'param18', label: 'Vendor Name', sortable: true, width: '7%' },
-    { key: 'param3', label: 'Dealer Name', sortable: true, width: '9%' },
-    { key: 'param9', label: 'Contact Person', sortable: true, width: '7%' },
-    { key: 'param11', label: 'Mobile No.', sortable: true, width: '6%' },
-    { key: 'param12', label: 'Alternate No.', sortable: true, width: '6%' },
-    { key: 'param10', label: 'Email ID', sortable: true, width: '9%' },
-    { key: 'param5', label: 'Address', sortable: true, width: '12%' },
-    { key: 'param7', label: 'City', sortable: true, width: '6%' },
-    { key: 'param8', label: 'State', sortable: true, width: '6%' },
-    { key: 'param29', label: 'Total Devices', sortable: true, width: '5%' },
-    { key: 'param30', label: 'Installed', sortable: true, width: '5%' },
-    { key: 'param31', label: 'Activated', sortable: true, width: '5%' },
-    { key: 'param32', label: 'Pending', sortable: true, width: '5%' },
-    { key: 'param28', label: 'Status / Activity', width: '9%' }
+  readonly tableColumns: DataTableColumn<Dealer>[] = [
+    { key: 'param1', header: '#', width: '3%' },
+    { key: 'param18', header: 'Vendor Name', sortKey: 'param18' },
+    { key: 'param3', header: 'Dealer Name', sortKey: 'param3' },
+    { key: 'param9', header: 'Contact Person', sortKey: 'param9' },
+    { header: '', headers: ['Mobile No.', 'Alternate No.'], sortKey: 'param8', value: dealer => this.joinValues(dealer.param11, dealer.param12) },
+    { key: 'param10', header: 'Email ID', sortKey: 'param10' },
+    { key: 'param5', header: 'Address', sortKey: 'param5' },
+    { header: '', headers: ['State', 'City'], value: dealer => this.joinValues(dealer.param8, dealer.param7) },
+    { key: 'param29', header: 'Total Devices', sortKey: 'param29' },
+    { key: 'param30', header: 'Installed', sortKey: 'param30' },
+    { key: 'param31', header: 'Activated', sortKey: 'param31' },
+    { key: 'param32', header: 'Pending', sortKey: 'param32' },
+    {
+      header: 'Activity',
+      className: 'activity-column',
+      visible: () => this.canManageByRole(),
+      actions: [
+        { label: 'Edit', className: 'table-action-btn table-action-edit', run: dealer => this.openEditModal(dealer), disabled: dealer => dealer.param28 !== 'Active' },
+        { label: 'Delete', className: 'table-action-btn table-action-delete', run: dealer => this.openDeleteModal(dealer), disabled: dealer => dealer.param28 === 'Suspend' },
+        { label: dealer => this.activeBlockLabel(dealer), className: 'table-action-btn table-action-toggle', run: dealer => this.openBlockModal(dealer) }
+      ]
+    }
+    // { key: 'param28', header: 'Status / Activity' }
   ];
   
   // State and City lists
@@ -132,6 +141,39 @@ selectedCityId: any = null;    // = $scope.city
     this.loadDistributorList();
   }
  }
+ private joinValues(primary?: string, secondary?: string): string {
+    const values = [primary, secondary].filter(value => value && value !== '0');
+    return values.length ? values.join(' \n ') : '-';
+}
+canManageByRole(): boolean {
+    return !['17', '18', '19'].includes(String(this.roleId));
+  }
+
+ getPaginatedData(): Dealer[] {
+     // API already returns paginated data, so just sort if needed
+     // Note: In a production app, sorting should be done server-side
+     // For now, we do client-side sorting on the current page
+     let sorted = [...this.dealers];
+     if (this.sortKey) {
+       sorted.sort((a: any, b: any) => {
+         const aVal = String(a[this.sortKey] || '').toLowerCase();
+         const bVal = String(b[this.sortKey] || '').toLowerCase();
+         if (this.reverse) {
+           return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+         } else {
+           return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+         }
+       });
+     }
+     return sorted;
+  }
+
+  onCellClick(event: { row: Dealer; column: DataTableColumn<Dealer> }) {
+      // if (event.column.header === 'Approval' && event.row.param44 === 'Not Approve') {
+      //   this.openApproveModal(event.row);
+      // }
+    }
+
  updatePageSizeOptions() {
     // Generate page size options based on total count
     const options = [20];
@@ -533,6 +575,10 @@ if (this.stateName) {
     this.getManagedata(dealer);
     this.remarkForBlock = '';
     this.showBlockModal = true;
+     
+  }
+  activeBlockLabel(dealer: any): string {
+  return dealer.param28 === 'Active' ? 'Block' : 'Active';
   }
 
   closeBlockModal() {
@@ -855,8 +901,8 @@ exportToExcel() {
 
   const payload = {
     param1: this.searchText || '',
-    param2: 1,
-    param3: this.totalCount || 1000,
+    param2: "",
+    param3: "",
     param4: this.counttype || '',
     dealerid: '',
     pdfexcel: 'excel'

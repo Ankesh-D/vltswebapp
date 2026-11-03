@@ -27,6 +27,8 @@
         [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
         (reload)="reloadData()" [loading]="loading" [pageSize]="pageSize"
         [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
+        (excelExport)="exportToExcel()"
+        (exportLoading)="isExporting"
         (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows" totalLabel="Total Records"
         countSeparator="of">
       </app-common-data-toolbar>

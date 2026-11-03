@@ -21,23 +21,10 @@
         </div>
       </div>
 
-      <!-- ERROR MESSAGE -->
-      @if (errorMessage) {
-        <div class="custom-alert">
-          <strong>Warning:</strong> {{ errorMessage }}
-          <button
-            type="button"
-            class="alert-close"
-            (click)="errorMessage = ''"
-            >
-            &times;
-          </button>
-        </div>
-      }
+     
 
       <!-- SEARCH + CONTROLS -->
-      <form autocomplete="off" class="top-controls-row">
-        <!-- LEFT SEARCH -->
+      <!-- <form autocomplete="off" class="top-controls-row">
         <div class="left-controls">
           <span class="search-label">Search :</span>
 
@@ -73,9 +60,7 @@
           </button>
         </div>
 
-        <!-- RIGHT CONTROLS -->
         <div class="right-controls">
-          <!-- OLD / NEW TOGGLE -->
           <div class="control-item">
             <label>Type :</label>
 
@@ -87,17 +72,14 @@
               <option value="old">Old</option>
             </select>
           </div>
-          <!-- DOWNLOAD -->
           <div class="control-item">
             <label>Download :</label>
             <select (change)="exportPDFExcel($event)">
               <option vlaue="" >Select</option>
-              <!-- <option value="excel">Excel</option> -->
               <option value="">Excel</option>
             </select>
           </div>
 
-          <!-- SHOW ROWS -->
           <div class="control-item">
             <label>Show Rows :</label>
             <select
@@ -114,14 +96,41 @@
             </select>
           </div>
 
-          <!-- TOTAL RECORDS -->
           <div class="total-records-text">
             Total Records : {{ pageCount }} of {{ totalCount }}
           </div>
         </div>
-      </form>
-
-      <div class="col-sm-12">
+      </form> -->
+       <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here..." [showExcel]="true"
+          [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
+          (reload)="reloadData()" [loading]="loading" [exportLoading]="isExporting" [pageSize]="pageSize" [showOldNew]="true"
+          [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount" (oldNewChange)="onTypeChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)" (excelExport)="exportPDFExcel($event)" pageSizeLabel="Show Rows"
+          totalLabel="Total Records" countSeparator="of">
+          @if (isExporting) {
+            <span class="dealer-exporting"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Generating...</span>
+          }
+        </app-common-data-toolbar>
+        <app-data-table
+        [columns]="tableColumns"
+        [rows]="getPaginatedData()"
+        [loading]="loading"
+        [sortKey]="sortKey"
+        [reverse]="reverse"
+        tableClass="table table-striped table-sm table-bordered mb-1"
+        tableId="devicetable"
+        (sort)="sort($event)"
+        (cellClick)="onCellClick($event)"
+      ></app-data-table>
+      <div class="float-end">
+        <app-pagination
+        [totalCount]="totalCount"
+        [page]="currentPage"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)"
+      ></app-pagination>
+      </div>
+      <!-- <div class="col-sm-12">
         <table
           class="table-striped table mb-1"
                 style="
@@ -198,17 +207,6 @@
                   >
                 </span>
               </th>
-
-              <!-- <th style="width:145px;" (click)="sort('param67')" class="sortable">
-              IMSI Primary No
-              <hr style="margin: 1px 0;">
-              IMSI Secondary No
-              <span class="sorting"
-        [ngClass]="{'sorting_desc': reverse && sortKey=='param67',
-                    'sorting_asc': !reverse && sortKey=='param67'}">
-              </span>
-            </th> -->
-
             <th
               style="width: 160px"
               (click)="sort('param16')"
@@ -288,12 +286,10 @@
             @if (roleId == '10') {
               <th class="sortable">Action</th>
             }
-            <!-- <th>Download Receipt</th> -->
           </tr>
         </thead>
 
         <tbody>
-          <!-- NO DATA -->
           @if (devices.length === 0) {
             <tr>
               <td
@@ -305,7 +301,6 @@
             </tr>
           }
 
-          <!-- DATA ROWS -->
           @for (d of devices; track d) {
             <tr>
               <td>{{ d["param1"] || "NA" }}</td>
@@ -324,7 +319,6 @@
                 {{ d["param19"] || "NA" }}<br />
                 {{ d["param42"] || "NA" }}
               </td>
-              <!-- param50make ka hay ab filal pata nhi  -->
               <td>
                 {{ d["param40"] || "NA" }}<br />
                 {{ d["param41"] || "NA" }}
@@ -343,7 +337,6 @@
               <td>
                 {{ d["param18"] || "NA" }}
               </td>
-              <!-- ✅ Activation Status -->
               <td>
                       <div class="fw-bold" [ngClass]="{
                         'text-success': d['param25'] == 'Activated',
@@ -351,10 +344,8 @@
                       }">
                   {{ d["param25"] || "NA" }}
                 </div>
-                <!-- {{ d["param25"] || "NA" }}<br /> -->
                 {{ d["param14"] || "NA" }}
               </td>
-              <!-- ✅ Polling Status -->
               <td>
                       <div class="fw-bold" [ngClass]="{
                         'text-success': d['param45'] == 'Received',
@@ -363,7 +354,6 @@
                       }">
                   {{ d["param45"] || "NA" }}
                 </div>
-                <!-- {{ d["param45"] || "NA" }} -->
               </td>
               @if (roleId == '10') {
                 <td
@@ -386,12 +376,7 @@
                       >
                       <i class="fa fa-trash"></i>
                     </button>
-                    <!-- <button *ngIf="d.param25=='Pending OTP'" class="btn btn-danger btn-sm" (click)="setdataData(d)">
-                    <i class="fa fa-trash"></i>
-                  </button>
-                  <button *ngIf="d.param25=='Activated'" class="btn btn-danger btn-sm" (click)="untagDevice(d)">
-                    <i class="fa fa-trash"></i>
-                  </button> -->
+                   
                 </div>
               </td>
             }
@@ -407,7 +392,7 @@
         </ngb-pagination>
       }
     </div>
-  </div>
+  </div> -->
 </div>
 </div>
 
@@ -458,10 +443,13 @@
       (click)="$event.stopPropagation()"
       >
       <!-- HEADER -->
-      <div class="modal-header">
-        <h5 class="modal-title">Delete Asset</h5>
-        <button type="button" class="close-btn" (click)="closeDeleteModal()">
-          ×
+     <div class="modal-header py-2 px-3" style="background: #f8d3d3;">
+        <h5 class="modal-title text-danger" style="font-size: 14px; font-weight: 600;">Delete Asset</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="closeDeleteModal()">
         </button>
       </div>
       <!-- BODY -->
@@ -493,10 +481,18 @@
         </div>
       </div>
       <!-- FOOTER -->
-      <div class="modal-footer">
+       <div class="modal-footer justify-content-center" style="background: #f7f7f7;">
+          <button type="submit" [disabled]="loading" class="btn btn-danger btn-sm px-4" (click)="submitDelete()">
+            <i class="fa fa-trash me-1"></i> Delete
+          </button>
+          <button type="button" (click)="closeDeleteModal()" class="btn btn-primary btn-sm px-4">
+            <i class="fa fa-times me-1"></i> Back
+          </button>
+        </div>
+      <!-- <div class="modal-footer">
         <button class="btn-primary" (click)="submitDelete()">Submit</button>
         <button class="stn-secondary" (click)="closeDeleteModal()">Cancel</button>
-      </div>
+      </div> -->
     </div>
   </div>
 }

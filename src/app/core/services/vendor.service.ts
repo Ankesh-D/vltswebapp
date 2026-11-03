@@ -37,6 +37,7 @@ export interface VendorRequest {
   param2: string;  // Page number (1-based)
   param3: string;  // Page size
   param4: string;  // Count type (Total, Active, etc.)
+  pdfexcel: string;
 }
 
 export interface VendorPortMappingRequest {
@@ -81,7 +82,8 @@ export class VendorService extends BaseApiService {
       param1: request.param1 || '',
       param2: request.param2 || '1',
       param3: request.param3 || '20',
-      param4: request.param4 || ''
+      param4: request.param4 || '',
+      pdfexcel: request.pdfexcel || ''
     });
   }
 

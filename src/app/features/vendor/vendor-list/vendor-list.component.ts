@@ -119,6 +119,7 @@ export class VendorListComponent implements OnInit {
   formErrors: { [key: string]: boolean } = {};
   emailMessage: string = '';
   contactPersonEmailMessage: string = '';
+  isExporting: boolean =false;
   
   constructor(
     private vendorService: VendorService,
@@ -169,7 +170,8 @@ export class VendorListComponent implements OnInit {
       param1: this.searchText.trim(),
       param2: this.currentPage.toString(),
       param3: this.pageSize.toString(),
-      param4: this.counttype || ''  // Use counttype from route params (Total, Active, etc.)
+      param4: this.counttype || '',  // Use counttype from route params (Total, Active, etc.)
+      pdfexcel: ''
     };
 
     this.vendorService.getVendorDetails(request).subscribe({
@@ -701,5 +703,43 @@ export class VendorListComponent implements OnInit {
     } else {
       this.formErrors['mobileNo'] = false;
     }
+  }
+  exportToExcel() {
+
+    this.isExporting = true;
+
+   const request: VendorRequest = {
+      param1: this.searchText.trim(),
+      param2: "",
+      param3: "",
+      param4: this.counttype || '',  // Use counttype from route params (Total, Active, etc.)
+      pdfexcel: 'excel'
+    };
+    console.log(request);
+
+    this.vendorService.getVendorDetails(request).subscribe({
+        next: (response: any) => {
+
+          this.isExporting = false;
+
+          if (response?.status && typeof response.entity === 'string') {
+
+            const link = document.createElement('a');
+            link.href = response.entity;
+            link.download = '';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+          } else {
+            alert('Failed to generate Excel');
+          }
+        },
+        error: (err) => {
+          this.isExporting = false;
+          alert('Error exporting Excel');
+          console.error(err);
+        }
+      });
   }
 }

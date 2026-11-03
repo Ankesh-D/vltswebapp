@@ -30,7 +30,28 @@
           }
         </app-common-data-toolbar>
 
-        <ng-template #dealerHeader let-column>
+        <app-data-table
+        [columns]="tableColumns"
+        [rows]="getPaginatedData()"
+        [loading]="loading"
+        [sortKey]="sortKey"
+        [reverse]="reverse"
+        tableClass="table table-striped table-sm table-bordered mb-1"
+        tableId="devicetable"
+        (sort)="sort($event)"
+        (cellClick)="onCellClick($event)"
+      ></app-data-table>
+      
+      <div class="float-end">
+        <app-pagination
+        [totalCount]="totalCount"
+        [page]="currentPage"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)"
+      ></app-pagination>
+      </div>
+
+        <!-- <ng-template #dealerHeader let-column>
           @switch (column.key) {
             @case ('param28') { Status<hr class="my-0">Activity }
             @default { {{ column.label }} }
@@ -82,7 +103,7 @@
           <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
             [disabled]="loading" (pageChange)="onPageChange($event)">
           </app-common-pagination>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

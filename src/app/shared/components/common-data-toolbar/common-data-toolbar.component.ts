@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 export type PageSizeOption = number | string;
+export type OldNewOption = 'old' | 'new';
 
 @Component({
   selector: 'app-common-data-toolbar',
@@ -24,9 +25,10 @@ export class CommonDataToolbarComponent {
   @Input() exportLoading = false;
   @Input() showSearch = true;
   @Input() showReload = true;
-  @Input() showExcel = false;
+  @Input() showExcel = true;
   @Input() showPdf = false;
   @Input() showPageSize = true;
+  @Input() showOldNew = false;
   @Input() showTotal = true;
   @Input() pageSizeLabel = 'Rows';
   @Input() totalLabel = 'Total Records';
@@ -38,12 +40,25 @@ export class CommonDataToolbarComponent {
   @Output() readonly excelExport = new EventEmitter<void>();
   @Output() readonly pdfExport = new EventEmitter<void>();
   @Output() readonly pageSizeChange = new EventEmitter<PageSizeOption>();
+  @Output() readonly oldNewChange = new EventEmitter<OldNewOption>();
+  OldNewOptions: { value: OldNewOption; label: string }[] = [
+    { value: 'old', label: 'Old' },
+    { value: 'new', label: 'New' }
+  ];
 
   get selectedPageSize(): PageSizeOption {
     return this.variant === 'vehicle' && this.pageSize === this.totalRecords ? 'All' : this.pageSize;
   }
 
+
   onPageSizeChange(value: PageSizeOption): void {
     this.pageSizeChange.emit(value);
   }
+
+  selectedOldNew: OldNewOption = 'new';
+
+onOldNewChange(value: OldNewOption): void {
+  this.selectedOldNew = value;
+  this.oldNewChange.emit(value);
+}
 }

@@ -14,6 +14,8 @@ import { CommonModule } from '@angular/common';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
 import { CommonPaginationComponent } from '../../../shared/components/common-pagination/common-pagination.component';
 import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 export type CertificateType =
   | 'TAC'
@@ -26,7 +28,7 @@ declare var $: any;
 @Component({
     selector: 'app-model-list',
     imports: [CommonModule, FormsModule, RouterModule, ToastComponent, NgSelectModule,
-      CommonDataToolbarComponent, CommonPaginationComponent, CommonTableComponent],
+      CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './model-list.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./model-list.component.scss']
@@ -60,18 +62,25 @@ export class ModelListComponent implements OnInit {
   // Sorting
   sortKey: string = '';
   reverse: boolean = false;
-  readonly tableColumns: CommonTableColumn[] = [
-    { key: 'param1', label: '#', width: '3%' },
-    { key: 'param15', label: 'Vendor', sortable: true, width: '9%' },
-    { key: 'param3', label: 'Model Code', sortable: true, width: '8%' },
-    { key: 'param4', label: 'Model Name', sortable: true, width: '11%' },
-    { key: 'param9', label: 'Production Date', sortable: true, width: '8%' },
-    { key: 'param7', label: 'Certified Date', sortable: true, width: '8%' },
-    { key: 'param20', label: 'Approval Status', sortable: true, width: '9%' },
-    { key: 'param5', label: 'Certification Authority', sortable: true, width: '13%' },
-    { key: 'param18', label: 'Approved By', sortable: true, width: '9%' },
-    { key: 'param8', label: 'TAC Validity / COP Validity', sortable: true, width: '11%' },
-    { key: 'activity', label: 'Activity', width: '11%' }
+  readonly tableColumns: DataTableColumn<Model>[] = [
+    { key: 'param1', header: '#', className: 'id-column'   },
+    { key: 'param15', header: 'Vendor',  },
+    { key: 'param3', header: 'Model Code',  },
+    { key: 'param4', header: 'Model Name', },
+    { key: 'param9', header: 'Production Date',  },
+    { key: 'param7', header: 'Certified Date',  },
+    { key: 'param20', header: 'Approval Status',  },
+    { key: 'param5', header: 'Certification Authority',},
+    { key: 'param18', header: 'Approved By',  },
+    {
+      key: 'param8', headers: ['TAC Validity', 'COP Validity'],
+      header: '',
+      value: vendor => this.joinValues(vendor.param8, vendor.param12)
+    },
+    { header: 'Activity', actions: [
+      { label: 'Edit', className: 'table-action-btn table-action-edit', run: row => this.openEditModal(row), visible: row => this.roleId === '10' || (this.roleId === '11' && row.param20 === 'Pending') },
+      { label: 'Delete', className: 'table-action-btn table-action-delete', run: row => this.openDeleteModal(row), visible: () => this.roleId === '10' || this.roleId === '11' }
+    ]}
   ];
 
   // Selected model for edit/delete
@@ -109,6 +118,10 @@ export class ModelListComponent implements OnInit {
     this.loadModels();
     this.loadYears();
     this.loadMonths();
+  }
+  private joinValues(primary?: string, secondary?: string): string {
+    const values = [primary, secondary].filter(value => value && value !== '0');
+    return values.length ? values.join(' \n ') : '-';
   }
   initializeDatePickers() {
     this.datePickerService.initialize({

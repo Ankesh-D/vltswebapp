@@ -13,7 +13,7 @@
         totalLabel="Total Records" countSeparator="of">
       </app-common-data-toolbar>
 
-      <ng-template #customerCell let-customer let-column="column">
+      <!-- <ng-template #customerCell let-customer let-column="column">
         @if (column.key === 'activity') {
           <div class="vendor-actions">
             <button type="button" class="btn btn-sm btn-outline-primary" (click)="openEditModal(customer)">
@@ -32,12 +32,26 @@
         [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="customerCell"
         tableClass="table table-striped app-table table-sm table-bordered mb-1" tableId="customer-table"
         (sortChange)="sort($event)">
-      </app-common-table>
+      </app-common-table> -->
 
-      <div class="d-flex justify-content-end">
-        <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
-          [disabled]="loading" (pageChange)="onPageChange($event)">
-        </app-common-pagination>
+      <app-data-table
+        [columns]="tableColumns"
+        [rows]="getPaginatedData()"
+        [loading]="loading"
+        [sortKey]="sortKey"
+        [reverse]="reverse"
+        tableClass="table table-striped table-sm table-bordered mb-1"
+        tableId="devicetable"
+        (sort)="sort($event)"
+        (cellClick)="onCellClick($event)"></app-data-table>
+
+      <<div class="float-end">
+        <app-pagination
+        [totalCount]="totalCount"
+        [page]="currentPage"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)"
+      ></app-pagination>
       </div>
     </div>
   </section>

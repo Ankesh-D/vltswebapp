@@ -10,12 +10,14 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
 import { CommonPaginationComponent } from '../../../shared/components/common-pagination/common-pagination.component';
 import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
 
 
 @Component({
     selector: 'app-update-customer-details',
     imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, ToastComponent,
-      CommonDataToolbarComponent, CommonPaginationComponent, CommonTableComponent],
+      CommonDataToolbarComponent, PaginationComponent, DataTableComponent],
     templateUrl: './update-customer-details.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./update-customer-details.component.scss']
@@ -33,17 +35,26 @@ export class UpdateCustomerDetailsComponent implements OnInit, AfterViewInit {
 
   sortKey: string = '';
   reverse: boolean = false;
-  readonly tableColumns: CommonTableColumn[] = [
-    { key: 'param1', label: '#', width: '52px' },
-    { key: 'param3', label: 'Holder Name', sortable: true },
-    { key: 'param4', label: 'Holder Type', sortable: true },
-    { key: 'param5', label: 'Mobile No.', sortable: true },
-    { key: 'param6', label: 'Email ID', sortable: true },
-    { key: 'param7', label: 'Alternate Mobile No.', sortable: true },
-    { key: 'param8', label: 'Address', sortable: true },
-    { key: 'param9', label: 'City', sortable: true },
-    { key: 'param10', label: 'Pin Code', sortable: true },
-    { key: 'activity', label: 'Activity', width: '140px' }
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { key: 'param1', header: '#', width: '52px' },
+    { key: 'param3', header: 'Holder Name' },
+    { key: 'param4', header: 'Holder Type' },
+    { key: 'param5', header: 'Mobile No.' },
+    { key: 'param6', header: 'Email ID' },
+    { key: 'param7', header: 'Alternate Mobile No.' },
+    { key: 'param8', header: 'Address' },
+    { key: 'param9', header: 'City' },
+    { key: 'param10', header: 'Pin Code' },
+    {
+      header: 'Activity',
+      className: 'activity-column',
+      // visible: () => this.canManageByRole(),
+      actions: [
+        { label: 'Edit', className: 'table-action-btn table-action-edit', run: customer => this.openEditModal(customer) },
+        { label: 'Delete', className: 'table-action-btn table-action-delete', run: customer => this.openDeleteModal(customer) },
+        // { label: dealer => this.activeBlockLabel(dealer), className: 'table-action-btn table-action-toggle', run: dealer => this.openBlockModal(dealer) }
+      ]
+    }
   ];
 
   // Edit Modal
@@ -96,6 +107,11 @@ export class UpdateCustomerDetailsComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     // No jQuery/select2; using Angular bindings and overlay modals
+  }
+  onCellClick(event: { row: any; column: DataTableColumn<any> }) {
+        // if (event.column.header === 'Approval' && event.row.param44 === 'Not Approve') {
+        //   this.openApproveModal(event.row);
+        // }
   }
   loadStateList(stateName?: string) {
     this.permitHolderService.getStateList().subscribe({
@@ -284,10 +300,10 @@ export class UpdateCustomerDetailsComponent implements OnInit, AfterViewInit {
   }
 
   downloadExcel(): void {
-    const columns = this.tableColumns.filter(column => column.key !== 'activity');
+    const columns = this.tableColumns.filter((column) => column.key !== 'activity');
     const rows = [
-      columns.map(column => column.label),
-      ...this.customerDetails.map(customer => columns.map(column => customer[column.key] ?? ''))
+      columns.map((column: any) => column.label),
+      ...this.customerDetails.map(customer => columns.map((column: any) => customer[column.key] ?? ''))
     ];
     const csv = '\uFEFF' + rows
       .map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(','))
@@ -303,6 +319,7 @@ export class UpdateCustomerDetailsComponent implements OnInit, AfterViewInit {
 
   // Edit Customer (overlay modal)
   openEditModal(customer: any) {
+    console.log(customer)
     this.editCustomerId = customer.param2 || '';
     this.editHolderName = customer.param3 || '';
     this.editHolderType = customer.param4 || '';
