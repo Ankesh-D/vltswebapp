@@ -1,4 +1,4 @@
-<div class="content-i device-list-page" [class.device-ux4g-error]="!!ux4gStylesError">
+<div class="content-i device-list-page">
   <div class="content-box px-0">
     <div class="element-wrapper">
       <!-- Home Button -->
@@ -21,12 +21,12 @@
               <!-- ACTION BUTTONS -->
               @if (roleId=='10' || roleId=='12' ||roleId=='61' || roleId=='13' || roleId=='64') {
                 <div class="header-actions">
-                  <button type="button" class="ux4g-btn ux4g-btn-primary ux4g-btn-l header-btn" (click)="redirectInsert()">
+                  <button type="button" class="header-btn header-btn--primary" (click)="redirectInsert()">
                     <i class="fa fa-plus" aria-hidden="true"></i>
                     Add New
                   </button>
                   @if (roleId == '10' ||roleId=='61' || roleId=='12' || roleId=='13' || roleId=='64') {
-                    <button type="button" class="ux4g-btn ux4g-btn-outline-primary ux4g-btn-l header-btn" routerLink="/bulk-device-entry">
+                    <button type="button" class="header-btn" routerLink="/bulk-device-entry">
                       <i class="fa fa-plus" aria-hidden="true"></i>
                       Add Multiple
                     </button>
@@ -79,17 +79,17 @@
               @case ('param50') { {{ d['param50'] || 'NA' }}<br>{{ d['param51'] || 'NA' }} }
               @case ('param16') { {{ d['param16'] || 'NA' }}<br>{{ d['param15'] || 'NA' }} }
               @case ('param47') {
-                <span class="ux4g-tag-s" [ngClass]="{'ux4g-tag-filled-success': d['param47'] == 'Assigned', 'ux4g-tag-filled-error': d['param47'] != 'Assigned'}">
+                <span class="device-status" [ngClass]="d['param47'] == 'Assigned' ? 'device-status--success' : 'device-status--error'">
                   {{ d['param47'] || 'NA' }}
                 </span>
                 <span class="device-cell-detail">{{ d['param20'] || 'NA' }}</span>
               }
               @case ('param54') { {{ d['param54'] }} }
               @case ('param34') {
-                <span class="ux4g-tag-s" [ngClass]="{
-                  'ux4g-tag-filled-success': d['param34'] == 'Activated',
-                  'ux4g-tag-filled-warning': d['param34'] == 'Pending OTP',
-                  'ux4g-tag-filled-error': d['param34'] != 'Activated' && d['param34'] != 'Pending OTP'
+                <span class="device-status" [ngClass]="{
+                  'device-status--success': d['param34'] == 'Activated',
+                  'device-status--warning': d['param34'] == 'Pending OTP',
+                  'device-status--error': d['param34'] != 'Activated' && d['param34'] != 'Pending OTP'
                 }">
                   {{ d['param34'] || 'NA' }}
                 </span>
@@ -98,7 +98,7 @@
                 } @else { - }
               }
               @case ('param48') {
-                <span class="ux4g-tag-s" [ngClass]="{'ux4g-tag-filled-success': d['param48'] == 'Received', 'ux4g-tag-filled-error': d['param48'] != 'Received'}">
+                <span class="device-status" [ngClass]="d['param48'] == 'Received' ? 'device-status--success' : 'device-status--error'">
                   {{ d['param48'] || 'NA' }}
                 </span>
                 <span class="device-cell-detail">{{ d['param60'] || 'NA' }}</span>
@@ -110,14 +110,14 @@
           }
           <app-common-table class="device-table" [columns]="tableColumns" [rows]="devices" [loading]="loading"
             [sortKey]="sortKey" [reverse]="reverse" [headerTemplate]="deviceHeader" [cellTemplate]="deviceCell"
-            tableClass="ux4g-table ux4g-table-m ux4g-table-column-dividers ux4g-table-zebra-rows device-table__table"
-            wrapperClass="ux4g-table-responsive ux4g-table-rounded"
+            tableClass="table table-striped table-sm table-bordered mb-1 device-table__table"
+            wrapperClass="device-table__wrapper"
             tableId="devicetable" headerClass="device-thead" (sortChange)="sort($event)">
           </app-common-table>
           <div class="float-end">
-            <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+            <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
               [disabled]="loading" (pageChange)="onPageChange($event)">
-            </app-common-pagination>
+            </app-pagination>
           </div>
       </div>
     </div>

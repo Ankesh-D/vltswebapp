@@ -175,8 +175,8 @@ export class AlertService extends BaseApiService {
     return this.post<any>('/panicdashcount', { pagename });
   }
 
-  getVehicleClassWisePanicCounts(request: VehicleClassWiseAlertCountReq): Observable<ApiResponse<any>> {
-    return this.post<any>('/vehicleclasswisepaniccounts', request);
+  getVehicleClassWisePanicCounts(request?: VehicleClassWiseAlertCountReq): Observable<ApiResponse<any>> {
+    return this.post<any>('/vehicleclasswisepaniccounts', { pagename: '', ...(request ?? {}) });
   }
 
   getRtoWisePanicCounts(range?: { param1: string; param2: string }): Observable<ApiResponse<any>> {

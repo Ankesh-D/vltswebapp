@@ -12,12 +12,11 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DeviceService, Device, DeviceRequest } from '../../../core/services/device.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonPaginationComponent } from '../../../shared/components/common-pagination/common-pagination.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
 @Component({
     selector: 'app-device-list',
-    imports: [CommonModule, RouterModule, CommonDataToolbarComponent,
-      CommonPaginationComponent, CommonTableComponent],
+    imports: [CommonModule, RouterModule, CommonDataToolbarComponent, PaginationComponent, CommonTableComponent],
     templateUrl: './device-list.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./device-list.component.scss']
