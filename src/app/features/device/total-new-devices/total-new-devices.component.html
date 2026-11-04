@@ -1,174 +1,153 @@
 <div class="content-i">
   <div class="content-box">
     <div class="element-wrapper">
-      <!-- Home Button -->
-      <!-- <button style="background: #2bdc16;border-color: #2bdc16;" class="btn btn-primary returnbtn">
-      <i class="fa fa-angle-double-left" style="width: 20px;"></i>
-      <a style="float: right;" (click)="goHome()" style="cursor: pointer;">Home</a>
-    </button>	 -->
-
-    <div class="element-box">
-      <!-- HEADER -->
       <div class="table-responsive">
         <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
           <div class="col-md-12 pagetitleborder">
             <div class="page-header-row">
-
-              <!-- TITLE -->
-              <div class="pagetitlestyle">
-                {{ filterType }} Details
-              </div>
-
-              <!-- ACTION BUTTONS -->
+              <div class="pagetitlestyle">{{ filterType }} Details</div>
               <div class="header-actions">
-                <button type="button" class="header-btn" (click)="redirectInsert()">
-                  <i class="fa fa-plus"></i>
-                  Add New
+                <button type="button" class="toolbar-btn" (click)="redirectInsert()">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                  <span>Add New</span>
                 </button>
-
                 @if (roleId !== '13') {
-                  <button type="button" class="header-btn" routerLink="/bulk-device-entry">
-                    <i class="fa fa-plus"></i>
-                    Add Multiple
+                  <button type="button" class="toolbar-btn" routerLink="/bulk-device-entry">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                    <span>Add Multiple</span>
                   </button>
                 }
               </div>
-
             </div>
           </div>
 
-          <!-- ERROR MESSAGE -->
           @if (errorMessage) {
-            <div class="custom-alert">
+            <div class="alert alert-warning error-message" role="alert">
               <strong>Warning:</strong> {{ errorMessage }}
-              <button type="button" class="alert-close" (click)="errorMessage = ''">
-                &times;
-              </button>
+              <button type="button" class="close" (click)="errorMessage = ''" aria-label="Close">&times;</button>
             </div>
           }
 
-          <!-- SEARCH + CONTROLS -->
-          <form autocomplete="off" class="top-controls-row">
+          <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here..."
+            [searchText]="searchText" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+            [displayedCount]="pageCount" [totalRecords]="totalCount" [loading]="loading"
+            [exportLoading]="isExporting" (searchTextChange)="searchText = $event"
+            (search)="getSearchDetails()" (reload)="reloadData()"
+            (pageSizeChange)="onPageSizeChange($event)" (excelExport)="exportPDFExcel()"
+            [showOldNew]="true" (oldNewChange)="onOldNewChange($event)"
+            pageSizeLabel="Show Rows" totalLabel="Total Records" countSeparator="of">
+            <label toolbarBeforeExports class="device-filter">
+              <span>Type</span>
+              <select [ngModel]="selectedFilter" (ngModelChange)="onFilterChange($event)" name="deviceFilter"
+                aria-label="Device filter">
+                <option value="NewDevice">New</option>
+                <option value="TotalDevice">Total Device</option>
+                <option value="ACTIVATED">Activated</option>
+                <option value="PENDING">Pending</option>
+                <option value="TODAYINSTALLED">Today's Installation</option>
+                <option value="NeverReceived">Never Received</option>
+                <option value="NotReceived">Not Received</option>
+              </select>
+            </label>
+            @if (isExporting) {
+              <span class="export-status"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Generating...</span>
+            }
+          </app-common-data-toolbar>
 
-            <!-- LEFT SEARCH -->
-            <div class="left-controls">
-
-              <span class="search-label">Search :</span>
-
-              <div class="search-box">
-                <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input inner"
-                  placeholder="Search..." maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()"
-                  name="searchby" />
-
-                <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
-                  <i class="fa fa-search"></i>
-                </button>
-              </div>
-
-              <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading">
-                {{ loading ? 'Reloading...' : 'Reload' }}
-              </button>
-
-            </div>
-
-            <!-- RIGHT CONTROLS -->
-            <div class="right-controls">
-
-              <!-- DOWNLOAD -->
-              <div class="control-item">
-                <label>Download :</label>
-                <select>
-                  <option>Select</option>
-                  <option>Excel</option>
-                </select>
-              </div>
-
-              <!-- SHOW ROWS -->
-              <div class="control-item">
-                <label>Show Rows :</label>
-                <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize">
-                  @for (size of pageSizeOptions; track size) {
-                    <option [value]="size === totalCount ? 'All' : size">
-                      {{ size === totalCount ? 'All' : size }}
-                    </option>
-                  }
-                </select>
-              </div>
-
-              <!-- TOTAL RECORDS -->
-              <div class="total-records-text">
-                Total Records : {{ pageCount }} of {{ totalCount }}
-              </div>
-
-            </div>
-          </form>
-
-
-
-          <div class="col-sm-12">
-            <ng-template #newDeviceCell let-d let-column="column">
-              @switch (column.key) {
-                @case ('param5') { {{d.param5 || 'NA'}}<br>{{d.param6 || 'NA'}} }
-                @case ('param7') { {{d.param7 || 'NA'}}<br>{{d.param14 || 'NA'}} }
-                @case ('param8') { {{d.param10 || 'NA'}}<br>{{d.param11 || 'NA'}} }
-                @case ('param9') { {{d.param8 || 'NA'}}<br>{{d.param9 || 'NA'}} }
-                @case ('param50') { {{d.param50 || 'NA'}}<br>{{d.param51 || 'NA'}} }
-                @case ('param16') { {{d.param15 || 'NA'}}<br>{{d.param16 || 'NA'}} }
-                @case ('param47') { {{d.param47 || 'NA'}}<br>{{d.param20 || 'NA'}} }
-                @case ('param34') {
-                  {{d.param34 || 'NA'}}<br>
-                  @if (d.param34 === 'Activated') { {{d.param54}} } @else { - }
-                }
-                @case ('param48') { {{d.param48 || 'NA'}}<br>{{d.param60 || 'NA'}} }
-                @default { {{d[column.key] || 'NA'}} }
-              }
-            </ng-template>
-            <app-common-table [columns]="tableColumns" [rows]="devices" [loading]="loading"
-              [cellTemplate]="newDeviceCell" [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
-              tableClass="table-striped app-table table" tableId="devicetable"
-              tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
-              headerClass="device-thead" emptyMessage="NO DATA FOUND">
-            </app-common-table>
+          <app-data-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
+            [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped table-sm table-bordered mb-1"
+            tableId="devicetable" (sort)="sort($event)" emptyMessage="NO DATA FOUND">
+          </app-data-table>
+          <div class="float-end">
+            <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+              [disabled]="loading" (pageChange)="onPageChange($event)">
+            </app-pagination>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Pagination Controls -->
-  @if (totalCount > 0) {
-    <div class="pagination-wrapper">
-      <ul class="pagination">
-        <li [class.disabled]="currentPage === 1">
-          <button (click)="onPageChange(currentPage - 1)"
-            [disabled]="currentPage === 1">
-            Prev
-          </button>
-        </li>
-        @for (page of getPageNumbers(); track page) {
-          <li
-            [class.active]="page === currentPage"
-            [class.ellipsis]="page === -1">
-            @if (page === -1) {
-              <span>…</span>
-            }
-            @if (page !== -1) {
-              <button
-                (click)="onPageChange(page)">
-                {{ page }}
-              </button>
-            }
-          </li>
+      @if (selectedDevice) {
+          <div class="modal-overlay" (click)="closeDeleteModal()">
+            <section class="delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-title"
+              (click)="$event.stopPropagation()">
+              <header class="delete-modal__header">
+                <h2 id="delete-title">Delete Device</h2>
+                <button type="button" aria-label="Close" (click)="closeDeleteModal()" [disabled]="isDeleting">&times;</button>
+              </header>
+              <div class="delete-modal__body">
+                <p>IMEI No.: <strong>{{ selectedDevice.param4 || 'NA' }}</strong></p>
+                <label for="deleteRemark">Remark <span aria-hidden="true">*</span></label>
+                <textarea id="deleteRemark" name="deleteRemark" rows="3" maxlength="500"
+                  [(ngModel)]="deleteRemark" [disabled]="isDeleting" placeholder="Enter remark"></textarea>
+                @if (selectedDevice.param25 !== 'Activated') {
+                  <label class="refund-option">
+                    <input type="checkbox" name="refundAmount" [(ngModel)]="deleteRefundAmount"
+                      [disabled]="isDeleting">
+                    Refund amount
+                  </label>
+                }
+              </div>
+              <footer class="delete-modal__footer">
+                <button type="button" class="delete-confirm" (click)="submitDelete()" [disabled]="isDeleting">
+                  <i class="fa fa-trash" aria-hidden="true"></i> {{ isDeleting ? 'Deleting...' : 'Delete' }}
+                </button>
+                <button type="button" class="delete-cancel" (click)="closeDeleteModal()" [disabled]="isDeleting">Cancel</button>
+              </footer>
+            </section>
+          </div>
         }
-        <li [class.disabled]="currentPage >= getTotalPages()">
-          <button (click)="onPageChange(currentPage + 1)"
-            [disabled]="currentPage >= getTotalPages()">
-            Next
-          </button>
-        </li>
-      </ul>
+
+        @if (showUntagModal) {
+          <div class="modal-overlay" (click)="closeUntagModal()">
+            <section class="delete-modal untag-modal" role="dialog" aria-modal="true" aria-labelledby="untag-title"
+              (click)="$event.stopPropagation()">
+              <header class="delete-modal__header">
+                <h2 id="untag-title">Untag Device / Change Request</h2>
+                <button type="button" aria-label="Close" (click)="closeUntagModal()" [disabled]="isSubmitting">&times;</button>
+              </header>
+              <div class="delete-modal__body">
+                @if (requestedFor) {
+                  <p>Request for: <strong>{{ requestedFor }}</strong></p>
+                }
+                @if (requestStatus === 'Pending' && requestData.param12) {
+                  <p>Request reason: {{ requestData.param12 }}</p>
+                }
+                <p>IMEI No.: <strong>{{ selectedDeviceImei || 'NA' }}</strong></p>
+                <p>Device ID: <strong>{{ selectedDeviceId }}</strong></p>
+                @if ((requestStatus === 'Pending' || requestStatus === 'Rejected') && roleId === '10') {
+                  <div class="request-status-options">
+                    <label><input type="radio" name="requestStatus" value="Approved" [(ngModel)]="status"> Approve</label>
+                    <label><input type="radio" name="requestStatus" value="Rejected" [(ngModel)]="status"> Reject</label>
+                  </div>
+                }
+                <label for="untagRemark">Remarks <span aria-hidden="true">*</span></label>
+                <textarea id="untagRemark" name="untagRemark" rows="4" maxlength="500"
+                  [(ngModel)]="untagRemarks" [disabled]="isSubmitting" placeholder="Enter reason (minimum 5 characters)"></textarea>
+              </div>
+              <footer class="delete-modal__footer">
+                @if (activationStatus === 'Pending OTP') {
+                  <button type="button" class="delete-confirm" (click)="performOperation('untag')"
+                    [disabled]="isSubmitting || untagRemarks.trim().length < 5">Confirm Untag</button>
+                  <button type="button" class="delete-confirm" (click)="performOperation('delete')"
+                    [disabled]="isSubmitting || untagRemarks.trim().length < 5">Confirm Delete</button>
+                }
+                @if (activationStatus === 'Activated' && ['11', '61', '13'].includes(roleId)) {
+                  <button type="button" class="delete-confirm" (click)="performOperation('untag')"
+                    [disabled]="isSubmitting || untagRemarks.trim().length < 5">Request Untag</button>
+                  <button type="button" class="delete-confirm" (click)="performOperation('delete')"
+                    [disabled]="isSubmitting || untagRemarks.trim().length < 5">Request Delete</button>
+                }
+                @if (activationStatus === 'Activated' && roleId === '10') {
+                  <button type="button" class="delete-confirm" (click)="performOperation('untag')"
+                    [disabled]="isSubmitting || untagRemarks.trim().length < 5">{{ isSubmitting ? 'Processing...' : 'Confirm Untag' }}</button>
+                  <button type="button" class="delete-confirm" (click)="performOperation('delete')"
+                    [disabled]="isSubmitting || untagRemarks.trim().length < 5">{{ isSubmitting ? 'Processing...' : 'Confirm Delete' }}</button>
+                }
+                <button type="button" class="delete-cancel" (click)="closeUntagModal()" [disabled]="isSubmitting">Cancel</button>
+              </footer>
+            </section>
+          </div>
+        }
     </div>
-  }
-  <br>
   </div>
-</div>
-</div>
 </div>

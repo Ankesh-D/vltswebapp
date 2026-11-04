@@ -1,336 +1,529 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { DeviceService, Device, DeviceRequest } from '../../../core/services/device.service';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Device, DeviceRequest, DeviceService } from '../../../core/services/device.service';
+import { EncryptionService } from '../../../core/services/encryption.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { VehicleService } from '../../../core/services/vehicle.service';
+import { CommonDataToolbarComponent, OldNewOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+
+interface ChangeRequestDetails {
+  param12?: string;
+}
 
 @Component({
-    selector: 'app-total-new-devices',
-    imports: [CommonModule, FormsModule, RouterModule, CommonTableComponent],
-    templateUrl: './total-new-devices.component.html',
-    changeDetection: ChangeDetectionStrategy.Eager,
-    styleUrl: './total-new-devices.component.scss'
+  selector: 'app-total-new-devices',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
+  templateUrl: './total-new-devices.component.html',
+  styleUrl: './total-new-devices.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager
 })
 export class TotalNewDevicesComponent implements OnInit {
   devices: Device[] = [];
-  readonly tableColumns: CommonTableColumn<Device>[] = [
-    { key: 'param1', label: '#', width: '35px' },
-    { key: 'param5', headers: ['IMEI No.', 'Serial No.'], sortable: true },
-    { key: 'param7', headers: ['ICCID No.', 'M2M Code'], sortable: true },
-    { key: 'param8', headers: ['Mobile N/W 1', 'Mobile N/W 2'], sortable: true },
-    { key: 'param9', headers: ['Mobile No. 1', 'Mobile No. 2'], sortable: true },
-    { key: 'param50', headers: ['Mobile No. 1 Validity', 'Mobile No. 2 Validity'], sortable: true, width: '130px' },
-    { key: 'param16', headers: ['Dealer', 'Vendor'], sortable: true, width: '160px' },
-    { key: 'param47', label: 'Vehicle Status', sortable: true },
-    { key: 'param34', label: 'Activation Status', sortable: true },
-    { key: 'param48', label: 'Polling Status', sortable: true }
+  readonly tableColumns: DataTableColumn<Device>[] = [
+    { header: '#', key: 'param1', className: 'id-column' },
+    {
+      header: '',
+      headers: ['Chassis No.', 'Vehicle No.'],
+      sortKey: 'param5',
+      value: device => this.joinValues(device.param12, device.param11),
+      width: '120px'
+    },
+    { header: 'Engine No.', key: 'param13', sortKey: 'param7', width: '120px' },
+    {
+      header: '',
+      headers: ['Serial No.', 'IMEI No.', 'ICCID No.'],
+      width: '140px',
+      sortKey: 'param8',
+      value: device => this.joinValues(device.param5, device.param4, device.param6)
+    },
+    {
+      header: '',
+      headers: ['Vehicle Type', 'Vehicle Class'],
+      sortKey: 'param9',
+      value: device => this.joinValues(device.param19, device.param42)
+    },
+    {
+      header: '',
+      headers: ['Make', 'Model'],
+      sortKey: 'param50',
+      width: '130px',
+      value: device => this.joinValues(device.param40, device.param41)
+    },
+    { header: 'Installation Date', key: 'param43', sortKey: 'param16', width: '160px' },
+    {
+      header: '',
+      headers: ['Customer Name', 'Mobile No.'],
+      sortKey: 'param47',
+      value: device => this.joinValues(device.param28, device.param29)
+    },
+    {
+      header: '',
+      headers: ['Dealer', '(Vendor)'],
+      sortKey: 'param34',
+      value: device => this.joinValues(device.param8, device.param7)
+    },
+    { header: 'RTO Name', key: 'param18', sortKey: 'param48' },
+    {
+      header: '',
+      headers: ['Activation Status', 'Activation Details'],
+      key: 'param25',
+      sortKey: 'param25',
+      value: device => this.joinValues(device.param25, device.param14),
+      className: 'activation-column'
+    },
+    { header: 'Polling Status', key: 'param45', sortKey: 'param45', className: 'polling-column' },
+    {
+      header: 'Action',
+      className: 'action-column',
+      width: '70px',
+      actions: [
+        {
+          label: 'Generate receipt',
+          icon: 'fa-file-pdf-o',
+          iconOnly: true,
+          className: 'table-action-btn table-action-edit',
+          run: device => this.printReceipt(device)
+        },
+        {
+          label: 'Untag / request',
+          icon: 'fa-unlink',
+          iconOnly: true,
+          className: 'table-action-btn table-action-toggle',
+          visible: () => this.canManageDeviceActions(),
+          run: device => this.openUntagModal(device)
+        },
+        {
+          label: 'Delete',
+          icon: 'fa-trash',
+          iconOnly: true,
+          className: 'table-action-btn table-action-delete',
+          tone: 'danger',
+          visible: () => this.roleId === '10',
+          run: device => this.openDeleteModal(device),
+          disabled: device => device.param25 === 'Activated'
+        }
+      ]
+    }
   ];
+
   loading = false;
+  isExporting = false;
+  isDeleting = false;
   errorMessage = '';
   searchText = '';
   currentPage = 1;
   pageSize = 20;
-  pageSizeOptions = [20];
+  pageSizeOptions: number[] = [20];
   totalCount = 0;
   pageCount = 0;
-    roleId: string = '';
-  // Route parameters
-  filter: string = '';  // Filter type (TotalDevice, Activated, Pending, etc.)
-  vendor: string = '';  // Vendor ID (encrypted)
-  rto: string = '';     // RTO ID (encrypted)
-  
-  // Sorting
-  sortKey: string = '';
-  reverse: boolean = false;
-  
-  // Filter type display
-  filterType: string = 'New Device';
-  
+  roleId = '';
+  filter = '';
+  selectedFilter = 'NewDevice';
+  filterType = 'New Device';
+  vendor = '';
+  rto = '';
+  deviceType: OldNewOption = 'new';
+  sortKey = '';
+  reverse = false;
+  selectedDevice: Device | null = null;
+  deleteRemark = '';
+  deleteRefundAmount = false;
+  showUntagModal = false;
+  isSubmitting = false;
+  untagRemarks = '';
+  selectedDeviceId = '';
+  selectedDeviceImei = '';
+  activationStatus = '';
+  requestStatus = '';
+  requestedFor = '';
+  requestId = '';
+  requestType = '';
+  status = '';
+  requestData: ChangeRequestDetails = {};
+
   constructor(
-    private toast: ToastService,
-    private deviceService: DeviceService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private readonly toast: ToastService,
+    private readonly deviceService: DeviceService,
+    private readonly vehicleService: VehicleService,
+    private readonly encryptionService: EncryptionService,
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.roleId = sessionStorage.getItem('roleId') || '';
-    // Get route parameters
     this.route.params.subscribe(params => {
-      this.filter = params['filter'] || 'New Device';
-      this.vendor = params['vendor'] || '0';
-      this.rto = params['rto'] || '0';
-      
-      // Map filter to display name
+      this.filter = params['filter'] || 'NewDevice';
+      this.selectedFilter = this.filter;
+      this.vendor = params['vendor'] === '0' ? '' : (params['vendor'] || '');
+      this.rto = params['rto'] === '0' ? '' : (params['rto'] || '');
       this.mapFilterToDisplayName();
-      
-      // Reload devices with new params
       this.loadDevices();
     });
-    
   }
-  redirectInsert() {
+
+  redirectInsert(): void {
     this.router.navigate(['device/entry']);
   }
 
-  mapFilterToDisplayName() {
-    if (this.filter === 'NewDevice' || this.filter === 'New Device' || this.filter === 'New Devices') {
-      this.filterType = 'New Device';
-    } else if (this.filter === 'ACTIVATED') {
-      this.filterType = 'Activated';
-    } else if (this.filter === 'PENDING') {
-      this.filterType = 'Pending';
-    } else if (this.filter === 'TODAYINSTALLED' || this.filter === 'Installed') {
-      this.filterType = 'Today\'s Installation';
-    } else if (this.filter === 'NeverReceived') {
-      this.filterType = 'Never Received';
-    } else if (this.filter === 'NotReceived') {
-      this.filterType = 'Not Received';
-    } else {
-      this.filterType = this.filter;
-    }
+  mapFilterToDisplayName(): void {
+    const labels: Record<string, string> = {
+      NewDevice: 'New Device',
+      'New Device': 'New Device',
+      'New Devices': 'New Device',
+      TotalDevice: 'Total Device',
+      ACTIVATED: 'Activated',
+      PENDING: 'Pending',
+      TODAYINSTALLED: "Today's Installation",
+      Installed: "Today's Installation",
+      NeverReceived: 'Never Received',
+      NotReceived: 'Not Received'
+    };
+    this.filterType = labels[this.filter] || this.filter;
   }
 
-  loadDevices() {
+  onFilterChange(filter: string): void {
+    this.filter = filter;
+    this.selectedFilter = filter;
+    this.currentPage = 1;
+    this.mapFilterToDisplayName();
+    this.loadDevices();
+  }
+
+  onOldNewChange(value: OldNewOption): void {
+    this.deviceType = value;
+    this.currentPage = 1;
+    this.loadDevices();
+  }
+
+  canManageDeviceActions(): boolean {
+    return ['10', '11', '61', '13'].includes(this.roleId);
+  }
+
+  private joinValues(...values: (string | null | undefined)[]): string {
+    return values.map(value => value == null || value === '' ? 'NA' : value).join('\n');
+  }
+
+  loadDevices(): void {
     this.loading = true;
     this.errorMessage = '';
-    this.devices = [];
-
-    // Normalize filter value - pass it directly to API as original JSP does
-    // The original passes $routeParams.filter directly to param2
-    let filterValue = this.filter;
-    if (filterValue === 'NewDevice' || filterValue === 'New Devices') {
-      filterValue = 'New Device';
-    }
-    // Backend API doesn't seem to recognize "Installed" as a valid filter
-    // Map "Installed" to "TotalDevice" since installed devices = all devices that have been installed
-    // This is a workaround for backend API limitation
-    if (filterValue === 'Installed') {
-      // console.warn('⚠️ Backend API does not support "Installed" filter. Mapping to "TotalDevice" as workaround.');
-      filterValue = 'New Device';
-    }
-
+    const filterValue = this.filter === 'NewDevice' || this.filter === 'New Devices'
+      ? 'New Device'
+      : this.filter === 'Installed' ? 'New Device' : this.filter;
     const request: DeviceRequest = {
       param1: this.searchText.trim(),
-      param2: this.currentPage.toString() ,// Pass filter directly as original does
-      param3:this.pageSize.toString(),
-      param10:filterValue,
-      param8: this.vendor !== '0' ? this.vendor : '',
-      param9: this.rto !== '0' ? this.rto : '',
+      param2: String(this.currentPage),
+      param3: String(this.pageSize),
+      param8: this.vendor,
+      param9: this.rto,
+      param10: filterValue,
       pdfexcel: ''
-
-
-
     };
 
-    
-
     this.deviceService.getDeviceDetailsByType(request).subscribe({
-      next: (response) => {
+      next: response => {
         this.loading = false;
-        const statuscode = (response as any)?.statuscode;
-        // //console.log('Device API Response (Full):', JSON.stringify(response, null, 2));
-        // //console.log('Device API Response (Summary):', 
-        //   {
-        //   status: response?.status,
-        //   statuscode: statuscode,
-        //   hasEntity: !!response?.entity,
-        //   listDataLength: response?.entity?.listData?.length,
-        //   totalCount: response?.entity?.param1,
-        //   currentPage: this.currentPage,
-        //   pageSize: this.pageSize,
-        //   filter: this.filter,
-        //   filterValue: filterValue,
-        //   entityKeys: response?.entity ? Object.keys(response.entity) : [],
-        //   isEmptyEntity: response?.entity ? Object.keys(response.entity).length === 0 : true
-        // });
-
-        // Log warning if filter is "Installed" but returns empty
-        if (this.filter === 'Installed' && String(response?.entity?.param1) === '0') {
-          // console.warn('⚠️ API returned 0 records for "Installed" filter. This might indicate:');
-          // console.warn('1. Backend API does not recognize "Installed" as a valid filter value');
-          // console.warn('2. Backend query needs to be checked/fixed');
-          // console.warn('3. The filter value might need to be converted (e.g., "TotalDevice" or "TODAYINSTALLED")');
-        }
-
-        // Check statuscode==200 like original JSP controller does
-        if ((response?.status && statuscode === 200) || (response?.status && !statuscode)) {
-          if (Object.keys(response.entity).length === 0) {
-            this.devices = [];
-            if (this.currentPage === 1) {
-              this.totalCount = 0;
-              this.pageCount = 0;
-            }
-          } else if (response.entity.listData !== undefined) {
-            this.devices = response.entity.listData || [];
-            // Parse totalCount - it might be string or number
-            if (response.entity.param1 !== undefined && response.entity.param1 !== null) {
-              const totalCountValue = Number(response.entity.param1) || 0;
-              if (this.totalCount !== totalCountValue) {
-                // //console.log(`Total count updated: ${this.totalCount} -> ${totalCountValue}`);
-              }
-              this.totalCount = totalCountValue;
-            }
-          } else if (Array.isArray(response.entity)) {
-            this.devices = response.entity;
-            this.totalCount = response.entity.length;
-          } else {
-            this.devices = [];
-          }
-
-          this.pageCount = this.devices.length < this.pageSize ? this.devices.length : this.pageSize;
+        if (response?.status && (!response.statuscode || Number(response.statuscode) === 200)) {
+          this.devices = response.entity?.listData || [];
+          this.totalCount = Number(response.entity?.param1) || 0;
+          this.pageCount = this.devices.length;
           this.updatePageSizeOptions();
-          this.cdr.detectChanges();
         } else {
-          const errorMsg = typeof response?.entity === 'string'
-            ? response.entity
-            : 'Failed to load devices';
-          this.errorMessage = errorMsg;
           this.devices = [];
-          this.cdr.detectChanges();
+          this.totalCount = 0;
+          this.pageCount = 0;
+          this.errorMessage = typeof response?.entity === 'string' ? response.entity : 'Failed to load devices.';
         }
+        this.cdr.detectChanges();
       },
-      error: (error) => {
+      error: () => {
         this.loading = false;
-        this.errorMessage = 'Error loading devices. Please try again.';
         this.devices = [];
-        // console.error('Error loading devices:', error);
+        this.totalCount = 0;
+        this.pageCount = 0;
+        this.errorMessage = 'Error loading devices. Please try again.';
         this.cdr.detectChanges();
       }
     });
   }
 
-  updatePageSizeOptions() {
-    const options = [20];
-    if (this.totalCount > 50) options.push(50);
-    if (this.totalCount > 100) options.push(100);
-    if (this.totalCount > 200) options.push(200);
-    if (this.totalCount > 500) options.push(500);
-    if (this.totalCount > 0) options.push(this.totalCount);
-    this.pageSizeOptions = options;
+  private updatePageSizeOptions(): void {
+    this.pageSizeOptions = [20, 50, 100, 200, 500].filter(size => size < this.totalCount);
+    if (this.totalCount > 0) this.pageSizeOptions.push(this.totalCount);
+    if (this.pageSizeOptions.length === 0) this.pageSizeOptions = [20];
   }
 
-  onPageSizeChange(size: number | string) {
-    if (size === 'All' || size === this.totalCount) {
-      this.pageSize = this.totalCount;
-    } else {
-      this.pageSize = Number(size);
-    }
+  onPageSizeChange(size: number | string): void {
+    this.pageSize = Number(size) || 20;
     this.currentPage = 1;
     this.loadDevices();
   }
 
-  onPageChange(page: number) {
-    if (page < 1) return;
-    const totalPages = this.getTotalPages();
-    if (this.totalCount > 0 && page > totalPages) return;
+  onPageChange(page: number): void {
+    if (page < 1 || (this.totalCount > 0 && page > Math.ceil(this.totalCount / this.pageSize))) return;
     this.currentPage = page;
     this.loadDevices();
   }
 
-  reloadData() {
+  reloadData(): void {
     this.searchText = '';
     this.currentPage = 1;
     this.loadDevices();
   }
 
-  getSearchDetails() {
+  getSearchDetails(): void {
     this.currentPage = 1;
     this.loadDevices();
   }
 
-  sort(key: string) {
-    if (this.sortKey === key) {
-      this.reverse = !this.reverse;
-    } else {
+  sort(key: string): void {
+    if (this.sortKey === key) this.reverse = !this.reverse;
+    else {
       this.sortKey = key;
       this.reverse = false;
     }
-    this.cdr.detectChanges();
   }
 
-  goHome() {
-    this.router.navigate(['/dashboard']);
+  getPaginatedData(): Device[] {
+    if (!this.sortKey) return this.devices;
+    const direction = this.reverse ? -1 : 1;
+    return [...this.devices].sort((a, b) =>
+      String(a[this.sortKey as keyof Device] ?? '').localeCompare(
+        String(b[this.sortKey as keyof Device] ?? ''),
+        undefined,
+        { numeric: true, sensitivity: 'base' }
+      ) * direction
+    );
   }
 
-  getTotalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
+  exportPDFExcel(): void {
+    this.isExporting = true;
+    const request: DeviceRequest = {
+      param1: this.searchText.trim(),
+      param2: '1',
+      param3: String(this.totalCount || this.pageSize),
+      param8: this.vendor,
+      param9: this.rto,
+      param10: this.filter === 'NewDevice' || this.filter === 'New Devices' ? 'New Device' : this.filter,
+      pdfexcel: 'excel'
+    };
 
-  getPageNumbers(): number[] {
-    const total = this.getTotalPages();
-    const pages: number[] = [];
-    const maxPages = 8;
-    
-    if (total <= maxPages) {
-      for (let i = 1; i <= total; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) {
-          pages.push(i);
-        }
-        pages.push(-1);
-        pages.push(total);
-      } else if (this.currentPage >= total - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = total - 4; i <= total; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push(-1);
-        pages.push(total);
-      }
-    }
-    return pages;
-  }
-
-  shouldShowPage(page: number): boolean {
-    return page !== -1;
-  }
-
-  // Helper method to convert value to string for template usage
-  toString(value: any): string {
-    return value ? String(value) : '';
-  }
-
-  // Helper method to check if string has length
-  hasLength(value: any): boolean {
-    return value && String(value).length > 0;
-  }
-
-  printReceipt(d: any) {
-    let request  = {
-      param1: d.param19,
-      param10: "pdf"
-    }
-    this.deviceService.getReceiptGeneratedDevices1(request).subscribe({
-      next: (response: any) => {
-        if( response.statuscode == 200) {
-          let  receiptUrl: string = response.entity;
-          if (receiptUrl) {
-            window.open(receiptUrl, '_blank');
-          }
-          
-        }
-
+    this.deviceService.getDeviceDetailsByType(request).subscribe({
+      next: response => {
+        this.isExporting = false;
+        if (response?.status && response.entity) this.toast.commonFileDownload(String(response.entity));
+        else this.toast.show(typeof response?.entity === 'string' ? response.entity : 'Export failed.', 'error');
+        this.cdr.detectChanges();
       },
-      error: (error) => {
-        // console.error('Error generating receipt:', error);
-  this.toast.show('Error generating receipt. Please try again.', 'error');
-
+      error: () => {
+        this.isExporting = false;
+        this.toast.show('Error exporting devices. Please try again.', 'error');
+        this.cdr.detectChanges();
       }
     });
+  }
 
+  openDeleteModal(device: Device): void {
+    this.selectedDevice = device;
+    this.deleteRemark = '';
+    this.deleteRefundAmount = false;
+  }
+
+  closeDeleteModal(): void {
+    if (!this.isDeleting) this.selectedDevice = null;
+  }
+
+  submitDelete(): void {
+    if (!this.selectedDevice || this.deleteRemark.trim().length < 10) {
+      this.toast.show('Remark must have a minimum of 10 characters.', 'error');
+      return;
+    }
+    this.isDeleting = true;
+    this.deviceService.deleteDevice({
+      param1: this.encryptionService.encryptAccountId(this.selectedDevice.param2),
+      param2: this.deleteRemark.trim(),
+      param3: this.deleteRefundAmount
+    }).subscribe({
+      next: response => {
+        this.isDeleting = false;
+        const succeeded = response?.status || Number(response?.statuscode) === 200;
+        this.toast.show(String(response?.entity || (succeeded ? 'Device deleted successfully.' : 'Delete failed.')), succeeded ? 'success' : 'error');
+        if (succeeded) {
+          if (this.devices.length === 1 && this.currentPage > 1) this.currentPage--;
+          this.selectedDevice = null;
+          this.loadDevices();
+        }
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isDeleting = false;
+        this.toast.show('Error deleting device. Please try again.', 'error');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  openUntagModal(device: Device): void {
+    this.untagRemarks = '';
+    this.status = '';
+    this.requestType = '';
+    this.requestData = {};
+    this.selectedDeviceId = device.param2 || device.param3 || '';
+    this.activationStatus = device.param25 || device.param34 || '';
+    this.selectedDeviceImei = device.param4 || device.param5 || '';
+    this.requestStatus = device.param71 || '';
+    this.requestedFor = device.param70 || '';
+    this.requestId = device.param69 || '';
+    this.showUntagModal = true;
+    if (this.requestId) this.requestDetails();
+  }
+
+  closeUntagModal(): void {
+    if (this.isSubmitting) return;
+    this.showUntagModal = false;
+    this.untagRemarks = '';
+    this.selectedDeviceId = '';
+    this.selectedDeviceImei = '';
+    this.activationStatus = '';
+    this.requestStatus = '';
+    this.requestedFor = '';
+    this.requestId = '';
+    this.requestType = '';
+    this.requestData = {};
+    this.loadDevices();
+  }
+
+  performOperation(type: 'untag' | 'delete'): void {
+    if (this.untagRemarks.trim().length < 5) {
+      this.toast.show('Remarks must be at least 5 characters.', 'error');
+      return;
+    }
+
+    if (this.activationStatus === 'Pending OTP') {
+      type === 'delete' ? this.deleteOperation() : this.untagOperation();
+    } else if (this.activationStatus === 'Activated' && ['11', '61', '13'].includes(this.roleId)) {
+      this.requestType = type;
+      this.requestInitialize();
+    } else if (this.activationStatus === 'Activated' && this.roleId === '10') {
+      if (this.requestStatus) this.updateChangeRequestStatus(type);
+      else type === 'delete' ? this.deleteOperation() : this.untagOperation();
+    } else this.toast.show('This device action is not available for its current status or your role.', 'error');
+  }
+
+  private requestInitialize(): void {
+    this.isSubmitting = true;
+    this.deviceService.requestInitialize({
+      requestpage: 'device',
+      assetid: this.selectedDeviceId,
+      requestvalues_new: '',
+      reasonid: '',
+      requesttype: this.requestType,
+      requestvalues_old: '',
+      remarks: this.untagRemarks
+    }).subscribe({
+      next: response => {
+        this.isSubmitting = false;
+        if (response?.status || Number(response?.statuscode) === 200) {
+          this.toast.show(response.entity || 'Request submitted successfully.', 'success');
+          this.closeUntagModal();
+        } else this.toast.show(response?.entity || 'Request failed.', 'error');
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.toast.show('Error submitting request.', 'error');
+      }
+    });
+  }
+
+  private requestDetails(): void {
+    this.deviceService.requestDetails({ param2: '1', param3: '10', param4: '', param5: this.requestId }).subscribe({
+      next: response => {
+        if (response?.status || Number(response?.statuscode) === 200) {
+          this.requestData = response.entity?.listData?.[0] || {};
+        } else this.toast.show('Error fetching request details.', 'error');
+      },
+      error: () => this.toast.show('Error fetching request details.', 'error')
+    });
+  }
+
+  private updateChangeRequestStatus(type: 'untag' | 'delete'): void {
+    if (!this.status) {
+      this.toast.show('Please select Approve or Reject.', 'error');
+      return;
+    }
+    this.isSubmitting = true;
+    this.deviceService.updateChangeRequestStatus({
+      requestid: this.requestId,
+      status: this.status,
+      remarks: this.untagRemarks
+    }).subscribe({
+      next: response => {
+        this.isSubmitting = false;
+        if (response?.status || Number(response?.statuscode) === 200) {
+          this.toast.show(response.entity || 'Request updated successfully.', 'success');
+          if (this.status === 'Approved') {
+            type === 'delete' ? this.deleteOperation() : this.untagOperation();
+          } else this.closeUntagModal();
+        } else this.toast.show(response?.entity || 'Request update failed.', 'error');
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.toast.show('Error updating request status.', 'error');
+      }
+    });
+  }
+
+  private untagOperation(): void {
+    this.isSubmitting = true;
+    this.vehicleService.untagDevice({ param2: this.selectedDeviceId, param3: this.untagRemarks }).subscribe({
+      next: response => {
+        this.isSubmitting = false;
+        if (response?.status || Number(response?.statuscode) === 200) {
+          this.toast.show(response.entity || 'Device untagged successfully.', 'success');
+          this.closeUntagModal();
+        } else this.toast.show(response?.entity || 'Error untagging device.', 'error');
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.toast.show('Error untagging device.', 'error');
+      }
+    });
+  }
+
+  private deleteOperation(): void {
+    this.isSubmitting = true;
+    this.deviceService.deleteDevice({
+      param1: this.selectedDeviceId,
+      param2: this.untagRemarks,
+      param3: false
+    }).subscribe({
+      next: response => {
+        this.isSubmitting = false;
+        if (response?.status || Number(response?.statuscode) === 200) {
+          this.toast.show(response.entity || 'Device deleted successfully.', 'success');
+          this.closeUntagModal();
+        } else this.toast.show(response?.entity || 'Delete failed.', 'error');
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.toast.show('Error deleting device.', 'error');
+      }
+    });
+  }
+
+  printReceipt(device: Device): void {
+    this.deviceService.getReceiptGeneratedDevices1({ param1: device.param19, param10: 'pdf' }).subscribe({
+      next: response => {
+        if (Number(response?.statuscode) === 200 && response.entity) window.open(String(response.entity), '_blank', 'noopener');
+        else this.toast.show(typeof response?.entity === 'string' ? response.entity : 'Receipt could not be generated.', 'error');
+      },
+      error: () => this.toast.show('Error generating receipt. Please try again.', 'error')
+    });
   }
 }

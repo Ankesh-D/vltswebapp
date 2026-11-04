@@ -1,402 +1,198 @@
-/* =========================================================
-   Device List Styles – JSP Match (Final & Clean)
-   ========================================================= */
-
-/* ⚠️ Scoped deep styles for Angular */
-::ng-deep {
-
-  /* ---------- Layout ---------- */
-  .content-i {
-    padding: 20px;
-  }
-
-  .content-box {
-    background: #ffffff;
-  }
-
-
-
-  .element-box {
-    padding: 1rem;
-  }
-
-  /* ---------- Page Title ---------- */
-  .pagetitleborder {
-    border-bottom: 2px solid #0b58b9 !important;
-    padding: 10px 0;
-    // margin-bottom: 10px;
-  }
-
-  /* ---------- Home / Return Button ---------- */
-  .returnbtn {
-    background: #2bdc16 !important;
-    border-color: #2bdc16 !important;
-    // margin-bottom: 10px;
-  }
-
-  .returnbtn a {
-    color: #fff;
-    text-decoration: none;
-  }
-
-  /* =========================================================
-     TABLE STYLES
-     ========================================================= */
-  .table {
-    width: 100%;
-    // margin-bottom: 20px;
-    border-collapse: collapse;
-  }
-
-  .table-striped tbody tr:nth-of-type(odd) {
-    background-color: #d9e7d8 !important;
-  }
-
-  .table-striped tbody tr:nth-of-type(even) {
-    background-color: #fcfcfc !important;
-  }
-
-  /* ---------- Table Head ---------- */
-  thead {
-    background: #aacda8 !important;
-    color: #212529 !important;
-    font-family: serif !important;
-  }
-
-  .table th {
-    font-size: 11px !important;
-    font-weight: bold;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    border: 1px solid #d3a130 !important;
-    padding: 6px;
-  }
-
-  .table th hr {
-    // margin: 2px 0;
-    border-top: 1px solid #000;
-  }
-
-  /* ---------- Table Body ---------- */
-  .table td {
-    font-size: 11px;
-    text-align: center;
-    vertical-align: center;
-    padding: 1px;
-    border: 1px solid #d3a130 !important;
-  }
-
-  /* =========================================================
-     SORTING ICONS (JSP STYLE)
-     ========================================================= */
-  .sorting {
-    display: inline-block;
-    // margin-left: 4px;
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-  }
-
-  .sorting_asc {
-    border-bottom: 6px solid #555;
-  }
-
-  .sorting_desc {
-    border-top: 6px solid #555;
-  }
-
-  /* =========================================================
-     PAGINATION
-     ========================================================= */
-  .pagination-wrapper {
-    text-align: center;
-    // margin-top: 20px;
-    padding: 10px;
-  }
-
-  .pagination-wrapper button {
-    padding: 5px 10px;
-    // margin: 0 3px;
-    border: 1px solid #7b7a7a;
-    background-color: #eff9f0;
-    color: #0d9706;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 11px;
-  }
-
-  .pagination-wrapper button:hover:not(:disabled) {
-    background-color: #d4f4d4;
-  }
-
-  .pagination-wrapper button.active {
-    background-color: #76dd6b;
-    border-color: #159706;
-    color: #fff;
-    text-decoration: underline;
-  }
-
-  .pagination-wrapper button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-
-}
-
-/* =========================================================
-   DEVICE TABLE HEADER (Custom – Used by device-thead)
-   ========================================================= */
-.device-thead th {
-  background: #aacda8;
-  border: 1px solid #c9a44c;
-  font-size: 12px;
-  font-weight: bold;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.device-thead hr {
-  // margin: 2px 0;
-  border-top: 1px solid #000;
-}
-
-.device-thead .sorting {
-  float: right;
-}
-
-.device-thead .sorting_asc::after {
-  content: " ▲";
-  font-size: 10px;
-}
-
-.device-thead .sorting_desc::after {
-  content: " ▼";
-  font-size: 10px;
-}
-::ng-deep {
-
-  .table-top-controls {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 25px;
-    padding: 5px 10px;
-    font-size: 11px;
-  }
-
-  .table-top-controls label {
-    font-weight: bold;
-    color: #0e0e0e;
-    margin-right: 4px;
-  }
-
-  .table-top-controls select {
-    height: 23px;
-    font-size: 10px;
-  }
-
-  .control-item {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-  }
-
-  .show-rows span {
-    font-weight: bold;
-    margin-right: 5px;
-  }
-
-  .total-records {
-    font-weight: bold;
-    color: #0b58b9;
-  }
-}
-/* ===== HEADER ===== */
-
-.page-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-}
+@use '../../../shared/styles/compact-admin-page' as compact;
 
 .header-actions {
   display: flex;
-  gap: 8px;
+  align-items: center;
 }
 
-.header-btn {
-  height: 26px;
-  padding: 0 12px;
-  font-size: 11px;
-  font-weight: bold;
-  background: #fff;
-  color: #0b58b9;
-  border: 1px solid #0b58b9;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+:host app-data-table {
+  --app-table-header-bg: #245A96;
+}
+
+.header-actions {
+  flex-wrap: wrap;
   gap: 5px;
 }
 
-.header-btn:hover {
-  background: #0b58b9;
-  color: #fff;
+.device-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  color: #334155;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-/* ===== ALERT ===== */
-
-.custom-alert {
-  margin: 10px;
-  padding: 10px;
-  background-color: #fff3cd;
-  border: 1px solid #ffc107;
+.device-filter select {
+  height: 22px;
+  min-width: 90px;
+  padding: 0 18px 0 6px;
+  color: #172033;
+  font-size: 10px;
+  font-weight: 700;
+  background: #fff;
+  border: 1px solid #90b9df;
   border-radius: 4px;
-  font-size: 11px;
-  position: relative;
+  outline: none;
 }
 
-.alert-close {
-  position: absolute;
-  right: 8px;
-  top: 4px;
-  background: none;
-  border: none;
-  font-size: 18px;
+.toolbar-btn {
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+  color: var(--app-primary);
+  font-size: 11px;
+  font-weight: bold;
+  background: #fff;
+  border: 1px solid var(--app-primary);
+  border-radius: 4px;
   cursor: pointer;
 }
 
-/* ===== TOP CONTROLS ===== */
+.toolbar-btn:hover:not(:disabled) {
+  color: #fff;
+  background: var(--app-primary);
+}
 
-.top-controls-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.toolbar-btn:disabled,
+.delete-modal button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.error-message {
+  margin: 10px;
   padding: 10px;
 }
 
-.left-controls,
-.right-controls {
-  display: flex;
+.export-status {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
+  color: var(--app-primary);
+  font-size: 10px;
 }
 
-.search-label {
-  font-size: 11px;
-  font-weight: bold;
-}
-
-.search-box {
-  display: flex;
-  border: 1px solid #0b58b9;
-  border-radius: 4px;
-  overflow: hidden;
-  height: 24px;
-}
-
-.search-input.inner {
-  border: none;
-  outline: none;
-  padding: 0 8px;
-  font-size: 11px;
-  width: 180px;
-}
-
-.search-inner-btn {
-  width: 30px;
-  background: #0b58b9;
-  color: #fff;
-  border: none;
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.5);
 }
 
-.reload-btn {
-  height: 26px;
-  padding: 0 12px;
-  font-size: 11px;
-  font-weight: bold;
+.delete-modal {
+  width: min(460px, 100%);
+  overflow: hidden;
   background: #fff;
-  color: #0b58b9;
-  border: 1px solid #0b58b9;
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: 5px;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.25);
 }
 
-.control-item {
+.untag-modal {
+  width: min(620px, 100%);
+}
+
+.delete-modal__header,
+.delete-modal__footer {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f7f7f7;
+  border-bottom: 1px solid #ddd;
 }
 
-.control-item select {
-  height: 24px;
-  font-size: 11px;
-  border: 1px solid #0b58b9;
-  border-radius: 4px;
-  padding: 0 6px;
+.delete-modal__header {
+  color: #b02a37;
+  background: #f8d3d3;
 }
 
-.total-records-text {
-  font-size: 11px;
-  font-weight: bold;
-  color: #0b58b9;
-  white-space: nowrap;
-}
-.pagination-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
-}
-
-.pagination {
-  list-style: none;
-  display: flex;
-  gap: 4px;
-  padding: 0;
+.delete-modal__header h2 {
   margin: 0;
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.pagination li {
-  display: inline-flex;
+.delete-modal__header button {
+  padding: 0 4px;
+  color: #333;
+  font-size: 22px;
+  line-height: 1;
+  background: transparent;
+  border: 0;
 }
 
-.pagination button {
-  border: 1px solid #0b58b9;
-  background: #ffffff;
-  color: #0b58b9;
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 700;
+.delete-modal__body {
+  display: grid;
+  gap: 8px;
+  padding: 15px;
+  font-size: 12px;
+}
+
+.delete-modal__body p {
+  margin: 0 0 4px;
+}
+
+.delete-modal__body textarea {
+  width: 100%;
+  padding: 7px;
+  border: 1px solid #ced4da;
   border-radius: 4px;
-  cursor: pointer;
+  resize: vertical;
 }
 
-.pagination button:hover:not(:disabled) {
-  background: #eaf2ff;
+.refund-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.pagination li.active button {
-  background: #0b58b9;
+.request-status-options {
+  display: flex;
+  gap: 14px;
+}
+
+.request-status-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.delete-modal__footer {
+  justify-content: center;
+  gap: 8px;
+  border-top: 1px solid #ddd;
+  border-bottom: 0;
+}
+
+.delete-modal__footer button {
+  padding: 5px 14px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.delete-confirm {
   color: #fff;
+  background: #dc3545;
 }
 
-.pagination li.disabled button {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: #f4f6f9;
-  color: #7a8aa0;
+.delete-cancel {
+  color: #fff;
+  background: #245A96;
 }
 
-.pagination li.ellipsis span {
-  padding: 0 6px;
-  font-weight: 700;
+@media (max-width: 576px) {
+  .header-actions {
+    width: 100%;
+  }
 }
+
+@include compact.compact-admin-page;

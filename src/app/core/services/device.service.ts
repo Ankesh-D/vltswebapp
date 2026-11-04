@@ -135,11 +135,11 @@ export class FreeDevicesResponse {
 
 export interface DeviceRequest {
   param1: string;  // Search text
-  param2: string;  // Filter type (TotalDevice, Activated, Pending, Today's Installation, Never Received, Not Received)
-  param3: string;  // Page number (1-based)
-  param8?: string;  // Page size
-  param9?: string; // Vendor ID (encrypted)
-  param10?: string; // RTO ID (encrypted)
+  param2: string;  // Page number (1-based)
+  param3: string;  // Page size
+  param8?: string; // Vendor ID (encrypted)
+  param9?: string; // RTO ID (encrypted)
+  param10?: string; // Filter type
   pdfexcel: string;
 }
 
@@ -336,7 +336,8 @@ export class DeviceService extends BaseApiService {
       param8: request.param8 || '',
       param9: request.param9 || '',
       param10: request.param10 || '',
-      pdfexcel: ''
+      pdfexcel: request.pdfexcel || '',
+      pagename: 'Device Master Details'
     });
   }
   getAssetsDetails(
@@ -690,8 +691,8 @@ export class DeviceService extends BaseApiService {
     // param4: string;  // pageSize
     "param1": string,
     "param10": string,
-  }): Observable<ApiResponse<DeviceListResponse>> {
-    return this.post<DeviceListResponse>('/psv_get_receipt_details', request);
+  }): Observable<ApiResponse<string>> {
+    return this.post<string>('/psv_get_receipt_details', request);
   }
 
   /**
@@ -879,8 +880,8 @@ getCommandDetails(req: any): Observable<any> {
     "param3": string;//"itemperpage",
     "param4": string;//"searchby",
     "param5": string;//"requestid"
-  }): Observable<ApiResponse<string>> {
-    return this.post<string>('/changerequestdetails', request);
+  }): Observable<ApiResponse<{ listData: Array<{ param12?: string }> }>> {
+    return this.post<{ listData: Array<{ param12?: string }> }>('/changerequestdetails', request);
     // {"param1": "1","param2": "requestid","param3": "vendorid","param4": "vendorname","param5": "assetid","param6": "assetname","param7": "requestvalues_new","param8": "requestvalues_old","param9": "requesttime","param10": "requeststatus","param11": "requesttype","param12": "remarks"}
   }
   deviceRenewalDetails(request: RenewalDetailsRequest): Observable<ApiResponse<string>> {
@@ -920,6 +921,3 @@ export interface M2MProvider {
   param2: string; // providerName (DISPLAY THIS)
   param3: string; // shortCode
 }
-
-
-

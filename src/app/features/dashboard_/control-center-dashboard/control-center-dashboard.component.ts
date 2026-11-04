@@ -13,6 +13,7 @@ import { VehicleService } from '../../../core/services/vehicle.service';
 import { AlertService } from '../../../core/services/alert.service';
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { BaseApiService } from '../../../core/services/base-api.service';
+import { VehicleClassWiseAlertCountReq } from '../../../core/model/request.model';
 
 interface PanicCount { id?: string; label: string; count: number; percent: number; share: number; color: string; offset: number; }
 interface AlertTypeCount { id: string; label: string; count: number | null; icon: string; tone: string; }
@@ -179,7 +180,7 @@ export class ControlCenterDashboardComponent implements OnInit {
   rtoError = '';
   lastUpdated: Date | null = null;
 
-  ngOnInit(): void { this.refresh(); this.loadVendorList(); this.loadRTORoster(); }
+  ngOnInit(): void { this.refresh(); }
   get loading(): boolean { return this.countsLoading || this.classLoading || this.rtoLoading || this.sessionsLoading || this.alertWidgetsLoading; }
   get classTotal(): number { return this.vehicleClassCounts.reduce((total, item) => total + item.count, 0); }
   get rtoTotal(): number { return this.rtoCounts.reduce((total, item) => total + item.count, 0); }
@@ -194,7 +195,6 @@ export class ControlCenterDashboardComponent implements OnInit {
     this.countsLoading = this.classLoading = this.rtoLoading = true;
     this.countsError = this.classError = this.rtoError = '';
     this.loadSessions();
-    this.getAlerts(false);
     this.alertService.getPanicDashboardCount('ControlCenterDashboard')
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.countsLoading = false))
       .subscribe({
@@ -239,7 +239,7 @@ export class ControlCenterDashboardComponent implements OnInit {
     this.rtoLoading = true;
     this.rtoError = '';
     this.rtoCounts = [];
-    let range: { fromdate: string; todate: string } | undefined;
+    let range: { param1: string; param2: string } | undefined;
     if (this.rtoPeriod !== 'all') {
       const end = new Date();
       const start = new Date(end);
@@ -248,7 +248,7 @@ export class ControlCenterDashboardComponent implements OnInit {
       if (this.rtoPeriod === 'yearly') start.setMonth(0, 1);
       const format = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       // Date parameters must match the rtowisepaniccounts backend contract.
-      range = { fromdate: format(start), todate: format(end) };
+      range = { param1: format(start), param2: format(end) };
     }
     this.rtoCountRequest = this.alertService.getRtoWisePanicCounts(range)
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.rtoLoading = false))

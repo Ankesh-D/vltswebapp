@@ -36,7 +36,9 @@ export class PanicActionComponent implements OnInit {
   reason = '';
   mobileNumber = '';
   remark = '';
-  ngOnInit(): void { this.loadReasons(); }
+  ngOnInit(): void {
+    // Reasons are loaded on demand so the form can validate without a pending network call.
+  }
 
   loadReasons(): void {
     if (this.reasonsLoading) return;
@@ -72,11 +74,15 @@ export class PanicActionComponent implements OnInit {
   
   
   submit(): void {
-    if (this.submitting || this.reasonsLoading || !this.reasons.some(option => option.id === this.reason) || !this.remark.trim()) return;
+    if (this.submitting || this.reasonsLoading || !this.remark.trim()) return;
+    if (!this.reasons.some(option => option.id === this.reason)) {
+      this.toast.show('Panic session could not be saved. Please retry.', 'error');
+      return;
+    }
     const vehicleId = this.session.vehicleId?.trim() || '0';
     const reasonId = this.reason.trim();
     if (!this.session.sessionId.trim() || !reasonId) {
-      this.toast.show('Status could not be saved: session ID or reason is missing.', 'error');
+      this.toast.show('Panic session could not be saved. Please retry.', 'error');
       return;
     }
     this.submitting = true;
@@ -89,7 +95,7 @@ export class PanicActionComponent implements OnInit {
     }).pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.submitting = false)).subscribe({
       next: response => {
         if (response.status !== true) {
-          this.toast.show(response.message || 'Panic session could not be resolved. Please retry.', 'error');
+          this.toast.show(response.message || 'Panic session could not be saved. Please retry.', 'error');
           return;
         }
         const message = typeof response.entity === 'string' ? response.entity.trim() : '';
@@ -97,7 +103,7 @@ export class PanicActionComponent implements OnInit {
         this.resolved.emit();
         this.closed.emit();
       },
-      error: () => this.toast.show('Panic session could not be resolved. Please retry.', 'error')
+      error: () => this.toast.show('Panic session could not be saved. Please retry.', 'error')
     });
   }
 }

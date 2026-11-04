@@ -199,11 +199,7 @@ export class ControlCenterDashboardComponent implements OnInit, OnDestroy {
   public vehicleClassWisePanicCountReq: VehicleClassWiseAlertCountReq =  new VehicleClassWiseAlertCountReq();
   ngOnInit(): void {
     if (this.erssSessionsPage) return;
-    this.dateObj = moment().subtract(7, "days").format("DD-MMM-YYYY") + ' - ' + moment().format("DD-MMM-YYYY");
-    this.rtodateObj = moment().subtract(7, "days").format("DD-MMM-YYYY") + ' - ' + moment().format("DD-MMM-YYYY");
-    this.refresh(); 
-    this.loadVendorList(); 
-    this.loadRTORoster();
+    this.refresh();
     this.getVehicleClassWisePanicCounts();
   }
   get loading(): boolean { return !!this.erssDetails?.loading || this.countsLoading || this.classLoading || this.rtoLoading || this.sessionsLoading || this.alertWidgetsLoading; }
@@ -323,7 +319,6 @@ param7Sessions: number | null = null;
     this.countsLoading = this.classLoading = this.rtoLoading = true;
     this.countsError = this.classError = this.rtoError = '';
     this.loadSessions();
-    this.getAlerts(false);
     this.alertService.getPanicDashboardCount('ControlCenterDashboard')
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.countsLoading = false))
       .subscribe({
@@ -347,9 +342,12 @@ param7Sessions: number | null = null;
   getVehicleClassWisePanicCounts(): void {
     this.classLoading = true;
     this.classError = '';
-    this.vehicleClassWisePanicCountReq.param1 = this.dateObj.split(' - ')[0];
-    this.vehicleClassWisePanicCountReq.param2 = this.dateObj.split(' - ')[1];
-    this.alertService.getVehicleClassWisePanicCounts(this.vehicleClassWisePanicCountReq)
+    const hasSelectedDates = this.dateObj.includes(' - ');
+    const request = hasSelectedDates ? {
+      param1: this.dateObj.split(' - ')[0],
+      param2: this.dateObj.split(' - ')[1]
+    } : undefined;
+    this.alertService.getVehicleClassWisePanicCounts(request)
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.classLoading = false))
       .subscribe({
         next: response => {
@@ -432,7 +430,7 @@ param7Sessions: number | null = null;
   private loadSessionClassOptions(): void {
     this.classLoading = true;
     this.classError = '';
-    this.alertService.getVehicleClassWisePanicCounts(this.vehicleClassWisePanicCountReq)
+    this.alertService.getVehicleClassWisePanicCounts()
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.classLoading = false))
       .subscribe({
         next: response => {

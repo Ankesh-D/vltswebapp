@@ -18,6 +18,7 @@
           <i class="fa fa-refresh" [class.fa-spin]="loading" aria-hidden="true"></i>
         </button>
       }
+      <ng-content select="[toolbarBeforeExports]"></ng-content>
       @if (showOldNew) {
           <label class="common-data-toolbar__page-size">
             <select
