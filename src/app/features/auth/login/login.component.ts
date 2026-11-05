@@ -1,5 +1,4 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject, ChangeDetectionStrategy, Renderer2 } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -22,11 +21,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private baseApiService = inject(BaseApiService);
   private destroy$ = new Subject<void>();
-  private readonly document = inject(DOCUMENT);
-  private readonly renderer = inject(Renderer2);
-  private removeUx4gStyles?: () => void;
-  private removeUx4gLoadListener?: () => void;
-  private removeUx4gErrorListener?: () => void;
   loginForm!: FormGroup;
   hidePassword = true;
   loading = false;
@@ -42,8 +36,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   vendorList: any[] = [];
   leftLogo: string='';
   webelIcon: string='';
-  ux4gStylesReady = false;
-  ux4gStylesError = '';
 
   constructor(
     private fb: FormBuilder,
@@ -67,7 +59,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.loadUx4gStyles();
     this.leftLogo = 'assets/login/LOGO_WB.png';
     this.webelIcon = 'assets/login/Webel_logo_WBEIDC.png';
       fetch('/assets/version.json')
@@ -119,30 +110,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-    this.removeUx4gLoadListener?.();
-    this.removeUx4gErrorListener?.();
-    this.removeUx4gStyles?.();
-  }
-
-  private loadUx4gStyles() {
-    const stylesheet = this.renderer.createElement('link') as HTMLLinkElement;
-    this.renderer.setAttribute(stylesheet, 'rel', 'stylesheet');
-    this.renderer.setAttribute(
-      stylesheet,
-      'href',
-      new URL('assets/ux4g/ux4g.css', this.document.baseURI).href
-    );
-    this.removeUx4gLoadListener = this.renderer.listen(stylesheet, 'load', () => {
-      this.ux4gStylesReady = true;
-      this.cdr.detectChanges();
-    });
-    this.removeUx4gErrorListener = this.renderer.listen(stylesheet, 'error', () => {
-      this.ux4gStylesError = 'The design system styles could not load. Refresh this page to try again.';
-      this.ux4gStylesReady = true;
-      this.cdr.detectChanges();
-    });
-    this.renderer.appendChild(this.document.head, stylesheet);
-    this.removeUx4gStyles = () => this.renderer.removeChild(this.document.head, stylesheet);
   }
 
   token: string = '';
