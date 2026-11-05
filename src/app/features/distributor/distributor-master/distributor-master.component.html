@@ -10,7 +10,9 @@
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-12 pagetitleborder">
-                    @if (detailsflag) {
+                   
+                    <div class="pagetitlestyle"><span>Distributor Details</span></div>
+                  @if (detailsflag) {
                       <button class="add-new-btn btn btn-sm btn-primary text-white mb-1"
                         (click)="openAddNew()">
                         <a><i class="fa fa-plus"></i>&nbsp;&nbsp;Add New</a>
@@ -22,7 +24,6 @@
                         <a><i class="fa fa-plus"></i>&nbsp;&nbsp;Details </a>
                       </button>
                     }
-                    <div class="pagetitlestyle"><span>Distributor Details</span></div>
                   </div>
                 </div>
 

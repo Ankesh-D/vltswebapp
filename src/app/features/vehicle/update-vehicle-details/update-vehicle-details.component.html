@@ -73,26 +73,26 @@
         </div>
       </div>
     </div> -->
-    <div class="table-responsive">
-      <form autocomplete="off" class="top-controls-row">
+    <div class="update-vehicle-list">
+      <form autocomplete="off" class="top-controls-row" (submit)="$event.preventDefault()">
 
         <!-- LEFT SIDE -->
         <div class="left-controls">
 
-          <label class="topbar-label">Search :</label>
+          <label class="topbar-label" for="searchby">Search :</label>
 
           <div class="search-box">
             <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input inner"
               id="searchby" placeholder="Type here and press button...." autocomplete="disabled" maxlength="50"
               [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" />
 
-            <button class="search-inner-btn" (click)="getSearchDetails()">
+            <button type="button" class="search-inner-btn" (click)="getSearchDetails()" [disabled]="loading">
               <i class="fa fa-search"></i>
             </button>
           </div>
 
           <!-- RELOAD -->
-          <button class="reload-btn" (click)="reloadData()">
+          <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading">
             @if (!loading) {
               <span>Reload</span>
             }
@@ -106,9 +106,9 @@
         <!-- RIGHT SIDE -->
         <div class="right-controls">
 
-          <div class="total-records-text">Show Rows :</div>
+          <label class="total-records-text" for="vehiclePageSize">Show Rows :</label>
 
-          <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
+          <select id="vehiclePageSize" class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
 
             @for (size of pageSizeOptions; track size) {
               <option [value]="size === totalCount ? totalCount : size">
@@ -125,82 +125,94 @@
         </div>
 
       </form>
-      <table class="table table-striped app-table mb-1"
-        style="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;">
+      <div class="vehicle-table-scroll">
+      <table class="table table-striped app-table mb-1 vehicle-details-table">
+        <colgroup>
+          <col class="column-index">
+          <col class="column-vehicle">
+          <col class="column-engine">
+          <col class="column-type">
+          <col class="column-year">
+          <col class="column-state">
+          <col class="column-rto">
+          <col class="column-make">
+          <col class="column-model">
+          <col class="column-status">
+          <col class="column-actions">
+        </colgroup>
         <thead>
           <tr>
-            <th style="width:40px;">#</th>
-            <th (click)="sort('param7')" style="cursor: pointer;">
-              Vehicle No.
-              <hr>Chassis No.
+            <th scope="col">#</th>
+            <th scope="col" (click)="sort('param7')" (keydown.enter)="sort('param7')" tabindex="0">
+              Vehicle No.<br>Chassis No.
                 @if (sortKey === 'param7') {
                   <span class="sorting"
                   [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
                 }
               </th>
-              <th (click)="sort('param9')" style="cursor: pointer;">
+              <th scope="col" (click)="sort('param9')" (keydown.enter)="sort('param9')" tabindex="0">
                 Engine No.
                 @if (sortKey === 'param9') {
                   <span class="sorting"
                   [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
                 }
               </th>
-              <th (click)="sort('param15')" style="cursor: pointer;">
+              <th scope="col" (click)="sort('param15')" (keydown.enter)="sort('param15')" tabindex="0">
                 Vehicle Type
                 @if (sortKey === 'param15') {
                   <span class="sorting"
                   [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
                 }
               </th>
-              <th (click)="sort('param12')" style="cursor: pointer;">
+              <th scope="col" (click)="sort('param12')" (keydown.enter)="sort('param12')" tabindex="0">
                 Mfg Year
                 @if (sortKey === 'param12') {
                   <span class="sorting"
                   [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
                 }
               </th>
-              <th (click)="sort('param13')" style="cursor: pointer;">
+              <th scope="col" (click)="sort('param13')" (keydown.enter)="sort('param13')" tabindex="0">
                 State Code
                 @if (sortKey === 'param13') {
                   <span class="sorting"
                   [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
                 }
               </th>
-              <th (click)="sort('param14')" style="cursor: pointer;">
+              <th scope="col" (click)="sort('param14')" (keydown.enter)="sort('param14')" tabindex="0">
                 RTO Name
                 @if (sortKey === 'param14') {
                   <span class="sorting"
                   [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
                 }
               </th>
-              <th (click)="sort('param26')" style="cursor: pointer;">
+              <th scope="col" (click)="sort('param26')" (keydown.enter)="sort('param26')" tabindex="0">
                 Make Name
                 @if (sortKey === 'param26') {
                   <span class="sorting"
                   [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
                 }
               </th>
-              <th (click)="sort('param27')" style="cursor: pointer;">
+              <th scope="col" (click)="sort('param27')" (keydown.enter)="sort('param27')" tabindex="0">
                 Model Name
                 @if (sortKey === 'param27') {
                   <span class="sorting"
                   [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
                 }
               </th>
-              <th (click)="sort('param21')" style="cursor: pointer;">
+              <th scope="col" (click)="sort('param21')" (keydown.enter)="sort('param21')" tabindex="0">
                 Activation Status
                 @if (sortKey === 'param21') {
                   <span class="sorting"
                   [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
                 }
               </th>
-              <th>Activity</th>
+              <th scope="col">Activity</th>
             </tr>
           </thead>
           <tbody>
             @if (vehicleDetails.length === 0 && !loading) {
               <tr>
-                <td style="font-weight: bold; text-align: center;" colspan="100">NO DATA FOUND</td>
+                <td class="no-data" colspan="11">NO DATA FOUND</td>
               </tr>
             }
             @for (vehicle of getPaginatedData(); track vehicle) {
@@ -235,6 +247,7 @@
             }
           </tbody>
         </table>
+      </div>
         <!-- Pagination Controls -->
         <div class="float-end">
           @if (totalCount > pageSize) {
