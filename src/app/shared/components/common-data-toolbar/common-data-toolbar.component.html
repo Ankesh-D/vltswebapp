@@ -1,6 +1,6 @@
 <div class="common-data-toolbar" [class.common-data-toolbar--vehicle]="variant === 'vehicle'"
   [class.common-data-toolbar--device]="variant === 'device'">
-  @if (showSearch || showReload || showExcel || showPdf) {
+  @if (showSearch || showReload || showFilters || showDateRange || showOldNew || showExcel || showPdf) {
     <div class="common-data-toolbar__search">
       @if (showSearch) {
         <div class="common-data-toolbar__search-control">
@@ -18,11 +18,19 @@
           <i class="fa fa-refresh" [class.fa-spin]="loading" aria-hidden="true"></i>
         </button>
       }
-      <ng-content select="[toolbarBeforeExports]"></ng-content>
+      @if (showFilters) {
+        <div class="common-data-toolbar__filters">
+          <ng-content select="[toolbarFilters]"></ng-content>
+        </div>
+      }
+      @if (showDateRange) {
+        <input #dateRangeInput type="text" id="datepicker" class="form-control common-data-toolbar__date-range"
+          name="date" aria-label="Date range" autocomplete="off">
+      }
       @if (showOldNew) {
           <label class="common-data-toolbar__page-size">
             <select
-              [ngModel]="selectedOldNew"
+              [ngModel]="oldNewValue"
               (ngModelChange)="onOldNewChange($event)"
               aria-label="Select Old or New"
             >

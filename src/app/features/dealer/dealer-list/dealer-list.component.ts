@@ -172,7 +172,7 @@ canManageByRole(): boolean {
       // if (event.column.header === 'Approval' && event.row.param44 === 'Not Approve') {
       //   this.openApproveModal(event.row);
       // }
-    }
+  }
 
  updatePageSizeOptions() {
     // Generate page size options based on total count

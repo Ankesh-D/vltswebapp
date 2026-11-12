@@ -28,176 +28,42 @@
 
           @if (!showEntryForm) {
             <div class="row">
-              <!-- Search and Pagination Controls -->
-              <form autocomplete="off" class="mb-2">
-                <div class="d-flex justify-content-between align-items-center flex-wrap">
-                  <!-- Left Side: Search -->
-                  <div class="d-flex align-items-center">
-                    <!-- <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Search :</label> -->
-                    <div class="input-group input-group-sm">
-                      <input type="search" class="form-control shadow-none" placeholder="Type here..."
-                        [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" autocomplete="off"
-                        style="font-size: 11px; width: 200px;">
-                      <div class="input-group-append">
-                        <button type="button" class="btn btn-sm btn-primary" (click)="getSearchDetails()">
-                          <i class="fa fa-search" style="font-size: 11px;"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <button type="button" (click)="reloadData()" class="btn btn-outline-success btn-sm ms-2"
-                      style="font-size: 11px;" title="Reload">
-                      <i class="fa fa-refresh me-1" [class.fa-spin]="loading"></i>
-                      {{ loading ? 'Reloading...' : 'Reload' }}
-                    </button>
-                  </div>
-                  <!-- Right Side: Controls -->
-                  <div class="d-flex align-items-center">
-                    <!-- Download -->
-                    <div class="d-flex align-items-center me-3">
-                      <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Download :</label>
-                      <select name="excelpdfdownload" id="excelpdfdownload"
-                        class="form-control form-control-sm" style="font-size: 11px; width: auto;">
-                        <option value="Select">Select</option>
-                        <!-- <option value="Excel">Excel</option> -->
-                        <option value="">Excel</option>
-                      </select>
-                    </div>
-                    <!-- Show Rows -->
-                    <div class="d-flex align-items-center me-3">
-                      <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Show Rows :</label>
-                      <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize"
-                        class="form-control form-control-sm" style="font-size: 11px; width: auto;">
-                        @for (size of pageSizeOptions; track size) {
-                          <option [value]="size === totalCount ? 'All' : size">
-                            {{size === totalCount ? 'All' : size}}
-                          </option>
-                        }
-                      </select>
-                    </div>
-                    <!-- Total Records -->
-                    <span class="fw-bold" style="font-size: 11px;">
-                      Total Records : <span class="text-primary">{{pageCount}} of {{totalCount}}</span>
-                    </span>
-                  </div>
-                </div>
-              </form>
-              <!-- <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
-              <table style="width: 100%;">
-                <tbody class="bg-body">
-                  <tr>
-                    <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
-                      <font style="font-weight: bold; color: #0b58b9;">Search : </font>
-                    </td>
-                    <td>
-                      <div style="display: flex; align-items: center;">
-                        <input type="search" readonly
-                          onfocus="this.removeAttribute('readonly');" class="form-control"
-                          id="searchby" placeholder="Type here and press button...."
-                          style="border: 1px solid #ced4da; height: 28px; width: 220px; font-size: 12px; border-radius: 4px 0 0 4px; padding: 4px 10px; "
-                          autocomplete="disabled" maxlength="50" [(ngModel)]="searchText"
-                          (keyup.enter)="getSearchDetails()" name="searchby">
-                        <button id="searchbtn" style="cursor: pointer; margin-left: 0; height: 28px; border: none; background-color: #0b58b9; color: white; border-radius: 0 4px 4px 0; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; transition: background-color 0.2s;"
-                          (click)="getSearchDetails()" title="Search">
-                          <i class="fa fa-search"></i>
-                        </button>
-                        <button type="button" (click)="reloadData()" [disabled]="loading"
-                          style="margin-left: 6px; height: 28px; border: 1px solid #0b58b9; background-color: white; color: #0b58b9; border-radius: 4px; padding: 0 12px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s;"
-                          onmouseover="this.style.backgroundColor='#0b58b9'; this.style.color='white';"
-                          onmouseout="this.style.backgroundColor='white'; this.style.color='#0b58b9';">
-                          <span *ngIf="!loading" style="display: inline-flex; align-items: center;"><i class="fa fa-refresh" style="margin-right: 4px;"></i>Reload</span>
-                          <span *ngIf="loading" style="display: inline-flex; align-items: center;"><i class="fa fa-spinner fa-spin" style="margin-right: 4px;"></i>Reloading...</span>
-                        </button>
-                      </div>
-                    </td>
-                    <td>
-                      <table style="float: right;">
-                        <tbody>
-                          <tr>
-                            <td style="vertical-align: middle; padding-right: 15px;">
-                              <div style="display: flex; align-items: center;">
-                                <label class="control-label" for="excelpdfdownload"
-                                style="color: #0b58b9; margin-bottom: 0; margin-right: 5px; font-size: 12px; font-weight: bold;">Download :</label>
-                                <select class="" name="excelpdfdownload"
-                                  id="excelpdfdownload" style="height: 25px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;">
-                                  <option value="Select">Select</option>
-                                  <option value="Excel" id="downloadexcel">Excel
-                                  </option>
-                                </select>
-                              </div>
-                            </td>
-                            <td style="vertical-align: middle; padding-right: 5px;">
-                              <div style="font-weight: bold; color: #0b58b9; font-size: 12px;">
-                                Show Rows :
-                              </div>
-                            </td>
-                            <td style="vertical-align: middle; padding-right: 15px;">
-                              <select [(ngModel)]="pageSize"
-                                (change)="onPageSizeChange(pageSize)" name="pageSize"
-                                style="font-size: 11px; height: 25px; border: 1px solid #ccc; border-radius: 3px;">
-                                <option *ngFor="let size of pageSizeOptions"
-                                  [value]="size === totalCount ? 'All' : size">
-                                  {{size === totalCount ? 'All' : size}}
-                                </option>
-                              </select>
-                            </td>
-                            <td style="vertical-align: middle; padding-right: 9px;">
-                              <div style="text-align: right; font-weight: bold; font-size: 12px; color: #0b58b9;">
-                                <span class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</span>
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </form> -->
+              <app-common-data-toolbar
+                searchLabel="Search" searchPlaceholder="Type here..."
+                [searchText]="searchText"
+                (searchTextChange)="searchText=$event"
+                (search)="getSearchDetails()"
+                (reload)="reloadData()"
+                [loading]="loading"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                [displayedCount]="pageCount"
+                [totalRecords]="totalCount"
+                [showExcel]="false"
+                (pageSizeChange)="onPageSizeChange($event)"
+                pageSizeLabel="Show Rows"
+                totalLabel="Total Records"
+                countSeparator="of">
+              </app-common-data-toolbar>
             <div class="table-responsive">
-              <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
-                <div class="col-sm-12">
-                  <ng-template #rtoUserCell let-user let-column="column" let-i="index">
-                    @if (column.key === 'index') {
-                      {{ (currentPage - 1) * pageSize + i + 1 }}
-                    } @else if (column.key === 'param12') {
-                      <button class="btn btn-sm btn-primary"
-                        [ngClass]="{'btn-success': user.param12=='Activate', 'btn-danger': user.param12!='Activate'}"
-                        (click)="openStatusModal(user)">{{user.param12}}</button>
-                    } @else {
-                      {{ $any(user)[column.key] || 'NA' }}
-                    }
-                  </ng-template>
-                  <app-common-table [columns]="tableColumns" [rows]="getPaginatedUsers()" [loading]="loading"
-                    [cellTemplate]="rtoUserCell" [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
-                    tableClass="table table-striped app-table" tableId="devicetable"
-                    tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
-                    emptyMessage="NO DATA FOUND">
-                  </app-common-table>
-                  <!-- Pagination Controls -->
-                  @if (totalCount > 0) {
-                    <div class="pagination-wrapper"
-                      style="text-align: center; margin-top: 10px;">
-                      <ul class="pagination"
-                        style="display: inline-flex; list-style: none; padding: 0;">
-                        <li [class.disabled]="currentPage === 1">
-                          <button (click)="onPageChange(currentPage - 1)"
-                          [disabled]="currentPage === 1">Previous</button>
-                        </li>
-                        @for (page of getPageNumbers(); track page; let i = $index) {
-                          <li
-                            [class.active]="currentPage === (i + 1)">
-                            <button (click)="onPageChange(i + 1)">{{i + 1}}</button>
-                          </li>
-                        }
-                        <li [class.disabled]="currentPage >= getTotalPages()">
-                          <button (click)="onPageChange(currentPage + 1)"
-                          [disabled]="currentPage >= getTotalPages()">Next</button>
-                        </li>
-                      </ul>
-                    </div>
-                  }
-                </div>
-              </div>
+              <app-data-table
+                [columns]="tableColumns"
+                [rows]="users"
+                [loading]="loading"
+                [sortKey]="sortKey"
+                [reverse]="reverse"
+                tableClass="table table-striped app-table"
+                tableId="devicetable"
+                tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
+                emptyMessage="NO DATA FOUND"
+                (sort)="sort($event)">
+              </app-data-table>
+              <app-pagination
+                [totalCount]="totalCount"
+                [page]="currentPage"
+                [pageSize]="pageSize"
+                (pageChange)="onPageChange($event)">
+              </app-pagination>
             </div>
           </div>
         }

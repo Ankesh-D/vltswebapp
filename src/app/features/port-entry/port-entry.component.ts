@@ -11,7 +11,7 @@ import { CommonDataToolbarComponent } from '../../shared/components/common-data-
 
 @Component({
     selector: 'app-port-entry',
-    imports: [CommonModule, FormsModule, RouterModule, ToastComponent, LoadingComponent, CommonDataToolbarComponent],
+    imports: [CommonModule, FormsModule, RouterModule, ToastComponent, LoadingComponent],
     templateUrl: './port-entry.component.html',
     styleUrl: './port-entry.component.scss',
     changeDetection: ChangeDetectionStrategy.Eager,

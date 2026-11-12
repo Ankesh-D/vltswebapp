@@ -6,13 +6,11 @@ import { HttpHeaders } from '@angular/common/http';
 import { ApprovedVendorRequest, AuthService, LoginRequest } from '../../../core/services/auth.service';
 import { forkJoin, Subject, takeUntil } from 'rxjs';
 import { BaseApiService } from '../../../core/services/base-api.service';
-import { CookieService } from 'ngx-cookie-service';
 import { EncryptionService } from '../../../core/services/encryption.service';
 import { ValidationsService } from '../../../core/services/validations.service';
 @Component({
     selector: 'app-login',
     imports: [ReactiveFormsModule, FormsModule, RouterLink],
-    providers: [CookieService],
     templateUrl: './login.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./login.component.scss']
@@ -43,7 +41,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    public cookieService: CookieService,
     public apiService: BaseApiService,
     public cv: ValidationsService,
     public encryptionService: EncryptionService,   

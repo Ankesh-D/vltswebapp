@@ -37,7 +37,7 @@
       <ng-container [ngTemplateOutlet]="bodyTemplate" [ngTemplateOutletContext]="{ $implicit: rows }"></ng-container>
       } @else if (rows.length === 0) {
       <tr>
-        <td class="empty-state" [attr.colspan]="getVisibleColumns().length || 1">{{ emptyMessage }}</td>
+        <td class="empty-state text-center" [attr.colspan]="getVisibleColumns().length || 1">{{ emptyMessage }}</td>
       </tr>
       } @else {
       @for (row of rows; track row) {

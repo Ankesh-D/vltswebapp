@@ -1,413 +1,216 @@
-<div class="container-fluid main-wrapper">
-
-  <!-- ================= HEADER ================= -->
-  <header class="top-header">
-
-    <div class="row align-items-center text-center g-0">
-
-      <!-- Government Logo -->
-      <div class="col-2 gov-logo">
-        <img
-          [src]="leftLogo"
-          alt="Government Logo"
-          >
+<div class="homepage">
+  <header class="brand-header container-fluid">
+    <div class="brand-lockup brand-lockup-government">
+      <img [src]="leftLogo" alt="Government of Nagaland emblem">
+      <div>
+        <span class="brand-overline">Government of Nagaland</span>
+        <strong>Transport Department</strong>
       </div>
-
-      <!-- Title -->
-      <div class="col-8">
-
-        <div class="main-title">
-          Vehicle Location Tracking System (VLTS)
-        </div>
-
-        <div class="sub-title">
-          Transport Department, Government of West Bengal
-        </div>
-
-      </div>
-
-      <!-- Webel Logo -->
-      <div class="col-2 webel-logo">
-        <img
-          [src]="webelIcon"
-          alt="Webel Logo"
-          >
-      </div>
-
     </div>
 
+    <div class="brand-title">
+      <h1>Nagaland Vehicle Tracking &amp; Monitoring System (N-VTMS)</h1>
+      <p>Proposed Government Vehicle Tracking Platform under the AIS-140 / VLTD Project</p>
+    </div>
+
+    <div class="brand-lockup brand-lockup-partner">
+      <img [src]="dimtsLogo" alt="DIMTS" style="width: 200px;">
+      <!-- <span>Powered by DIMTS</span> -->
+    </div>
   </header>
 
-
-  <!-- ================= NAVIGATION ================= -->
-  <nav class="nav-links">
-
-    <div class="container-fluid text-center">
-
-      <a
-        (click)="openFaqModal()"
-        class="nav-other"
-        >
-        FAQ
+  <nav class="main-nav navbar navbar-expand-lg" aria-label="Main navigation">
+    <div class="container-fluid">
+      <a class="nav-home" href="/" aria-label="Home">
+        <i class="fa fa-home" aria-hidden="true"></i>
+        <span>Home</span>
       </a>
-
-      <a
-        href="https://vlts.wb.gov.in/entityonboarding/"
-        target="_blank"
-        rel="noopener noreferrer"
-        >
-        VLTD Manufacturer Onboarding
-      </a>
-
-      <a
-        (click)="openVendorModal()"
-        >
-        VLTD Manufacturer Having access
-      </a>
-
-      <a
-        (click)="redirectToLogin()"
-        class="nav-other"
-        >
-        Sign In
-      </a>
-
-      <a
-        class="nav-other"
-        href="mailto:support.vlts@wb.gov.in"
-        >
-        Contact Us:
-        <span class="text-dark">
-          support.vlts&#64;wb.gov.in
-        </span>
-      </a>
-
+      <div class="nav-actions">
+        <button type="button" (click)="openFaqModal()">
+          <i class="fa fa-info-circle" aria-hidden="true"></i>
+          <span>About</span>
+        </button>
+        <a href="mailto:support.vlts@wb.gov.in">
+          <i class="fa fa-envelope" aria-hidden="true"></i>
+          <span>Contact Us</span>
+        </a>
+        <a class="nav-register" href="https://vlts.wb.gov.in/entityonboarding/" target="_blank" rel="noopener noreferrer">
+          <i class="fa fa-user-plus" aria-hidden="true"></i>
+          <span>Register as Manufacturer</span>
+          <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+        </a>
+      </div>
     </div>
-
   </nav>
 
-
-  <!-- ================= MAIN CONTENT ================= -->
-  <main class="main-content">
-
-    <!-- PAGE TITLE -->
-    <section class="page-heading-wrapper">
-
-      <div class="page-heading">
-        AIS-140 VLTD Tracking Platform
+  <main>
+    <section class="hero-section">
+      <div class="hero-copy">
+        <span class="eyebrow"><i class="fa fa-map-marker" aria-hidden="true"></i> Safer journeys, smarter transport</span>
+        <h2>Vehicle Tracking Platform for<br><span>Safety, Security &amp; Enforcement</span></h2>
+        <p>One connected platform for real-time fleet visibility, emergency response and informed transport management.</p>
+        <div class="hero-benefits">
+          <div><i class="fa fa-shield" aria-hidden="true"></i><span>Real-time<br>monitoring</span></div>
+          <div><i class="fa fa-bell" aria-hidden="true"></i><span>Emergency<br>response</span></div>
+          <div><i class="fa fa-line-chart" aria-hidden="true"></i><span>Better<br>governance</span></div>
+          <div><i class="fa fa-road" aria-hidden="true"></i><span>Safer<br>roads</span></div>
+        </div>
       </div>
 
+      <div class="hero-art" aria-hidden="true">
+        <div class="sun-glow"></div>
+        <div class="hill hill-back"></div>
+        <div class="hill hill-front"></div>
+        <div class="road"></div>
+        <div class="road-markings"></div>
+        <div class="hero-bus"><i class="fa fa-bus"></i></div>
+        <div class="hero-car"><i class="fa fa-car"></i></div>
+        <div class="location-pin"><i class="fa fa-map-marker"></i></div>
+      </div>
+
+      <aside class="login-panel" aria-label="Sign in">
+        <div class="login-panel-heading"><i class="fa fa-lock" aria-hidden="true"></i> Portal Sign In</div>
+        <div class="login-options">
+          <button type="button" class="login-option option-admin" (click)="redirectToLogin()">
+            <i class="fa fa-users" aria-hidden="true"></i>
+            <span><strong>Administrator</strong><small>Department officials</small></span>
+            <i class="fa fa-angle-right option-arrow" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="login-option option-operator" (click)="redirectToLogin()">
+            <i class="fa fa-desktop" aria-hidden="true"></i>
+            <span><strong>Monitoring Centre</strong><small>Operations team</small></span>
+            <i class="fa fa-angle-right option-arrow" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="login-option option-reports" (click)="redirectToLogin()">
+            <i class="fa fa-bar-chart" aria-hidden="true"></i>
+            <span><strong>Reports Access</strong><small>Authorized users</small></span>
+            <i class="fa fa-angle-right option-arrow" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="login-option option-vendor" (click)="openVendorModal()">
+            <i class="fa fa-microchip" aria-hidden="true"></i>
+            <span><strong>VLTD Manufacturer</strong><small>Manufacturer access</small></span>
+            <i class="fa fa-angle-right option-arrow" aria-hidden="true"></i>
+          </button>
+        </div>
+        <button type="button" class="btn portal-signin" (click)="redirectToLogin()">
+          <i class="fa fa-sign-in" aria-hidden="true"></i> Sign In
+        </button>
+      </aside>
     </section>
 
+    <section class="dashboard-content container-fluid">
+      <div class="feature-grid">
+        <article class="feature-card feature-monitoring">
+          <div class="feature-icon"><i class="fa fa-map" aria-hidden="true"></i></div>
+          <h3>Live Monitoring</h3>
+          <p>View vehicle locations and fleet activity from one place.</p>
+          <button class="btn feature-action" type="button" (click)="redirectToLogin()">View Map <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+        </article>
 
-    <!-- ================= ANNOUNCEMENT ================= -->
-    @if (announcementData?.length) {
-      <section
-        class="announcement-section"
-        >
-        <div class="news-marquee">
-          <div class="news-text">
-            @for (item of announcementData; track item) {
-              <span class="fw-bold px-1">
-                {{ item.param3 }} :
-              </span>
-              <span class="pe-4">
-                {{ item.param4 }}
-              </span>
-            }
-          </div>
-        </div>
-      </section>
-    }
+        <article class="feature-card feature-emergency">
+          <div class="feature-icon"><i class="fa fa-bell" aria-hidden="true"></i></div>
+          <h3>Emergency Management</h3>
+          <p>Respond to alerts and coordinate timely assistance.</p>
+          <button class="btn feature-action" type="button" (click)="redirectToLogin()">View Alerts <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+        </article>
 
-
-    <!-- ================= MENU ================= -->
-    <section class="containers">
-
-      <!-- MENU ROW 1 -->
-      <div class="row justify-content-center menu-row">
-
-        <div class="col-lg-6 col-md-6 col-sm-10 mb-3">
-
-          <div class="shutter-box">
-
-            <a
-              href="https://vlts.wb.gov.in/entityonboarding/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text text-white"
-              >
-              VLTD Manufacturer Onboarding
-            </a>
-
-          </div>
-
-        </div>
-
-
-        <div class="col-lg-6 col-md-6 col-sm-10 mb-3">
-
-          <div
-            class="shutter-box"
-            (click)="openVendorModal()"
-            >
-
-            <div class="text">
-              VLTD Manufacturer Having Access
+        <article class="feature-card feature-analytics">
+          <div class="analytics-heading">
+            <div class="feature-icon"><i class="fa fa-pie-chart" aria-hidden="true"></i></div>
+            <div>
+              <h3>Analytics &amp; Reports</h3>
+              <p>Illustrative weekly activity</p>
             </div>
-
           </div>
+          <div #activityChart class="activity-chart" role="img" aria-label="Illustrative weekly vehicle activity chart"></div>
+          <p class="analytics-description">Explore fleet trends and generate reports.</p>
+          <button class="btn feature-action" type="button" (click)="redirectToLogin()">View Reports <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+        </article>
 
-        </div>
-
+        <article class="feature-card feature-devices">
+          <div class="feature-icon"><i class="fa fa-microchip" aria-hidden="true"></i></div>
+          <h3>Device Management</h3>
+          <p>Access VLTD manufacturer resources and information.</p>
+          <button class="btn feature-action" type="button" (click)="openVendorModal()">Manage Devices <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+        </article>
       </div>
 
-
-      <!-- MENU ROW 2 -->
-      <div class="row justify-content-center menu-row">
-
-        <!-- Installation -->
-        <div class="col-lg-4 col-md-4 col-sm-10 mb-3">
-
-          <div class="shutter-box">
-
-            <a
-              [href]="installationPDF"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text text-white"
-              >
-              VLTD Installation Process
-            </a>
-
-          </div>
-
+      <aside class="highlights-card">
+        <h3><i class="fa fa-info-circle" aria-hidden="true"></i> Platform Highlights</h3>
+        <div class="highlight-row">
+          <i class="fa fa-map-marker highlight-blue" aria-hidden="true"></i>
+          <div><strong>Fleet visibility</strong><span>Vehicle location monitoring</span></div>
         </div>
-
-
-        <!-- Renewal -->
-        <div class="col-lg-4 col-md-4 col-sm-10 mb-3">
-
-          <div class="shutter-box">
-
-            <a
-              [href]="renewalPDF"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text text-white"
-              >
-              VLTD Renewal Process
-            </a>
-
-          </div>
-
+        <div class="highlight-row">
+          <i class="fa fa-shield highlight-green" aria-hidden="true"></i>
+          <div><strong>AIS-140 ready</strong><span>Built for compliance workflows</span></div>
         </div>
-
-
-        <!-- Untag -->
-        <div class="col-lg-4 col-md-4 col-sm-10 mb-3">
-
-          <div class="shutter-box">
-
-            <a
-              [href]="untagPDF"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text text-white"
-              >
-              VLTD Untag Process
-            </a>
-
-          </div>
-
+        <div class="highlight-row">
+          <i class="fa fa-bell highlight-orange" aria-hidden="true"></i>
+          <div><strong>Emergency response</strong><span>Alerts for timely action</span></div>
         </div>
-
-      </div>
-
+        <div class="highlight-row">
+          <i class="fa fa-file-text highlight-purple" aria-hidden="true"></i>
+          <div><strong>Reports &amp; insights</strong><span>Tools for better decisions</span></div>
+        </div>
+      </aside>
     </section>
 
+    <section class="process-links" aria-label="VLTD process documents">
+      <span><i class="fa fa-check-circle" aria-hidden="true"></i> Need a VLTD guide?</span>
+      <a [href]="installationPDF" target="_blank" rel="noopener noreferrer">Installation</a>
+      <a [href]="renewalPDF" target="_blank" rel="noopener noreferrer">Renewal</a>
+      <a [href]="untagPDF" target="_blank" rel="noopener noreferrer">Untag process</a>
+      <button type="button" (click)="openFaqModal()">Frequently asked questions</button>
+    </section>
   </main>
 
-
-  <!-- ================= FOOTER ================= -->
-  <footer class="footer">
-
-    <div class="footer-left"></div>
-
-    <div class="footer-center">
-
-      Copyrights © 2026 |
-      Transport Department, Government of West Bengal |
-      All rights reserved
-
+  <footer class="site-footer">
+    <span>© 2026 Transport Department, Government of West Bengal. All rights reserved.</span>
+    <div>
+      <a href="mailto:support.vlts@wb.gov.in">Helpdesk</a>
+      <span class="footer-divider">|</span>
+      <span><i class="fa fa-phone" aria-hidden="true"></i> Support: support.vlts&#64;wb.gov.in</span>
     </div>
-
-    <div class="footer-right">
-      Powered by DIMTS
-    </div>
-
   </footer>
-
 </div>
 
-
-<!-- =====================================================
-VENDOR MODAL
-===================================================== -->
-
-<div
-  class="modal fade"
-  id="vendorModal"
-  tabindex="-1"
-  aria-labelledby="vendorModalLabel"
-  aria-hidden="true"
-  >
+<div class="modal fade" id="vendorModal" tabindex="-1" aria-labelledby="vendorModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered vendor-modal-dialog">
-
     <div class="modal-content">
-
       <div class="modal-header py-2">
-
-        <h5
-          class="modal-title"
-          id="vendorModalLabel"
-          >
-          VLTD Manufacturers Having Access
-        </h5>
-
-        <button
-          type="button"
-          class="btn-close"
-          aria-label="Close"
-          (click)="authService.closeModal('vendorModal')">
-        </button>
-
+        <h5 class="modal-title" id="vendorModalLabel">VLTD Manufacturers Having Access</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="authService.closeModal('vendorModal')"></button>
       </div>
-
-
       <div class="modal-body p-0">
-
         <div class="table-responsive">
-
           <table class="table vendor-tbl mb-0">
-
             <thead>
-
-              <tr>
-
-                <th style="width: 50px;">
-                  #
-                </th>
-
-                <th>
-                  Vendor Name
-                </th>
-
-                <th>
-                  Contact No.
-                </th>
-
-                <th>
-                  Email Id
-                </th>
-
-              </tr>
-
+              <tr><th style="width: 50px;">#</th><th>Vendor Name</th><th>Contact No.</th><th>Email Id</th></tr>
             </thead>
-
-
             <tbody>
-
               @if (vendorList.length === 0) {
-                <tr>
-                  <td
-                    colspan="4"
-                    class="text-center"
-                    >
-                    No VLTD Manufacturers Having Access found.
-                  </td>
-                </tr>
+                <tr><td colspan="4" class="text-center">No VLTD Manufacturers Having Access found.</td></tr>
               }
-
-
               @for (item of vendorList; track item; let i = $index) {
-                <tr
-                  >
-                  <td>
-                    {{ i + 1 }}
-                  </td>
-                  <td>
-                    {{ item.param3 }}
-                  </td>
-                  <td>
-                    {{ item.param4 }}
-                  </td>
-                  <td>
-                    {{ item.param5 }}
-                  </td>
-                </tr>
+                <tr><td>{{ i + 1 }}</td><td>{{ item.param3 }}</td><td>{{ item.param4 }}</td><td>{{ item.param5 }}</td></tr>
               }
-
             </tbody>
-
           </table>
-
         </div>
-
       </div>
-
     </div>
-
   </div>
-
 </div>
 
-
-<!-- =====================================================
-FAQ MODAL
-===================================================== -->
-
-<div
-  class="modal fade"
-  id="faqModal"
-  tabindex="-1"
-  aria-labelledby="faqModalLabel"
-  aria-hidden="true"
-  >
-
+<div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-
     <div class="modal-content">
-
-      <div
-        class="modal-header text-white"
-        style="background-color: #885000;"
-        >
-
-        <h5
-          class="modal-title"
-          id="faqModalLabel"
-          >
-          Frequently Asked Questions
-        </h5>
-
-        <button
-          type="button"
-          class="btn-close btn-close-white"
-          aria-label="Close"
-          (click)="authService.closeModal('faqModal')"
-        ></button>
-
+      <div class="modal-header text-white faq-modal-header">
+        <h5 class="modal-title" id="faqModalLabel">Frequently Asked Questions</h5>
+        <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="authService.closeModal('faqModal')"></button>
       </div>
-
-      <div class="modal-body p-0">
-
-        <app-faq></app-faq>
-
-      </div>
-
+      <div class="modal-body p-0"><app-faq></app-faq></div>
     </div>
-
   </div>
-
 </div>

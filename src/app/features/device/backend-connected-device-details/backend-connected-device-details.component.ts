@@ -1,17 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 import { BackendConnectedDeviceReq } from '../../../core/model/request.model';
 import { BackendConnDeviceResponse } from '../../../core/model/response.model';
 import { DeviceService } from '../../../core/services/device.service';
 import { ToastService } from '../../../core/services/toast.service';
-import moment from 'moment';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent, PageSizeOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-backend-connected-device-details',
-    imports: [CommonModule, FormsModule, RouterModule, CommonTableComponent],
+    imports: [CommonModule, CommonDataToolbarComponent, PaginationComponent],
     templateUrl: './backend-connected-device-details.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './backend-connected-device-details.component.scss'
@@ -20,33 +18,8 @@ export class BackendConnectedDeviceDetailsComponent implements OnInit {
   
   public detailsRequest: BackendConnectedDeviceReq = new BackendConnectedDeviceReq();
   public detailsData: BackendConnDeviceResponse[]=[];
-  readonly tableColumns: CommonTableColumn<BackendConnDeviceResponse>[] = [
-    { key: 'param1', label: '#' },
-    { key: 'param2', label: 'IMEI No' },
-    { key: 'param30', label: 'Packet Vendor' },
-    { key: 'param3', label: 'Firmware Version' },
-    { key: 'param4', label: 'Packet Type' },
-    { key: 'param5', label: 'Alert ID' },
-    { key: 'param6', label: 'Packet Status' },
-    { key: 'param7', label: 'GPS Status' },
-    { key: 'param8', label: 'Event Time' },
-    { key: 'coordinates', headers: ['Latitude', 'Longitude'] },
-    { key: 'direction', label: 'Direction' },
-    { key: 'param14', label: 'Speed (kmph)' },
-    { key: 'param16', label: 'Altitude (m)' },
-    { key: 'mncMcc', headers: ['MNC', 'MCC'] },
-    { key: 'operatorSatellites', headers: ['Operator', 'Satellite Count'] },
-    { key: 'ignitionPower', headers: ['Ignition', 'Main Power'] },
-    { key: 'param22', label: 'Client IP/Subnet' },
-    { key: 'param29', label: 'M2M verification' },
-    { key: 'param26', label: 'LAC' },
-    { key: 'param27', label: 'Cell ID' },
-    { key: 'param28', label: 'Signal' }
-  ];
 
   pageSizeOptions: any[]=[10, 20, 50, 100, 500];
-  isExporting: boolean = false;
-  selectedDownloadType: any = '';
   totalCount: number = 0;
   pageCount: number = 0;
   totalPages: number = 0;
@@ -127,7 +100,10 @@ export class BackendConnectedDeviceDetailsComponent implements OnInit {
     this.detailsRequest.param2 = this.pageNo;
     this.getDetails('pagechage'); // 🔥 reload API
   }
-  onDownloadChange() {
 
+  onPageSizeChange(pageSize: PageSizeOption): void {
+    this.pageSize = pageSize === 'All' ? this.totalCount : Number(pageSize);
+    this.detailsRequest.param3 = this.pageSize;
+    this.getDetails('pageSize');
   }
 }

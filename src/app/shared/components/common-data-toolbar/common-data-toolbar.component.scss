@@ -113,6 +113,31 @@
   opacity: 0.7;
 }
 
+.common-data-toolbar__date-range {
+  width: 220px;
+  height: 30px;
+  padding: 0 7px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-surface);
+  color: inherit;
+  font: 400 11px Roboto, "Helvetica Neue", sans-serif;
+  white-space: nowrap;
+}
+
+.common-data-toolbar__date-range:focus {
+  outline: 0;
+  border-color: var(--app-primary);
+  box-shadow: var(--app-shadow-focus);
+}
+
+.common-data-toolbar__filters {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
 .common-data-toolbar__page-size {
   margin-left: auto;
   flex-shrink: 0;
@@ -196,6 +221,11 @@
   padding: 0 7px;
   font-size: 10px;
 }
+.common-data-toolbar--vehicle .common-data-toolbar__date-range {
+  width: 190px;
+  height: 22px;
+  font-size: 10px;
+}
 .common-data-toolbar--vehicle .common-data-toolbar__export { height: 22px; padding: 0 6px; font-size: 9px; }
 
 .common-data-toolbar--vehicle .common-data-toolbar__page-size select {
@@ -244,6 +274,10 @@
 .common-data-toolbar--device .common-data-toolbar__search-control input {
   width: 100%;
   min-width: 0;
+}
+
+.common-data-toolbar--device .common-data-toolbar__filters {
+  flex: 0 1 auto;
 }
 
 .common-data-toolbar--device .common-data-toolbar__page-size {

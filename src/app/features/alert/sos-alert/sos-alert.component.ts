@@ -1,6 +1,6 @@
 import { createLeafletBasemap } from '../../../shared/components/map-layer-options/map-basemaps';
 import { MapLayerOptionsComponent } from '../../../shared/components/map-layer-options/map-layer-options.component';
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, OnDestroy, NgZone, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, OnDestroy, NgZone, ChangeDetectionStrategy, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LiveEmergencyVehiclesRequest } from '../../../core/services/alert.service'; // Import the new interface
@@ -16,31 +16,24 @@ import dayjs from 'dayjs';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent, OldNewOption, PageSizeOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 import L from 'leaflet';
 declare var $: any;
 
 @Component({
     selector: 'app-sos-alert',
-    imports: [MapLayerOptionsComponent, CommonModule, FormsModule, NgxDaterangepickerMd, TimepickerModule, ToastComponent, NgSelectModule, CommonTableComponent],
+    imports: [MapLayerOptionsComponent, CommonModule, FormsModule, NgxDaterangepickerMd, TimepickerModule, ToastComponent, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './sos-alert.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./sos-alert.component.scss']
 })
 export class SosAlertComponent implements OnInit, AfterViewInit, OnDestroy {
   alertDetails: any[] = [];
-  readonly tableColumns: CommonTableColumn<any>[] = [
-    { key: 'param1', label: '#' },
-    { key: 'vehicle', headers: ['Vehicle No.', 'Chassis No.'], sortable: true, sortKey: 'param11' },
-    { key: 'param8', label: 'Vendor Name', sortable: true },
-    { key: 'device', headers: ['Serial No.', 'IMEI No.'], sortable: true, sortKey: 'param5' },
-    { key: 'param6', label: 'ICCID No.', sortable: true },
-    { key: 'param18', label: 'Customer', sortable: true },
-    { key: 'param22', label: 'Alert Time', sortable: true },
-    { key: 'map', label: 'Panic Alert with Map View', sortable: true, sortKey: 'param30' },
-    { key: 'speed', headers: ['Speed(Km/hrs)', 'Ignition'], sortable: true, sortKey: 'param27' }
-  ];
+  @ViewChild('sosSpeedCell', { static: true }) private sosSpeedCell!: TemplateRef<{ $implicit: any }>;
+  tableColumns: DataTableColumn<any>[] = [];
   loading = false;
 
   searchText: string = '';
@@ -155,6 +148,53 @@ export class SosAlertComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.tableColumns = [
+      { key: 'param1', header: '#', width: '60px' },
+      {
+        headers: ['Vehicle No.', 'Chassis No.'],
+        sortKey: 'param11',
+        value: alert => this.joinValues(alert.param10, alert.param11, 'NA'),
+        cellClassName: 'multiline-cell'
+      },
+      { key: 'param8', header: 'Vendor Name', sortKey: 'param8' },
+      {
+        headers: ['Serial No.', 'IMEI No.'],
+        sortKey: 'param5',
+        value: alert => this.joinValues(alert.param5, alert.param4, 'NA'),
+        cellClassName: 'multiline-cell'
+      },
+      { key: 'param6', header: 'ICCID No.', sortKey: 'param6' },
+      { key: 'param18', header: 'Customer', sortKey: 'param18' },
+      { key: 'param22', header: 'Alert Time', sortKey: 'param22', width: '85px' },
+      {
+        header: 'Panic Alert with Map View',
+        width: '190px',
+        className: 'sos-action-cell',
+        actions: [
+          {
+            label: 'View Map',
+            icon: 'fa-map-marker',
+            className: 'alert-action-button',
+            tone: 'primary',
+            run: alert => this.alertmapopen(alert)
+          },
+          {
+            label: 'Raw',
+            icon: 'fa-code',
+            className: 'alert-action-button alert-action-raw',
+            tone: 'neutral',
+            run: alert => this.openRawStringModal(alert.param55)
+          }
+        ]
+      },
+      {
+        headers: ['Speed(Km/hrs)', 'Ignition'],
+        sortKey: 'param27',
+        width: '70px',
+        cellTemplate: this.sosSpeedCell
+      }
+    ];
+
     const lastElement = this.router.url.split('/').filter(x => x).pop();
     // this.pageName
     this.BindTable();
@@ -245,7 +285,7 @@ export class SosAlertComponent implements OnInit, AfterViewInit, OnDestroy {
       pdfexcel: "",
       type: ''
     };
-
+    console.log("details data", this.alertDetails);
     this.detailsAPI = this.alertService.getLiveEmergencyVehiclesCompliance(request, true).subscribe({
       next: (response: any) => {
         this.loading = false;
@@ -277,6 +317,7 @@ export class SosAlertComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setView(type: string) {
     this.vehicleType = type;
+    this.currentPage = 1;
     this.BindTable();
 
   }
@@ -300,25 +341,21 @@ export class SosAlertComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   sort(key: string) {
-    this.sortKey = key;
-    this.reverse = !this.reverse;
-    this.alertDetails.sort((a, b) => {
-      const valA = (a as any)[key];
-      const valB = (b as any)[key];
-      let comparison = 0;
-      if (valA > valB) {
-        comparison = 1;
-      } else if (valA < valB) {
-        comparison = -1;
-      }
-      return this.reverse ? comparison * -1 : comparison;
-    });
+    if (this.sortKey === key) {
+      this.reverse = !this.reverse;
+    } else {
+      this.sortKey = key;
+      this.reverse = false;
+    }
+    this.cdr.detectChanges();
   }
-  downloadPDFExcel(event: any) {
+  downloadPDFExcel(selection: Event | string) {
     if (this.refreshInterval) {
       clearInterval(this.refreshInterval);
     }
-    let docType = event.target.value;
+    const docType = typeof selection === 'string'
+      ? selection
+      : (selection.target as HTMLSelectElement).value;
     this.loading = true;
     const request = {
       param1: (this.searchText || '').trim(),//searchby
@@ -373,8 +410,7 @@ export class SosAlertComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
+  onPageSizeChange(newSize: PageSizeOption) {
     this.pageSize = newSize === 'All' ? this.totalCount : Number(newSize);
     this.currentPage = 1;
     this.BindTable();
@@ -383,31 +419,8 @@ export class SosAlertComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  getTotalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
-
-  getPageNumbers(): (number | string)[] {
-    const totalPages = this.getTotalPages();
-    const currentPage = this.currentPage;
-    const pages: (number | string)[] = [];
-
-    if (totalPages <= 10) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-      return pages;
-    }
-
-    if (currentPage <= 4) {
-      return [1, 2, 3, 4, 5, '...', totalPages];
-    } else if (currentPage >= totalPages - 3) {
-      return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
-    } else {
-      return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
-    }
-  }
-
-  getPaginatedData(): any[] {
-    return this.alertDetails;
+  onOldNewChange(value: OldNewOption): void {
+    this.setView(value === 'old' ? 'OLD' : 'NEW');
   }
 
   // Tab switching logic for Leaflet Popups (AngularJS port)
@@ -1487,4 +1500,34 @@ export class SosAlertComponent implements OnInit, AfterViewInit, OnDestroy {
     this.historyArrowLayers.clearLayers();
     this.historyRoute = undefined;
   }
+  getPaginatedData(): any[] {
+       // API already returns paginated data, so just sort if needed
+       // Note: In a production app, sorting should be done server-side
+       // For now, we do client-side sorting on the current page
+       let sorted = [...this.alertDetails];
+       if (this.sortKey) {
+         sorted.sort((a: any, b: any) => {
+           const aVal = String(a[this.sortKey] || '').toLowerCase();
+           const bVal = String(b[this.sortKey] || '').toLowerCase();
+           if (this.reverse) {
+             return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+           } else {
+             return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+           }
+         });
+       }
+       return sorted;
+    }
+
+  private joinValues(primary: unknown, secondary: unknown, fallback: string): string {
+    const firstValue = primary ? String(primary) : fallback;
+    const secondValue = secondary ? String(secondary) : fallback;
+    return `${firstValue}\n${secondValue}`;
+  }
+
+  onCellClick(event: { row: any; column: DataTableColumn<any> }) {
+        // if (event.column.header === 'Approval' && event.row.param44 === 'Not Approve') {
+        //   this.openApproveModal(event.row);
+        // }
+    }
 }

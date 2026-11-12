@@ -8,12 +8,14 @@ import { ToastComponent } from '../../assets/inactive-assets/toast.component';
 import * as CryptoJS from 'crypto-js';
 import Swal from 'sweetalert2';
 import { ToastService } from '../../../core/services/toast.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent, PageSizeOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 @Component({
     selector: 'app-rtouser-creation',
-    imports: [CommonModule, FormsModule, RouterModule, ToastComponent, CommonTableComponent],
+    imports: [CommonModule, FormsModule, RouterModule, ToastComponent, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './rtouser-creation.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './rtouser-creation.component.scss'
@@ -66,17 +68,25 @@ export class RTOUserCreationComponent implements OnInit {
   // Form validation flags
   formErrors: { [key: string]: boolean } = {};
   users: User[] = [];
-  readonly tableColumns: CommonTableColumn<User>[] = [
-    { key: 'index', label: '#', sortable: false },
-    { key: 'param11', label: 'RTO Name', sortable: true },
-    { key: 'param4', label: 'Contact Person', sortable: true },
-    { key: 'param5', label: 'Mobile No.', sortable: true },
-    { key: 'param6', label: 'Email ID', sortable: true },
-    { key: 'param7', label: 'Address', sortable: true, width: '180px' },
-    { key: 'param8', label: 'Pincode', sortable: true },
-    { key: 'param10', label: 'Login Name', sortable: true },
-    { key: 'param9', label: 'Created At', sortable: true },
-    { key: 'param12', label: 'Action' }
+  readonly tableColumns: DataTableColumn<User>[] = [
+    { key: 'index', header: '#', value: user => (this.currentPage - 1) * this.pageSize + this.users.indexOf(user) + 1 },
+    { key: 'param11', header: 'RTO Name', sortKey: 'param11' },
+    { key: 'param4', header: 'Contact Person', sortKey: 'param4' },
+    { key: 'param5', header: 'Mobile No.', sortKey: 'param5' },
+    { key: 'param6', header: 'Email ID', sortKey: 'param6' },
+    { key: 'param7', header: 'Address', sortKey: 'param7', width: '180px' },
+    { key: 'param8', header: 'Pincode', sortKey: 'param8' },
+    { key: 'param10', header: 'Login Name', sortKey: 'param10' },
+    { key: 'param9', header: 'Created At', sortKey: 'param9' },
+    {
+      key: 'param12',
+      header: 'Action',
+      actions: [{
+        label: user => user.param12 || 'Update',
+        className: 'btn btn-sm btn-primary',
+        run: user => this.openStatusModal(user)
+      }]
+    }
   ];
   showEntryForm: boolean = false;
 
@@ -578,23 +588,14 @@ export class RTOUserCreationComponent implements OnInit {
     });
   }
 
-  onPageSizeChange(size: any) {
+  onPageSizeChange(size: PageSizeOption) {
     if (size === 'All') {
       this.pageSize = this.totalCount;
     } else {
-      this.pageSize = parseInt(size, 10);
+      this.pageSize = Number(size);
     }
     this.currentPage = 1;
     this.loadUsers();
-  }
-
-  getPaginatedUsers(): User[] {
-    if (this.pageSize === this.totalCount || this.pageSize >= this.users.length) {
-      return this.users;
-    }
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    return this.users.slice(start, end);
   }
 
   onPageChange(page: number) {
@@ -604,16 +605,6 @@ export class RTOUserCreationComponent implements OnInit {
 
   goHome() {
     this.router.navigate(['/dashboard']);
-  }
-
-  getTotalPages(): number {
-    if (this.pageSize === 0 || this.totalCount === 0) return 0;
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
-
-  getPageNumbers(): number[] {
-    const totalPages = this.getTotalPages();
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
   toggleView(showEntry: boolean) {

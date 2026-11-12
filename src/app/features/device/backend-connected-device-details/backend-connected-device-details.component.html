@@ -12,143 +12,193 @@
           </div>
 
         </div>
+        <app-common-data-toolbar
+          variant="device"
+          searchLabel="Search :" searchPlaceholder="Type here..."
+          [searchText]="detailsRequest.param4"
+          (searchTextChange)="detailsRequest.param4=$event"
+          (search)="getDetails('search')"
+          (reload)="getDetails('init')"
+          [loading]="loading"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [displayedCount]="pageCount"
+          [totalRecords]="totalCount"
+          [showExcel]="false"
+          (pageSizeChange)="onPageSizeChange($event)"
+          pageSizeLabel="Show Rows"
+          totalLabel="Total Records"
+          countSeparator="of">
+        </app-common-data-toolbar>
 
-
-        <!-- SEARCH + CONTROLS BAR -->
-        <div class="top-controls-row">
-
-          <!-- LEFT SEARCH -->
-          <div class="left-controls">
-
-            <!-- SEARCH WITH INNER BUTTON -->
-            <div class="search-box">
-              <input type="search" class="search-input inner" placeholder="Type here and press button...."
-                maxlength="50" [(ngModel)]="detailsRequest.param4" (keyup.enter)="getDetails('search')"
-                name="searchTextBox" />
-
-              <button type="button" class="search-inner-btn" (click)="getDetails('search')">
-                <i class="fa fa-search"></i>
-              </button>
-            </div>
-
-            <!-- RELOAD -->
-            <button (click)="getDetails('init')" [disabled]="loading"
-              style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
-              <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
-              <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
-            </button>
-
+      <section class="device-results" aria-label="Connected devices">
+        @if (loading && detailsData.length === 0) {
+          <div class="device-state">
+            <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
+            <span>Loading device details...</span>
           </div>
+        } @else if (detailsData.length === 0) {
+          <div class="device-state">
+            <i class="fa fa-inbox" aria-hidden="true"></i>
+            <span>No records found. Try changing your search.</span>
+          </div>
+        } @else {
+          <div class="device-card-list">
+            @for (item of detailsData; track item) {
+              <article class="device-card">
+                <header class="device-card__header">
+                  <div class="device-card__identity">
+                    <span class="device-card__index">{{ item.param1 || '—' }}</span>
+                    <div class="device-card__title-group">
+                      <span class="device-card__eyebrow">IMEI NUMBER</span>
+                      <h2 class="device-card__imei"
+                        [class.device-card__imei--verified]="item.param29 && item.param29.trim() !== ''">
+                        {{ item.param2 || 'Not available' }}
+                      </h2>
+                    </div>
+                  </div>
+                  <div class="device-card__badges">
+                    <span class="device-badge device-badge--vendor">{{ item.param30 || 'Vendor unavailable' }}</span>
+                    @if (item.param4) {
+                      <span class="device-badge">{{ item.param4 }}</span>
+                    }
+                  </div>
+                </header>
 
-          <!-- RIGHT CONTROLS -->
-          <div class="right-controls">
-            <!-- <div style="display: flex; align-items: center; margin-right: 15px;">
-            <label class="total-records-text">
-              Download: &nbsp;
-            </label>
+                <div class="device-card__body">
+                  <section class="device-card__section">
+                    <h3><i class="fa fa-microchip" aria-hidden="true"></i> Device &amp; packet</h3>
+                    <div class="device-detail-grid">
+                      <div class="device-detail">
+                        <span>Firmware version</span>
+                        <strong>{{ item.param3 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>Alert ID</span>
+                        <strong>{{ item.param5 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>Packet status</span>
+                        <strong>{{ item.param6 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>GPS status</span>
+                        <strong>{{ item.param7 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail device-detail--wide">
+                        <span>Event time</span>
+                        <strong>{{ item.param8 || '—' }}</strong>
+                      </div>
+                    </div>
+                  </section>
 
-            <select [(ngModel)]="selectedDownloadType" (change)="onDownloadChange()"
-              [disabled]="isExporting"
-              style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; background: white;">
+                  <section class="device-card__section">
+                    <h3><i class="fa fa-map-marker" aria-hidden="true"></i> Location &amp; movement</h3>
+                    <div class="device-detail-grid">
+                      <div class="device-detail">
+                        <span>Latitude</span>
+                        <strong>{{ item.param9 && item.param9 !== '0' ? item.param9 : '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>Longitude</span>
+                        <strong>{{ item.param11 && item.param11 !== '0' ? item.param11 : '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>Direction</span>
+                        <strong class="device-direction">
+                          <i class="fa fa-arrow-circle-up"
+                            [style.transform]="'rotate(' + item.param15 + 'deg)'"
+                            [title]="item.param15 + '° (' + item.param13 + ')'"
+                            aria-hidden="true"></i>
+                          {{ item.param13 || '—' }}
+                        </strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>Speed</span>
+                        <strong>{{ item.param14 || '—' }} <small>km/h</small></strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>Altitude</span>
+                        <strong>{{ item.param16 || '—' }} <small>m</small></strong>
+                      </div>
+                    </div>
+                  </section>
 
-              <option value="" selected>Select</option>
-              <option value="Excel">Excel</option>
-            </select>
+                  <section class="device-card__section">
+                    <h3><i class="fa fa-signal" aria-hidden="true"></i> Network &amp; cell</h3>
+                    <div class="device-detail-grid">
+                      <div class="device-detail">
+                        <span>Operator</span>
+                        <strong>{{ item.param17 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>Satellite count</span>
+                        <strong>{{ item.param18 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>MNC</span>
+                        <strong>{{ item.param24 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>MCC</span>
+                        <strong>{{ item.param25 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail device-detail--wide">
+                        <span>Client IP / Subnet</span>
+                        <strong class="device-detail__breakable">{{ item.param22 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>M2M verification</span>
+                        <strong>{{ item.param29 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>LAC</span>
+                        <strong>{{ item.param26 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>Cell ID</span>
+                        <strong>{{ item.param27 || '—' }}</strong>
+                      </div>
+                      <div class="device-detail">
+                        <span>Signal</span>
+                        <strong>{{ item.param28 || '—' }}</strong>
+                      </div>
+                    </div>
+                  </section>
 
-            <span *ngIf="isExporting" style="margin-left:8px; font-size:11px; color:#0b58b9;">
-              <i class="fa fa-spinner fa-spin"></i> Generating...
-            </span>
-          </div> -->
-          <select class="rows-select" [(ngModel)]="detailsRequest.param3" (change)="getDetails('pageSize')">
-            @for (size of pageSizeOptions; track size) {
-              <option [value]="size === totalCount ? 'All' : size">
-                {{ size === totalCount ? 'All' : size }}
-              </option>
+                  <section class="device-card__section device-card__section--power">
+                    <h3><i class="fa fa-bolt" aria-hidden="true"></i> Power status</h3>
+                    <div class="device-status-list">
+                      <div class="device-status"
+                        [class.device-status--on]="item.param19 === 'true'"
+                        [class.device-status--off]="item.param19 !== 'true'">
+                        <i class="fa fa-key" aria-hidden="true"></i>
+                        <span>Ignition</span>
+                        <strong>{{ item.param19 === 'true' ? 'ON' : 'OFF' }}</strong>
+                      </div>
+                      <div class="device-status"
+                        [class.device-status--on]="item.param20 === 'true'"
+                        [class.device-status--off]="item.param20 !== 'true'">
+                        <i class="fa fa-power-off" aria-hidden="true"></i>
+                        <span>Main power</span>
+                        <strong>{{ item.param20 === 'true' ? 'ON' : 'OFF' }}</strong>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </article>
             }
-          </select>
-
-          <div class="total-records-text">
-            Total Records : {{ pageCount }} of {{ totalCount }}
           </div>
-
-        </div>
+        }
+      </section>
+      <div class="float-end">
+        <app-pagination
+          [totalCount]="totalCount"
+          [page]="pageNo"
+          [pageSize]="pageSize"
+          (pageChange)="changePage($event)">
+        </app-pagination>
       </div>
-
-      <!-- TABLE -->
-      <div class="table-responsive">
-        <ng-template #backendCell let-item let-column="column">
-          @switch (column.key) {
-            @case ('param2') {
-              <span [ngStyle]="{'color': (!item.param29 || item.param29.trim() === '') ? 'red' : 'green', 'font-weight': 'bold'}">
-                {{item.param2 || '-'}}
-              </span>
-            }
-            @case ('param4') { <span class="text-end">{{item.param4 || '-'}}</span> }
-            @case ('param5') { <span class="text-center">{{item.param5 || '-'}}</span> }
-            @case ('param7') { <span class="text-center">{{item.param7 || '-'}}</span> }
-            @case ('param8') { <span class="text-end">{{item.param8 || '-'}}</span> }
-            @case ('coordinates') { {{item.param9 !== '0' ? item.param9 : '-'}}<hr class="m-0">{{item.param11 !== '0' ? item.param11 : '-'}} }
-            @case ('direction') {
-              <i class="fa fa-arrow-circle-up" style="font-size: 14px; color:sienna; display:inline-block"
-                [style.transform]="'rotate(' + item.param15 + 'deg)'"
-                [title]="item.param15 + '° (' + item.param13 + ')'"></i>
-            }
-            @case ('mncMcc') { {{item.param24}}<hr>{{item.param25}} }
-            @case ('operatorSatellites') { {{item.param17}}<hr>{{item.param18}} }
-            @case ('ignitionPower') {
-              <i class="fa" [ngClass]="item.param19 === 'true' ? 'fa-key text-success' : 'fa-key text-danger'"
-                [title]="item.param19 === 'true' ? 'Ignition ON' : 'Ignition OFF'"></i>
-              <hr>
-              <i class="fa" [ngClass]="item.param20 === 'true' ? 'fa-power-off text-success' : 'fa-power-off text-danger'"
-                [title]="item.param20 === 'true' ? 'Main Power ON' : 'Main Power OFF'"></i>
-            }
-            @default { {{item[column.key] || 'NA'}} }
-          }
-        </ng-template>
-        <app-common-table [columns]="tableColumns" [rows]="detailsData" [loading]="loading"
-          [cellTemplate]="backendCell" tableClass="table app-table" tableId="devicetable"
-          emptyMessage="No Record Found">
-        </app-common-table>
-
-</div>
-@if (totalPages > 1) {
-  <div class="custom-pagination" style="display:flex;justify-content: end;"
-    >
-    <button class="pg-btn" (click)="changePage(pageNo - 1)" [disabled]="pageNo === 1">
-      Prev
-    </button>
-    <button class="pg-num" [class.active]="pageNo === 1" (click)="changePage(1)">
-      1
-    </button>
-    @if (pageNo > 3) {
-      <span class="pg-dots">...</span>
-    }
-    @if (pageNo > 2) {
-      <button class="pg-num" (click)="changePage(pageNo - 1)">
-        {{ pageNo - 1 }}
-      </button>
-    }
-    @if (pageNo !== 1 && pageNo !== totalPages) {
-      <button class="pg-num active">
-        {{ pageNo }}
-      </button>
-    }
-    @if (pageNo < totalPages - 1) {
-      <button class="pg-num" (click)="changePage(pageNo + 1)">
-        {{ pageNo + 1 }}
-      </button>
-    }
-    @if (pageNo < totalPages - 2) {
-      <span class="pg-dots">...</span>
-    }
-    <button class="pg-num" [class.active]="pageNo === totalPages" (click)="changePage(totalPages)">
-      {{ totalPages }}
-    </button>
-    <button class="pg-btn" (click)="changePage(pageNo + 1)" [disabled]="pageNo === totalPages">
-      Next
-    </button>
-  </div>
-}
 </div>
 </div>
 </div>

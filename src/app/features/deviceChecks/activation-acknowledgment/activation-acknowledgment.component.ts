@@ -7,11 +7,12 @@ import { ToastService } from '../../../core/services/toast.service';
 import { CheckHealthAckResponse, UserCreationDetailsResp } from '../../../core/model/response.model';
 import moment from 'moment';
 import { DeviceService } from '../../../core/services/device.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
-declare var $: any;
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { CommonDataToolbarComponent, PageSizeOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 @Component({
     selector: 'app-activation-acknowledgment',
-    imports: [FormsModule, RouterModule, CommonTableComponent],
+    imports: [FormsModule, RouterModule, DataTableComponent, CommonDataToolbarComponent, PaginationComponent],
     templateUrl: './activation-acknowledgment.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './activation-acknowledgment.component.scss'
@@ -20,11 +21,11 @@ export class ActivationAcknowledgmentComponent implements OnInit {
   @ViewChild('searchVendorForm') searchVendorForm!: NgForm;
   public detailsRequest: CheckHealthAckDetailsReq = new CheckHealthAckDetailsReq();
   public detailsData: CheckHealthAckResponse[]=[];
-  readonly tableColumns: CommonTableColumn<CheckHealthAckResponse>[] = [
-    { key: 'param1', label: '#', value: row => row.param1 || '-' },
-    { key: 'param3', label: 'IMEI No', value: row => row.param3 || '-' },
-    { key: 'param29', label: 'Health Packet', value: row => row.param29 || '-' },
-    { key: 'param17', label: 'Received Time', value: row => row.param17 || '-' }
+  readonly tableColumns: DataTableColumn<CheckHealthAckResponse>[] = [
+    { key: 'param1', header: '#', value: row => row.param1 || '-' },
+    { key: 'param3', header: 'IMEI No', value: row => row.param3 || '-' },
+    { key: 'param29', header: 'Health Packet', value: row => row.param29 || '-' },
+    { key: 'param17', header: 'Received Time', value: row => row.param17 || '-' }
   ];
 
   pageSizeOptions: any[]=[10, 20, 50, 100, 500];
@@ -37,73 +38,53 @@ export class ActivationAcknowledgmentComponent implements OnInit {
   loading: boolean= false;
   pageNo: number = 1;
   roleId: any;
-  selectedDate: any;
+  dateRangeStart = moment().format('DD-MMM-YYYY');
+  dateRangeEnd = moment().format('DD-MMM-YYYY');
   constructor(private deviceService: DeviceService, private toastService: ToastService, private router: Router) {
     this.toastService.pageName = 'Activation Acknowledgment';
   }
   ngOnInit(): void {
     this.roleId = sessionStorage.getItem('roleid');
-    this.initializeDatePicker() 
+    this.detailsRequest.param6 = this.dateRangeStart;
+    this.detailsRequest.param7 = this.dateRangeEnd;
     setTimeout(() => {
       this.getDetails('init');  
     }, 500);
   }
-  initializeDatePicker() {
-    // this.selectedDate = moment().format('DD-MMM-YYYY');
-  
-    $(() => {
-      const $dateInput = $('input[name="date"]');
-  
-      $dateInput.daterangepicker({
-        singleDatePicker: false,
-        showDropdowns: true,
-        autoApply: false,
-        timePicker: false,
-        startDate: moment(),
-        endDate: moment(), 
-        maxDate: moment(),
-        minYear: moment().subtract(2, 'year').year(),
-        maxYear: moment(),
-        opens: 'center',
-        drops: 'down',
-        locale: {
-          format: 'DD-MMM-YYYY'
-        }
-      });
-  
-      // On date selection
-     $dateInput.on('apply.daterangepicker', (ev: any, picker: any) => {
-        this.selectedDate = `${picker.startDate.format('DD-MMM-YYYY')} - ${picker.endDate.format('DD-MMM-YYYY')}`;
-        this.detailsRequest.param6 = `${picker.startDate.format('DD-MMM-YYYY')}`;
-        this.detailsRequest.param7 = `${picker.endDate.format('DD-MMM-YYYY')}`;
-         this.getDetails('filter')
-      });
-  
-      // On picker close
-      // $dateInput.on('hide.daterangepicker', (ev: any, picker: any) => {
-      //   this.selectedDate = `${picker.startDate.format('DD-MMM-YYYY')} - ${picker.endDate.format('DD-MMM-YYYY')}`;
-      //   this.detailsRequest.param6 = `${picker.startDate.format('DD-MMM-YYYY')}`;
-      //   this.detailsRequest.param7 = `${picker.endDate.format('DD-MMM-YYYY')}`;
-       
-      // });
-    });
+
+  onDateRangeChange(range: { startDate: string; endDate: string }): void {
+    this.dateRangeStart = range.startDate;
+    this.dateRangeEnd = range.endDate;
+
+    const startDate = moment(range.startDate, 'DD-MMM-YYYY', true);
+    const endDate = moment(range.endDate, 'DD-MMM-YYYY', true);
+    if (!startDate.isValid() || !endDate.isValid()) return;
+
+    this.detailsRequest.param6 = range.startDate;
+    this.detailsRequest.param7 = range.endDate;
+    this.pageNo = 1;
+    this.detailsRequest.param2 = this.pageNo;
+    this.getDetails('filter');
+  }
+
+  onPageSizeChange(pageSize: PageSizeOption): void {
+    this.pageSize = Number(pageSize);
+    this.detailsRequest.param3 = this.pageSize;
+    this.pageNo = 1;
+    this.detailsRequest.param2 = this.pageNo;
+    this.getDetails('pageSize');
   }
   
   getDetails(tooluse?: any) {
-    let daterange = $('#datepicker').val().split(" - ")
-    this.detailsRequest.param6 = daterange[0];
-    this.detailsRequest.param7 = daterange[1];
     if(tooluse=='init' || tooluse=='search') {
         if(tooluse=='init') {
           
           this.detailsRequest.param4 = "";
         }
-        this.detailsRequest.param2 = 1;
-        this.detailsRequest.param3 = 10;
+        this.pageNo = 1;
+        this.detailsRequest.param2 = this.pageNo;
+        this.detailsRequest.param3 = this.pageSize;
       }
-    if(tooluse=='pagesize') {
-
-    }
     this.loading=true;
     this.deviceService.smsacknowledgeResponse(this.detailsRequest).subscribe({
       
@@ -136,6 +117,10 @@ export class ActivationAcknowledgmentComponent implements OnInit {
     this.pageNo = p;
     this.detailsRequest.param2 = this.pageNo;
     this.getDetails('pagechage'); // 🔥 reload API
+  }
+
+  onPageChange(page: number): void {
+    this.changePage(page);
   }
   onDownloadChange() {}
 

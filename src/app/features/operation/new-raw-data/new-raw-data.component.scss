@@ -77,6 +77,21 @@
   padding-bottom: 2px;
 }
 
+.raw-data-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.raw-data-filters .filter-field {
+  min-width: 150px;
+}
+
+.raw-data-filters .filter-input {
+  min-width: 150px;
+}
+
 .filter-label {
   font-size: 11px;
   font-weight: bold;
@@ -255,15 +270,15 @@
   border-collapse: collapse;
 }
 
-.table-striped tbody tr:nth-of-type(odd) {
+:host ::ng-deep .table-section .table-striped tbody tr:nth-of-type(odd) {
   background-color: #d9e7d8;
 }
 
-.table-striped tbody tr:nth-of-type(even) {
+:host ::ng-deep .table-section .table-striped tbody tr:nth-of-type(even) {
   background-color: #fcfcfc;
 }
 
-.rd-thead th {
+:host ::ng-deep .table-section .rd-thead th {
   background: #aacda8;
   color: #212529;
   font-family: serif;
@@ -281,7 +296,7 @@
   cursor: pointer;
 }
 
-.table td {
+:host ::ng-deep .table-section .table td {
   font-size: 11px;
   text-align: left;
   vertical-align: middle;
@@ -289,12 +304,12 @@
   padding: 5px 8px;
 }
 
-.no-data {
+:host ::ng-deep .table-section .no-data {
   font-weight: bold;
   text-align: center;
 }
 
-.raw-string-cell {
+:host ::ng-deep .table-section .raw-string-cell {
   max-width: 420px;
   word-break: break-all;
   color: #000;

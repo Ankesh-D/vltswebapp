@@ -1,18 +1,19 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, AfterViewInit, DoCheck, OnChanges, AfterViewChecked, AfterContentChecked, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
-import { CheckHealthAckDetailsReq, UserCreationDetailsReq } from '../../../core/model/request.model';
+import { CheckHealthAckDetailsReq } from '../../../core/model/request.model';
 import { ToastService } from '../../../core/services/toast.service';
-import { CheckHealthAckResponse, UserCreationDetailsResp } from '../../../core/model/response.model';
+import { CheckHealthAckResponse } from '../../../core/model/response.model';
 import moment from 'moment';
 import { DeviceService } from '../../../core/services/device.service';
 import { CheckAcknowledgementComponent } from '../check-acknowledgement/check-acknowledgement.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
-declare var $: any;
+import { CommonDataToolbarComponent, PageSizeOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 @Component({
     selector: 'app-health-check',
-    imports: [FormsModule, RouterModule, CheckAcknowledgementComponent, CommonTableComponent],
+    imports: [FormsModule, RouterModule, CheckAcknowledgementComponent, DataTableComponent, CommonDataToolbarComponent, PaginationComponent],
     templateUrl: './health-check.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './health-check.component.scss'
@@ -21,14 +22,15 @@ export class HealthCheckComponent implements OnInit {
   @ViewChild('searchVendorForm') searchVendorForm!: NgForm;
   public detailsRequest: CheckHealthAckDetailsReq = new CheckHealthAckDetailsReq();
   public detailsData: CheckHealthAckResponse[]=[];
-  readonly tableColumns: CommonTableColumn<any>[] = [
-    { key: 'param1', label: '#' , value: item => item.param1 || '-' },
-    { key: 'param2', label: 'IMEI No', value: item => item.param2 || '-' },
-    { key: 'param21', label: 'Health Packet', value: item => item.param21 || '-' },
-    { key: 'param12', label: 'Received Time', value: item => item.param12 || '-' }
+  readonly tableColumns: DataTableColumn<CheckHealthAckResponse>[] = [
+    { key: 'param1', header: '#' , value: item => item.param1 || '-', sortKey: 'param1' },
+    { key: 'param2', header: 'IMEI No', value: item => item.param2 || '-', sortKey: 'param2' },
+    { key: 'param21', header: 'Health Packet', value: item => item.param21 || '-', sortKey: 'param21' },
+    { key: 'param12', header: 'Received Time', value: item => item.param12 || '-', sortKey: 'param12' }
   ];
   showAcknowledgementEntry: boolean = false;
-  isDatePickerInitialized: boolean = false;
+  dateRangeStart = moment().format('DD-MMM-YYYY');
+  dateRangeEnd = moment().format('DD-MMM-YYYY');
 
   pageSizeOptions: any[]=[10, 20, 50, 100, 500];
   isExporting: boolean = false;
@@ -40,98 +42,84 @@ export class HealthCheckComponent implements OnInit {
   loading: boolean= false;
   pageNo: number = 1;
   roleId: any;
-  selectedDate: string = "";
-  constructor(private deviceService: DeviceService, private toastService: ToastService, private router: Router) {
+  sortKey: string = '';
+  reverse: boolean = false;
+  constructor(private deviceService: DeviceService, private toastService: ToastService, private router: Router,  private cdr: ChangeDetectorRef) {
   }
   ngOnInit(): void {
     this.roleId = sessionStorage.getItem('roleid');
-    this.initializeDatePicker(); 
+    this.detailsRequest.param6 = this.dateRangeStart;
+    this.detailsRequest.param7 = this.dateRangeEnd;
     setTimeout(() => {
       this.getDetails('init');  
     }, 500);
     
   }
- 
-  // initializeDatePicker() {
-  //   $(() => {
-  //     $('input[name="date"]').daterangepicker({
-  //       singleDatePicker: false,
-  //       showDropdowns: true,
-  //       autoApply: true,
-  //       timePicker: false,
-  //       startDate: moment(),
-  //       endDate: moment(), 
-  //       maxDate: moment(),
-  //       minYear: moment().subtract(2, 'year').year(),
-  //       maxYear: moment(),
-  //       opens: 'center',
-  //       drops: 'down',
-  //       locale: {
-  //         format: 'DD-MMM-YYYY'
-  //       }
-  //     })
-  //   })
-    
-  //     $('input[name="date"]').on('hide.daterangepicker', (ev: any, picker: any) => {
-  //     try { this.selectedDate = (ev.target.value) } catch (error) { }
-  //     this.getDetails('datefilter');       
-  //   });
-  //     this.selectedDate = (document.getElementById('datepicker') as HTMLInputElement).value;
-  //     console.log("1", this.selectedDate)
-      
-  // }
-  initializeDatePicker() {
-      // this.selectedDate = moment().format('DD-MMM-YYYY');
-    
-      $(() => {
-        const $dateInput = $('input[name="date"]');
-    
-        $dateInput.daterangepicker({
-          singleDatePicker: false,
-          showDropdowns: true,
-          autoApply: false,
-          timePicker: false,
-          startDate: moment(),
-          endDate: moment(), 
-          maxDate: moment(),
-          minYear: moment().subtract(2, 'year').year(),
-          maxYear: moment(),
-          opens: 'center',
-          drops: 'down',
-          locale: {
-            format: 'DD-MMM-YYYY'
-          }
-        });
-    
-        // On date selection
-       $dateInput.on('apply.daterangepicker', (ev: any, picker: any) => {
-          this.selectedDate = `${picker.startDate.format('DD-MMM-YYYY')} - ${picker.endDate.format('DD-MMM-YYYY')}`;
-          this.detailsRequest.param6 = `${picker.startDate.format('DD-MMM-YYYY')}`;
-          this.detailsRequest.param7 = `${picker.endDate.format('DD-MMM-YYYY')}`;
-         this.getDetails('filter')
-        });
-    
-        // On picker close
-        // $dateInput.on('hide.daterangepicker', (ev: any, picker: any) => {
-        //   this.selectedDate = `${picker.startDate.format('DD-MMM-YYYY')} - ${picker.endDate.format('DD-MMM-YYYY')}`;
-        //   this.detailsRequest.param6 = `${picker.startDate.format('DD-MMM-YYYY')}`;
-        //   this.detailsRequest.param7 = `${picker.endDate.format('DD-MMM-YYYY')}`;
-        //   this.getDetails('filter')
-        // });
-      });
+
+  getPaginatedData(): CheckHealthAckResponse[] {
+       // API already returns paginated data, so just sort if needed
+       // Note: In a production app, sorting should be done server-side
+       // For now, we do client-side sorting on the current page
+       let sorted = [...this.detailsData];
+       if (this.sortKey) {
+         sorted.sort((a: any, b: any) => {
+           const aVal = String(a[this.sortKey] || '').toLowerCase();
+           const bVal = String(b[this.sortKey] || '').toLowerCase();
+           if (this.reverse) {
+             return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+           } else {
+             return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+           }
+         });
+       }
+       return sorted;
     }
+
+    onCellClick(event: { row: CheckHealthAckResponse; column: DataTableColumn<CheckHealthAckResponse> }) {
+        // if (event.column.header === 'Approval' && event.row.param44 === 'Not Approve') {
+        //   this.openApproveModal(event.row);
+        // }
+    }
+
+    sort(key: string) {
+    if (this.sortKey === key) {
+      this.reverse = !this.reverse;
+    } else {
+      this.sortKey = key;
+      this.reverse = false;
+    }
+    this.cdr.detectChanges();
+  }
+
+  onDateRangeChange(range: { startDate: string; endDate: string }): void {
+    this.dateRangeStart = range.startDate;
+    this.dateRangeEnd = range.endDate;
+
+    if (!range.startDate && !range.endDate) {
+      this.detailsRequest.param6 = '';
+      this.detailsRequest.param7 = '';
+    } else {
+      const startDate = moment(range.startDate, 'DD-MMM-YYYY', true);
+      const endDate = moment(range.endDate, 'DD-MMM-YYYY', true);
+      if (!startDate.isValid() || !endDate.isValid()) return;
+
+      this.detailsRequest.param6 = range.startDate;
+      this.detailsRequest.param7 = range.endDate;
+    }
+
+    this.pageNo = 1;
+    this.detailsRequest.param2 = this.pageNo;
+    this.getDetails('filter');
+  }
   
   getDetails(tooluse?: any) {
-    let daterange = $('#datepicker').val().split(" - ")
-    this.detailsRequest.param6 = daterange[0];
-    this.detailsRequest.param7 = daterange[1];
-    
     if(tooluse=='init' || tooluse=='search') {
       if(tooluse=='init') {
         this.detailsRequest.param4 = "";
       }
-      this.detailsRequest.param2 = 1;
-      this.detailsRequest.param3 = 10;
+      this.pageNo = 1;
+      this.detailsRequest.param2 = this.pageNo;
+      this.detailsRequest.param3 = this.pageSize;
     }
    
     this.loading=true;
@@ -180,11 +168,22 @@ export class HealthCheckComponent implements OnInit {
     this.showAcknowledgementEntry = event;
     if (!event) {
       setTimeout(() => {
-        this.initializeDatePicker();
-      }, 500);
-      setTimeout(() => {
         this.getDetails('init');
       }, 1000);
     }
   }
+onPageChange(page: number): void {
+  this.pageNo = page;
+  this.detailsRequest.param2 = page;
+  this.getDetails('pagechage');
+}
+
+onPageSizeChange(pageSize: PageSizeOption): void {
+  this.pageSize = Number(pageSize);
+  this.detailsRequest.param3 = this.pageSize;
+  this.pageNo = 1;
+  this.detailsRequest.param2 = this.pageNo;
+  this.getDetails('pageSize');
+}
+  exportToExcel() {}
 }

@@ -1,25 +1,35 @@
-import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from "@angular/core";
-import { Router, RouterLink } from "@angular/router";
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from "@angular/core";
+import { Router } from "@angular/router";
 import { FaqComponent } from '../faq/faq.component';
 import {
   AnnouncementResposne,
   ApprovedVendorRequest,
   AuthService,
 } from "../../../core/services/auth.service";
-
-import { FormsModule } from "@angular/forms";
 import { Subscription } from "rxjs";
+import * as am5 from "@amcharts/amcharts5";
+import * as am5xy from "@amcharts/amcharts5/xy";
 
 @Component({
     selector: "app-homepage",
-    imports: [FormsModule, FaqComponent],
+    imports: [FaqComponent],
     templateUrl: "./homepage.component.html",
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: "./homepage.component.scss"
 })
-export class HomepageComponent implements OnInit, OnDestroy {
+export class HomepageComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild("activityChart") activityChart?: ElementRef<HTMLDivElement>;
+
   leftLogo: string = "";
-  webelIcon: string = "";
+  dimtsLogo: string = "";
   installationPDF: string = "";
   renewalPDF: string = "";
   untagPDF: string = "";
@@ -27,24 +37,119 @@ export class HomepageComponent implements OnInit, OnDestroy {
   announcementData: AnnouncementResposne[] = [];
   announcementInterval: any;
   announcementAPI?: Subscription;
+  private chartRoot?: am5.Root;
+
   constructor(
     public router: Router,
     public authService: AuthService,
   ) {}
   ngOnInit(): void {
-    this.leftLogo = "assets/login/LOGO_WB.png";
-    this.webelIcon = "assets/login/Webel_logo_WBEIDC.png";
+    this.leftLogo = "assets/nagaland_gov.png";
+    this.dimtsLogo = "assets/login/dimtslogo.png";
     this.installationPDF =
       "assets/login/vehical_installation_and_activation.pdf";
     this.renewalPDF = "assets/login/renewalprocess1.pdf";
     this.untagPDF = "assets/login/untagworkflow.pdf";
     this.getAnnouncementDetails();
   }
+
+  ngAfterViewInit(): void {
+    const chartElement = this.activityChart?.nativeElement;
+    if (!chartElement) {
+      return;
+    }
+
+    const root = am5.Root.new(chartElement);
+    this.chartRoot = root;
+    const chart = root.container.children.push(
+      am5xy.XYChart.new(root, {
+        panX: false,
+        panY: false,
+        wheelX: "none",
+        wheelY: "none",
+        paddingTop: 2,
+        paddingBottom: 0,
+        paddingLeft: 0,
+        paddingRight: 0,
+      }),
+    );
+
+    const xRenderer = am5xy.AxisRendererX.new(root, { minGridDistance: 24 });
+    xRenderer.grid.template.setAll({ forceHidden: true });
+    xRenderer.labels.template.setAll({
+      fill: am5.color(0x49627e),
+      fontSize: 9,
+      paddingTop: 3,
+    });
+
+    const xAxis = chart.xAxes.push(
+      am5xy.CategoryAxis.new(root, {
+        categoryField: "day",
+        renderer: xRenderer,
+      }),
+    );
+
+    const yRenderer = am5xy.AxisRendererY.new(root, {});
+    yRenderer.grid.template.setAll({
+      stroke: am5.color(0x7893ad),
+      strokeOpacity: 0.15,
+    });
+    yRenderer.labels.template.setAll({ forceHidden: true });
+
+    const yAxis = chart.yAxes.push(
+      am5xy.ValueAxis.new(root, {
+        min: 0,
+        max: 100,
+        strictMinMax: true,
+        renderer: yRenderer,
+      }),
+    );
+
+    const series = chart.series.push(
+      am5xy.LineSeries.new(root, {
+        name: "Activity",
+        xAxis,
+        yAxis,
+        categoryXField: "day",
+        valueYField: "value",
+        stroke: am5.color(0xe59a19),
+        fill: am5.color(0xe59a19),
+        tooltip: am5.Tooltip.new(root, {
+          labelText: "{categoryX}: {valueY}",
+        }),
+      }),
+    );
+    series.strokes.template.setAll({ strokeWidth: 3 });
+    series.fills.template.setAll({ visible: true, fillOpacity: 0.12 });
+    series.bullets.push(() =>
+      am5.Bullet.new(root, {
+        sprite: am5.Circle.new(root, {
+          radius: 3,
+          fill: am5.color(0xe59a19),
+          stroke: am5.color(0xffffff),
+          strokeWidth: 1.5,
+        }),
+      }),
+    );
+
+    const activityData = [
+      { day: "Mon", value: 42 },
+      { day: "Tue", value: 66 },
+      { day: "Wed", value: 53 },
+      { day: "Thu", value: 78 },
+      { day: "Fri", value: 61 },
+      { day: "Sat", value: 88 },
+      { day: "Sun", value: 72 },
+    ];
+    xAxis.data.setAll(activityData);
+    series.data.setAll(activityData);
+  }
     openFaqModal() {
     this.authService.openModal('faqModal');
   }
 
   ngOnDestroy(): void {
+    this.chartRoot?.dispose();
     if (this.announcementAPI) {
       this.announcementAPI.unsubscribe();
     }

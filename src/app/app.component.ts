@@ -29,6 +29,12 @@ import { ToastComponent } from './features/assets/inactive-assets/toast.componen
     .app-container {
       min-height: 100vh;
     }
+    .app-container:has(app-homepage) {
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      overflow: hidden;
+    }
   `]
 })
 export class AppComponent implements OnInit {

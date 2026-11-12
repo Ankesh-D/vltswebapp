@@ -102,7 +102,7 @@ timeoutId: any;
      this.roleId = sessionStorage.getItem('roleid') || '';
     // this.logoImg = './assets/logo.png'; // Set your logo image path here
     const encrypted = sessionStorage.getItem('username') || '';
-    this.logoImg = './assets/login/LOGO_WB.png'; // Set your logo image path here
+    this.logoImg = './assets/nagaland_gov.png'; // Set your logo image path here
     this.welcomename = this.encryptionService.decryptUsername(encrypted) ;
     // this.loadMenus();
     // TODO: Get welcome name from user service
