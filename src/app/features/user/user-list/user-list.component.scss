@@ -1138,3 +1138,25 @@ hr {
   color: #666;
 }
 @include compact.compact-admin-page;
+.header-btn {
+  float: right;
+  background: var(--app-primary, #0b58b9);
+  color: #fff;
+  border: 1px solid var(--app-primary, #0b58b9);
+  padding: 7px 16px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #084a9c;
+    border-color: #084a9c;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  i {
+    margin-right: 5px;
+  }
+}
