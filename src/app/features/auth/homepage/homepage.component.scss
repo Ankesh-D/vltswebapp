@@ -69,7 +69,7 @@
   color: #0c2e69;
   font-size: clamp(18px, 1.65vw, 22px);
   font-weight: 800;
-  letter-spacing: -.5px;
+  letter-spacing: -.3px;
   line-height: 1.05;
   text-transform: uppercase;
 }
@@ -228,7 +228,7 @@
   overflow: hidden;
   background:
     linear-gradient(90deg, rgba(255,255,255,.82) 0%, rgba(245,250,255,.67) 50%, rgba(235,247,255,.5) 100%),
-    url('/assets/background_bus_image.png') center 56% / cover no-repeat,
+    url('/assets/background_bus_image.png') center 77% / cover no-repeat,
     linear-gradient(180deg, #bce6ff 0%, #f5fbff 62%, #d7edff 100%);
 }
 

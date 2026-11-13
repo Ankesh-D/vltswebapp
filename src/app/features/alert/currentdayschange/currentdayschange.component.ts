@@ -19,6 +19,9 @@ import { Subscription } from 'rxjs';
 import moment from 'moment';
 import { VehicleClassWiseAlertCountReq } from '../../../core/model/request.model';
 import { configureMapboxAccessToken } from '../../../core/utils/mapbox-config';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { CommonPaginationComponent } from '../../../shared/components/common-pagination/common-pagination.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
 
 declare var $: any;
 declare var jAlert: any;
@@ -36,7 +39,8 @@ interface PanicCount {
 
 @Component({
     selector: 'app-currentdayschange',
-    imports: [CommonModule, FormsModule, AlertGraphViewComponent, NgSelectModule, RtoColumnChartComponent],
+    imports: [CommonModule, FormsModule, AlertGraphViewComponent, NgSelectModule, RtoColumnChartComponent,
+      CommonDataToolbarComponent, DataTableComponent, CommonPaginationComponent],
     templateUrl: './currentdayschange.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './currentdayschange.component.scss'
@@ -53,10 +57,8 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
   pageSizeOptions = [20, 50, 100, 200, 500];
   totalCount = 0;
   pageCount = 0;
-
   sortKey: string = '';
   reverse: boolean = false;
-
   viewMode: 'map' | 'grid' | 'chart' | 'restalertgrid' | 'rtowisealert' | 'vclasswisealert' = 'grid';
 
   // Map & Charts
@@ -99,10 +101,12 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
   vehicleType: string = 'NEW';
   type: string = '';
 
-  selectedVendorFilter: any = null;
+  selectedVendorFilter: string | null = null;
+  isVendorListLoading = false;
   alertTypeList: any[] = [];
   isAlertTypeLoading: boolean = false;
-  dateObj: any = [];
+  dateObj = '';
+  private mapAlertInteractionsBound = false;
   constructor(
     private alertService: AlertService,
     private vehicleService: VehicleService, // Inject VehicleService
@@ -111,7 +115,6 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
     private dashboardService: DashboardService, // Assuming you have a DashboardService for vendor list
     private route: ActivatedRoute,
   ) {
-    this.dateObj = [];
     this.roleId = sessionStorage.getItem('roleid');
     this.toastService.pageName = 'Current Day Alerts (Alert Analysis)';
   }
@@ -121,16 +124,9 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
   //   this.getTodayAlerts(1, true);
   // }
   async ngOnInit() {
-    this.selectedAlertType = {
-      param1: '10',
-      param2: 'Panic'
-    };
     this.formatCurrentDate();
     this.loadPanicCharts();
 
-    if (this.roleId != '11') {
-      this.loadVendorList();
-    }
     // Initialize poiData with default date/time values
     // this.poiData = {
     //   historyDate: dayjs(),
@@ -144,21 +140,27 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
         this.type = params['type'];
       }
     });
-    await this.getAlertList();
-    setTimeout(() => {
-      if (this.type.toLowerCase() == 'emergency') {
-        this.viewMode = 'grid';
-        this.selectedAlertType = this.alertTypeList.find(alert => alert.param1 == 10) || null;
-      } else if (this.type.toLowerCase() == 'overspeed') {
-        this.viewMode = 'restalertgrid';
-        this.selectedAlertType = this.alertTypeList.find(alert => alert.param1 == 17) || null;
-      } else if (this.type.toLowerCase() == 'harshbrake') {
-        this.viewMode = 'restalertgrid';
-        this.selectedAlertType = this.alertTypeList.find(alert => alert.param1 == 13) || null;
-      }
+    const lookupRequests = [this.getAlertList()];
+    if (this.roleId != '11') {
+      lookupRequests.push(this.loadVendorList());
+    }
+    await Promise.all(lookupRequests);
 
-      this.getTodayAlerts(1, true);
-    }, 600);
+    const alertTypeByRoute: Record<string, string> = {
+      emergency: '10',
+      overspeed: '17',
+      harshbrake: '13'
+    };
+    const routeType = this.type.toLowerCase();
+    if (routeType === 'overspeed' || routeType === 'harshbrake') {
+      this.viewMode = 'restalertgrid';
+      this.alertType = 'otheralerts';
+    } else {
+      this.viewMode = 'grid';
+      this.alertType = '';
+    }
+    this.selectedAlertType = alertTypeByRoute[routeType] || (this.viewMode === 'grid' ? '10' : null);
+    this.getTodayAlerts(1, true);
 
   }
 
@@ -176,19 +178,16 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
     if (this.alertCountChart) this.alertCountChart.dispose();
     if (this.lineChart) this.lineChart.dispose();
     if (this.hourwiseChart) this.hourwiseChart.dispose();
-    // Note: You may also want to clear any active setTimeout intervals here to prevent memory leaks.
-    // clearTimeout(this.alertRefreshTimer);
-    try {
-      clearTimeout(this.alertRefreshTimer)
-    } catch (error) {
-      clearTimeout(this.alertRefreshTimer)
-    }
-    this.clearSingleAlertLiveTrackingLayers(); // Clear single alert live tracking
     if (this.alertRefreshTimer) {
       clearTimeout(this.alertRefreshTimer);
       this.alertRefreshTimer = null;
     }
+    this.clearSingleAlertLiveTrackingLayers();
     if (this.map) this.map.remove();
+    if (this.singleAlertMap) {
+      this.singleAlertMap.remove();
+      this.singleAlertMap = null;
+    }
   }
   public vehicleClassWisePanicCountReq: VehicleClassWiseAlertCountReq = new VehicleClassWiseAlertCountReq();
   private loadPanicCharts(): void {
@@ -196,8 +195,9 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
     this.rtoPanicCountsLoading = true;
     this.vehicleClassCountsError = '';
     this.rtoPanicCountsError = '';
-    this.vehicleClassWisePanicCountReq.param1 = this.dateObj.split(' - ')[0];
-    this.vehicleClassWisePanicCountReq.param2 = this.dateObj.split(' - ')[1];
+    const [startDate = '', endDate = ''] = this.dateObj.split(' - ');
+    this.vehicleClassWisePanicCountReq.param1 = startDate;
+    this.vehicleClassWisePanicCountReq.param2 = endDate;
     this.panicChartRequests.push(this.alertService.getVehicleClassWisePanicCounts(this.vehicleClassWisePanicCountReq).subscribe({
       next: response => {
         const rows = this.panicCountRows(response);
@@ -339,36 +339,63 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
   get rtoPanicTotal(): number {
     return this.rtoPanicCounts.reduce((total, item) => total + item.count, 0);
   }
-  loadVendorList() {
-    this.dashboardService.getVendorList().subscribe({
-      next: (response) => {
-        if (response.status && response.entity) {
-          this.vendorList = response.entity;
+  loadVendorList(): Promise<void> {
+    this.isVendorListLoading = true;
+    return new Promise(resolve => {
+      this.dashboardService.getVendorList().subscribe({
+        next: response => {
+          this.isVendorListLoading = false;
+          if (response.status && response.entity) {
+            this.vendorList = response.entity.map((vendor: any) => ({
+              ...vendor,
+              param1: String(vendor.param1 ?? '')
+            }));
+          } else {
+            this.vendorList = [];
+            this.toastService.show('Could not load vendor list.', 'error');
+          }
+          resolve();
+        },
+        error: error => {
+          this.isVendorListLoading = false;
+          this.vendorList = [];
+          console.error('Error loading vendor list:', error);
+          this.toastService.show('Could not load vendor list.', 'error');
+          resolve();
         }
-      },
-      error: (error) => {
-        { }
-      }
+      });
     });
   }
 
-  getAlertList() {
+  getAlertList(): Promise<void> {
     this.isAlertTypeLoading = true;
-    this.alertService.getAlertTypeList().subscribe({
-      next: (response: any) => {
-        this.isAlertTypeLoading = false;
-        if (response.status && response.entity) {
-          this.alertTypeList = response.entity;
+    return new Promise(resolve => {
+      this.alertService.getAlertTypeList().subscribe({
+        next: (response: any) => {
+          this.isAlertTypeLoading = false;
+          if (response.status && response.entity) {
+            this.alertTypeList = response.entity.map((alertType: any) => ({
+              ...alertType,
+              param1: String(alertType.param1 ?? '')
+            }));
+          } else {
+            this.alertTypeList = [];
+            this.toastService.show('Could not load alert types.', 'error');
+          }
+          resolve();
+        },
+        error: (error: any) => {
+          this.isAlertTypeLoading = false;
+          this.alertTypeList = [];
+          console.error('Error loading alert types:', error);
+          this.toastService.show('Could not load alert types.', 'error');
+          resolve();
         }
-      },
-      error: (err: any) => {
-        this.isAlertTypeLoading = false;
-        this.alertTypeList = [];
-      }
+      });
     });
   }
-  onVendorFilterChange(event: any) {
-    this.getTodayAlerts(1, true);
+  onVendorFilterChange() {
+    this.getSearchDetails();
   }
 
   setView(view: string) {
@@ -406,6 +433,7 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
       clearTimeout(this.alertRefreshTimer);
       this.alertRefreshTimer = null;
     }
+    this.getAlertDetailVehiclesAPI?.unsubscribe();
 
     this.loading = showLoader;
     this.currentPage = page;
@@ -428,9 +456,9 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
       param2: String(this.currentPage), // page no
       param3: this.pageSize === this.totalCount ? 'All' : String(this.pageSize), // items per page
       param4: this.formattedDate, // date
-      param5: this.selectedAlertType ? this.selectedAlertType.param1 : "", // Handle null case when dropdown is cleared
+      param5: this.selectedAlertType || "",
       param6: "10", //stateid
-      param7: this.selectedVendorFilter ? String(this.selectedVendorFilter.param1) : 'All',
+      param7: this.selectedVendorFilter || 'All',
       param8: "",
       param9: this.alertType,
       param10: "",
@@ -469,7 +497,9 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
         this.alertDetails = [];
         this.totalCount = 0;
         this.pageCount = 0;
-        if (this.viewMode === 'grid' || this.viewMode === 'chart') {
+        if (this.viewMode === 'map') {
+          this.alertRefreshTimer = setTimeout(() => this.GetAllAlertsMap(), 10000);
+        } else if (this.viewMode === 'grid' || this.viewMode === 'chart') {
           this.alertRefreshTimer = setTimeout(() => {
             this.getTodayAlerts(this.currentPage);
           }, 10000);
@@ -479,9 +509,8 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
     });
   }
 
-  downloadPDFExcel(event: any) {
+  downloadPDFExcel(type: string) {
     this.loading = true;
-    let type = event.target.value;
     const request = {
       param1: this.searchText, // search text
       param2: "", // page no
@@ -511,10 +540,8 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
         this.alertDetails = [];
         this.totalCount = 0;
         this.pageCount = 0;
-        if (this.viewMode === 'grid' || this.viewMode === 'chart') {
-          this.alertRefreshTimer = setTimeout(() => {
-            this.getTodayAlerts(this.currentPage);
-          }, 10000);
+        if (this.viewMode === 'map') {
+          this.alertRefreshTimer = setTimeout(() => this.GetAllAlertsMap(), 10000);
         }
         this.cdr.detectChanges();
       }
@@ -553,75 +580,24 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
     this.getTodayAlerts(page);
   }
 
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
+  onPageSizeChange(newSize: number | string) {
     this.pageSize = newSize === 'All' ? this.totalCount : Number(newSize);
     this.currentPage = 1;
     this.getTodayAlerts(1);
   }
 
-  getTotalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
+  exportExcel() {
+    if (this.viewMode === 'restalertgrid') {
+      this.selectedAlertType = null;
+    }
+    this.downloadPDFExcel('');
   }
 
-  getPageNumbers(): number[] {
-    const totalPages = this.getTotalPages();
-    const currentPage = this.currentPage;
-    const maxPagesToShow = 5;
-    const pages: number[] = [];
-
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-      return pages;
-    }
-
-    // Add first page
-    pages.push(1);
-
-    // Add ellipsis or pages
-    if (currentPage > 3) {
-      pages.push(-1); // Ellipsis
-    }
-
-    let start = Math.max(2, currentPage - 1);
-    let end = Math.min(totalPages - 1, currentPage + 1);
-
-    if (currentPage <= 3) {
-      start = 2;
-      end = 4;
-    }
-
-    if (currentPage >= totalPages - 2) {
-      start = totalPages - 3;
-      end = totalPages - 1;
-    }
-
-    for (let i = start; i <= end; i++) {
-      if (!pages.includes(i)) {
-        pages.push(i);
-      }
-    }
-
-    // Add ellipsis or pages
-    if (currentPage < totalPages - 2) {
-      pages.push(-1); // Ellipsis
-    }
-
-    // Add last page
-    if (!pages.includes(totalPages)) {
-      pages.push(totalPages);
-    }
-
-    return pages;
+  exportPdf() {
+    this.downloadPDFExcel('Pdf');
   }
 
-  getPaginatedData(): any[] {
-    return this.alertDetails;
-  }
-
-  selectedAlertType: any = null;
+  selectedAlertType: string | null = null;
   vendorList: any[] = [];
   alertType: string = "";
   setViewMode(mode: 'map' | 'grid' | 'chart' | 'restalertgrid' | 'rtowisealert' | 'vclasswisealert') {
@@ -639,7 +615,11 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
           this.initializeMap();
         } else {
           this.map.resize();
-          this.GetAllAlertsMap();
+          if (this.map.isStyleLoaded()) {
+            this.GetAllAlertsMap();
+          } else {
+            this.map.once('load', () => this.GetAllAlertsMap());
+          }
         }
       }, 200);
     }
@@ -649,10 +629,7 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
     // }
 
     if (mode === 'grid') {
-      this.selectedAlertType = {
-        param1: '10',
-        param2: 'Panic'
-      };
+      this.selectedAlertType = '10';
       this.getTodayAlerts(1);
     }
 
@@ -969,8 +946,10 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
     if (typeof mapboxgl === 'undefined') return;
 
     if (!configureMapboxAccessToken(mapboxgl)) return;
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) return;
     this.map = new mapboxgl.Map({
-      container: 'map',
+      container: mapContainer,
       style: 'mapbox://styles/mapbox/streets-v11',
       center: [87.74780, 22.978624],
       zoom: 8,
@@ -994,6 +973,7 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
     })(), 'bottom-right');
 
     this.map.on('load', () => {
+      this.map.resize();
       // Add WMS source and layer for India State boundaries
       this.map.addSource('wms-source', {
         type: 'raster',
@@ -1016,39 +996,28 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
         type: 'raster',
         source: 'wms-source'
       });
-      this.loadAlertImages();
-      this.GetAllAlertsMap();
+      this.loadAlertImages().then(() => {
+        if (this.viewMode === 'map' && this.map) {
+          this.GetAllAlertsMap();
+        }
+      });
     });
-
-    // Popup logic
-    this.map.on('click', 'alertlayer', (e: any) => {
-      const coordinates = e.features[0].geometry.coordinates.slice();
-      const props = e.features[0].properties;
-
-      new mapboxgl.Popup()
-        .setLngLat(coordinates)
-        .setHTML(this.createPopupContent(props))
-        .addTo(this.map);
-    });
-
-    this.map.on('mouseenter', 'alertlayer', () => {
-      this.map.getCanvas().style.cursor = 'pointer';
-    });
-    this.map.on('mouseleave', 'alertlayer', () => {
-      this.map.getCanvas().style.cursor = '';
+    this.map.on('error', (event: any) => {
+      console.error('Mapbox map error:', event.error || event);
     });
   }
 
-  loadAlertImages() {
+  loadAlertImages(): Promise<void> {
+    const map = this.map;
     const images = [
-      { id: 'powerdisconnect-image', url: 'assets/images/mapimages/alertimage/powerdisconnect.png' },
+      { id: 'powerdisconnect-image', url: 'assets/images/mapimages/alertimage/powerDisconnect.png' },
       { id: 'batterylow-image', url: 'assets/images/mapimages/alertimage/batterylow.png' },
       { id: 'batterycharge-image', url: 'assets/images/mapimages/alertimage/batterycharge.png' },
       { id: 'tamper-image', url: 'assets/images/mapimages/alertimage/tamper.png' },
-      { id: 'panic-image', url: 'assets/images/mapimages/alertimage/panic.gif' },
+      { id: 'panic-image', url: 'assets/images/mapimages/alertimage/panic1.gif' },
       { id: 'harshbrake-image', url: 'assets/images/mapimages/alertimage/harshbrake_new.png' },
       { id: 'harshacceleration-image', url: 'assets/images/mapimages/alertimage/harshacceleration_new.png' },
-      { id: 'rashturning-image', url: 'assets/images/mapimages/alertimage/rashturning.png' },
+      { id: 'rashturning-image', url: 'assets/images/mapimages/alertimage/Rashturning.png' },
       { id: 'overspeed-image', url: 'assets/images/mapimages/alertimage/overspeed_new.png' },
       { id: 'geofenceentry-image', url: 'assets/images/mapimages/alertimage/geofenceentry.png' },
       { id: 'geofenceexit-image', url: 'assets/images/mapimages/alertimage/geofenceexit.png' },
@@ -1059,13 +1028,31 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
       { id: 'otheralert-image', url: 'assets/images/mapimages/alertimage/alertbell_new.png' }
     ];
 
-    images.forEach(img => {
-      if (!this.map.hasImage(img.id)) {
-        this.map.loadImage(img.url, (error: any, image: any) => {
-          if (!error) this.map.addImage(img.id, image);
-        });
+    return Promise.all(images.map(img => new Promise<void>(resolve => {
+      if (!map || this.map !== map) {
+        resolve();
+        return;
       }
-    });
+      if (map.hasImage(img.id)) {
+        resolve();
+        return;
+      }
+      map.loadImage(img.url, (error: any, image: any) => {
+        if (this.map !== map) {
+          resolve();
+          return;
+        }
+        if (error || !image) {
+          console.error(`Could not load map alert icon: ${img.url}`, error);
+          resolve();
+          return;
+        }
+        if (!map.hasImage(img.id)) {
+          map.addImage(img.id, image);
+        }
+        resolve();
+      });
+    }))).then(() => undefined);
   }
 
   getAlertImageId(alertid: string): string {
@@ -1133,10 +1120,8 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
             this.map.setPaintProperty('alertlayer', 'icon-opacity', 1);
           }
 
-          if (this.viewMode === 'grid' || this.viewMode === 'chart') {
-            this.alertRefreshTimer = setTimeout(() => {
-              this.getTodayAlerts(this.currentPage);
-            }, 10000);
+          if (this.viewMode === 'map') {
+            this.alertRefreshTimer = setTimeout(() => this.GetAllAlertsMap(), 10000);
           }
           this.cdr.detectChanges();
         }
@@ -1152,7 +1137,16 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
   }
 
   plotAlertsOnMap(data: any[]) {
-    const features = data.map(item => ({
+    if (!this.map?.isStyleLoaded()) return;
+
+    const features = data.flatMap(item => {
+      const latitude = Number(item.param6);
+      const longitude = Number(item.param7);
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude) ||
+        latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+        return [];
+      }
+      return [{
       type: 'Feature',
       properties: {
         vehicleno: item.param9,
@@ -1165,13 +1159,16 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
         eventtime: item.param3,
         direction: item.param23,
         ignition: item.param20 === '1' ? 'On' : 'Off',
-        iconimage: this.getAlertImageId(item.param2)
+        iconimage: this.map.hasImage(this.getAlertImageId(item.param2))
+          ? this.getAlertImageId(item.param2)
+          : 'otheralert-image'
       },
       geometry: {
         type: 'Point',
-        coordinates: [Number(item.param7), Number(item.param6)]
+        coordinates: [longitude, latitude]
       }
-    }));
+      }];
+    });
 
     if (this.map.getSource('alertsource')) {
       this.map.getSource('alertsource').setData({
@@ -1204,6 +1201,24 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
             delay: 0
           }
         }
+      });
+    }
+
+    if (!this.mapAlertInteractionsBound && this.map.getLayer('alertlayer')) {
+      this.mapAlertInteractionsBound = true;
+      this.map.on('click', 'alertlayer', (event: any) => {
+        const feature = event.features?.[0];
+        if (!feature) return;
+        new mapboxgl.Popup()
+          .setLngLat(feature.geometry.coordinates.slice())
+          .setHTML(this.createPopupContent(feature.properties))
+          .addTo(this.map);
+      });
+      this.map.on('mouseenter', 'alertlayer', () => {
+        this.map.getCanvas().style.cursor = 'pointer';
+      });
+      this.map.on('mouseleave', 'alertlayer', () => {
+        this.map.getCanvas().style.cursor = '';
       });
     }
   }
@@ -1248,23 +1263,29 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
   isSingleInfoCollapsed: boolean = false;
 
   openSingleAlertMap(alert: any) {
-    this.selectedSingleAlert = alert;
-    this.showSingleAlertModal = true;
-    this.isSingleInfoCollapsed = false;
-
-    // Wait for modal DOM to render
-    setTimeout(() => {
-      this.initializeSingleAlertMap(alert);
-    }, 100);
-  }
-
-  closeSingleAlertModal() {
-    this.showSingleAlertModal = false;
+    this.clearSingleAlertLiveTrackingLayers();
     if (this.singleAlertMap) {
       this.singleAlertMap.remove();
       this.singleAlertMap = null;
     }
-    this.clearSingleAlertLiveTrackingLayers(); // Clear live tracking when modal closes
+    this.selectedSingleAlert = alert;
+    this.showSingleAlertModal = true;
+    this.isSingleInfoCollapsed = false;
+
+    setTimeout(() => {
+      if (this.showSingleAlertModal && this.selectedSingleAlert === alert) {
+        this.initializeSingleAlertMap(alert);
+      }
+    }, 150);
+  }
+
+  closeSingleAlertModal() {
+    this.showSingleAlertModal = false;
+    this.clearSingleAlertLiveTrackingLayers();
+    if (this.singleAlertMap) {
+      this.singleAlertMap.remove();
+      this.singleAlertMap = null;
+    }
     this.selectedSingleAlert = null;
   }
 
@@ -1275,90 +1296,80 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
   initializeSingleAlertMap(alert: any) {
     if (typeof mapboxgl === 'undefined') return;
 
-    const lat = Number(alert.param6);
-    const lng = Number(alert.param7);
+    const lat = Number(String(alert.param6 ?? '').trim());
+    const lng = Number(String(alert.param7 ?? '').trim());
 
     if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
       Swal.fire('Error', 'Invalid coordinates for this alert', 'error');
       return;
     }
 
-    if (!configureMapboxAccessToken(mapboxgl)) return;
+    const hasMapboxToken = configureMapboxAccessToken(mapboxgl);
+    const mapContainer = document.getElementById('singleAlertMap');
+    if (!mapContainer) return;
 
-    this.singleAlertMap = new mapboxgl.Map({
-      container: 'singleAlertMap',
-      style: 'mapbox://styles/mapbox/streets-v11',
+    const fallbackStyle = {
+      version: 8,
+      sources: {
+        openstreetmap: {
+          type: 'raster',
+          tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+          tileSize: 256,
+          attribution: '© OpenStreetMap contributors'
+        }
+      },
+      layers: [{
+        id: 'openstreetmap',
+        type: 'raster',
+        source: 'openstreetmap'
+      }]
+    };
+    const map = new mapboxgl.Map({
+      container: mapContainer,
+      style: hasMapboxToken ? 'mapbox://styles/mapbox/streets-v11' : fallbackStyle,
       center: [lng, lat],
       zoom: 14,
-      attributionControl: false
+      attributionControl: !hasMapboxToken
     });
-    addMapBasemapControl(this.singleAlertMap, 'mapbox');
+    this.singleAlertMap = map;
 
-    this.singleAlertMap.addControl(new mapboxgl.NavigationControl());
-    this.singleAlertMap.addControl(new mapboxgl.FullscreenControl());
+    if (hasMapboxToken) {
+      addMapBasemapControl(map, 'mapbox');
+    }
+    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new mapboxgl.FullscreenControl());
 
-    // Add custom attribution control
-    this.singleAlertMap.addControl(new (class {
-      onAdd(map: any) {
-        const container = document.createElement('div');
-        container.className = 'mapboxgl-ctrl mapboxgl-ctrl-attrib';
-        container.innerHTML = '<span class="mapboxgl-ctrl-attrib-inner">Powered by DIMTS</span>';
-        return container;
-      }
-      onRemove() { }
-    })(), 'bottom-right');
+    if (hasMapboxToken) {
+      map.addControl(new (class {
+        onAdd() {
+          const container = document.createElement('div');
+          container.className = 'mapboxgl-ctrl mapboxgl-ctrl-attrib';
+          container.innerHTML = '<span class="mapboxgl-ctrl-attrib-inner">Powered by DIMTS</span>';
+          return container;
+        }
+        onRemove() { }
+      })(), 'bottom-right');
+    }
 
-    this.singleAlertMap.on('load', () => {
-      const imageId = this.getAlertImageId(alert.param2);
-      // Find the URL for this image ID from our existing list or define it
-      const images = [
-        { id: 'powerdisconnect-image', url: 'assets/images/mapimages/alertimage/powerdisconnect.png' },
-        { id: 'batterylow-image', url: 'assets/images/mapimages/alertimage/batterylow.png' },
-        { id: 'batterycharge-image', url: 'assets/images/mapimages/alertimage/batterycharge.png' },
-        { id: 'tamper-image', url: 'assets/images/mapimages/alertimage/tamper.png' },
-        { id: 'panic-image', url: 'assets/images/mapimages/alertimage/panic.gif' },
-        { id: 'harshbrake-image', url: 'assets/images/mapimages/alertimage/harshbrake_new.png' },
-        { id: 'harshacceleration-image', url: 'assets/images/mapimages/alertimage/harshacceleration_new.png' },
-        { id: 'rashturning-image', url: 'assets/images/mapimages/alertimage/rashturning.png' },
-        { id: 'overspeed-image', url: 'assets/images/mapimages/alertimage/overspeed_new.png' },
-        { id: 'geofenceentry-image', url: 'assets/images/mapimages/alertimage/geofenceentry.png' },
-        { id: 'geofenceexit-image', url: 'assets/images/mapimages/alertimage/geofenceexit.png' },
-        { id: 'tilt-image', url: 'assets/images/mapimages/alertimage/tilt.png' },
-        { id: 'routedeviation-image', url: 'assets/images/mapimages/alertimage/routedeviation.png' },
-        { id: 'ignitionoff-image', url: 'assets/images/mapimages/alertimage/ignitionOff.png' },
-        { id: 'ignitionon-image', url: 'assets/images/mapimages/alertimage/ignitionOn.png' },
-        { id: 'otheralert-image', url: 'assets/images/mapimages/alertimage/alertbell_new.png' }
-      ];
-
-      const imgObj = images.find(img => img.id === imageId) || images.find(img => img.id === 'otheralert-image');
-
-      if (imgObj) {
-        this.singleAlertMap.loadImage(imgObj.url, (error: any, image: any) => {
-          if (!error) {
-            if (!this.singleAlertMap.hasImage(imageId)) {
-              this.singleAlertMap.addImage(imageId, image);
-            }
-            // Add marker using a DOM element for better control or a symbol layer
-            new mapboxgl.Marker({ element: this.createCustomMarkerElement(imgObj.url) })
-              .setLngLat([lng, lat])
-              .addTo(this.singleAlertMap);
-
-            // Start live tracking from the alert location, using IMEI (param4) as vehicle identifier
-            this.startSingleAlertLiveTracking(alert.param9, [lng, lat]);
-          }
-        });
+    let mapLoaded = false;
+    let fallbackApplied = !hasMapboxToken;
+    map.on('load', () => {
+      mapLoaded = true;
+      map.resize();
+      new mapboxgl.Marker({ color: '#d32f2f' })
+        .setLngLat([lng, lat])
+        .addTo(map);
+      if (this.showSingleAlertModal && this.singleAlertMap === map) {
+        this.startSingleAlertLiveTracking(String(alert.param9 ?? ''), [lng, lat]);
       }
     });
-  }
-
-  createCustomMarkerElement(url: string) {
-    const el = document.createElement('div');
-    el.style.backgroundImage = `url(${url})`;
-    el.style.width = '40px';
-    el.style.height = '40px';
-    el.style.backgroundSize = 'contain';
-    el.style.backgroundRepeat = 'no-repeat';
-    return el;
+    map.on('error', (event: any) => {
+      console.error('Single-alert Mapbox map error:', event.error || event);
+      if (!mapLoaded && !fallbackApplied) {
+        fallbackApplied = true;
+        map.setStyle(fallbackStyle);
+      }
+    });
   }
 
   // ==========================================
@@ -1373,6 +1384,7 @@ export class CurrentdayschangeComponent implements OnInit, AfterViewInit, OnDest
     const fetchSingleAlertLive = (showLoader: boolean = false) => {
       this.vehicleService.getLiveTrack(this.singleAlertLiveVehicleId, showLoader).subscribe({
         next: (response: any) => {
+          if (!this.showSingleAlertModal || !this.singleAlertMap) return;
           if (!response.entity || response.entity.length === 0) return;
 
           this.singleAlertLiveData = response.entity[0];

@@ -3,6 +3,7 @@ export const environment = {
   // Previous production API URL (currently active)
   // apiUrl: 'https://wb.psv.dimts.in/wbsdcpsvapi',
    apiUrl: 'https://vlts.wb.gov.in/wbsdcpsvnew',
+  //  apiUrl: 'http://216.48.185.212:9094/psvtrackapi',
   // apiUrl: 'https://vlts.wb.gov.in/wbsdcpsvnew',
   // apiUrl: 'http://stage.indtrack.co.in:8080/wbsdcpsvnew',
   //apiUrl: 'http://192.168.1.118:8080/psv_api',

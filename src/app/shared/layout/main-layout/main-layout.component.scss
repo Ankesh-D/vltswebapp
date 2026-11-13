@@ -41,8 +41,9 @@
   align-items: center;
   gap: 14px;
   padding: 0 18px;
-  border-bottom: 1px solid var(--app-border);
-  background: var(--app-surface);
+  border-bottom: 1px solid rgba(36, 87, 167, 0.14);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(234, 242, 255, 0.96) 100%);
+  box-shadow: 0 10px 24px rgba(19, 38, 75, 0.06);
 }
 
 .nav-toggle,
@@ -53,7 +54,7 @@
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: 10px;
   background: transparent;
   color: #435169;
   cursor: pointer;
@@ -72,34 +73,161 @@
 .topbar-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #17427a;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
+  gap: 12px;
+  min-width: 0;
+  color: #153b72;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 6px;
+  border: 1px solid rgba(36, 87, 167, 0.16);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(233, 241, 255, 0.92));
+  box-shadow: 0 8px 18px rgba(18, 48, 95, 0.08);
 }
 
 .topbar-brand img {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.1;
+}
+
+.brand-primary {
+  color: #183f7c;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.brand-secondary {
+  color: #4b6487;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .topbar-user {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-left: auto;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px 7px 8px;
+  border: 1px solid rgba(36, 87, 167, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 22px rgba(27, 52, 90, 0.08);
+  color: #2d466c;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-menu-trigger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(27, 52, 90, 0.12);
+}
+
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--app-primary) 0%, #4d7fd3 100%);
+  color: #fff;
+  font-size: 14px;
+  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.2);
 }
 
 .welcome-name {
   max-width: 220px;
   overflow: hidden;
-  color: #526176;
+  color: #4a5d7a;
   font-size: 12px;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.user-menu-caret {
+  font-size: 10px;
+  color: #5d6d84;
+}
+
+.user-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(36, 87, 167, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 42px rgba(19, 38, 75, 0.12);
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-bottom: 1px solid rgba(36, 87, 167, 0.08);
+  background: transparent;
+  color: #2d466c;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-item:last-child {
+  border-bottom: 0;
+}
+
+.dropdown-item:hover {
+  background: var(--app-primary-soft);
+  color: var(--app-primary);
+}
+
+.logout-menu-item {
+  color: #b42318;
+}
+
+.logout-menu-item:hover {
+  background: rgba(180, 35, 24, 0.08);
+  color: #a81d15;
 }
 
 .header-action {
@@ -164,13 +292,21 @@
   }
 
   .topbar-brand {
-    gap: 5px;
+    gap: 6px;
+  }
+
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brand-primary {
     font-size: 11px;
   }
 
-  .topbar-brand img {
-    width: 25px;
-    height: 25px;
+  .brand-secondary {
+    font-size: 8px;
+    letter-spacing: 0.06em;
   }
 
   .topbar-user {
@@ -204,7 +340,8 @@
 }
 
 @media (max-width: 420px) {
-  .topbar-brand span,
+  .brand-primary,
+  .brand-secondary,
   .welcome-name,
   .android-link {
     display: none;
@@ -212,6 +349,10 @@
 
   .topbar {
     min-height: calc(var(--app-header-height) - 8px);
+  }
+
+  .user-menu-trigger {
+    padding: 6px 8px 6px 6px;
   }
 }
 

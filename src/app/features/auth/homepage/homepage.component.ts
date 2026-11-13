@@ -45,7 +45,7 @@ export class HomepageComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
   ngOnInit(): void {
     this.leftLogo = "assets/nagaland_gov.png";
-    this.dimtsLogo = "assets/login/dimtslogo.png";
+    this.dimtsLogo = "assets/dimtslogoo.png";
     this.installationPDF =
       "assets/login/vehical_installation_and_activation.pdf";
     this.renewalPDF = "assets/login/renewalprocess1.pdf";

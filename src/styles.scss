@@ -716,6 +716,14 @@ body {
 .single-alert-body {
   flex: 1;
   position: relative;
+  min-height: 0;
+}
+
+#singleAlertMap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .single-alert-info-panel {

@@ -163,6 +163,30 @@ this.showSessionModal = true;
   menuList: SidebarMenuItem[] = [];
   navCollapsed = true;
   mobileMenuOpen = false;
+  userMenuOpen = false;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target?.closest('.user-menu')) {
+      this.userMenuOpen = false;
+    }
+  }
+
+  toggleUserMenu(): void {
+    this.userMenuOpen = !this.userMenuOpen;
+  }
+
+  openChangePassword(): void {
+    this.userMenuOpen = false;
+    this.openResetPasswordForm();
+  }
+
+  logoutFromMenu(): void {
+    this.userMenuOpen = false;
+    this.logout();
+  }
+
   getMenuDetails() {
     let mainMenu: any = sessionStorage.getItem('mainmenu');
     let subMenu: any = sessionStorage.getItem('submenu');
