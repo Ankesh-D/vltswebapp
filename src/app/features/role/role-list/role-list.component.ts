@@ -4,10 +4,10 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RoleService, Role, RoleRequest, RoleUpdateRequest, RoleDeleteRequest } from '../../../core/services/role.service';
 import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
-
+import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 @Component({
     selector: 'app-role-list',
-    imports: [CommonModule, FormsModule, RouterModule, CommonTableComponent],
+    imports: [CommonModule, FormsModule, RouterModule, CommonTableComponent, NgbPaginationModule],
     templateUrl: './role-list.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./role-list.component.scss']
@@ -136,11 +136,14 @@ export class RoleListComponent implements OnInit {
     return this.roles.slice(start, end);
   }
   
-  onPageChange(page: number) {
-    this.currentPage = page;
-    this.loadRoles();
-  }
-  
+  // onPageChange(page: number) {
+  //   this.currentPage = page;
+  //   this.loadRoles();
+  // }
+  onPageChange(page: number): void {
+  this.currentPage = page;
+  this.getSearchDetails();
+}
   openEditModal(role: Role) {
     this.selectedRole = role;
     this.editRoleName = role.param3 || '';
