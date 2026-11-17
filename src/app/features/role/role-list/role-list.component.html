@@ -3,99 +3,87 @@
     <div class="element-wrapper">
       <div class="element-box">
         <div class="col-md-12 pagetitleborder">
+             <div class="pagetitlestyle"><span>Role Details</span></div>
           <button class="pagebtn" style="margin-right: 10px;">
             <a routerLink="/role/entry"><i class="fa fa-plus"></i>&nbsp;&nbsp;Add New</a>
           </button>
-          <div class="pagetitlestyle"><span>Role Details</span></div>
+       
         </div>
 
         <!-- Search and Pagination Controls -->
-        <form autocomplete="off" style="width: 100%; padding: 10px 0px 10px 0px;">
-          <table style="width: 100%;">
-            <tbody class="bg-body">
-              <tr>
-                <td style="width: 75px; padding-top: 0px; padding-left: 9px;">
-                  <font style="font-weight: bold;">Search : </font>
-                </td>
-                <td>
-                  <div class="">
-                    <input
-                      type="search"
-                      readonly
-                      onfocus="this.removeAttribute('readonly');"
-                      class="tabletitlesearch"
-                      id="searchby"
-                      placeholder="Type here and press button...."
-                      style="border: 1px solid #0b58b9; height: 25px; width: 200px;"
-                      autocomplete="disabled"
-                      maxlength="50"
-                      [(ngModel)]="searchText"
-                      (keyup.enter)="getSearchDetails()"
-                      name="searchby">
-                    &nbsp;&nbsp;
-                    <button class="" id="searchbtn" style="cursor: pointer;" (click)="getSearchDetails()">
-                      <i class="fa fa-search"></i>
-                    </button>
-                    &nbsp;&nbsp;
-                    <button>
-                      @if (!loading) {
-                        <span id="notspin"
-                          style="font-size: 11px; cursor: pointer; margin-top: 6px;"
-                          title="Reload"
-                        (click)="reloadData()">Reload</span>
-                      }
-                      @if (loading) {
-                        <span id="spin"
-                        style="font-size: 11px; cursor: pointer; display: inline; margin-top: 6px;">Reloading...</span>
-                      }
-                    </button>
-                  </div>
-                </td>
-                <td>
-                  <table style="float: right;">
-                    <tbody>
-                      <tr>
-                        <td>
-                          <div>
-                            <label class="control-label" for="excelpdfdownload" style="color: #0e0e0e;">Download :</label>
-                            <select class="" name="excelpdfdownload" id="excelpdfdownload" style="height: 23px;">
-                              <option value="Select">Select</option>
-                              <!-- <option value="Excel" id="downloadexcel">Excel</option> -->
-                              <option value="">Excel</option>
-                            </select>
-                          </div>
-                        </td>
-                        <td>
-                          <div style="width: 70px; margin-left: 25px; font-weight: bold; color: #0e0e0e;">
-                            <font><b>Show Rows : </b></font>
-                          </div>
-                        </td>
-                        <td>
-                          <select
-                            [(ngModel)]="pageSize"
-                            (change)="onPageSizeChange(pageSize)"
-                            name="pageSize"
-                            style="font-size: 10px; height: 23px;">
-                            @for (size of pageSizeOptions; track size) {
-                              <option [value]="size === totalCount ? 'All' : size">
-                                {{size === totalCount ? 'All' : size}}
-                              </option>
-                            }
-                          </select>
-                        </td>
-                        <td style="padding-right: 9px;">
-                          <div style="text-align: right; font-weight: bold; margin-left: 25px;">
-                            <font class="testclassalert"> Total Records : {{pageCount}} of {{totalCount}}</font>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </form>
+      
+<form autocomplete="off" class="list-toolbar">
+
+  <!-- Left: Search and Actions -->
+  <div class="toolbar-left">
+
+    <div class="search-group">
+      <input
+        type="search"
+        class="tabletitlesearch"
+        id="searchby"
+        placeholder="Type here..."
+        maxlength="50"
+        [(ngModel)]="searchText"
+        (keyup.enter)="getSearchDetails()"
+        name="searchby"
+      />
+
+      <button
+        type="button"
+        class="search-btn"
+        title="Search"
+        (click)="getSearchDetails()">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
+
+    <button
+      type="button"
+      class="reload-btn"
+      title="Reload"
+      [disabled]="loading"
+      (click)="reloadData()">
+      <i class="fa"
+         [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-refresh'">
+      </i>
+    </button>
+
+    <button
+      type="button"
+      class="excel-btn">
+      <i class="fa fa-file-excel-o"></i>
+      Excel
+    </button>
+
+  </div>
+
+  <!-- Right: Pagination -->
+  <div class="toolbar-right">
+
+    <select
+      [(ngModel)]="pageSize"
+      (change)="onPageSizeChange(pageSize)"
+      name="pageSize"
+      class="page-size-select">
+
+      @for (size of pageSizeOptions; track size) {
+        <option [value]="size === totalCount ? 'All' : size">
+          {{ size === totalCount ? 'All' : size }}
+        </option>
+      }
+
+    </select>
+
+    <div class="record-count">
+      <strong>Total Records:</strong>
+      <span>{{ pageCount }} of {{ totalCount }}</span>
+    </div>
+
+  </div>
+
+</form>
+
 
         <div class="table-responsive">
           <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
@@ -106,37 +94,55 @@
                 tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
                 (sortChange)="sort($event)">
               </app-common-table>
-              <ng-template #roleListCell let-role let-column="column">
-                @if (column.key === 'actions') {
-                  <div class="btn-group btn-group-sm">
-                    <button type="button" (click)="openEditModal(role)">Edit</button>
-                    &nbsp;
-                    <button type="button" (click)="openDeleteModal(role)">Delete</button>
-                  </div>
-                } @else {
-                  {{column.value ? column.value(role) : 'NA'}}
-                }
-              </ng-template>
+            
+<ng-template #roleListCell let-role let-column="column">
+  @if (column.key === 'actions') {
+    <div class="role-action-buttons">
 
-              <!-- Pagination Controls -->
-              @if (totalCount > 0) {
-                <div class="pagination-wrapper" style="text-align: center; margin-top: 10px;">
-                  <ul class="pagination" style="display: inline-flex; list-style: none; padding: 0;">
-                    <li [class.disabled]="currentPage === 1">
-                      <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
-                    </li>
-                    @for (page of getPageNumbers(); track page; let i = $index) {
-                      <li
-                        [class.active]="currentPage === (i + 1)">
-                        <button (click)="onPageChange(i + 1)">{{i + 1}}</button>
-                      </li>
-                    }
-                    <li [class.disabled]="currentPage >= getTotalPages()">
-                      <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">Next</button>
-                    </li>
-                  </ul>
-                </div>
-              }
+      <button
+        type="button"
+        class="role-edit-btn"
+        (click)="openEditModal(role)">
+        Edit
+      </button>
+
+      <button
+        type="button"
+        class="role-delete-btn"
+        (click)="openDeleteModal(role)">
+        Delete
+      </button>
+
+    </div>
+  } @else {
+    {{ column.value ? column.value(role) : 'NA' }}
+  }
+</ng-template>
+
+
+           
+@if (totalCount > 0) {
+  <div class="pagination-wrapper">
+
+    <ngb-pagination
+      [collectionSize]="totalCount"
+      [pageSize]="pageSize"
+      [page]="currentPage"
+      [maxSize]="5"
+      [rotate]="true"
+      [ellipses]="true"
+      [boundaryLinks]="true"
+      [directionLinks]="true"
+      firstText="««"
+      previousText="«"
+      nextText="»"
+      lastText="»»"
+      (pageChange)="onPageChange($event)">
+    </ngb-pagination>
+
+  </div>
+}
+
             </div>
           </div>
         </div>
