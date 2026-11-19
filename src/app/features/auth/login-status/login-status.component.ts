@@ -1,37 +1,45 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { LoadingComponent } from '../../../shared/components/loading/loading.component';
-import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { ActiveUsersReq, LoginStatusReq } from '../../../core/model/request.model';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-login-status',
-    imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule, CommonTableComponent],
+    imports: [CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './login-status.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./login-status.component.scss']
 })
 export class LoginStatusComponent implements OnInit {
-  readonly loginStatusColumns: CommonTableColumn<any>[] = [
-    { key: 'param1', label: '#', width: '30px', cellClass: 'ps-3' },
-    { key: 'param3', label: 'Login Name' },
-    { key: 'param7', label: 'Contact Person' },
-    { key: 'param8', label: 'Mobile No.' },
-    { key: 'param9', label: 'Email ID' },
-    { key: 'users', label: 'Users', className: 'text-center', cellClass: 'text-center' }
+  readonly loginStatusColumns: DataTableColumn<any>[] = [
+    { key: 'param1', header: '#', width: '30px', cellClassName: 'ps-3' },
+    { key: 'param3', header: 'Login Name' },
+    { key: 'param7', header: 'Contact Person' },
+    { key: 'param8', header: 'Mobile No.' },
+    { key: 'param9', header: 'Email ID' },
+    {
+      header: 'Users',
+      className: 'text-center',
+      cellClassName: 'text-center fw-bold',
+      value: login => login.param10 || 'NA',
+      clickable: () => true
+    }
   ];
-  readonly userDetailsColumns: CommonTableColumn<any>[] = [
-    { key: 'param1', label: '#', width: '30px', cellClass: 'ps-3' },
-    { key: 'param13', label: 'Browser Name' },
-    { key: 'param10', label: 'Login Time' },
-    { key: 'param11', label: 'Logout Time' },
-    { key: 'param18', label: 'Login Status', width: '88px' }
+  readonly userDetailsColumns: DataTableColumn<any>[] = [
+    { key: 'param1', header: '#', width: '30px', cellClassName: 'ps-3' },
+    { key: 'param13', header: 'Browser Name' },
+    { key: 'param10', header: 'Login Time' },
+    { key: 'param11', header: 'Logout Time' },
+    {
+      key: 'param18',
+      header: 'Login Status',
+      width: '88px',
+      cellClassName: login => login.param18 === 'Active' ? 'text-success fw-bold' : 'text-secondary'
+    }
   ];
 
   loginStatusDetailsReq: LoginStatusReq = new LoginStatusReq();
@@ -82,14 +90,15 @@ export class LoginStatusComponent implements OnInit {
     if (this.totalCount > 0 && this.totalCount < 100) options.push(this.totalCount); // 'All'
     this.pageSizeOptions = options;
   }
-  onPageSizeChange(event: any) {
-    const size = Number(event.target.value);
-    console.log('Selected page size:', size);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount ? this.totalCount : Number(size);
+    this.currentPage = 1;
     this.loginStatusDetailsReq.param2 = '1';
-    this.loginStatusDetailsReq.param3 = Number(size);
+    this.loginStatusDetailsReq.param3 = this.pageSize;
     this.getDetails('pagesize');
   }
   onPageChange(page: number) {
+    this.currentPage = page;
     this.loginStatusDetailsReq.param2 = page.toString();
     this.getDetails('pageChange');
   }
@@ -97,12 +106,15 @@ export class LoginStatusComponent implements OnInit {
     if(type === 'reload') {
       this.loginStatusDetailsReq.param1 = '';
       this.loginStatusDetailsReq.param2 = '1';
+      this.pageSize = 20;
       this.loginStatusDetailsReq.param3 = this.pageSize.toString();
     } 
     if(type === 'search') {
       this.loginStatusDetailsReq.param2 = '1';
       this.loginStatusDetailsReq.param3 = this.pageSize.toString();
     }
+    this.currentPage = Number(this.loginStatusDetailsReq.param2) || 1;
+    this.loading = true;
       this.authService.getLoginStatus(this.loginStatusDetailsReq).subscribe({
       next: (response: any) => {
         this.loading = false;
@@ -121,6 +133,11 @@ export class LoginStatusComponent implements OnInit {
 
         this.loading = false;}
       })
+  }
+  onLoginStatusCellClick(event: { row: any; column: DataTableColumn<any> }): void {
+    if (event.column.header === 'Users') {
+      this.getLoginname(event.row);
+    }
   }
   onChangeDownload(event: any) {
     const fileType = event.target.value;

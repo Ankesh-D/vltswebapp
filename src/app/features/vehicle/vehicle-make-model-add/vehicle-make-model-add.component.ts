@@ -4,9 +4,12 @@ import { ToastService } from '../../../core/services/toast.service';
 
 import { VehicleService } from '../../../core/services/vehicle.service';
 import { FormsModule } from '@angular/forms';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 @Component({
     selector: 'app-vehicle-make-model-add',
-    imports: [FormsModule],
+    imports: [FormsModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './vehicle-make-model-add.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './vehicle-make-model-add.component.scss'
@@ -14,9 +17,65 @@ import { FormsModule } from '@angular/forms';
 export class VehicleMakeModelAddComponent implements OnInit {
 
   activeTab: 'make' | 'model' | 'class' = 'make';
+  searchText = '';
+  currentPage = 1;
+  pageSize = 20;
+  pageSizeOptions = [10, 20, 50, 100];
+  totalCount = 0;
+  pageCount = 0;
+  tableRows: any[] = [];
+
+  readonly makeTableColumns: DataTableColumn<any>[] = [
+    { key: 'serialNo', header: 'Sr.No' },
+    { key: 'param2', header: 'Make Name' },
+    {
+      header: 'Action',
+      actions: [
+        { label: 'Edit', className: 'btn btn-sm btn-outline-primary me-2', run: item => this.editMake(item) },
+        { label: 'Delete', className: 'btn btn-sm btn-outline-danger', tone: 'danger', run: item => this.openDeleteModal('make', item) }
+      ]
+    }
+  ];
+  readonly modelTableColumns: DataTableColumn<any>[] = [
+    { key: 'serialNo', header: 'ID' },
+    { key: 'param2', header: 'Model Name' },
+    {
+      header: 'Action',
+      actions: [
+        { label: 'Edit', className: 'btn btn-sm btn-outline-primary me-2', run: item => this.editModel(item) },
+        { label: 'Delete', className: 'btn btn-sm btn-outline-danger', tone: 'danger', run: item => this.openDeleteModal('model', item) }
+      ]
+    }
+  ];
+  readonly classTableColumns: DataTableColumn<any>[] = [
+    { key: 'serialNo', header: 'Sr.No' },
+    { key: 'param2', header: 'Class Name' },
+    {
+      header: 'Action',
+      actions: [
+        { label: 'Edit', className: 'btn btn-sm btn-outline-primary me-2', run: item => this.editClass(item) },
+        { label: 'Delete', className: 'btn btn-sm btn-outline-danger', tone: 'danger', run: item => this.openDeleteModal('class', item) }
+      ]
+    }
+  ];
+
+  get tableColumns(): DataTableColumn<any>[] {
+    if (this.activeTab === 'model') return this.modelTableColumns;
+    if (this.activeTab === 'class') return this.classTableColumns;
+    return this.makeTableColumns;
+  }
+
+  get tableLoading(): boolean {
+    if (this.activeTab === 'model') return this.isModelLoading;
+    if (this.activeTab === 'class') return this.isClassLoading;
+    return this.isLoading;
+  }
 
 setTab(tab: 'make' | 'model' | 'class') {
   this.activeTab = tab;
+  this.searchText = '';
+  this.currentPage = 1;
+  this.updateTableView();
 
   if (tab === 'class') {
     this.loadClassList(); // 👈 important
@@ -25,6 +84,8 @@ setTab(tab: 'make' | 'model' | 'class') {
 
   makeList: any[] = [];
   isLoading = false;
+  isModelLoading = false;
+  isClassLoading = false;
 
   constructor(private Vehicle: VehicleService, private toastService: ToastService) {
     this.toastService.pageName = 'Vehicle Make & Model Management'; // Set page name for toast service
@@ -32,6 +93,72 @@ setTab(tab: 'make' | 'model' | 'class') {
 // getVehicleModelList
   ngOnInit(): void {
     this.loadVehicleMakeList();
+  }
+
+  private updateTableView(): void {
+    const records = this.activeTab === 'make'
+      ? this.makeList
+      : this.activeTab === 'model'
+        ? this.modelList
+        : this.classList;
+    const query = this.searchText.trim().toLowerCase();
+    const filteredRecords = query
+      ? records.filter(record => Object.values(record).some(value =>
+          String(value ?? '').toLowerCase().includes(query)))
+      : records;
+    this.totalCount = filteredRecords.length;
+
+    const totalPages = Math.ceil(this.totalCount / this.pageSize);
+    if (totalPages > 0 && this.currentPage > totalPages) {
+      this.currentPage = totalPages;
+    }
+
+    const start = (this.currentPage - 1) * this.pageSize;
+    this.tableRows = filteredRecords
+      .slice(start, start + this.pageSize)
+      .map((record, index) => ({ ...record, serialNo: start + index + 1 }));
+    this.pageCount = this.tableRows.length;
+  }
+
+  onSearchTextChange(searchText: string): void {
+    this.searchText = searchText;
+    this.currentPage = 1;
+    this.updateTableView();
+  }
+
+  onSearch(): void {
+    this.currentPage = 1;
+    this.updateTableView();
+  }
+
+  onPageChange(page: number): void {
+    const totalPages = Math.ceil(this.totalCount / this.pageSize);
+    if (page < 1 || page > totalPages) return;
+    this.currentPage = page;
+    this.updateTableView();
+  }
+
+  onPageSizeChange(size: number | string): void {
+    this.pageSize = size === 'All' ? this.totalCount : Number(size);
+    this.currentPage = 1;
+    this.updateTableView();
+  }
+
+  reloadList(): void {
+    this.searchText = '';
+    this.currentPage = 1;
+    this.pageSize = 20;
+
+    if (this.activeTab === 'make') {
+      this.loadVehicleMakeList();
+    } else if (this.activeTab === 'model' && this.selectedMakeId) {
+      this.loadModelList(this.selectedMakeId);
+    } else if (this.activeTab === 'class') {
+      this.loadClassList();
+    } else {
+      this.modelList = [];
+      this.updateTableView();
+    }
   }
 
   // ✅ MAIN FUNCTION (Proper)
@@ -46,10 +173,12 @@ setTab(tab: 'make' | 'model' | 'class') {
           this.makeList = [];
         }
         this.isLoading = false;
+        this.updateTableView();
       },
       error: (err) => {
         console.error('Vehicle Make API Error:', err);
         this.isLoading = false;
+        this.updateTableView();
       }
     });
   }
@@ -159,17 +288,20 @@ onMakeChange(event: any): void {
   const makeId = event.target.value;
 
   this.selectedMakeId = makeId;
+  this.currentPage = 1;
 
   if (makeId) {
     this.loadModelList(makeId);
   } else {
     this.modelList = [];
+    this.updateTableView();
   }
 }
 
 
 // ✅ LOAD MODEL LIST
 loadModelList(makeId: string): void {
+  this.isModelLoading = true;
   this.Vehicle.getVehicleModelList(makeId).subscribe({
     next: (res: any) => {
       if (res?.status) {
@@ -177,9 +309,13 @@ loadModelList(makeId: string): void {
       } else {
         this.modelList = [];
       }
+      this.isModelLoading = false;
+      this.updateTableView();
     },
     error: (err) => {
       console.error('Model API Error:', err);
+      this.isModelLoading = false;
+      this.updateTableView();
     }
   });
 }
@@ -214,14 +350,21 @@ classList: any[] = [];
 
 // ✅ LOAD CLASS LIST
 loadClassList(): void {
+  this.isClassLoading = true;
   this.Vehicle.getVehicleClassRoster().subscribe({
     next: (res: any) => {
       if (res?.status) {
         this.classList = res.entity || [];
+      } else {
+        this.classList = [];
       }
+      this.isClassLoading = false;
+      this.updateTableView();
     },
     error: (err) => {
       console.error('Class API Error:', err);
+      this.isClassLoading = false;
+      this.updateTableView();
     }
   });
 }

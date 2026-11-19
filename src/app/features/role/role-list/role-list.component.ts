@@ -1,13 +1,14 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { RoleService, Role, RoleRequest, RoleUpdateRequest, RoleDeleteRequest } from '../../../core/services/role.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 @Component({
     selector: 'app-role-list',
-    imports: [CommonModule, FormsModule, RouterModule, CommonTableComponent, NgbPaginationModule],
+    imports: [CommonModule, FormsModule, RouterModule, DataTableComponent, CommonDataToolbarComponent, PaginationComponent],
     templateUrl: './role-list.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./role-list.component.scss']
@@ -26,13 +27,14 @@ export class RoleListComponent implements OnInit {
   // Sorting
   sortKey: string = '';
   reverse: boolean = false;
-  readonly tableColumns: CommonTableColumn<Role>[] = [
-    { key: 'param1', label: '#', width: '25px', value: role => role.param1 || 'NA' },
-    { key: 'param3', label: 'Role Name', sortable: true, value: role => role.param3 || 'NA' },
-    { key: 'param4', label: 'Role Description', sortable: true, value: role => role.param4 || 'NA' },
-    { key: 'param5', label: 'Created Date', sortable: true, value: role => role.param5 || 'NA' },
-    { key: 'actions', label: 'Action' }
+  readonly tableColumns: DataTableColumn<Role>[] = [
+    { key: 'param1', header: '#', width: '25px', value: role => role.param1 || 'NA' },
+    { key: 'param3', header: 'Role Name', sortKey: 'param3', value: role => role.param3 || 'NA' },
+    { key: 'param4', header: 'Role Description', sortKey: 'param4', value: role => role.param4 || 'NA' },
+    { key: 'param5', header: 'Created Date', sortKey: 'param5', value: role => role.param5 || 'NA' },
+    { key: 'actions', header: 'Action' }
   ];
+  @ViewChild('roleActionsCell', { static: true }) roleActionsCell!: TemplateRef<{ $implicit: Role }>;
   
   // Modal data
   selectedRole: Role | null = null;
@@ -54,6 +56,8 @@ export class RoleListComponent implements OnInit {
   ) {}
   
   ngOnInit() {
+    const actionsColumn = this.tableColumns.find(column => column.key === 'actions');
+    if (actionsColumn) actionsColumn.cellTemplate = this.roleActionsCell;
     this.loadRoles();
   }
   
@@ -136,13 +140,9 @@ export class RoleListComponent implements OnInit {
     return this.roles.slice(start, end);
   }
   
-  // onPageChange(page: number) {
-  //   this.currentPage = page;
-  //   this.loadRoles();
-  // }
   onPageChange(page: number): void {
-  this.currentPage = page;
-  this.getSearchDetails();
+    this.currentPage = page;
+    this.loadRoles();
 }
   openEditModal(role: Role) {
     this.selectedRole = role;

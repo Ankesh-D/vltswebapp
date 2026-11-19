@@ -15,18 +15,20 @@ import { Subject } from 'rxjs';
 import moment from 'moment';
 import { LoaderService } from '../../../core/services/loader.service';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 @Component({
     selector: 'app-sos-session',
-    imports: [NgxDaterangepickerMd, FormsModule, NgSelectModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [NgxDaterangepickerMd, FormsModule, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './sos-session.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './sos-session.component.scss'
 })
 export class SosSessionComponent implements OnInit, AfterViewInit {
-  readonly tableColumns: CommonTableColumn[] = [
+  readonly tableColumns: CommonTableColumn<SOSSessionResponse>[] = [
     { key: 'column1', label: '#' },
     { key: 'column2', label: 'Vehicle No.' },
     { key: 'column3', headers: ['IMEI No.', 'Serial No.'] },

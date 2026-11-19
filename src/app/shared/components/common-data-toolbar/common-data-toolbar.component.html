@@ -1,6 +1,7 @@
 <div class="common-data-toolbar" [class.common-data-toolbar--vehicle]="variant === 'vehicle'"
-  [class.common-data-toolbar--device]="variant === 'device'">
-  @if (showSearch || showReload || showFilters || showDateRange || showOldNew || showExcel || showPdf) {
+  [class.common-data-toolbar--device]="variant === 'device'"
+  [class.common-data-toolbar--wrap-filters]="wrapFilters">
+  @if (showSearch || showReload || showFilters || showDateRange || showOldNew) {
     <div class="common-data-toolbar__search">
       @if (showSearch) {
         <div class="common-data-toolbar__search-control">
@@ -43,6 +44,11 @@
           </label>
         }
 
+    </div>
+  }
+
+  @if (showExcel || showPdf || showPageSize || showTotal) {
+    <div class="common-data-toolbar__actions">
       @if (showExcel || showPdf) {
         <div class="common-data-toolbar__exports" role="group" aria-label="Export data">
           @if (showExcel) {
@@ -59,26 +65,27 @@
           }
         </div>
       }
+
+      <ng-content select="[toolbarBeforePageSize]"></ng-content>
+
+      @if (showPageSize) {
+        <label class="common-data-toolbar__page-size">
+          <span>{{ pageSizeLabel }}:</span>
+          <select [ngModel]="selectedPageSize" (ngModelChange)="onPageSizeChange($event)" aria-label="Items per page">
+            @for (option of pageSizeOptions; track option) {
+              <option [ngValue]="option === totalRecords ? 'All' : option">
+                {{ option === totalRecords ? 'All' : option }}
+              </option>
+            }
+          </select>
+        </label>
+      }
+      @if (showTotal) {
+        <span class="common-data-toolbar__total">
+          {{ totalLabel }}: {{ displayedCount }} {{ countSeparator }} {{ totalRecords }}
+        </span>
+      }
     </div>
-  }
-
-  <ng-content select="[toolbarBeforePageSize]"></ng-content>
-
-  @if (showPageSize) {
-    <label class="common-data-toolbar__page-size">
-      <select [ngModel]="selectedPageSize" (ngModelChange)="onPageSizeChange($event)" aria-label="Items per page">
-        @for (option of pageSizeOptions; track option) {
-          <option [ngValue]="variant === 'vehicle' && option === totalRecords ? 'All' : option">
-            {{ variant === 'vehicle' && option === totalRecords ? 'All' : option }}
-          </option>
-        }
-      </select>
-    </label>
-  }
-  @if (showTotal) {
-    <span class="common-data-toolbar__total">
-      {{ totalLabel }}: {{ displayedCount }} {{ countSeparator }} {{ totalRecords }}
-    </span>
   }
 
   <ng-content></ng-content>

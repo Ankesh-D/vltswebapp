@@ -10,138 +10,35 @@
        
         </div>
 
-        <!-- Search and Pagination Controls -->
-      
-<form autocomplete="off" class="list-toolbar">
-
-  <!-- Left: Search and Actions -->
-  <div class="toolbar-left">
-
-    <div class="search-group">
-      <input
-        type="search"
-        class="tabletitlesearch"
-        id="searchby"
-        placeholder="Type here..."
-        maxlength="50"
-        [(ngModel)]="searchText"
-        (keyup.enter)="getSearchDetails()"
-        name="searchby"
-      />
-
-      <button
-        type="button"
-        class="search-btn"
-        title="Search"
-        (click)="getSearchDetails()">
-        <i class="fa fa-search"></i>
-      </button>
-    </div>
-
-    <button
-      type="button"
-      class="reload-btn"
-      title="Reload"
-      [disabled]="loading"
-      (click)="reloadData()">
-      <i class="fa"
-         [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-refresh'">
-      </i>
-    </button>
-
-    <button
-      type="button"
-      class="excel-btn">
-      <i class="fa fa-file-excel-o"></i>
-      Excel
-    </button>
-
-  </div>
-
-  <!-- Right: Pagination -->
-  <div class="toolbar-right">
-
-    <select
-      [(ngModel)]="pageSize"
-      (change)="onPageSizeChange(pageSize)"
-      name="pageSize"
-      class="page-size-select">
-
-      @for (size of pageSizeOptions; track size) {
-        <option [value]="size === totalCount ? 'All' : size">
-          {{ size === totalCount ? 'All' : size }}
-        </option>
-      }
-
-    </select>
-
-    <div class="record-count">
-      <strong>Total Records:</strong>
-      <span>{{ pageCount }} of {{ totalCount }}</span>
-    </div>
-
-  </div>
-
-</form>
-
+        <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here..."
+          [searchText]="searchText" (searchTextChange)="searchText = $event" (search)="getSearchDetails()"
+          (reload)="reloadData()" [loading]="loading" [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
+          (pageSizeChange)="onPageSizeChange($event)" [showFilters]="false" pageSizeLabel="Show Rows"
+          totalLabel="Total Records" countSeparator="of">
+        </app-common-data-toolbar>
 
         <div class="table-responsive">
           <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
             <div class="col-sm-12">
-              <app-common-table [columns]="tableColumns" [rows]="getPaginatedRoles()" [loading]="loading"
-                [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="roleListCell"
-                tableClass="table table-striped app-table" tableId="devicetable"
+              <app-data-table [columns]="tableColumns" [rows]="getPaginatedRoles()" [loading]="loading"
+                [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped app-table"
+                tableId="devicetable"
                 tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
-                (sortChange)="sort($event)">
-              </app-common-table>
-            
-<ng-template #roleListCell let-role let-column="column">
-  @if (column.key === 'actions') {
-    <div class="role-action-buttons">
+                (sort)="sort($event)">
+              </app-data-table>
+              <ng-template #roleActionsCell let-role>
+                <div class="role-action-buttons">
+                  <button type="button" class="role-edit-btn" (click)="openEditModal(role)">Edit</button>
+                  <button type="button" class="role-delete-btn" (click)="openDeleteModal(role)">Delete</button>
+                </div>
+              </ng-template>
 
-      <button
-        type="button"
-        class="role-edit-btn"
-        (click)="openEditModal(role)">
-        Edit
-      </button>
-
-      <button
-        type="button"
-        class="role-delete-btn"
-        (click)="openDeleteModal(role)">
-        Delete
-      </button>
-
-    </div>
-  } @else {
-    {{ column.value ? column.value(role) : 'NA' }}
-  }
-</ng-template>
-
-
-           
-@if (totalCount > 0) {
-  <div class="pagination-wrapper">
-
-    <ngb-pagination
-      [collectionSize]="totalCount"
-      [pageSize]="pageSize"
-      [page]="currentPage"
-      [maxSize]="5"
-      [rotate]="true"
-      [ellipses]="true"
-      [boundaryLinks]="true"
-      [directionLinks]="true"
-      firstText="««"
-      previousText="«"
-      nextText="»"
-      lastText="»»"
-      (pageChange)="onPageChange($event)">
-    </ngb-pagination>
-
-  </div>
-}
+              <div class="float-end">
+                <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+                  [disabled]="loading" (pageChange)="onPageChange($event)">
+                </app-pagination>
+              </div>
 
             </div>
           </div>

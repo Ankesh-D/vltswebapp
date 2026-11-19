@@ -2,18 +2,19 @@
 import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastService } from '../../../core/services/toast.service';
 import { SchoolManagementService } from '../../../core/services/school-management.service';
 import { DriverMasterDeleteReq, DriverMasterDetailsReq, DriverMasterFormReq } from '../../../core/model/request.model';
 import { DriverMasterDetailsResp } from '../../../core/model/response.model';
 import { ValidationsService } from '../../../core/services/validations.service';
 import { CommonFileUploadRequest, OperationService } from '../../../core/services/operation.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-driver-master',
-    imports: [FormsModule, NgSelectModule, NgbPaginationModule, CommonTableComponent],
+    imports: [FormsModule, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './driver-master.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './driver-master.component.scss'
@@ -28,16 +29,16 @@ export class DriverMasterComponent implements OnInit, OnDestroy {
   totalCount: any = 0;
   pageCount: any = 0;
   detailData: DriverMasterDetailsResp[] = [];
-  readonly tableColumns: CommonTableColumn<DriverMasterDetailsResp>[] = [
-    { key: 'rowNumber', label: '#', width: '25px' },
-    { key: 'param3', label: 'Staff Name', value: data => data.param3 },
-    { key: 'param4', label: 'Mobile No.', value: data => data.param4 },
-    { key: 'param5', label: 'Address', value: data => data.param5 },
-    { key: 'param9', label: 'City', value: data => data.param9 },
-    { key: 'param10', label: 'Pincode', value: data => data.param10 },
-    { key: 'param11', label: 'Licence Number', value: data => data.param11 },
-    { key: 'param12', label: 'Aadhar Number', value: data => data.param12 },
-    { key: 'actions', label: 'Action', width: '90px', className: 'text-center' }
+  readonly tableColumns: DataTableColumn<DriverMasterDetailsResp>[] = [
+    { key: 'rowNumber', header: '#', width: '25px' },
+    { key: 'param3', header: 'Staff Name' },
+    { key: 'param4', header: 'Mobile No.' },
+    { key: 'param5', header: 'Address' },
+    { key: 'param9', header: 'City' },
+    { key: 'param10', header: 'Pincode' },
+    { key: 'param11', header: 'Licence Number' },
+    { key: 'param12', header: 'Aadhar Number' },
+    { key: 'actions', header: 'Action', width: '90px', className: 'text-center' }
   ];
   detailsToggle: boolean = true;
   updateFlag: boolean = false;
@@ -124,13 +125,22 @@ export class DriverMasterComponent implements OnInit, OnDestroy {
   getDetails(type: string) {
     if(type === 'search') {
       this.pageSize = 10;
+      this.driverDetailsRequest.param1 = this.searchText;
+      this.driverDetailsRequest.param2 = 1;
+      this.driverDetailsRequest.param3 = this.pageSize;
     }
     if(type === 'pageSize') {
       this.searchText = '';
+      this.driverDetailsRequest.param1 = '';
+      this.driverDetailsRequest.param2 = 1;
+      this.driverDetailsRequest.param3 = this.pageSize;
     }
     if(type === 'reload') {
       this.searchText = '';
       this.pageSize = 10;
+      this.driverDetailsRequest.param1 = '';
+      this.driverDetailsRequest.param2 = 1;
+      this.driverDetailsRequest.param3 = this.pageSize;
     }
     if(type === 'pageChange') {
       this.loading = true;
@@ -493,7 +503,13 @@ export class DriverMasterComponent implements OnInit, OnDestroy {
   reloadData() {
     this.getDetails('reload');
   }
-  onPageSizeChange(arg0: any) {
+  onPageSizeChange(value: number | string) {
+    this.pageSize = Number(value);
     this.getDetails('pageSize');
+  }
+
+  onPageChange(page: number) {
+    this.driverDetailsRequest.param2 = page;
+    this.getDetails('pageChange');
   }
 }

@@ -9,7 +9,9 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { AlertService } from '../../../core/services/alert.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 declare var $: any;
 declare var moment: any;
@@ -22,7 +24,7 @@ declare var moment: any;
         NgSelectModule,
         NgxDaterangepickerMd,
         CommonDataToolbarComponent,
-        CommonTableComponent],
+        DataTableComponent, PaginationComponent],
     templateUrl: './vendorwiseinstalleddevicecountoverall.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './vendorwiseinstalleddevicecountoverall.component.scss'
@@ -317,9 +319,14 @@ onChangeVehicleType(type: string) {
   this.vehicleType = "ALL";
   this.getDetails();
 }
-  onPageSizeChange(event: any) {
-  this.pageSize = event.target.value;
-  this.pageCount = 1; // reset page
+  onPageSizeChange(size: number | string): void {
+    this.pageSize = size === 'All' ? this.totalCount : Number(size);
+    this.pageCount = 1;
+    this.getDetails();
+  }
+
+onPageChange(page: number): void {
+  this.pageCount = page;
   this.getDetails();
 }
 

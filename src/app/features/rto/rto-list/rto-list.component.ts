@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { RtoService, RTO, RTORequest } from '../../../core/services/rto.service';
 import { forkJoin } from 'rxjs';
 import { ToastService } from '../../../core/services/toast.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 @Component({
     selector: 'app-rto-list',
-    imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule, CommonTableComponent],
+    imports: [CommonModule, FormsModule, RouterModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './rto-list.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./rto-list.component.scss']
@@ -32,19 +33,19 @@ export class RtoListComponent implements OnInit {
   // Sorting
   sortKey: string = '';
   reverse: boolean = false;
-  readonly tableColumns: CommonTableColumn<RTO>[] = [
-    { key: 'param1', label: '#', width: '20px', value: rto => rto.param1 || 'NA' },
-    { key: 'param3', label: 'RTO Name', sortable: true, value: rto => rto.param3 || 'NA' },
-    { key: 'param4', label: 'RTO Code', sortable: true, value: rto => rto.param4 || 'NA' },
-    { key: 'param9', label: 'State Name', sortable: true, value: rto => rto.param9 || 'NA' },
-    { key: 'param5', label: 'State Code', sortable: true, value: rto => rto.param5 || 'NA' },
-    { key: 'param8', label: 'Pin Code', sortable: true, value: rto => rto.param8 || 'NA' },
+  readonly tableColumns: DataTableColumn<RTO>[] = [
+    { key: 'param1', header: '#', width: '20px', value: rto => rto.param1 || 'NA' },
+    { key: 'param3', header: 'RTO Name', sortKey: 'param3', value: rto => rto.param3 || 'NA' },
+    { key: 'param4', header: 'RTO Code', sortKey: 'param4', value: rto => rto.param4 || 'NA' },
+    { key: 'param9', header: 'State Name', sortKey: 'param9', value: rto => rto.param9 || 'NA' },
+    { key: 'param5', header: 'State Code', sortKey: 'param5', value: rto => rto.param5 || 'NA' },
+    { key: 'param8', header: 'Pin Code', sortKey: 'param8', value: rto => rto.param8 || 'NA' },
     {
       key: 'actions',
-      label: 'Action',
+      header: 'Action',
       actions: [
-        { label: 'Edit', tone: 'primary', run: rto => this.openEditModal(rto) },
-        { label: 'Delete', tone: 'danger', className: 'btnleft5', run: rto => this.openDeleteModal(rto) }
+        { label: 'Edit', tone: 'primary', className: 'btn btn-primary btn-sm', run: rto => this.openEditModal(rto) },
+        { label: 'Delete', tone: 'danger', className: 'btn btn-danger btn-sm btnleft5', run: rto => this.openDeleteModal(rto) }
       ]
     }
   ];
@@ -101,6 +102,7 @@ export class RtoListComponent implements OnInit {
           if (defaultState) {
             this.stateCode = defaultState.param3;
             this.stateId = defaultState.param1;
+            this.selectedStateCode = defaultState.param1;
           }
         }
         this.loadRTODetails();
@@ -231,10 +233,8 @@ export class RtoListComponent implements OnInit {
 
   onStateChange() {
     const state = this.rtolist.find((r: any) => r.param1 === this.selectedStateCode);
-    if (state) {
-      this.stateCode = state.param3;
-      this.stateId = state.param1;
-    }
+    this.stateCode = state?.param3 || '';
+    this.stateId = state?.param1 || '';
     this.currentPage = 1;
     this.loadRTODetails();
   }

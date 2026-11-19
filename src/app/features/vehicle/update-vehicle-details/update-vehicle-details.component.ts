@@ -12,7 +12,9 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 dayjs.extend(utc);
 dayjs.extend(localizedFormat);
@@ -22,7 +24,8 @@ declare var jAlert: any;
 
 @Component({
     selector: 'app-update-vehicle-details',
-    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, NgxDaterangepickerMd, NgbPaginationModule],
+    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, NgxDaterangepickerMd,
+      CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './update-vehicle-details.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./update-vehicle-details.component.scss']
@@ -44,6 +47,26 @@ export class UpdateVehicleDetailsComponent implements OnInit, AfterViewInit {
 
   sortKey: string = '';
   reverse: boolean = false;
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { header: '#', key: 'param1', width: '5%' },
+    { header: '', headers: ['Vehicle No.', 'Chassis No.'], sortKey: 'param7', width: '14%' },
+    { header: 'Engine No.', key: 'param9', sortKey: 'param9', width: '10%' },
+    { header: 'Vehicle Type', key: 'param15', sortKey: 'param15', width: '8%' },
+    { header: 'Mfg Year', key: 'param12', sortKey: 'param12', width: '7%' },
+    { header: 'State Code', key: 'param13', sortKey: 'param13', width: '8%' },
+    { header: 'RTO Name', key: 'param14', sortKey: 'param14', width: '10%' },
+    { header: 'Make Name', key: 'param26', sortKey: 'param26', width: '9%' },
+    { header: 'Model Name', key: 'param27', sortKey: 'param27', width: '9%' },
+    { header: 'Activation Status', key: 'param21', sortKey: 'param21', width: '9%' },
+    {
+      header: 'Activity',
+      width: '11%',
+      actions: [
+        { label: 'Edit', className: 'btn-edit', run: vehicle => this.openEditModal(vehicle) },
+        { label: 'Delete', className: 'btn-delete', run: vehicle => this.openDeleteModal(vehicle) }
+      ]
+    }
+  ];
 
   // Tab Slider
   sliderWidth: number = 0;
@@ -348,9 +371,10 @@ export class UpdateVehicleDetailsComponent implements OnInit, AfterViewInit {
     this.getVehicleDetails(this.currentPage);
   }
 
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
-    this.pageSize = newSize === 'All' ? this.totalCount : Number(newSize);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount
+      ? this.totalCount
+      : Number(size);
     this.currentPage = 1;
     this.getVehicleDetails(this.currentPage);
   }

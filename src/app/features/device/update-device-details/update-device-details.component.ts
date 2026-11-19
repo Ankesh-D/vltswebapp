@@ -8,12 +8,14 @@ import { EncryptionService } from '../../../core/services/encryption.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { NgSelectModule } from '@ng-select/ng-select'; // Import NgSelectModule
 import { ToastComponent } from '../../assets/inactive-assets/toast.component';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-update-device-details',
-    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, ToastComponent, NgbPaginationModule, CommonTableComponent],
+    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, ToastComponent,
+      CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './update-device-details.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./update-device-details.component.scss']
@@ -21,16 +23,34 @@ import { CommonTableColumn, CommonTableComponent } from '../../../shared/compone
 
 export class UpdateDeviceDetailsComponent implements OnInit, AfterViewInit {
   deviceDetails: any[] = [];
-  readonly tableColumns: CommonTableColumn<any>[] = [
-    { key: 'param1', label: '#' },
-    { key: 'param6', headers: ['Serial No.', 'IMEI No.'], sortable: true },
-    { key: 'param7', label: 'ICCID No.', sortable: true },
-    { key: 'param32', headers: ['Mobile N/W 1', 'Mobile N/W 2'], sortable: true },
-    { key: 'param9', headers: ['Mobile No. 1', 'Mobile No. 2'], sortable: true },
-    { key: 'param13', label: 'Esim Provider', sortable: true },
-    { key: 'param38', label: 'Vehicle Status', sortable: true },
-    { key: 'param27', label: 'Activation Status', sortable: true },
-    { key: 'activity', label: 'Activity' }
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { header: '#', key: 'param1' },
+    { header: '', headers: ['Serial No.', 'IMEI No.'], sortKey: 'param6' },
+    { header: 'ICCID No.', key: 'param7', sortKey: 'param7' },
+    { header: '', headers: ['Mobile N/W 1', 'Mobile N/W 2'], sortKey: 'param32' },
+    { header: '', headers: ['Mobile No. 1', 'Mobile No. 2'], sortKey: 'param9' },
+    { header: 'Esim Provider', key: 'param13', sortKey: 'param13' },
+    { header: 'Vehicle Status', key: 'param38', sortKey: 'param38' },
+    { header: 'Activation Status', key: 'param27', sortKey: 'param27' },
+    {
+      header: 'Activity',
+      actions: [
+        {
+          label: 'Edit',
+          className: 'btn-edit',
+          run: device => this.openEditModal(device),
+          visible: device => device.param30 === 'update' || device.param30 === 'noupdate',
+          disabled: device => device.param30 === 'noupdate'
+        },
+        {
+          label: 'Delete',
+          className: 'btn-delete',
+          run: device => this.openDeleteModal(device),
+          visible: device => device.param30 === 'update' || device.param30 === 'noupdate',
+          disabled: device => device.param30 === 'noupdate'
+        }
+      ]
+    }
   ];
   loading = false;
 
@@ -213,9 +233,10 @@ export class UpdateDeviceDetailsComponent implements OnInit, AfterViewInit {
     this.getDeviceDetails(this.currentPage);
   }
 
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
-    this.pageSize = newSize === 'All' ? this.totalCount : Number(newSize);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount
+      ? this.totalCount
+      : Number(size);
     this.currentPage = 1;
     this.getDeviceDetails(this.currentPage);
   }

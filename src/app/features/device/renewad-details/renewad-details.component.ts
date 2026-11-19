@@ -1,13 +1,14 @@
 
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../core/services/toast.service';
 import { DeviceService, RenewalDetailsRequest } from '../../../core/services/device.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-renewad-details',
-    imports: [FormsModule, CommonTableComponent],
+    imports: [CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './renewad-details.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './renewad-details.component.scss'
@@ -22,17 +23,17 @@ export class RenewadDetailsComponent implements OnInit {
   pageCount = 0;
 
   detailsData: any[] = [];
-  readonly tableColumns: CommonTableColumn<any>[] = [
-    { key: 'param1', label: '#' },
-    { key: 'param5', label: 'Vendor' },
-    { key: 'param6', label: 'Dealer' },
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { key: 'param1', header: '#' },
+    { key: 'param5', header: 'Vendor' },
+    { key: 'param6', header: 'Dealer' },
     { key: 'vehicle', headers: ['Vehicle No.', 'Chassis No.'] },
-    { key: 'param11', label: 'Engine No.' },
+    { key: 'param11', header: 'Engine No.' },
     { key: 'makeModel', headers: ['Make', 'Model'] },
-    { key: 'param19', label: 'Class' },
-    { key: 'param13', label: 'Mfg Year' },
+    { key: 'param19', header: 'Class' },
+    { key: 'param13', header: 'Mfg Year' },
     { key: 'device', headers: ['Serial No.', 'IMEI NO.'] },
-    { key: 'param4', label: 'ICCID No.' },
+    { key: 'param4', header: 'ICCID No.' },
     { key: 'installation', headers: ['Installation Date', 'Activation Date'] },
     { key: 'validity', headers: ['Validity Upto', 'Renewal Date'] }
   ];
@@ -68,7 +69,7 @@ export class RenewadDetailsComponent implements OnInit {
         this.loading = false;
         if (response.status && response.entity) {
           this.detailsData = response.entity.listData || [];
-          this.totalCount = response.entity.param1 || 0;
+          this.totalCount = Number(response.entity.param1) || 0;
 
           // Calculate page count
           if (this.detailsData.length < this.pageSize) {
@@ -116,7 +117,7 @@ export class RenewadDetailsComponent implements OnInit {
     if (this.totalCount > 200) options.push(200);
     if (this.totalCount > 500) options.push(500);
     if (this.totalCount > 1000) options.push(1000);
-    if (this.totalCount > 0) options.push(this.totalCount); // 'All'
+    if (this.totalCount > 0 && !options.includes(this.totalCount)) options.push(this.totalCount);
     this.pageSizeOptions = options;
   }
   onPageChange(page: number) {
@@ -133,43 +134,6 @@ export class RenewadDetailsComponent implements OnInit {
   getSearchDetails() {
     this.currentPage = 1;
     this.getDetails();
-  }
-  getTotalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
-  getPageNumbers(): number[] {
-    const total = this.getTotalPages();
-    const pages: number[] = [];
-    const maxPages = 8;
-    
-    if (total <= maxPages) {
-      for (let i = 1; i <= total; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) {
-          pages.push(i);
-        }
-        pages.push(-1); // Ellipsis
-        pages.push(total);
-      } else if (this.currentPage >= total - 3) {
-        pages.push(1);
-        pages.push(-1); // Ellipsis
-        for (let i = total - 4; i <= total; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push(1);
-        pages.push(-1); // Ellipsis
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push(-1); // Ellipsis
-        pages.push(total);
-      }
-    }
-    return pages;
   }
     // downloadPDFExcel(event: any) {
     //   console.log(event.target.value);

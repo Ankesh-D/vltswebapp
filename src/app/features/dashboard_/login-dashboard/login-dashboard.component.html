@@ -242,285 +242,73 @@
                                 </div>
 
 
-                                <!-- =================================================
-                                     TOP CONTROLS
-                                     ================================================= -->
-                                <div class="top-controls-row">
-
-
-                                    <!-- LEFT CONTROLS -->
-                                    <div class="left-controls">
-
-                                        <!-- Search -->
-                                        <div class="search-box">
-
-                                            <input
-                                                type="search"
-                                                class="search-input inner"
-                                                placeholder="Search and press Enter..."
-                                                maxlength="50"
-                                                [(ngModel)]="loginStatusDetailsReq.param1"
-                                                (keyup.enter)="getDetails('search')" />
-
-
-                                            <button
-                                                type="button"
-                                                class="search-inner-btn"
-                                                (click)="getDetails('search')"
-                                                title="Search">
-
-                                                <i
-                                                    class="fa fa-search"
-                                                    aria-hidden="true">
-                                                </i>
-
-                                            </button>
-
-                                        </div>
-
-
-                                        <!-- Reload -->
-                                        <button
-                                            class="reload-btn"
-                                            (click)="getDetails('reload')"
-                                            [disabled]="loading"
-                                            title="Reload">
-
-                                            <i
-                                                class="fa fa-refresh"
-                                                [class.fa-spin]="loading"
-                                                aria-hidden="true">
-                                            </i>
-
-                                            <span>
-                                                {{ loading ? 'Reloading...' : 'Reload' }}
-                                            </span>
-
-                                        </button>
-
-                                    </div>
-
-
-                                    <!-- RIGHT CONTROLS -->
-                                    <div class="right-controls">
-
-                                        <!-- Rows Per Page -->
-                                        <select
-                                            class="rows-select"
-                                            [(ngModel)]="loginStatusDetailsReq.param3"
-                                            (change)="onPageSizeChange($event)"
-                                            title="Rows per page">
-
-                                            <option
-                                                *ngFor="let size of pageSizeOptions"
-                                                [value]="size === totalCount ? totalCount : size">
-
-                                                {{ size === totalCount ? totalCount : size }}
-
-                                            </option>
-
-                                        </select>
-
-
-                                        <!-- Total Records -->
-                                        <div class="total-records-text">
-
-                                            Total Records: {{ pageCount }} of {{ totalCount }}
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
+                                <app-common-data-toolbar
+                                    [searchText]="loginStatusDetailsReq.param1 || ''"
+                                    searchPlaceholder="Search and press Enter..."
+                                    [pageSize]="pageSize"
+                                    [pageSizeOptions]="pageSizeOptions"
+                                    [displayedCount]="pageCount"
+                                    [totalRecords]="totalCount"
+                                    [loading]="loading"
+                                    [showFilters]="false"
+                                    [showExcel]="false"
+                                    (searchTextChange)="loginStatusDetailsReq.param1 = $event"
+                                    (search)="getDetails('search')"
+                                    (reload)="getDetails('reload')"
+                                    (pageSizeChange)="onPageSizeChange($event)"
+                                    pageSizeLabel="Rows per page"
+                                    totalLabel="Total Records"
+                                    countSeparator="of">
+                                </app-common-data-toolbar>
 
                                 <!-- =================================================
                                      USER DETAILS TABLE
                                      ================================================= -->
-                                <div class="table-responsive">
-
-                                    <table
-                                        class="table table-striped app-table mb-1"
-                                        style="border-top: 1px solid black; border-bottom: 1px solid black;"
-                                        id="devicetable">
-
-
-                                        <!-- TABLE HEADER -->
-                                        <thead>
-
-                                            <tr>
-
-                                                <th style="width: 30px;">
-                                                    #
-                                                </th>
-
-                                                <th>
-                                                    Login Name
-                                                </th>
-
-                                                <th>
-                                                    Role Name
-                                                </th>
-
-                                                <th>
-                                                    Contact Person Name
-                                                </th>
-
-                                                <th>
-                                                    Contact Person Mobile No.
-                                                </th>
-
-                                                <th>
-                                                    Email ID
-                                                </th>
-
-                                                <th>
-                                                    Login Time
-                                                </th>
-
-                                                <th>
-                                                    Status
-                                                </th>
-
-                                                <th class="text-center">
-                                                    Action
-                                                </th>
-
-                                            </tr>
-
-                                        </thead>
-
-
-                                        <!-- TABLE BODY -->
-                                        <tbody>
-
-
-                                            <!-- No Data -->
-                                            <tr
-                                                *ngIf="detailsData.length === 0 && !loading">
-
-                                                <td
-                                                    class="text-center fw-bold text-muted py-1"
-                                                    colspan="10">
-
-                                                    NO DATA FOUND
-
-                                                </td>
-
-                                            </tr>
-
-
-                                            <!-- User Records -->
-                                            <tr
-                                                *ngFor="let login of detailsData; let i = index">
-
-
-                                                <!-- Login ID -->
-                                                <td style="padding-left: 15px;">
-
-                                                    {{ login.param1 || 'NA' }}
-
-                                                </td>
-
-
-                                                <!-- Login Name -->
-                                                <td>
-
-                                                    {{ login.param4 || 'NA' }}
-
-                                                </td>
-
-
-                                                <!-- Role Name -->
-                                                <td>
-
-                                                    {{ login.param5 || 'NA' }}
-
-                                                </td>
-
-
-                                                <!-- Contact Person Name -->
-                                                <td>
-
-                                                    {{ login.param6 || 'NA' }}
-
-                                                </td>
-
-
-                                                <!-- Contact Person Mobile No. -->
-                                                <td>
-
-                                                    {{ login.param7 || 'NA' }}
-
-                                                </td>
-
-
-                                                <!-- Email ID -->
-                                                <td>
-
-                                                    {{ login.param8 || 'NA' }}
-
-                                                </td>
-
-
-                                                <!-- Login Time -->
-                                                <td>
-
-                                                    {{ login.param9 || 'NA' }}
-
-                                                </td>
-
-
-                                                <!-- Status -->
-                                                <td>
-
-                                                    <span
-                                                        [ngClass]="login.param10 ? 'bg-success text-white' : 'bg-danger text-white'"
-                                                        class="px-2 py-1 rounded">
-
-                                                        {{ login.param10 || 'NA' }}
-
-                                                    </span>
-
-                                                </td>
-
-
-                                                <!-- Actions -->
-<td class="text-center">
-
-    <button
-        type="button"
-        class="btn btn-sm btn-primary"
-        title="Update Login Status"
-        (click)="openUpdateLoginStatusModal(login)">
-
-        <i class="fa fa-cog me-1"></i>
-        Action
-
-    </button>
-
-</td>
-
-                                         
-
-                                            </tr>
-
-                                        </tbody>
-
-                                    </table>
-    <ngb-pagination
-        *ngIf="totalCount > pageSize"
-        [collectionSize]="totalCount"
-        [(page)]="currentPage"
-        [pageSize]="pageSize"
-        (pageChange)="onPageChange($event)"
-        [maxSize]="5"
-        [rotate]="true"
-        [ellipses]="false"
-        [boundaryLinks]="true"
-        size="sm"
-        class="d-flex justify-content-end mt-2 mb-1">
-    </ngb-pagination>
+                                    <app-data-table
+                                        [columns]="tableColumns"
+                                        [rows]="detailsData"
+                                        [loading]="loading"
+                                        [bodyTemplate]="loginRows"
+                                        tableClass="table table-striped app-table mb-1"
+                                        tableId="devicetable"
+                                        tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
+                                        emptyMessage="NO DATA FOUND">
+                                    </app-data-table>
+                                    <ng-template #loginRows let-rows>
+                                        <tr *ngIf="rows.length === 0">
+                                            <td class="text-center fw-bold text-muted py-1" colspan="9">NO DATA FOUND</td>
+                                        </tr>
+                                        <tr *ngFor="let login of rows">
+                                            <td style="padding-left: 15px;">{{ login.param1 || 'NA' }}</td>
+                                            <td>{{ login.param4 || 'NA' }}</td>
+                                            <td>{{ login.param5 || 'NA' }}</td>
+                                            <td>{{ login.param6 || 'NA' }}</td>
+                                            <td>{{ login.param7 || 'NA' }}</td>
+                                            <td>{{ login.param8 || 'NA' }}</td>
+                                            <td>{{ login.param9 || 'NA' }}</td>
+                                            <td>
+                                                <span [ngClass]="login.param10 ? 'bg-success text-white' : 'bg-danger text-white'"
+                                                    class="px-2 py-1 rounded">
+                                                    {{ login.param10 || 'NA' }}
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm btn-primary"
+                                                    title="Update Login Status" (click)="openUpdateLoginStatusModal(login)">
+                                                    <i class="fa fa-cog me-1"></i>Action
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                    <div class="float-end">
+                                        <app-pagination
+                                            [totalCount]="totalCount"
+                                            [page]="currentPage"
+                                            [pageSize]="pageSize"
+                                            [disabled]="loading"
+                                            (pageChange)="onPageChange($event)">
+                                        </app-pagination>
+                                    </div>
 
            
                                 </div>

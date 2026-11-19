@@ -7,8 +7,10 @@ import { LoadingComponent } from '../../../shared/components/loading/loading.com
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { ActiveUsersReq, CommonDetailsReq, LoginStatusReq } from '../../../core/model/request.model';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { DashboardService } from '../../../core/services/dashboard.service';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 
 export interface RoleWidget {
@@ -20,7 +22,7 @@ export interface RoleWidget {
 @Component({
   selector: 'app-login-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule],
+  imports: [CommonModule, FormsModule, RouterModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
   templateUrl: './login-dashboard.component.html',
   styleUrl: './login-dashboard.component.scss'
 })
@@ -40,6 +42,17 @@ export class LoginDashboardComponent implements OnInit, AfterViewInit {
   @ViewChild('roleScroll', { static: false }) roleScrollRef!: ElementRef<HTMLElement>;
   loading: boolean = false;
   detailsData: any[] = [];
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { header: '#', key: 'param1', width: '30px' },
+    { header: 'Login Name', key: 'param4' },
+    { header: 'Role Name', key: 'param5' },
+    { header: 'Contact Person Name', key: 'param6' },
+    { header: 'Contact Person Mobile No.', key: 'param7' },
+    { header: 'Email ID', key: 'param8' },
+    { header: 'Login Time', key: 'param9' },
+    { header: 'Status', key: 'param10' },
+    { header: 'Action' }
+  ];
   isExporting: boolean = false;
   selectedDownloadType: any = null;
   userDetails: any[] = [];
@@ -306,23 +319,28 @@ getActiveSessionCountDetails() {
     el.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   }
   onPageSizeChange(event: any) {
-    const size = Number(event.target.value);
+    const size = Number(event?.target?.value ?? event);
     console.log('Selected page size:', size);
+    this.pageSize = size;
+    this.currentPage = 1;
     this.loginStatusDetailsReq.param2 = '1';
-    this.loginStatusDetailsReq.param3 = Number(size);
+    this.loginStatusDetailsReq.param3 = size;
     this.getDetails('pagesize');
   }
   onPageChange(page: number) {
+    this.currentPage = page;
     this.loginStatusDetailsReq.param2 = page.toString();
     this.getDetails('pageChange');
   }
   getDetails(type: string) {
     if(type === 'reload') {
+      this.currentPage = 1;
       this.loginStatusDetailsReq.param1 = '';
       this.loginStatusDetailsReq.param2 = '1';
       this.loginStatusDetailsReq.param3 = this.pageSize.toString();
     } 
     if(type === 'search') {
+      this.currentPage = 1;
       this.loginStatusDetailsReq.param2 = '1';
       this.loginStatusDetailsReq.param3 = this.pageSize.toString();
     }
@@ -333,6 +351,7 @@ getActiveSessionCountDetails() {
           this.detailsData = response.entity.listData;
           this.totalCount = response.entity.param1;
           this.pageCount = this.detailsData.length;
+          this.currentPage = Number(this.loginStatusDetailsReq.param2) || 1;
           this.updatePageSizeOptions();
           // compute summary widget values
           this.computeSummaryWidgets(response.entity);

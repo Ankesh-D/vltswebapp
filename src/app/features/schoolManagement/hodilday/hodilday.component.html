@@ -33,123 +33,109 @@ single card, sticky title bar with Details <-> Form toggle.
       <div class="row">
         <!-- ===== LEFT : Search + Holiday List Grid ===== -->
         <div class="col-md-8">
-          <form autocomplete="off" class="mb-2">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-              <div class="d-flex align-items-center flex-wrap">
-                <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Search :</label>
-                <div class="input-group input-group-sm">
-                  <input type="search" class="form-control shadow-none" placeholder="Holiday name / code..."
-                    [(ngModel)]="filter.searchText" (keyup.enter)="onSearch()" name="searchby" autocomplete="off"
-                    style="font-size: 11px; width: 200px;">
-                  <div class="input-group-append">
-                    <button type="button" class="btn btn-primary search-btn" (click)="onSearch()">
-                      <i class="fa fa-search" style="font-size: 11px;"></i>
-                    </button>
-                  </div>
-                </div>
-                <button type="button" (click)="resetFilters()" class="btn btn-outline-success btn-sm ms-2"
-                  style="font-size: 11px;" title="Reload">
-                  <i class="fa fa-refresh me-1" [class.fa-spin]="loading"></i>
-                  {{ loading ? 'Reloading...' : 'Reset' }}
+          <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Holiday name / code..."
+            [searchText]="filter.searchText" (searchTextChange)="filter.searchText = $event" (search)="onSearch()"
+            (reload)="resetFilters()" [loading]="loading" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+            [displayedCount]="holidayList.length" [totalRecords]="totalCount" [showFilters]="true"
+            [showExcel]="true" [showPdf]="true" pageSizeLabel="Show Rows" totalLabel="Total Records"
+            countSeparator="of" (pageSizeChange)="onPageSizeChange($event)"
+            (excelExport)="exportExcel()" (pdfExport)="exportPdf()">
+            <div toolbarFilters class="d-flex flex-wrap align-items-center">
+              <ng-select class="me-2 mb-1" style="width: 160px;" [items]="holidayTypeOptions" bindLabel="label"
+                bindValue="value" placeholder="Holiday Type" [(ngModel)]="filter.holidayType"
+                [ngModelOptions]="{standalone: true}" (change)="onSearch()"></ng-select>
+              <ng-select class="me-2 mb-1" style="width: 160px;" [items]="schoolList" bindLabel="name"
+                bindValue="id" placeholder="School" [(ngModel)]="filter.schoolId"
+                [ngModelOptions]="{standalone: true}" (change)="onSearch()"></ng-select>
+              <ng-select class="me-2 mb-1" style="width: 140px;" [items]="holidayStatusOptions" bindLabel="label"
+                bindValue="value" placeholder="Status" [(ngModel)]="filter.status"
+                [ngModelOptions]="{standalone: true}" (change)="onSearch()"></ng-select>
+            </div>
+            <div toolbarBeforePageSize class="d-flex align-items-center flex-wrap">
+              <button type="button" class="btn btn-outline-secondary btn-sm me-1" style="font-size: 11px;"
+                (click)="printGrid()"><i class="fa fa-print me-1"></i>Print</button>
+              <div class="me-1 position-relative">
+                <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size: 11px;"
+                  (click)="toggleColumnChooser()">
+                  <i class="fa fa-columns me-1"></i>Columns
                 </button>
-              </div>
-              <div class="d-flex align-items-center flex-wrap mt-1 mt-md-0">
-                <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
-                  [showPageSize]="false" [showTotal]="false" (excelExport)="exportExcel()"></app-common-data-toolbar>
-                <button type="button" class="btn btn-outline-danger btn-sm me-1" style="font-size: 11px;" (click)="exportPdf()"><i class="fa fa-file-pdf-o me-1"></i>PDF</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm me-1" style="font-size: 11px;" (click)="printGrid()"><i class="fa fa-print me-1"></i>Print</button>
-                <div class="me-1 position-relative">
-                  <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size: 11px;" (click)="toggleColumnChooser()">
-                    <i class="fa fa-columns me-1"></i>Columns
-                  </button>
-                  <div class="dropdown-menu p-2 column-chooser-menu" [class.show]="columnChooserOpen">
-                    @for (col of visibleColumns | keyvalue; track col) {
-                      <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" [id]="'col_' + col.key" [checked]="col.value"
-                          (change)="toggleColumnVisibility(col.key)" />
-                        <label class="custom-control-label" [for]="'col_' + col.key" style="font-size: 11px;">{{ col.key }}</label>
-                      </div>
-                    }
-                  </div>
+                <div class="dropdown-menu p-2 column-chooser-menu" [class.show]="columnChooserOpen">
+                  @for (col of visibleColumns | keyvalue; track col) {
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" [id]="'col_' + col.key" [checked]="col.value"
+                        (change)="toggleColumnVisibility(col.key)" />
+                      <label class="custom-control-label" [for]="'col_' + col.key" style="font-size: 11px;">{{ col.key }}</label>
+                    </div>
+                  }
                 </div>
               </div>
             </div>
-            <div class="d-flex flex-wrap mt-2">
-              <div class="me-2 mb-1" style="width: 160px;">
-                <ng-select [items]="holidayTypeOptions" bindLabel="label" bindValue="value" placeholder="Holiday Type"
-                [(ngModel)]="filter.holidayType" [ngModelOptions]="{standalone: true}" (change)="onSearch()"></ng-select>
-              </div>
-              <div class="me-2 mb-1" style="width: 160px;">
-                <ng-select [items]="schoolList" bindLabel="name" bindValue="id" placeholder="School"
-                [(ngModel)]="filter.schoolId" [ngModelOptions]="{standalone: true}" (change)="onSearch()"></ng-select>
-              </div>
-              <div class="me-2 mb-1" style="width: 140px;">
-                <ng-select [items]="holidayStatusOptions" bindLabel="label" bindValue="value" placeholder="Status"
-                [(ngModel)]="filter.status" [ngModelOptions]="{standalone: true}" (change)="onSearch()"></ng-select>
-              </div>
-            </div>
-          </form>
-          <app-common-table [columns]="tableColumns" [rows]="holidayTableRows"
-            [bodyTemplate]="holidayTableBody" [sortKey]="sortColumn"
+          </app-common-data-toolbar>
+          <app-data-table [columns]="tableColumns" [rows]="holidayList" [loading]="loading"
+            [headerTemplate]="holidayTableHeader" [bodyTemplate]="holidayTableBody" [sortKey]="sortColumn"
             [reverse]="sortDirection === 'desc'" tableClass="table table-striped app-table table-sm table-bordered mb-1"
-            tableId="holidayTable" (sortChange)="sortBy($event)">
-          </app-common-table>
+            tableId="holidayTable" (sort)="sortBy($event)">
+          </app-data-table>
+          <ng-template #holidayTableHeader>
+            <tr>
+              <th style="width: 30px;">#</th>
+              @if (visibleColumns['holidayCode']) {
+                <th (click)="sortBy('holidayCode')" style="cursor:pointer;">Code <i class="fa" [ngClass]="sortColumn === 'holidayCode' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i></th>
+              }
+              @if (visibleColumns['holidayName']) {
+                <th (click)="sortBy('holidayName')" style="cursor:pointer;">Holiday Name <i class="fa" [ngClass]="sortColumn === 'holidayName' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i></th>
+              }
+              @if (visibleColumns['holidayType']) {
+                <th (click)="sortBy('holidayType')" style="cursor:pointer;">Type <i class="fa" [ngClass]="sortColumn === 'holidayType' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i></th>
+              }
+              @if (visibleColumns['holidayDate']) {
+                <th (click)="sortBy('holidayDate')" style="cursor:pointer;">Date <i class="fa" [ngClass]="sortColumn === 'holidayDate' ? (sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i></th>
+              }
+              @if (visibleColumns['applicableFrom']) { <th>From</th> }
+              @if (visibleColumns['applicableTo']) { <th>To</th> }
+              @if (visibleColumns['academicSession']) { <th>Academic Session</th> }
+              @if (visibleColumns['applicableSchools']) { <th>Applicable Schools</th> }
+              @if (visibleColumns['status']) { <th>Status</th> }
+              <th style="width: 150px;">Action</th>
+            </tr>
+          </ng-template>
           <ng-template #holidayTableBody let-rows>
-            @if (loading) {
-              @for (row of rows; track $index) {
-                <tr><td [attr.colspan]="11"><div class="skeleton-row"></div></td></tr>
-              }
-            } @else if (!holidayList.length) {
-              <tr><td colspan="11" class="text-center">No Records Found</td></tr>
-            } @else {
-              @for (row of holidayList; track trackByHolidayId(i, row); let i = $index) {
-                <tr>
-                  <td>{{ (pageSize * (currentPage - 1)) + i + 1 }}</td>
-                  @if (visibleColumns['holidayCode']) { <td>{{ row.holidayCode }}</td> }
-                  @if (visibleColumns['holidayName']) { <td>{{ row.holidayName }}</td> }
-                  @if (visibleColumns['holidayType']) {
-                    <td><span class="badge" [style.backgroundColor]="colorForType(row.holidayType)" style="color:#fff">{{ row.holidayType }}</span></td>
-                  }
-                  @if (visibleColumns['holidayDate']) { <td>{{ row.holidayDate | date:'dd MMM yyyy' }}</td> }
-                  @if (visibleColumns['applicableFrom']) { <td>{{ row.applicableFrom | date:'dd MMM yyyy' }}</td> }
-                  @if (visibleColumns['applicableTo']) { <td>{{ row.applicableTo | date:'dd MMM yyyy' }}</td> }
-                  @if (visibleColumns['academicSession']) { <td>{{ getAcademicSessionName(row.academicSessionId) }}</td> }
-                  @if (visibleColumns['applicableSchools']) { <td>{{ getApplicableSchoolNames(row) }}</td> }
-                  @if (visibleColumns['status']) {
-                    <td>
-                      <span class="badge" [class.badge-success]="row.status === holidayStatusEnum.Active"
-                        [class.badge-secondary]="row.status !== holidayStatusEnum.Active">{{ row.status }}</span>
-                    </td>
-                  }
-                  <td class="text-center text-nowrap">
-                    <a class="btn btn-primary btn-sm" title="View" (click)="viewHoliday(row)"><i class="fa fa-eye"></i></a>
-                    <a class="btn btn-primary btn-sm" title="Edit" (click)="editHoliday(row)"><i class="fa fa-edit"></i></a>
-                    <a class="btn btn-secondary btn-sm" title="Copy" (click)="copyHoliday(row)"><i class="fa fa-copy"></i></a>
-                    <a class="btn btn-secondary btn-sm" [title]="row.status === holidayStatusEnum.Active ? 'Deactivate' : 'Activate'" (click)="toggleStatus(row)">
-                      <i class="fa" [class.fa-toggle-on]="row.status === holidayStatusEnum.Active" [class.fa-toggle-off]="row.status !== holidayStatusEnum.Active"></i>
-                    </a>
-                    <a class="btn btn-danger btn-sm" title="Delete" (click)="openDeleteModal(row)"><i class="fa fa-trash"></i></a>
+            @if (!rows.length) {
+              <tr><td [attr.colspan]="visibleHolidayColumnCount" class="text-center">No Records Found</td></tr>
+            }
+            @for (row of rows; track trackByHolidayId($index, row); let i = $index) {
+              <tr>
+                <td>{{ (pageSize * (currentPage - 1)) + i + 1 }}</td>
+                @if (visibleColumns['holidayCode']) { <td>{{ row.holidayCode }}</td> }
+                @if (visibleColumns['holidayName']) { <td>{{ row.holidayName }}</td> }
+                @if (visibleColumns['holidayType']) {
+                  <td><span class="badge" [style.backgroundColor]="colorForType(row.holidayType)" style="color:#fff">{{ row.holidayType }}</span></td>
+                }
+                @if (visibleColumns['holidayDate']) { <td>{{ row.holidayDate | date:'dd MMM yyyy' }}</td> }
+                @if (visibleColumns['applicableFrom']) { <td>{{ row.applicableFrom | date:'dd MMM yyyy' }}</td> }
+                @if (visibleColumns['applicableTo']) { <td>{{ row.applicableTo | date:'dd MMM yyyy' }}</td> }
+                @if (visibleColumns['academicSession']) { <td>{{ getAcademicSessionName(row.academicSessionId) }}</td> }
+                @if (visibleColumns['applicableSchools']) { <td>{{ getApplicableSchoolNames(row) }}</td> }
+                @if (visibleColumns['status']) {
+                  <td>
+                    <span class="badge" [class.badge-success]="row.status === holidayStatusEnum.Active"
+                      [class.badge-secondary]="row.status !== holidayStatusEnum.Active">{{ row.status }}</span>
                   </td>
-                </tr>
-              }
+                }
+                <td class="text-center text-nowrap">
+                  <a class="btn btn-primary btn-sm" title="View" (click)="viewHoliday(row)"><i class="fa fa-eye"></i></a>
+                  <a class="btn btn-primary btn-sm" title="Edit" (click)="editHoliday(row)"><i class="fa fa-edit"></i></a>
+                  <a class="btn btn-secondary btn-sm" title="Copy" (click)="copyHoliday(row)"><i class="fa fa-copy"></i></a>
+                  <a class="btn btn-secondary btn-sm" [title]="row.status === holidayStatusEnum.Active ? 'Deactivate' : 'Activate'" (click)="toggleStatus(row)">
+                    <i class="fa" [class.fa-toggle-on]="row.status === holidayStatusEnum.Active" [class.fa-toggle-off]="row.status !== holidayStatusEnum.Active"></i>
+                  </a>
+                  <a class="btn btn-danger btn-sm" title="Delete" (click)="openDeleteModal(row)"><i class="fa fa-trash"></i></a>
+                </td>
+              </tr>
             }
           </ng-template>
-          <div class="d-flex justify-content-between align-items-center flex-wrap">
-            <div class="d-flex align-items-center">
-              <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Show Rows :</label>
-              <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()" name="pageSize"
-                class="form-control form-control-sm" style="font-size: 11px; width: auto;">
-                @for (size of pageSizeOptions; track size) {
-                  <option [ngValue]="size">{{ size }}</option>
-                }
-              </select>
-              <span class="fw-bold ms-3" style="font-size: 11px;">
-                Total Records : <span class="text-primary">{{ holidayList.length }} of {{ totalCount }}</span>
-              </span>
-            </div>
-            <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage" [pageSize]="pageSize"
-            (pageChange)="onPageChange($event)" [maxSize]="5" [boundaryLinks]="true" class="mb-0"></ngb-pagination>
-          </div>
+          <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+            (pageChange)="onPageChange($event)"></app-pagination>
         </div>
         <!-- ===== RIGHT : Summary + Calendar Preview ===== -->
         <div class="col-md-4">

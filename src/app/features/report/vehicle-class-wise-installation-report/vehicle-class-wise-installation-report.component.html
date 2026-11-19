@@ -30,125 +30,33 @@
 
             </div>
 
-            <!-- TOP CONTROLS -->
-            <form
-              autocomplete="off"
-              class="top-controls-row"
-              >
-
-              <!-- LEFT CONTROLS -->
-              <div class="left-controls">
-
-                <span class="search-label" class="total-records-text">
-                  Search :
-                </span>
-
-                <div class="search-box">
-
-                  <input
-                    type="search"
-                    class="search-input inner"
-                    placeholder="Search..."
-                    maxlength="50"
-                    [(ngModel)]="searchBy"
-                    name="searchBy"
-                    (keyup.enter)="searchReport()"
-                    />
-
-                  <button
-                    type="button"
-                    class="search-inner-btn"
-                    (click)="searchReport()"
-                    >
-                    <i class="fa fa-search"></i>
-                  </button>
-
-                </div>
-
-                <button
-                  type="button"
-                  class="reload-btn"
-                  (click)="resetFilters()"
-                  >
-                  Reload
-                </button>
-
+            <app-common-data-toolbar
+              [searchText]="searchBy"
+              searchPlaceholder="Search..."
+              (searchTextChange)="searchBy=$event"
+              (search)="searchReport()"
+              (reload)="resetFilters()"
+              [loading]="loading"
+              [showFilters]="true"
+              [pageSize]="itemPerPage"
+              [pageSizeOptions]="pageSizeOptions"
+              [displayedCount]="reportList.length"
+              [totalRecords]="totalRecords"
+              (pageSizeChange)="onPageSizeChange($event)"
+              (excelExport)="downloadReport()"
+              pageSizeLabel="Show Rows"
+              totalLabel="Total Records">
+              <div toolbarFilters class="d-flex align-items-center gap-2 flex-wrap">
+                <label class="mb-0">Vehicle Class:</label>
+                <select [(ngModel)]="selectedVehicleClass" name="selectedVehicleClass"
+                  (change)="searchReport()">
+                  <option value="">All</option>
+                  @for (item of vehicleClassList; track item) {
+                    <option [value]="item.param1">{{ item.param2 }}</option>
+                  }
+                </select>
               </div>
-
-              <!-- RIGHT CONTROLS -->
-              <div class="right-controls">
-                <!-- =============================
-                ADD THIS BEFORE DOWNLOAD
-                ============================= -->
-
-                <div class="control-item">
-
-                  <label class="total-records-text">
-                    Vehicle Class :
-                  </label>
-
-                  <select
-                    [(ngModel)]="selectedVehicleClass"
-                    name="selectedVehicleClass"
-                    (change)="searchReport()"
-                    >
-
-                    <option value="">
-                      All
-                    </option>
-
-                    @for (
-                      item of vehicleClassList
-                      ; track
-                      item) {
-                      <option
-                        [value]="item.param1"
-                        >
-                        {{ item.param2 }}
-                      </option>
-                    }
-
-                  </select>
-
-                </div>
-                <!-- DOWNLOAD -->
-                <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
-                  [showPageSize]="false" [showTotal]="false" (excelExport)="downloadReport()">
-                </app-common-data-toolbar>
-
-                <!-- SHOW ROWS -->
-                <div class="control-item">
-
-                  <label class="total-records-text" >
-                    Show Rows :
-                  </label>
-
-                  <select
-                    [(ngModel)]="itemPerPage"
-                    name="itemPerPage"
-                    (change)="getReport()"
-                    >
-
-                    <option [value]="10">10</option>
-                    <option [value]="20">20</option>
-                    <option [value]="50">50</option>
-                    <option [value]="100">100</option>
-
-                  </select>
-
-                </div>
-
-                <!-- TOTAL RECORD -->
-                <div class="total-records-text">
-
-                  Total Records :
-                  {{ totalRecords }}
-
-                </div>
-
-              </div>
-
-            </form>
+            </app-common-data-toolbar>
 
             <!-- TABLE -->
             <div class="col-sm-12">
@@ -199,9 +107,9 @@
                 </tr>
               }
 </ng-template>
-<app-common-table [columns]="tableColumns" [rows]="reportList" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table-striped table app-table" headerClass="device-thead" tableStyle="border-top: 1px solid black;
+<app-data-table [columns]="tableColumns" [rows]="reportList" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table-striped table app-table" headerClass="device-thead" tableStyle="border-top: 1px solid black;
                   border-bottom: 1px solid black;
-                  margin-left: 0px;"></app-common-table>
+                  margin-left: 0px;"></app-data-table>
 
         </div>
 
@@ -210,39 +118,9 @@
     </div>
 
     <!-- PAGINATION -->
-    @if (totalRecords > 0) {
-      <div
-        class="pagination-wrapper"
-        >
-        <ul class="pagination">
-          <!-- PREV -->
-          <li
-            [class.disabled]="pageNo === 1"
-            >
-            <button
-              (click)="changePage(pageNo - 1)"
-              [disabled]="pageNo === 1"
-              >
-              Prev
-            </button>
-          </li>
-          <!-- PAGE NUMBER -->
-          <li class="active">
-            <button>
-              {{ pageNo }}
-            </button>
-          </li>
-          <!-- NEXT -->
-          <li>
-            <button
-              (click)="changePage(pageNo + 1)"
-              >
-              Next
-            </button>
-          </li>
-        </ul>
-      </div>
-    }
+    <app-pagination [totalCount]="totalRecords" [page]="pageNo" [pageSize]="itemPerPage"
+      [disabled]="loading" (pageChange)="changePage($event)">
+    </app-pagination>
 
   </div>
 

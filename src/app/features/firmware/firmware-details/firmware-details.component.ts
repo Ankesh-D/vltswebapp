@@ -1,71 +1,63 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DeviceService, FirmwareDetailsReq, FirmwareDetailsResp } from '../../../core/services/device.service';
 import { ToastService } from '../../../core/services/toast.service';
-
-import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import moment from 'moment';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent, PageSizeOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { CommonPaginationComponent } from '../../../shared/components/common-pagination/common-pagination.component';
 
 @Component({
     selector: 'app-firmware-details',
-    imports: [FormsModule, RouterModule, CommonTableComponent],
+    imports: [RouterModule, CommonDataToolbarComponent, DataTableComponent, CommonPaginationComponent],
     templateUrl: './firmware-details.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './firmware-details.component.scss'
 })
 export class FirmwareDetailsComponent implements OnInit {
   public detailsRequest: FirmwareDetailsReq = new FirmwareDetailsReq();
-  public detailsData: FirmwareDetailsResp[]=[];
+  public detailsData: FirmwareDetailsResp[] = [];
 
-  pageSizeOptions: any[]=[10, 20, 50, 100, 500];
-  isExporting: boolean = false;
-  selectedDownloadType: any = '';
+  pageSizeOptions: PageSizeOption[] = [10, 20, 50, 100, 500];
   totalCount: number = 0;
   pageCount: number = 0;
   totalPages: number = 0;
   pageSize: number = 10;
-  loading: boolean= false;
+  loading = false;
   pageNo: number = 1;
   roleId: any;
-  readonly tableColumns: CommonTableColumn<FirmwareDetailsResp>[] = [
-    { key: 'param1', label: '#' },
-    { key: 'param9', label: 'Vendor Name', visible: () => this.roleId === '10' || this.roleId === '17' },
-    { key: 'param11', label: 'Device Model' },
-    { key: 'param3', label: 'Firmware Name' },
-    { key: 'param5', label: 'Version', cellClass: 'text-end' },
-    { key: 'param6', label: 'Release Date', cellClass: 'text-center' },
-    { key: 'download', label: 'Download File', className: 'text-center', width: '250px' }
+  readonly tableColumns: DataTableColumn<FirmwareDetailsResp>[] = [
+    { key: 'param1', header: '#', width: '50px' },
+    { key: 'param9', header: 'Vendor Name', visible: () => this.roleId === '10' || this.roleId === '17' },
+    { key: 'param11', header: 'Device Model' },
+    { key: 'param3', header: 'Firmware Name' },
+    { key: 'param5', header: 'Version', className: 'text-end' },
+    { key: 'param6', header: 'Release Date', className: 'text-center' },
+    { key: 'download', header: 'Download File', className: 'text-center', width: '250px' }
   ];
   constructor(private deviceService: DeviceService, private toastService: ToastService) {
     this.toastService.pageName = 'Firmware Details';
   }
   ngOnInit(): void {
     this.roleId = sessionStorage.getItem('roleid');
-    console.log(this.roleId)
-    this.getDetails('init');  
+    this.getDetails();
   }
-  getDetails(tooluse?: any) {
-    if(tooluse=='init' || tooluse=='search') {
-      if(tooluse=='init') {
-        this.detailsRequest.param1 = "";
-      }
-      this.detailsRequest.param2 = 1;
-      this.detailsRequest.param3 = 10;
-    }
-    if(tooluse=='pagesize') {
 
-    }
+  getDetails(): void {
+    this.detailsRequest.param2 = this.pageNo;
+    this.detailsRequest.param3 = this.pageSize;
+    this.loading = true;
     this.deviceService.getFirmwareDetails(this.detailsRequest).subscribe({
-      
       next: (res: any) => {
         if(res.statuscode==200) {
-          this.detailsData = res?.entity?.listData || res?.entity || [];
-          this.detailsData.map((x)=> {x.param6 = moment(x.param6).format('DD-MMM-YYYY')});
+          const rows = res?.entity?.listData || res?.entity || [];
+          this.detailsData = Array.isArray(rows) ? rows : [];
+          this.detailsData.forEach(row => {
+            row.param6 = row.param6 ? moment(row.param6).format('DD-MMM-YYYY') : '';
+          });
           const total = Number(res?.entity?.param1 || 0);
           this.totalCount = total;
           this.pageCount = this.detailsData.length;
-          // ✅ pages
           this.totalPages = Math.ceil(total / this.pageSize);
         } else {
           this.toastService.show('No data found', 'error');
@@ -74,24 +66,45 @@ export class FirmwareDetailsComponent implements OnInit {
           this.pageCount = 0;
           this.totalPages = 0;    
         }
-    },
-    error: (err) => {
         this.loading = false;
+      },
+      error: (err) => {
+        this.loading = false;
+        this.detailsData = [];
+        this.pageCount = 0;
         console.error(err);
         this.toastService.show('Something went wrong', 'error');
       }
     });
   }
+
+  getSearchDetails(): void {
+    this.pageNo = 1;
+    this.getDetails();
+  }
+
+  reloadData(): void {
+    this.detailsRequest.param1 = '';
+    this.pageNo = 1;
+    this.getDetails();
+  }
+
+  onPageSizeChange(size: PageSizeOption): void {
+    const parsedSize = Number(size);
+    if (!Number.isFinite(parsedSize) || parsedSize < 1) return;
+    this.pageSize = parsedSize;
+    this.pageNo = 1;
+    this.getDetails();
+  }
+
   changePage(p: number) {
     if (p < 1 || p > this.totalPages) return;
     this.pageNo = p;
 
-    this.getDetails('pagechage'); // 🔥 reload API
+    this.getDetails();
   }
-  onDownloadChange() {
 
-  }
   getFileName(url: string): string {
-  return url.substring(url.lastIndexOf('/') + 1);
-}
+    return url.substring(url.lastIndexOf('/') + 1);
+  }
 }

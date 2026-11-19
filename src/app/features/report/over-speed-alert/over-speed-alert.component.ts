@@ -5,17 +5,32 @@ import { ReportService, OverspeedReportResponse } from '../../../core/services/r
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
 import { EncryptionService } from '../../../core/services/encryption.service';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 declare var $: any;
 
 @Component({
   selector: 'app-over-speed-alert',
   standalone: true,
- imports: [CommonModule, FormsModule],
+ imports: [CommonModule, FormsModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
   templateUrl: './over-speed-alert.component.html',
   styleUrl: './over-speed-alert.component.scss'
 })
 export class OverSpeedAlertComponent implements OnInit, AfterViewInit {
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { key: 'param1', header: '#', width: '40px' },
+    { key: 'param28', header: 'Vehicle No.', sortKey: 'param28', sortable: true },
+    { key: 'param2', headers: ['IMEI No.', 'Serial No.'], sortKey: 'param2', sortable: true },
+    { key: 'param25', header: 'Customer', sortKey: 'param25', sortable: true },
+    { key: 'param26', header: 'RTO', sortKey: 'param26', sortable: true },
+    { key: 'param3', header: 'Polling Time', sortKey: 'param3', sortable: true },
+    { key: 'param9', headers: ['Speed(Km/hrs)', 'Ignition'], sortKey: 'param9', sortable: true },
+    { key: 'param20', headers: ['Vehicle Status', 'GPS Status'], sortKey: 'param20', sortable: true },
+    { key: 'param5', headers: ['Latitude', 'Longitude'], sortKey: 'param5', sortable: true }
+  ];
+
   // Filter selection
   filterBy: string = 'Vendor'; // 'Vendor' or 'RTO'
   selectedVendorId: string = '';
@@ -424,10 +439,8 @@ export class OverSpeedAlertComponent implements OnInit, AfterViewInit {
     this.getOverspeedingAlertDetails(page);
   }
   
-  onPageSizeChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    const newSize = target.value;
-    this.pageSize = newSize === 'All' ? this.totalCount : parseInt(newSize);
+  onToolbarPageSizeChange(size: number | string): void {
+    this.pageSize = size === 'All' ? this.totalCount : Number(size);
     this.currentPage = 1;
     this.getOverspeedingAlertDetails(1);
   }

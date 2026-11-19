@@ -1,10 +1,12 @@
-import { Component, importProvidersFrom, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common'; 
  import { DashboardService } from '../../../core/services/dashboard.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { OperationService } from '../../../core/services/operation.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 export class RawDataRequest {
   param1: string = ''; // IMEI
   param2: string = ''; // Page number
@@ -15,7 +17,7 @@ export class RawDataRequest {
 }
 @Component({
     selector: 'app-new-push-cammand',
-    imports: [FormsModule, CommonModule, NgbPaginationModule],
+    imports: [FormsModule, CommonModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './new-push-cammand.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './new-push-cammand.component.scss'
@@ -23,6 +25,42 @@ export class RawDataRequest {
 export class NewPushCammandComponent{
   pageSize: any = 50;
   pageSizeOptions: number[] = [10, 20, 50, 100];
+  readonly resultColumns: DataTableColumn<any>[] = [
+    { header: '#', key: 'rowNumber', width: '50px' },
+    { header: 'IMEI', key: 'imei' },
+    { header: 'Command', key: 'command', cellClassName: 'text-success' },
+    {
+      header: 'Action',
+      className: 'text-center',
+      cellClassName: 'text-center',
+      actions: [
+        {
+          label: 'Resend Command',
+          icon: 'fa-refresh',
+          tone: 'primary',
+          run: row => this.resendCommand(row.imei)
+        },
+        {
+          label: row => this.loadingMap[row.rowNumber - 1] ? 'Loading...' : 'View Raw Data',
+          icon: 'fa-eye',
+          tone: 'success',
+          disabled: row => !!this.loadingMap[row.rowNumber - 1],
+          run: row => this.viewRawData(row.rowNumber - 1, row.imei)
+        }
+      ]
+    }
+  ];
+  readonly rawDataColumns: DataTableColumn<any>[] = [
+    { header: '#', key: 'param1' },
+    { header: 'Date Time', key: 'param3' },
+    {
+      header: 'Raw Packet',
+      key: 'param4',
+      cellStyle: { 'max-width': '400px', 'word-break': 'break-all' }
+    },
+    { header: 'IP', key: 'param5' },
+    { header: 'Port', key: 'param6' }
+  ];
    constructor(private dashboardservice: DashboardService,
     private toast: ToastService,
     private operationService: OperationService) {
@@ -251,9 +289,18 @@ resetForm() {
 
 }
 imeiNo: string = '';
+getSubmittedRows(): Array<{ rowNumber: number; imei: string; command: string }> {
+  return this.submittedImeis.map((imei, index) => ({
+    rowNumber: index + 1,
+    imei,
+    command: this.deviceCommand
+  }));
+}
+
 viewRawData(index: number, imei: string) {
   this.imeiNo = imei;
   this.loadingMap[index] = true;
+this.isRawLoading = true;
   const request: RawDataRequest = {
     param1: '',
     param2: this.pageNo ? this.pageNo.toString(): '1',
@@ -287,9 +334,11 @@ viewRawData(index: number, imei: string) {
       }
     },
     error: () => {
+      this.isRawLoading = false;
       this.toast.show('API Error', 'error');
     },
     complete: () => {
+      this.isRawLoading = false;
       this.loadingMap[index] = false;
     }
   });
@@ -318,15 +367,19 @@ reloadData() {
   this.pageSize = 20;
   this.viewRawData(0, this.submittedImeis[0]);
 }
-onPageSizeChange(event: any) {
-  this.pageSize = event.target.value;
-  this.reloadData();
+onPageSizeChange(size: number | string) {
+  this.pageSize = size === 'All' || Number(size) === this.totalCount
+    ? this.totalCount
+    : Number(size);
+  this.pageNo = 1;
+  this.getRawData();
 }
 onPageChange(page: number) {
   this.pageNo = page;
   this.getRawData();
 }
 getRawData() {
+  this.isRawLoading = true;
   const request: RawDataRequest = {
     param1: '',
     param2: this.pageNo ? this.pageNo.toString(): '1',
@@ -337,6 +390,7 @@ getRawData() {
   };
   this.operationService.getRawData(request).subscribe({
     next: (res: any) => {
+      this.isRawLoading = false;
 
       // ❌ NO DATA CASE
       if (res?.entity === 'No Data Found') {
@@ -359,6 +413,7 @@ getRawData() {
       }
     },
     error: () => {
+      this.isRawLoading = false;
       this.toast.show('API Error', 'error');
     },
     

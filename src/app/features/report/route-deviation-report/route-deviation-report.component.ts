@@ -19,31 +19,31 @@ import { LoaderService } from '../../../core/services/loader.service';
 import { RouteDeviationReportReq } from '../../../core/model/request.model';
 import { RouteDeviationReportResp } from '../../../core/model/response.model';
 import { RouteService } from '../../../core/services/route.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import * as L from 'leaflet';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 @Component({
     selector: 'app-route-deviation-report',
-    imports: [CommonModule, FormsModule, NgxDaterangepickerMd, NgSelectModule, TimepickerModule, NgbPaginationModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [CommonModule, FormsModule, NgxDaterangepickerMd, NgSelectModule, TimepickerModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './route-deviation-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './route-deviation-report.component.scss'
 })
 export class RouteDeviationReportComponent implements OnInit, AfterViewInit, OnDestroy {
-  readonly tableColumns: CommonTableColumn[] = [
-    { key: 'column1', label: '#' },
-    { key: 'column2', label: 'Vehicle No.' },
+  readonly tableColumns: DataTableColumn<RouteDeviationReportResp>[] = [
+    { key: 'column1', header: '#' },
+    { key: 'column2', header: 'Vehicle No.' },
     { key: 'column3', headers: ['IMEI No.', 'Serial No.'] },
     { key: 'column4', headers: ['Permit Holder', 'Mobile No.'] },
-    { key: 'column5', label: 'Route Name' },
-    { key: 'column6', label: 'Deviation Start Time' },
-    { key: 'column7', label: 'Deviation End Time' },
-    { key: 'column8', label: 'Duration' },
-    { key: 'column9', label: 'Status' },
-    { key: 'column10', label: 'Track' }
+    { key: 'column5', header: 'Route Name' },
+    { key: 'column6', header: 'Deviation Start Time' },
+    { key: 'column7', header: 'Deviation End Time' },
+    { key: 'column8', header: 'Duration' },
+    { key: 'column9', header: 'Status' },
+    { key: 'column10', header: 'Track' }
   ];
 
   today: Dayjs = dayjs();

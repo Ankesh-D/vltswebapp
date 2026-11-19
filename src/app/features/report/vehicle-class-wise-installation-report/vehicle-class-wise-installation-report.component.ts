@@ -5,13 +5,15 @@ import { VahanService } from '../../../core/services/vahan.service';
 import { ReportService } from './../../../core/services/report.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-vehicle-class-wise-installation-report',
     imports: [
     FormsModule,
-    CommonDataToolbarComponent, CommonTableComponent],
+    CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './vehicle-class-wise-installation-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./vehicle-class-wise-installation-report.component.scss']
@@ -37,6 +39,7 @@ downloadType: string = '';
 
   pageNo: number = 1;
   itemPerPage: number = 20;
+  readonly pageSizeOptions = [10, 20, 50, 100];
 
   totalRecords: number = 0;
   totalPages: number = 0;
@@ -166,6 +169,12 @@ getVehicleClassRoster(): void {
 
     this.getReport();
 
+  }
+
+  onPageSizeChange(size: number | string): void {
+    this.itemPerPage = size === 'All' ? this.totalRecords : Number(size);
+    this.pageNo = 1;
+    this.getReport();
   }
 
   resetFilters(): void {

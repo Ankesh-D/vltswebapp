@@ -11,11 +11,13 @@ import { ToastService } from '../../../core/services/toast.service';
 import dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 @Component({
     selector: 'app-alert-activity-report',
-    imports: [NgxDaterangepickerMd, FormsModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [NgxDaterangepickerMd, FormsModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './alert-activity-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./alert-activity-report.component.scss']
@@ -34,6 +36,7 @@ export class AlertActivityReportComponent implements OnInit, AfterViewInit {
 
 
   loading = false;
+  filtersExpanded = true;
   showSummary = false;
 deviceType: 'NEW' | 'OLD' = 'NEW'; // default NEW
   filterBy= '';
@@ -93,6 +96,33 @@ onDateRangeChange(e: any) {
   this.fromDate = this.formatDate(start);
   this.toDate = this.formatDate(end);
 }
+
+clearFilters(): void {
+  const today = dayjs();
+
+  this.filterBy = 'Vendor';
+  this.selectedVendor = '';
+  this.selectedRTO = '';
+  this.resetVehicleList();
+  this.selectedAlertType = '';
+  this.selectedDateFilter = '';
+  this.selectedDateRange = {
+    startDate: today.startOf('day'),
+    endDate: today.endOf('day')
+  };
+  this.fromDate = this.formatDate(today.toDate());
+  this.toDate = this.fromDate;
+  this.fromTime = '00:00';
+  this.toTime = '23:59';
+  this.searchText = '';
+  this.alertData = [];
+  this.showSummary = false;
+  this.page = 1;
+  this.totalPages = 0;
+  this.pageCount = 0;
+  this.totalCount = 0;
+}
+
   ngAfterViewInit() {
     
   }
@@ -115,26 +145,17 @@ onDateRangeChange(e: any) {
 
  onFilterByChange(type: 'Vendor' | 'RTO') {
   this.filterBy = type;
-
-  // 🔥 RESET ALL FIELDS
   this.selectedVendor = '';
   this.selectedRTO = '';
-  this.selectedVehicle = '';
+  this.resetVehicleList();
   this.selectedAlertType = '';
-
-  this.vehicleSearch = '';
-
-  this.fullVehicleList = [];
-  this.visibleVehicleList = [];
-
   this.alertData = [];
   this.showSummary = false;
+  this.page = 1;
+  this.totalPages = 0;
+  this.pageCount = 0;
+  this.totalCount = 0;
 
-  // OPTIONAL: reset date/time if needed
-  // this.fromDate = '';
-  // this.toDate = '';
-
-  // 🔄 LOAD NEW DATA
   if (type === 'Vendor') {
     this.loadVendorList();
   } else {
@@ -159,88 +180,76 @@ onDateRangeChange(e: any) {
       if (res.status) this.alertTypeList = res.entity;
     });
   }
-  onVehicleSearchChange() {
-
-  if (!this.vehicleSearch) {
-    // 🔥 input empty → reset everything
+  private resetVehicleList(): void {
+    this.vehicleRequestId++;
+    this.selectedVehicle = '';
     this.fullVehicleList = [];
     this.visibleVehicleList = [];
-    this.selectedVehicle = '';
+    this.vehicleLoading = false;
     this.isVehicleLoaded = false;
   }
 
-}
-onVendorChange() {
-  this.selectedVehicle = '';
-  this.vehicleSearch = '';
-  this.fullVehicleList = [];
-  this.visibleVehicleList = [];
-  this.isVehicleLoaded = false;
-}
-searchVehicle() {
-
-  if (!this.vehicleSearch) {
-    this.toast.show('Please enter vehicle number', 'error');
-    return;
-  }
-
-  if (!this.selectedVendor && !this.selectedRTO) {
-    this.toast.show('Please select vendor or RTO', 'error');
-    return;
-  }
-
-  const req = {
-    selectvendorid: this.selectedVendor || '',
-    selectroleid: '',
-    routeid: '',
-    poiid: '',
-    selectcustomerid: '',
-    vehicleclassid: '',
-  //  searchtype: this.deviceType === 'NEW' ? 'TCP' : 'HTTP',
-  searchtype:'',
-    rtoid: this.selectedRTO || '',
-    searchby: this.vehicleSearch
-  };
-
-  this.vehicleService.getVehicleListV2(req).subscribe(res => {
-
-    const data = res?.entity || [];
-
-    // ❌ NO DATA
-    if (!data || data.length === 0) {
-
-      this.fullVehicleList = [];
-      this.visibleVehicleList = [];
-      this.isVehicleLoaded = false;
-
-      this.toast.show('No vehicle found', 'error');   // 🔥 DIRECT
-
-      return;
+  onVendorChange(): void {
+    this.resetVehicleList();
+    if (this.selectedVendor) {
+      this.loadVehicleList();
     }
+  }
 
-    // ✅ DATA FOUND
-    this.fullVehicleList = data;
-    this.visibleVehicleList = data.slice(0, this.vehicleLimit);
-    this.isVehicleLoaded = true;
+  onRTOChange(): void {
+    this.resetVehicleList();
+    if (this.selectedRTO) {
+      this.loadVehicleList();
+    }
+  }
 
-    this.toast.show('Vehicle loaded successfully', 'success'); // optional
+  private loadVehicleList(): void {
+    const requestId = ++this.vehicleRequestId;
+    this.vehicleLoading = true;
 
-    this.cdr.detectChanges();
+    const req = {
+      selectvendorid: this.selectedVendor || '',
+      selectroleid: '',
+      routeid: '',
+      poiid: '',
+      selectcustomerid: '',
+      vehicleclassid: '',
+      searchtype: '',
+      rtoid: this.selectedRTO || '',
+      searchby: ''
+    };
 
-  }, err => {
+    this.vehicleService.getVehicleListV2(req).subscribe({
+      next: (res: any) => {
+        if (requestId !== this.vehicleRequestId) {
+          return;
+        }
 
-    this.toast.show('Something went wrong', 'error'); // 🔥 DIRECT
-    this.isVehicleLoaded = false;
+        const entity = res?.entity?.listData ?? res?.entity;
+        const data = Array.isArray(entity) ? entity : [];
+        this.fullVehicleList = data;
+        this.visibleVehicleList = data.slice(0, this.vehicleLimit);
+        this.vehicleLoading = false;
+        this.isVehicleLoaded = true;
 
-  });
-}
+        if (data.length === 0) {
+          this.toast.show('No vehicle found', 'error');
+        }
 
-  onRTOChange() {
- this.selectedVehicle = '';
-  this.vehicleSearch = '';
-  this.fullVehicleList = [];
-  this.visibleVehicleList = [];
-  this.isVehicleLoaded = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        if (requestId !== this.vehicleRequestId) {
+          return;
+        }
+
+        this.fullVehicleList = [];
+        this.visibleVehicleList = [];
+        this.vehicleLoading = false;
+        this.isVehicleLoaded = false;
+        this.toast.show('Something went wrong', 'error');
+      }
+    });
   }
 
 page=1
@@ -405,9 +414,9 @@ onPageSizeChange(size: any) {
 
 fullVehicleList: any[] = [];
 visibleVehicleList: any[] = [];
-
-vehicleLimit = 100;   // 🔥 only 100 items render
-vehicleSearch = '';
+vehicleLoading = false;
+private vehicleRequestId = 0;
+vehicleLimit = 100;
 
 
 eventPage = 1;

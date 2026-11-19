@@ -17,18 +17,19 @@ import { VendorStatusReportResp } from '../../../core/model/response.model';
 import { VendorStatusReportReq } from '../../../core/model/request.model';
 import { VendorService } from '../../../core/services/vendor.service';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
 declare var $: any;
 
 @Component({
     selector: 'app-vendor-status',
-    imports: [NgxDaterangepickerMd, FormsModule, NgSelectModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [NgxDaterangepickerMd, FormsModule, NgSelectModule, CommonDataToolbarComponent, DataTableComponent],
     templateUrl: './vendor-status.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './vendor-status.component.scss'
 })
 export class VendorStatusComponent implements OnInit, AfterViewInit, OnDestroy {
-    readonly tableColumns: CommonTableColumn[] = [
+    readonly tableColumns: CommonTableColumn<VendorStatusReportResp>[] = [
       { key: 'index', label: '#', cellClass: 'text-end' },
       { key: 'vendor', label: 'Vendor Name', width: '160px' },
       { key: 'onboarded', label: 'Onboarded On', cellClass: 'text-end' },
@@ -89,11 +90,12 @@ export class VendorStatusComponent implements OnInit, AfterViewInit, OnDestroy {
       this.formReq.param3 = ""; //this.pageSize;
       this.formReq.param4 = this.selectedFilterBy ? this.selectedFilterBy.value : 'All';
       this.formReq.pdfexcel = '';
+      this.loading = true;
       this.vendorService.getVendorStatusReport(this.formReq).subscribe({
         
         next: (res: any) => {
+          this.loading = false;
           if(res.statuscode==200) {
-            this.loading = false;
             this.reportData = res?.entity?.listData || res?.entity || [];
             const total = Number(res?.entity?.param1 || 0);
             this.totalCount = total;
@@ -129,22 +131,6 @@ export class VendorStatusComponent implements OnInit, AfterViewInit, OnDestroy {
     // 🔎 SEARCH
     getSearchDetails() {
       this.getReportData();
-  
-      // agar backend search hai to yaha API call karo
-      // abhi ke liye existing data filter example
-  
-      if (!this.formReq.param1) {
-        return this.getReportData();
-      }
-
-      const text = this.formReq.param1.toLowerCase();
-  
-      // this.alertData = this.alertData.filter((item: any) =>
-      //   Object.values(item).some(val =>
-      //     String(val).toLowerCase().includes(text)
-      //   )
-      // );
-  
     }
   
   

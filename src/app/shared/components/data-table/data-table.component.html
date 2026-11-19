@@ -1,15 +1,16 @@
-<div class="table-responsive" [class.scrollable-table]="!!maxHeight" [class.sticky-header]="stickyHeader"
+<div [class]="'table-responsive ' + wrapperClass"
+  [class.scrollable-table]="!!maxHeight" [class.sticky-header]="stickyHeader"
   [style.max-height]="maxHeight || null">
   <table class="app-table" [class]="tableClass" [id]="tableId" [attr.style]="tableStyle">
     <thead [class]="headerClass">
-      @if (headerTemplate) {
-      <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+      @if (headerTemplate || headerRowsTemplate) {
+      <ng-container [ngTemplateOutlet]="headerTemplate || headerRowsTemplate"></ng-container>
       } @else {
       <tr>
         @for (column of getVisibleColumns(); track column.key || column.header || $index) {
         <th [style.width]="column.width || null" [style.height]="column.height || null"
-          [class.sortable]="column.sortKey" [class]="column.className || ''"
-          (click)="column.sortKey && sort.emit(column.sortKey)">
+          [class.sortable]="column.sortKey || column.sortable" [class]="column.className || ''"
+          (click)="sortColumn(column)">
           @if (column.headers?.length) {
           @for (heading of column.headers; track $index; let last = $last) {
           {{ heading }}
@@ -18,9 +19,10 @@
           }
           }
           } @else {
-          {{ column.header }}
+          {{ getHeader(column) }}
           }
-          @if (column.sortKey === sortKey) {
+          @if ((column.sortKey || column.key) === sortKey && (column.sortKey || column.sortable)
+            && column.showSortIndicator !== false) {
           <span class="sorting" [ngClass]="{ sorting_desc: reverse, sorting_asc: !reverse }"></span>
           }
         </th>
@@ -42,7 +44,7 @@
       } @else {
       @for (row of rows; track row) {
       <tr [class]="rowClass(row)">
-        @for (column of getVisibleColumns(); track column.key || column.header || $index) {
+        @for (column of getVisibleColumns(); track column.key || column.header || column.label || $index; let columnIndex = $index) {
         <td [style.width]="column.width || null" [style.height]="column.height || null"
           [ngClass]="[getCellClassName(row, column) || '', column.clickable?.(row) ? 'clickable' : '']"
           [ngStyle]="getCellStyle(row, column)"
@@ -64,6 +66,9 @@
           </button>
           }
           }
+          } @else if (cellTemplate) {
+          <ng-container [ngTemplateOutlet]="cellTemplate"
+            [ngTemplateOutletContext]="{ $implicit: row, column: column, index: columnIndex }"></ng-container>
           } @else if (column.cellTemplate) {
           <ng-container [ngTemplateOutlet]="column.cellTemplate"
             [ngTemplateOutletContext]="{ $implicit: row }"></ng-container>

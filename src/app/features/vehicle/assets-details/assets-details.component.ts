@@ -5,7 +5,6 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { DeviceService, Device,  AssetsDetailsRequest } from '../../../core/services/device.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonDataToolbarComponent, OldNewOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
 import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
@@ -27,7 +26,7 @@ class RequestData {
 
 @Component({
     selector: 'app-assets-details',
-    imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
+    imports: [CommonModule, FormsModule, RouterModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './assets-details.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './assets-details.component.scss'

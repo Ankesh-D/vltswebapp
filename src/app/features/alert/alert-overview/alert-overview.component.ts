@@ -25,6 +25,7 @@ declare var $: any;
 export class AlertOverviewComponent implements OnInit, AfterViewInit {
 
   loading = false;
+  filtersExpanded = true;
   showSummary = false;
 deviceType: 'NEW' | 'OLD' = 'NEW'; // default NEW
   filterBy= 'Vendor';
@@ -147,6 +148,44 @@ onDateRangeChange(event: any): void {
   }
 }
 
+clearFilters(): void {
+  const today = new Date();
+
+  this.filterBy = 'Vendor';
+  this.selectedVendor = '';
+  this.selectedRTO = '';
+  this.selectedVehicle = '';
+  this.selectedAlertType = '';
+  this.selectedDateFilter = '';
+  this.selectedDateRange = dayjs();
+  this.fromDate = this.formatDate(today);
+  this.toDate = this.fromDate;
+  this.fromTime = '00:00';
+  this.toTime = '23:59';
+
+  this.vehicleSearch = '';
+  this.fullVehicleList = [];
+  this.visibleVehicleList = [];
+  this.isVehicleLoaded = false;
+
+  this.searchText = '';
+  this.alertData = [];
+  this.showSummary = false;
+  this.page = 1;
+  this.totalPages = 0;
+  this.pageCount = 0;
+  this.totalCount = 0;
+
+  this.showEventModal = false;
+  this.eventList = [];
+  this.filteredEventList = [];
+  this.eventSearch = '';
+  this.eventPage = 1;
+  this.eventTotal = 0;
+  this.eventTotalPages = 0;
+  this.totalEventCount = 0;
+}
+
   loadVendorList() {
     this.dashboardService.getVendorList().subscribe(res => {
       if (res.status) this.vendorList = res.entity;
@@ -181,6 +220,7 @@ onVendorChange() {
   this.fullVehicleList = [];
   this.visibleVehicleList = [];
   this.isVehicleLoaded = false;
+  this.searchVehicle();
 }
 searchVehicle() {
 
@@ -246,6 +286,8 @@ searchVehicle() {
   this.fullVehicleList = [];
   this.visibleVehicleList = [];
   this.isVehicleLoaded = false;
+    this.searchVehicle();
+
   }
 
 page=1

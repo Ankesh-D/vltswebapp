@@ -4,15 +4,17 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SimValidityService } from '../../../core/services/sim-validity.service';
 import { ToastComponent } from '../../assets/inactive-assets/toast.component';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastService } from '../../../core/services/toast.service';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 declare var $: any;
 declare var jAlert: any;
 
 @Component({
     selector: 'app-update-sim-validity',
-    imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule],
+    imports: [CommonModule, FormsModule, RouterModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './update-sim-validity.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./update-sim-validity.component.scss']
@@ -34,6 +36,25 @@ export class UpdateSimValidityComponent implements OnInit, AfterViewInit {
 
   sortKey: string = '';
   reverse: boolean = false;
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { header: '#', key: 'param1', width: '6%' },
+    { header: 'ICCID No', key: 'param7', sortKey: 'param7', width: '17%' },
+    { header: '', headers: ['Mobile No. 1', 'Mobile Network 1'], sortKey: 'param8', width: '19%' },
+    { header: '', headers: ['Mobile No. 2', 'Mobile Network 2'], sortKey: 'param9', width: '19%' },
+    { header: 'Mobile No. 1 Validity', key: 'param50', sortKey: 'param50', width: '15%' },
+    { header: 'Mobile No. 2 Validity', key: 'param51', sortKey: 'param51', width: '15%' },
+    {
+      header: 'Update',
+      width: '9%',
+      actions: [{
+        label: device => this.isUpdating(device.param1) ? 'Updating...' : 'Update',
+        icon: 'fa-refresh',
+        className: 'btn-table-update',
+        run: device => this.updateSimValidity(device),
+        disabled: device => this.isUpdating(device.param1) || this.loading
+      }]
+    }
+  ];
 
   // Update status tracking
   updatingDevices: Set<string> = new Set();
@@ -164,9 +185,10 @@ export class UpdateSimValidityComponent implements OnInit, AfterViewInit {
     this.getSimValidityDetails(this.currentPage);
   }
 
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
-    this.pageSize = newSize === 'All' ? this.totalCount : Number(newSize);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount
+      ? this.totalCount
+      : Number(size);
     this.currentPage = 1;
     this.getSimValidityDetails(this.currentPage);
   }

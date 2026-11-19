@@ -16,15 +16,17 @@ import { Subscription } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { LeafletTrackModalComponent } from '../../../shared/components/leaflet-track-modal/leaflet-track-modal.component';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { configureMapboxAccessToken } from '../../../core/utils/mapbox-config';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 declare var $: any;
 
 @Component({
     selector: 'app-asset-status-new',
     imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, NgxDaterangepickerMd,
-        TimepickerModule, ToastComponent, LeafletTrackModalComponent, NgbPaginationModule, CommonDataToolbarComponent],
+        TimepickerModule, ToastComponent, LeafletTrackModalComponent, CommonDataToolbarComponent,
+        DataTableComponent, PaginationComponent],
     templateUrl: './asset-status-new.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './asset-status-new.component.scss'
@@ -62,6 +64,20 @@ export class AssetStatusNewComponent implements OnInit, OnDestroy {
   // Sorting
   sortKey: string = '';
   reverse: boolean = false;
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { header: '#', key: 'param1' },
+    { header: '', headers: ['Vehicle/', 'Chassis No.'], sortKey: 'param10' },
+    { header: '', headers: ['Serial No.', 'IMEI No.'], sortKey: 'param5' },
+    { header: 'ICCID No.', key: 'param6', sortKey: 'param6' },
+    { header: 'Customer Details', sortKey: 'param18' },
+    { header: 'Vendor', key: 'param8', sortKey: 'param8' },
+    { header: '', headers: ['Polling', 'Datetime'], sortKey: 'param22' },
+    { header: '', headers: ['Latitude', 'Longitude'], sortKey: 'param25', width: '110px' },
+    { header: '', headers: ['Speed(Km/hrs)', 'Ignition'], sortKey: 'param29' },
+    { header: 'Location', sortKey: 'param33' },
+    { header: '', headers: ['Polling Status', 'GPS Status'] },
+    { header: 'Mode', key: 'param20' }
+  ];
 
   // Page mode - detect if Asset Status or Assets Details
   isAssetStatus: boolean = false;
@@ -239,8 +255,8 @@ export class AssetStatusNewComponent implements OnInit, OnDestroy {
       this.getAssetStatusDetailsAPI.unsubscribe();
     }
   }
-  onChangeInterval(event: any) {
-    this.reloadInterval = event.param2;
+  onChangeInterval(interval: number | string) {
+    this.reloadInterval = Number(interval);
     clearTimeout(this.setTimer);
     this.setTimer = setTimeout(() => {
       this.loadVehicles(false); // ❌ loader OFF
@@ -293,8 +309,7 @@ export class AssetStatusNewComponent implements OnInit, OnDestroy {
     this.loadVehicles();
   }
 
-  onVehicleClassFilterChange(event: any) {
-    this.vehicleClassFilter = event.target.value || '';
+  onVehicleClassFilterChange() {
     this.currentPage = 1;
     this.loadVehicles();
   }
@@ -431,7 +446,7 @@ export class AssetStatusNewComponent implements OnInit, OnDestroy {
   }
 
   onPageSizeChange(size: number | string) {
-    if (size === 'All' || size === this.totalCount) {
+    if (size === 'All' || Number(size) === this.totalCount) {
       this.pageSize = this.totalCount;
     } else {
       this.pageSize = Number(size);

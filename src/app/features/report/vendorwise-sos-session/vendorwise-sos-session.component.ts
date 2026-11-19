@@ -14,20 +14,21 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { Subject } from 'rxjs';
 import moment from 'moment';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonPaginationComponent } from '../../../shared/components/common-pagination/common-pagination.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 @Component({
     selector: 'app-vendorwise-sos-session',
     imports: [NgxDaterangepickerMd, FormsModule, NgSelectModule, CommonDataToolbarComponent,
-      CommonPaginationComponent, CommonTableComponent],
+      DataTableComponent, PaginationComponent],
     templateUrl: './vendorwise-sos-session.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './vendorwise-sos-session.component.scss'
 })
 export class VendorwiseSosSessionComponent implements OnInit {
-  readonly tableColumns: CommonTableColumn[] = [
+  readonly tableColumns: CommonTableColumn<SOSSessionResponse>[] = [
     { key: 'index', label: '#' },
     { key: 'vendor', label: 'Vendor Name' },
     { key: 'vehicles', label: 'Unique Vehicle Count', cellClass: 'text-end' },

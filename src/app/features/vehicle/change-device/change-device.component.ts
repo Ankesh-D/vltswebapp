@@ -8,13 +8,15 @@ import { EncryptionService } from '../../../core/services/encryption.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { M2MProvider } from '../../../core/services/device.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 
 @Component({
     selector: 'app-change-device',
-    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, NgbPaginationModule],
+    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './change-device.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./change-device.component.scss']
@@ -29,11 +31,71 @@ export class ChangeDeviceComponent implements OnInit, AfterViewInit {
   pageSizeOptions = [20, 50, 100, 200, 500];
   totalCount = 0;
   pageCount = 0;
-oldData: any;
-imeiFetched = false;
+  oldData: any;
+  imeiFetched = false;
 
   sortKey: string = '';
   reverse: boolean = false;
+  tableColumns: DataTableColumn<any>[] = [];
+
+  private createTableColumns(): DataTableColumn<any>[] {
+    const showVendor = this.roleId !== '11';
+    return [
+      { header: '#', key: 'rowNumber', width: '40px' },
+      {
+        headers: ['Vehicle No.', 'Chassis No.'],
+        sortKey: 'param20',
+        cellClassName: 'multiline-cell',
+        value: device => this.joinValues(device.param20, device.param21)
+      },
+      {
+        headers: ['Serial No.', 'IMEI No.'],
+        sortKey: 'param6',
+        cellClassName: 'multiline-cell',
+        value: device => this.joinValues(device.param6, device.param5)
+      },
+      { header: 'ICCID No.', key: 'param7', sortKey: 'param7' },
+      {
+        header: 'Customer Details',
+        sortKey: 'param36',
+        cellClassName: 'multiline-cell',
+        value: device => this.joinValues(device.param36, device.param37)
+      },
+      {
+        headers: showVendor ? ['Dealer', 'Vendor'] : ['Dealer'],
+        sortKey: 'param16',
+        cellClassName: 'multiline-cell',
+        value: device => showVendor
+          ? this.joinValues(device.param16, device.param15)
+          : this.joinValues(device.param16)
+      },
+      {
+        header: 'Activation Status',
+        sortKey: 'param27',
+        cellClassName: 'multiline-cell',
+        value: device => {
+          const status = device.param27 === 'Pending OTP' ? 'Pending' : device.param27 || 'NA';
+          return device.param27 === 'Activated'
+            ? `${status}\n${device.param23 > 0 ? device.param23 : 'NA'}`
+            : status;
+        }
+      },
+      { header: 'Polling Status', key: 'param34', sortKey: 'param34' },
+      {
+        header: 'Activity',
+        className: 'text-center',
+        cellClassName: 'text-center',
+        actions: [
+          {
+            label: 'Edit',
+            icon: 'fa-edit',
+            tone: 'primary',
+            run: device => this.getDeviceDataForChange(device)
+          }
+        ]
+      }
+    ];
+  }
 
   // Change Device Modal
   editSerialNo: string = '';
@@ -72,6 +134,11 @@ userId: string = '';
   ) {  
     this.toast.pageName = 'Change Device'; // Set page name for toast service
     this.roleId = sessionStorage.getItem('roleid') || '';
+    this.tableColumns = this.createTableColumns();
+  }
+
+  private joinValues(...values: Array<string | number | null | undefined>): string {
+    return values.map(value => value || 'NA').join('\n');
   }
 
  ngOnInit() {
@@ -117,11 +184,13 @@ userId: string = '';
           this.deviceDetails = response.entity.listData || [];
           this.totalCount = response.entity.param1 || 0;
           this.pageCount = this.deviceDetails.length;
+          this.updateTableRows();
           this.updatePageSizeOptions();
         } else {
           this.deviceDetails = [];
           this.totalCount = 0;
           this.pageCount = 0;
+          this.tableRows = [];
          this.toast.show('No Data Found: ' + response.entity, 'error');
 
         }
@@ -132,6 +201,7 @@ userId: string = '';
         this.deviceDetails = [];
         this.totalCount = 0;
         this.pageCount = 0;
+        this.tableRows = [];
         console.error('Error fetching device details:', error);
        this.toast.show('Error fetching device details.', 'error');
 
@@ -165,6 +235,7 @@ userId: string = '';
       }
       return this.reverse ? comparison * -1 : comparison;
     });
+    this.updateTableRows();
   }
 
   onPageChange(page: number) {
@@ -175,9 +246,10 @@ userId: string = '';
     this.getDeviceData(this.currentPage);
   }
 
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
-    this.pageSize = newSize === 'All' ? this.totalCount : Number(newSize);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount
+      ? this.totalCount
+      : Number(size);
     this.currentPage = 1;
     this.getDeviceData(this.currentPage);
   }
@@ -186,43 +258,13 @@ userId: string = '';
     return Math.ceil(this.totalCount / this.pageSize);
   }
 
-  getPageNumbers(): number[] {
-    const total = this.getTotalPages();
-    const pages: number[] = [];
-    const maxPages = 8;
+  tableRows: any[] = [];
 
-    if (total <= maxPages) {
-      for (let i = 1; i <= total; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) {
-          pages.push(i);
-        }
-        pages.push(-1);
-        pages.push(total);
-      } else if (this.currentPage >= total - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = total - 4; i <= total; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push(-1);
-        pages.push(total);
-      }
-    }
-    return pages;
-  }
-
-  getPaginatedData(): any[] {
-    return this.deviceDetails;
+  private updateTableRows(): void {
+    this.tableRows = this.deviceDetails.map((device, index) => ({
+      ...device,
+      rowNumber: (this.currentPage - 1) * this.pageSize + index + 1
+    }));
   }
 
   // Change Device

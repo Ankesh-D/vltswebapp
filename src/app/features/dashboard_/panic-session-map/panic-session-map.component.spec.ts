@@ -162,7 +162,7 @@ describe('PanicSessionMapComponent', () => {
     component.togglePoliceStations();
     const stations = http.expectOne('/policestationdetails');
     expect(stations.request.body).toEqual({ param1: '', param2: 1, param3: 20 });
-    stations.flush({ status: true, entity: { listData: [{ param2: 'Police station', param7: 'Kolkata', param8: 'West Bengal', param9: '22.55', param10: '88.35' }] } });
+    stations.flush({ status: true, entity: { listData: [{ param2: 'Police station', param7: 'Kolkata', param8: ' Bengal', param9: '22.55', param10: '88.35' }] } });
     expect(fixture.nativeElement.querySelector('.leaflet-marker-pane img[src="assets/mapimages/police-station.png"]')).not.toBeNull();
     component.showPoliceStations = false;
     component.togglePoliceStations();

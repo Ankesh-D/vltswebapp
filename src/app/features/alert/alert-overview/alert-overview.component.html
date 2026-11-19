@@ -3,36 +3,50 @@
     <div class="element-box">
 
       <!-- PAGE TITLE -->
-      <div class="pagetitlestyle">
+      <div class="pagetitlestyle pb-2 alert-overview-page-header">
         <span>Alert Overview</span>
+        <button type="button" class="btn btn-sm filters-toggle-btn"
+          [attr.aria-expanded]="filtersExpanded"
+          aria-controls="alert-overview-filter-panel"
+          (click)="filtersExpanded = !filtersExpanded">
+          <i class="fa fa-filter" aria-hidden="true"></i>
+          <span>{{ filtersExpanded ? 'Hide filters' : 'Show filters' }}</span>
+          <i class="fa"
+            [class.fa-chevron-up]="filtersExpanded"
+            [class.fa-chevron-down]="!filtersExpanded"
+            aria-hidden="true"></i>
+        </button>
       </div>
 
       <!-- MAIN LAYOUT -->
       <div class="overspeed-layout">
 
-        <!-- LEFT FILTER PANEL -->
-        <div class="left-filter-panel entrypagediv">
-
+        <!-- <app-common-data-toolbar class="alert-overview-filter-toolbar"
+          [showFilters]="true" [showSearch]="false" [showReload]="false"
+          [showExcel]="false" [showPageSize]="false" [showTotal]="false" [wrapFilters]="true"> -->
+        <div toolbarFilters class="alert-overview-filters" [hidden]="!filtersExpanded">
+        <div id="alert-overview-filter-panel" class="left-filter-panel entrypagediv alert-filter-panel">
           <!-- FILTER BY -->
           <div class="form-group filterby-row">
-            <label  style="margin: 2px;" class="control-label">Filter By :</label>
+            <label class="control-label">Filter By</label>
 
             <div class="filterby-options">
               <label class="radio-item">
                 <input type="radio" name="filter"
-                  (change)="onFilterByChange('Vendor')" checked>
+                  [checked]="filterBy === 'Vendor'"
+                  (change)="onFilterByChange('Vendor')">
                 Vendor
               </label>
 
               <label class="radio-item">
                 <input type="radio" name="filter"
+                  [checked]="filterBy === 'RTO'"
                   (change)="onFilterByChange('RTO')">
                 RTO
               </label>
             </div>
           </div>
 
-          <!-- VENDOR -->
           <!-- VENDOR -->
           @if (filterBy === 'Vendor') {
             <div class="form-group" >
@@ -96,7 +110,7 @@
 
 
           <!-- 🔍 SEARCH BOX -->
-          <div class="vehicle-search-box">
+          <!-- <div class="vehicle-search-box">
 
             <input type="text"
               class="form-control search-input"
@@ -109,12 +123,12 @@
               <i class="fa fa-search"></i>
             </button>
 
-          </div>
+          </div> -->
 
 
           <!-- 🚗 DROPDOWN -->
 
-          @if (isVehicleLoaded && visibleVehicleList.length > 0) {
+          <!-- @if (isVehicleLoaded && visibleVehicleList.length > 0) { -->
             <select
               class="searchable full-control"
               [(ngModel)]="selectedVehicle"
@@ -130,7 +144,7 @@
                 </option>
               }
             </select>
-          }
+          <!-- } -->
 
         </div>
 
@@ -150,120 +164,76 @@
         </div>
 
         <!-- DATE -->
-        <div class="date-row">
-          <div class="date-col" style="width:100%">
-            <label class="control-label">Select Date Range<span style="color:red">*</span> </label>
-            <input
-              ngxDaterangepickerMd
-              [(ngModel)]="selectedDateRange"
-              [singleDatePicker]="true"
-              [autoApply]="true"
-              [locale]="{ format: 'DD-MMM-YYYY' }"
-              [maxDate]="today"
-              />
-
-          </div>
+        <div class="form-group alert-date-range">
+          <label class="control-label">Select Date Range<span style="color:red">*</span></label>
+          <input
+            ngxDaterangepickerMd
+            [(ngModel)]="selectedDateRange"
+            class="form-control"
+            [singleDatePicker]="true"
+            [autoApply]="true"
+            [locale]="{ format: 'DD-MMM-YYYY' }"
+            [maxDate]="today"
+            />
         </div>
 
-        <div class="date-row">
+        <div class="form-group">
+          <label class="control-label">From Time<span style="color:red">*</span></label>
+          <input
+            type="time"
+            class="form-control"
+            [(ngModel)]="fromTime"
+            step="60"
+            />
+        </div>
 
-          <div class="date-col">
-            <label class="control-label">From Time<span style="color:red">*</span></label>
-            <input
-              type="time"
-              class="form-control"
-              [(ngModel)]="fromTime"
-              step="60"
-              />
-          </div>
-
-          <div class="date-col">
-            <label class="control-label">To Time<span style="color:red">*</span></label>
-            <input
-              type="time"
-              class="form-control"
-              [(ngModel)]="toTime"
-              step="60"
-              />
-          </div>
-
+        <div class="form-group">
+          <label class="control-label">To Time<span style="color:red">*</span></label>
+          <input
+            type="time"
+            class="form-control"
+            [(ngModel)]="toTime"
+            step="60"
+            />
         </div>
         <!-- SEARCH -->
         <div class="search-btn-row">
-          <button class="search-btn-full"
+          <button type="button" class="search-btn-clear" (click)="clearFilters()">
+            <i class="fa fa-eraser" aria-hidden="true"></i>
+            <span>Clear</span>
+          </button>
+          <button type="button" class="search-btn-full"
             (click)="getAlertOverview()">
-            <i class="fa fa-search"></i>   Search
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <span>Apply filters</span>
           </button>
         </div>
       </div>
+        </div>
+        <!-- </app-common-data-toolbar> -->
       <!-- *ngIf="showSummary" -->
       <!-- RIGHT REPORT PANEL -->
-      <div class="right-report-panel" >
-        <!-- 🔹 TOP CONTROLS BAR -->
-        <div class="top-controls-row">
-
-          <!-- LEFT SIDE -->
-          <div class="left-controls">
-
-            <!-- 🔍 SEARCH BOX -->
-            <div class="search-box">
-              <input
-                type="search"
-                class="search-input inner"
-                placeholder="Search vehicle / alert..."
-                maxlength="50"
-                [(ngModel)]="searchText"
-                (keyup.enter)="getSearchDetails()" />
-
-              <button class="search-inner-btn" (click)="getSearchDetails()">
-                <i class="fa fa-search"></i>
-              </button>
-            </div>
-
-            <!-- 🔄 RELOAD BUTTON -->
-            <button
-              class="reload-btn"
-              (click)="reloadData()"
-              [disabled]="loading">
-
-              <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
-              <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
-
-            </button>
-
-          </div>
-
-          <!-- RIGHT SIDE -->
-          <div class="right-controls">
-            <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
-              [showPageSize]="false" [showTotal]="false" [exportLoading]="loading"
-              (excelExport)="exportToExcel()"></app-common-data-toolbar>
-            <div class="total-records-text">Show Rows :</div>
-            <!-- ROWS SELECT -->
-            <select
-              class="rows-select"
-              [(ngModel)]="pageSize"
-              (change)="onPageSizeChanged(pageSize)">
-
-              @for (size of pageSizeOptions; track size) {
-                <option
-                  [value]="size === totalCount ? 'All' : size">
-                  {{ size === totalCount ? 'All' : size }}
-                </option>
-              }
-
-            </select>
-
-            <!-- TOTAL RECORD TEXT -->
-            <div class="total-records-text">
-              Total Records : {{ pageCount }} of {{ totalCount }}
-            </div>
-
-          </div>
-
-        </div>
+      <div class="right-report-panel">
+        <app-common-data-toolbar class="alert-overview-results-toolbar"
+          [searchText]="searchText"
+          searchPlaceholder="Search vehicle / alert..."
+          (searchTextChange)="searchText = $event"
+          (search)="getSearchDetails()"
+          (reload)="reloadData()"
+          [loading]="loading"
+          [exportLoading]="loading"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [displayedCount]="pageCount"
+          [totalRecords]="totalCount"
+          (pageSizeChange)="onPageSizeChanged($event)"
+          (excelExport)="exportToExcel()"
+          pageSizeLabel="Show rows"
+          totalLabel="Total records"
+          countSeparator="of">
+        </app-common-data-toolbar>
         <!-- TABLE -->
-        <div class="table-wrapper" >
+        <div class="table-wrapper">
           <ng-template #alertRows let-rows>
             @for (d of rows; track d; let i = $index) {
               <tr>
@@ -273,9 +243,10 @@
                 <td>{{ d.param11 }}</td>
                 <td>{{ d.param7 }}</td>
                 <td>{{ d.param9 }}<br>{{ d.param13 }}</td>
-                <td style="color: blue; font-weight: bold; cursor: pointer;"
-                  (click)="onEventCountClick(d)">
-                  {{ d.param14 }}
+                <td class="event-count-cell">
+                  <button type="button" class="event-count-link" (click)="onEventCountClick(d)">
+                    {{ d.param14 }}
+                  </button>
                 </td>
               </tr>
             }
@@ -285,7 +256,7 @@
           </app-common-table>
         </div>
         @if (totalCount > pageSize || page > 1) {
-          <div class="custom-pagination"style="display:flex;justify-content: end;">
+          <div class="custom-pagination">
             <button class="pg-btn"
               (click)="changePage(page - 1)"
               [disabled]="page === 1">
@@ -394,7 +365,7 @@
           </tbody>
         </table>
         @if (eventTotal > eventPageSize || eventPage > 1) {
-          <div class="custom-pagination" style="display:flex;justify-content: end;">
+          <div class="custom-pagination">
             <!-- PREV -->
             <button class="pg-btn"
               (click)="changeEventPage(eventPage - 1)"

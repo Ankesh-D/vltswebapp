@@ -11,78 +11,49 @@
         </ng-container>
       </div>
       @if (detailsToggle) {
-        <!-- Search and Pagination Controls -->
-        <form autocomplete="off" class="mb-2">
-          <div class="d-flex justify-content-between align-items-center flex-wrap">
-            <!-- Left Side: Search -->
-            <div class="d-flex align-items-center">
-              <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Search :</label>
-              <div class="input-group input-group-sm">
-                <input type="search" class="form-control shadow-none" placeholder="Type here..."
-                  [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" autocomplete="off"
-                  style="font-size: 11px; width: 200px;">
-                <div class="input-group-append">
-                  <button type="button" class="btn btn-primary search-btn" (click)="getSearchDetails()">
-                    <i class="fa fa-search" style="font-size: 11px;"></i>
-                  </button>
-                </div>
-              </div>
-              <button type="button" (click)="reloadData()" class="btn btn-outline-success btn-sm ms-2"
-                style="font-size: 11px;" title="Reload">
-                <i class="fa fa-refresh me-1" [class.fa-spin]="loading"></i>
-                {{ loading ? 'Reloading...' : 'Reload' }}
-              </button>
-            </div>
-            <!-- Right Side: Controls -->
-            <div class="d-flex align-items-center">
-              <!-- Download -->
-              <div class="d-flex align-items-center me-3">
-                <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Download :</label>
-                <select name="excelpdfdownload" id="excelpdfdownload"
-                  class="form-control form-control-sm" style="font-size: 11px; width: auto;">
-                  <option value="Select">Select</option>
-                  <!-- <option value="Excel">Excel</option> -->
-                  <option value="">Excel</option>
-                </select>
-              </div>
-              <!-- Show Rows -->
-              <div class="d-flex align-items-center me-3">
-                <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Show Rows :</label>
-                <select [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)" name="pageSize"
-                  class="form-control form-control-sm" style="font-size: 11px; width: auto;">
-                  @for (size of pageSizeOptions; track size) {
-                    <option [value]="size === totalCount ? totalCount : size">
-                      {{size === totalCount ? totalCount : size}}
-                    </option>
-                  }
-                </select>
-              </div>
-              <!-- Total Records -->
-              <span class="fw-bold" style="font-size: 11px;">
-                Total Records : <span class="text-primary">{{pageCount}} of {{totalCount}}</span>
-              </span>
-            </div>
-          </div>
-        </form>
-        <!-- Table -->
-        <app-common-table [columns]="tableColumns" [rows]="detailData" [loading]="loading"
-          [cellTemplate]="driverCell" emptyMessage="No Records Found"
+        <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here..."
+          [searchText]="searchText" (searchTextChange)="searchText = $event"
+          (search)="getSearchDetails()" (reload)="reloadData()" [loading]="loading"
+          [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+          [displayedCount]="pageCount" [totalRecords]="totalCount" pageSizeLabel="Show Rows"
+          totalLabel="Total Records" countSeparator="of" [showFilters]="false"
+          [showExcel]="false" [showPdf]="false" (pageSizeChange)="onPageSizeChange($event)">
+        </app-common-data-toolbar>
+        <app-data-table [columns]="tableColumns" [rows]="detailData" [loading]="loading"
+          [bodyTemplate]="driverRows" emptyMessage="No Records Found"
           tableClass="table table-striped app-table table-sm table-bordered mb-1" tableId="drivertable">
-        </app-common-table>
-        <ng-template #driverCell let-data let-column="column" let-index="index">
-          @if (column.key === 'rowNumber') {
-            {{(pageSize * (driverDetailsRequest.param2 - 1)) + index + 1}}
-          } @else if (column.key === 'actions') {
-            <a class="btn btn-primary btn-sm me-1" title="Edit" (click)="setData(data, 'edit')">
-              <i class="fa fa-edit"></i>
-            </a>
-            <a class="btn btn-danger btn-sm" title="Delete" (click)="setData(data, 'delete')">
-              <i class="fa fa-trash"></i>
-            </a>
+        </app-data-table>
+        <ng-template #driverRows let-rows>
+          @if (rows.length === 0) {
+            <tr><td class="empty-state text-center" colspan="9">No Records Found</td></tr>
           } @else {
-            {{column.value ? column.value(data) : ''}}
+            @for (data of rows; track data; let index = $index) {
+              <tr>
+                <td>{{(pageSize * (driverDetailsRequest.param2 - 1)) + index + 1}}</td>
+                <td>{{data.param3}}</td>
+                <td>{{data.param4}}</td>
+                <td>{{data.param5}}</td>
+                <td>{{data.param9}}</td>
+                <td>{{data.param10}}</td>
+                <td>{{data.param11}}</td>
+                <td>{{data.param12}}</td>
+                <td class="text-center">
+                  <a class="btn btn-primary btn-sm me-1" title="Edit" (click)="setData(data, 'edit')">
+                    <i class="fa fa-edit"></i>
+                  </a>
+                  <a class="btn btn-danger btn-sm" title="Delete" (click)="setData(data, 'delete')">
+                    <i class="fa fa-trash"></i>
+                  </a>
+                </td>
+              </tr>
+            }
           }
         </ng-template>
+        <div class="float-end">
+          <app-pagination [totalCount]="totalCount" [page]="driverDetailsRequest.param2"
+            [pageSize]="driverDetailsRequest.param3" (pageChange)="onPageChange($event)">
+          </app-pagination>
+        </div>
       }
       @if (!detailsToggle) {
         <form #masterForm="ngForm" (ngSubmit)="onSubmit(masterForm)">

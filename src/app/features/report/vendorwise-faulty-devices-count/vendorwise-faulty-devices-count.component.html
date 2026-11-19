@@ -1,5 +1,4 @@
 <div class="content-i">
-
   <div class="content-box pt-0">
     <div class="element-wrapper">
       <div class="element-box">
@@ -8,140 +7,63 @@
             <div class="card main-card">
               <div class="card-body">
                 <div class="col-md-12 pagetitleborder">
-                  <div class="pagetitlestyle"><span>Vendor Wise Faulty Devices Counts Report</span>
+                  <div class="pagetitlestyle"><span>Vendor Wise Faulty Devices Counts Report</span></div>
+                </div>
+
+                <app-common-data-toolbar [showFilters]="true" [showSearch]="false"
+                  [loading]="!listLoaded" (reload)="reloadData()" [showReload]="true"
+                  [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" [displayedCount]="detailData.length"
+                  [totalRecords]="totalCount || 0" (pageSizeChange)="onPageSizeChange($event)"
+                  (excelExport)="downloadExcel()" pageSizeLabel="Show Rows" totalLabel="Total Records">
+                  <div toolbarFilters class="d-flex align-items-center gap-2 flex-wrap">
+                    <label class="mb-0">Vendor</label>
+                    <ng-select class="vendor-select" [items]="vendorlist" bindLabel="param2" bindValue="param1"
+                      [(ngModel)]="selectedVendorFilter" (change)="onVendorFilterChange($event)" placeholder="All">
+                    </ng-select>
+                    <input type="text" id="datepicker" class="form-control form-control-sm" name="date"
+                      aria-label="Select date range" style="width: 190px">
+                    <div class="toggle-container modern-toggle">
+                      <button type="button" class="toggle-option" [class.active]="vehicleType === 'NEW'"
+                        (click)="onChangeVehicleType('NEW')">NEW (Installation)</button>
+                      <button type="button" class="toggle-option" [class.active]="vehicleType === 'OLD'"
+                        (click)="onChangeVehicleType('OLD')">OLD (Renewal)</button>
+                    </div>
+                  </div>
+                </app-common-data-toolbar>
+
+                <ng-template #vendorFaultyHeader>
+                  <tr>
+                    <th rowspan="2" class="green py-1 text-center">#</th>
+                    <th class="green py-1 text-center">Vendor Name</th>
+                    <th class="green py-1 text-end">Faulty device count</th>
+                    <th class="green py-1 text-end">Activated</th>
+                    <th class="green py-1 text-end">Not Activated</th>
+                  </tr>
+                  <tr>
+                    <th class="green py-1 text-center">Total</th>
+                    <th class="green py-1 text-end">{{ totalfaultydevicecount }}</th>
+                    <th class="green py-1 text-end">{{ total_faultydevicecount_activated }}</th>
+                    <th class="green py-1 text-end">{{ total_faultydevicecount_notactivated }}</th>
+                  </tr>
+                </ng-template>
+                <div class="status-table">
+                  <app-data-table [columns]="tableColumns" [rows]="detailData" [loading]="!listLoaded"
+                    [headerTemplate]="vendorFaultyHeader" [rowClass]="rowClass" [emptyMessage]="'NO DATA FOUND'"
+                    (cellClick)="openVendorDetails($event.row)" tableClass="table table-striped app-table small-table">
+                  </app-data-table>
+                  <div class="float-end">
+                    <app-pagination [totalCount]="totalCount || 0" [page]="pageCount" [pageSize]="pageSize"
+                      [disabled]="!listLoaded" (pageChange)="onPageChange($event)">
+                    </app-pagination>
+                  </div>
                 </div>
               </div>
-              <div
-                style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0px; padding: 0 10px;">
-                <!-- Left Side: Search and Reload -->
-                <div style="display: flex; align-items: center;">
-                  <span style="font-weight: bold; font-size: 12px; margin-right: 10px;">vendor
-                  </span>
-                  <ng-select class="vendor-select" [items]="vendorlist" bindLabel="param2"
-                    bindValue="param1" [(ngModel)]="selectedVendorFilter"
-                    (change)="onVendorFilterChange($event)" placeholder="All">
-                  </ng-select>
-
-
-
-                  <button class="mx-2" (click)="reloadData()"
-                    style="background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
-                    <i class="fa fa-refresh" [class.fa-spin]="!listLoaded"
-                    style="margin-right: 5px;"></i>
-                    @if (listLoaded) {
-                      <span>Reload</span>
-                    }
-                    @if (!listLoaded) {
-                      <span>Reloading...</span>
-                    }
-                  </button>
-                  <!-- <input
-                  ngxDaterangepickerMd
-                  [(ngModel)]="selectedRange"
-                  (datesUpdated)="onDateApply($event)"
-                  [showDropdowns]="true"
-                  [alwaysShowCalendars]="true"
-                  [autoApply]="false"
-                  [locale]="{ format: 'DD-MMM-YYYY' }"
-
-                  class="form-control"
-                  style="font-size:12px"
-                  /> -->
-                  <input type="text" id="datepicker" class="form-control" name="date" />
-
-                  <!-- <select [(ngModel)]="alertType" (change)="onAlertTypeChange()"
-                  style="height: 26px; font-size: 11px; margin-left: 10px; border: 1px solid #0b58b9; border-radius: 4px;">
-
-                  <option value="">All</option>
-                  <option value="new">New</option>
-                  <option value="old">Old</option>
-
-                </select> -->
-
-              </div>
-
-              <!-- Right Side: Download, Page Size, Count -->
-              <div style="display: flex; align-items: center; font-size: 11px;">
-                <div class="toggle-container modern-toggle mx-2">
-                  <button class="toggle-option" [class.active]="vehicleType === 'NEW'"
-                    (click)="onChangeVehicleType('NEW')">
-                    NEW (Installation)
-                  </button>
-                  <!-- <button class="toggle-option" [class.active]="vehicleType === 'ALL'"
-                  (click)="onChangeVehicleType('ALL')">
-                  ALL
-                </button> -->
-                <button class="toggle-option" [class.active]="vehicleType === 'OLD'"
-                  (click)="onChangeVehicleType('OLD')">
-                  OLD (Renewal)
-                </button>
-              </div>
-              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
-                [showPageSize]="false" [showTotal]="false" (excelExport)="downloadExcel()">
-              </app-common-data-toolbar>
-
-            <div style="display: flex; align-items: center; margin-right: 15px;">
-
-              <label style="margin: 0 5px 0 0; font-weight: bold;">Show Rows:</label>
-
-              <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)"
-                style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px;">
-
-                @for (size of pageSizeOptions; track size) {
-                  <option [value]="size">
-                    {{ size }}
-                  </option>
-                }
-
-              </select>
             </div>
-
-            <div style="font-weight: bold; color: #0b58b9;">
-              Total Records : {{ totalCount }}
-            </div>
-          </div>
-        </div>
-
-        <ng-template #vendorFaultyHeader>
-          <tr>
-            <th rowspan="2" class="green py-1 text-center">#</th>
-            <th class="green py-1 text-center">Vendor Name</th>
-            <th class="green py-1 text-end">Faulty device count</th>
-            <th class="green py-1 text-end">Activated</th>
-            <th class="green py-1 text-end">Not Activated</th>
-          </tr>
-          <tr>
-            <th class="green py-1 text-center">Total</th>
-            <th class="green py-1 text-end">{{ totalfaultydevicecount }}</th>
-            <th class="green py-1 text-end">{{ total_faultydevicecount_activated }}</th>
-            <th class="green py-1 text-end">{{ total_faultydevicecount_notactivated }}</th>
-          </tr>
-        </ng-template>
-        <div class="status-table">
-          <app-common-table [columns]="tableColumns" [rows]="detailData" [loading]="!listLoaded"
-            [headerRowsTemplate]="vendorFaultyHeader" [rowClass]="rowClass"
-            (cellClick)="openVendorDetails($event.row)" tableClass="table table-striped app-table small-table"
-            wrapperClass="status-table" emptyMessage="NO DATA FOUND">
-          </app-common-table>
-          <!-- Pagination Controls -->
-          <div class="float-end">
-            @if (totalCount > pageSize) {
-              <ngb-pagination [collectionSize]="totalCount"
-                [(page)]="pageCount" [pageSize]="pageSize"
-                (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-                [ellipses]="false" [boundaryLinks]="true" size="sm"
-                class="d-flex justify-content-center mt-2 mb-1">
-              </ngb-pagination>
-            }
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-</div>
-</div>
-</div>
 </div>
 
 @if (showDetailsModal) {

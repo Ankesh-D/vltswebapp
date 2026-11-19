@@ -1,14 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { DeviceService, Device, DeviceRequest } from '../../../core/services/device.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-activated-devices-for-home-dashboard',
-    imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule],
+    imports: [CommonModule, RouterModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './activated-devices-for-home-dashboard.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './activated-devices-for-home-dashboard.component.scss'
@@ -35,6 +36,65 @@ export class ActivatedDevicesForHomeDashboardComponent  implements OnInit {
   
   // Filter type display
   filterType: string = 'Total Device';
+  readonly tableColumns: DataTableColumn<Device>[] = [
+    { header: '#', key: 'param1' },
+    {
+      headers: ['IMEI No.', 'Serial No.'],
+      sortKey: 'param5',
+      cellClassName: 'multiline-cell',
+      value: device => this.joinValues(device.param5, device.param6)
+    },
+    {
+      headers: ['ICCID No.', 'M2M Code'],
+      sortKey: 'param7',
+      cellClassName: 'multiline-cell',
+      value: device => this.joinValues(device.param7, device.param14)
+    },
+    {
+      headers: ['Mobile N/W 1', 'Mobile N/W 2'],
+      sortKey: 'param8',
+      cellClassName: 'multiline-cell',
+      value: device => this.joinValues(device.param10, device.param11)
+    },
+    {
+      headers: ['Mobile No. 1', 'Mobile No. 2'],
+      sortKey: 'param9',
+      cellClassName: 'multiline-cell',
+      value: device => this.joinValues(device.param8, device.param9)
+    },
+    {
+      headers: ['Mobile No. 1 Validity', 'Mobile No. 2 Validity'],
+      sortKey: 'param50',
+      width: '130px',
+      cellClassName: 'multiline-cell',
+      value: device => this.joinValues(device.param50, device.param51)
+    },
+    {
+      headers: ['Dealer', 'Vendor'],
+      sortKey: 'param16',
+      width: '160px',
+      cellClassName: 'multiline-cell',
+      value: device => this.joinValues(device.param15, device.param16)
+    },
+    {
+      header: 'Vehicle Status',
+      sortKey: 'param47',
+      cellClassName: 'multiline-cell',
+      value: device => this.joinValues(device.param47, device.param20 || '')
+    },
+    {
+      header: 'Activation Status',
+      sortKey: 'param34',
+      cellClassName: 'multiline-cell',
+      value: device => `${device.param34 || 'NA'}\n${device.param34 === 'Activated' ? device.param54 || '-' : '-'}`
+    },
+    {
+      header: 'Polling Status',
+      sortKey: 'param48',
+      cellClassName: 'multiline-cell',
+      value: device => this.joinValues(device.param48, device.param60)
+    }
+  ];
   
   constructor(
     private toast: ToastService,
@@ -44,6 +104,10 @@ export class ActivatedDevicesForHomeDashboardComponent  implements OnInit {
     private cdr: ChangeDetectorRef
   ) {
     this.toast.pageName = 'Activated Devices'; // Set page name for toast service
+  }
+
+  private joinValues(...values: string[]): string {
+    return values.map(value => value || 'NA').join('\n');
   }
 
   ngOnInit() {
@@ -224,6 +288,10 @@ export class ActivatedDevicesForHomeDashboardComponent  implements OnInit {
     this.loadDevices();
   }
 
+  getTotalPages(): number {
+    return Math.ceil(this.totalCount / this.pageSize);
+  }
+
   reloadData() {
     this.searchText = '';
     this.currentPage = 1;
@@ -248,49 +316,6 @@ export class ActivatedDevicesForHomeDashboardComponent  implements OnInit {
 
   goHome() {
     this.router.navigate(['/dashboard']);
-  }
-
-  getTotalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
-
-  getPageNumbers(): number[] {
-    const total = this.getTotalPages();
-    const pages: number[] = [];
-    const maxPages = 8;
-    
-    if (total <= maxPages) {
-      for (let i = 1; i <= total; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) {
-          pages.push(i);
-        }
-        pages.push(-1);
-        pages.push(total);
-      } else if (this.currentPage >= total - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = total - 4; i <= total; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push(-1);
-        pages.push(total);
-      }
-    }
-    return pages;
-  }
-
-  shouldShowPage(page: number): boolean {
-    return page !== -1;
   }
 
   // Helper method to convert value to string for template usage

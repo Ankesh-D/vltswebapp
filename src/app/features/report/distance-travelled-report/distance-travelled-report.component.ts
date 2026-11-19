@@ -10,12 +10,15 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ToastService } from '../../../core/services/toast.service';
 import dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 @Component({
     selector: 'app-distance-travelled-report',
-    imports: [FormsModule, NgxDaterangepickerMd, CommonTableComponent],
+    imports: [FormsModule, NgxDaterangepickerMd, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './distance-travelled-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./distance-travelled-report.component.scss']

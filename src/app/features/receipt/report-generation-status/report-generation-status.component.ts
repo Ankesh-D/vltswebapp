@@ -14,7 +14,9 @@ import { DashboardService } from '../../../core/services/dashboard.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import{UserService} from '../../../core/services/user.service';
 import { LoaderService } from '../../../core/services/loader.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent, PageSizeOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { CommonPaginationComponent } from '../../../shared/components/common-pagination/common-pagination.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
 // import { ToastService } from '../../../core/services/toast.service';
 @Component({
     selector: 'app-report-generation-status',
@@ -24,7 +26,9 @@ import { CommonTableColumn, CommonTableComponent } from '../../../shared/compone
         ToastComponent,
         NgxDaterangepickerMd, // ✅ REQUIRED,
         NgSelectModule,
-        CommonTableComponent
+        CommonDataToolbarComponent,
+        CommonPaginationComponent,
+        DataTableComponent
     ],
     templateUrl: './report-generation-status.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -39,20 +43,20 @@ export class ReportGenerationStatusComponent implements OnInit, OnDestroy {
   errorType: 'error' | 'success' = 'error';
   // New properties for the vehicle list table
   vehicleDetails: any[] = [];
-  readonly tableColumns: CommonTableColumn<any>[] = [
-    { key: 'param1', label: 'Sr.No' },
-    { key: 'param7', label: 'Vendor Name' },
-    { key: 'param18', label: 'RTO Code' },
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { key: 'param1', header: 'Sr.No' },
+    { key: 'param7', header: 'Vendor Name' },
+    { key: 'param18', header: 'RTO Code' },
     { key: 'param11', headers: ['Vehcile.No', 'Chassis No.'] },
     { key: 'param5', headers: ['Device Sr.No.', 'IMEI.No', 'ICCID.No'] },
-    { key: 'param28', label: 'Customer Details' },
+    { key: 'param28', header: 'Customer Details' },
     { key: 'param19', headers: ['Vehicle Type', 'Vehicle Class', 'MFG. Year'] },
-    { key: 'param66', label: 'Installation Type' },
-    { key: 'param43', label: 'Installation Date' },
+    { key: 'param66', header: 'Installation Type' },
+    { key: 'param43', header: 'Installation Date' },
     { key: 'param14', headers: ['Activation Status', 'Activation Date'] },
-    { key: 'param64', label: 'Valid Upto' },
+    { key: 'param64', header: 'Valid Upto' },
     { key: 'param80', headers: ['MVI Approval Status', 'Approved By', 'Approved On'], width: '170px' },
-    { key: 'view', label: 'View' }
+    { key: 'view', header: 'View' }
   ];
   isVehicleListLoaded: boolean = false;
   sortKey: string = '';
@@ -60,10 +64,9 @@ export class ReportGenerationStatusComponent implements OnInit, OnDestroy {
   task: any | null = sessionStorage.getItem('roleid'); // For conditional columns in the template, assuming it's a number.
   companyid: any | null = sessionStorage.getItem('ownersid');
   private noTrackDataSubscription: Subscription | undefined;
-  pageSize: number = 20;
-selectedPageSize: number | string = 20;
-
-pageSizeOptions = [20, 50, 100, 200, 500];
+  pageSize = 20;
+  selectedPageSize: PageSizeOption = 20;
+  pageSizeOptions: PageSizeOption[] = [20, 50, 100, 200, 500];
   currentPage = 1;
 
   totalCount = 0;
@@ -105,6 +108,7 @@ vendorObj: any = null;
         this.errorMessage = message;
       }
     });
+    this.ChangeFilter();
     this.getStatusOnInitDetails(1);
   }
   onChangeVendor() {
@@ -151,6 +155,7 @@ onChangeRTO() {
   this.totalCount = 0;
   this.pageCount = 0;
   this.pageSize = 20;
+  this.currentPage = 1;
   this.getStatusOnInitDetails(1);
 }
 pageno=0
@@ -185,11 +190,12 @@ const requestBody = {
     this.loader.show();
     this.vehicleService.getVehicleDetailsByType(requestBody).subscribe({
       next: (response: any) => {
-        this.loader.show();
+        this.loader.hide();
         if (response?.status && Array.isArray(response?.entity?.listData)) {
           this.vehicleDetails = response.entity.listData;
-          this.totalCount = response.entity.param1 || 0;
+          this.totalCount = Number(response.entity.param1 || 0);
           this.pageCount = this.vehicleDetails.length;
+          this.updatePageSizeOptions();
           this.detailsflag = true;
           this.receiptstatusflag = false;
           this.isVehicleListLoaded = true;
@@ -197,6 +203,7 @@ const requestBody = {
           this.vehicleDetails = [];
           this.pageCount = 0;
           this.totalCount = 0;
+          this.updatePageSizeOptions();
           this.detailsflag = true;
           this.receiptstatusflag = false;
           this.errorMessage = 'No data found.';
@@ -204,8 +211,12 @@ const requestBody = {
         }
       },
       error: (error) => {
+        this.loader.hide();
         this.isVehicleListLoaded = true;
         this.vehicleDetails = [];
+        this.totalCount = 0;
+        this.pageCount = 0;
+        this.updatePageSizeOptions();
         this.errorMessage = 'Error fetching vehicle details.';
         console.error(error);
       }
@@ -222,6 +233,19 @@ const requestBody = {
   applyFilters() {
     this.currentPage = 1;
     this.getStatusOnInitDetails(this.currentPage);
+  }
+
+  onActivationFilterChange(): void {
+    this.ChangeFilter();
+    this.applyFilters();
+  }
+
+  private updatePageSizeOptions(): void {
+    const options: PageSizeOption[] = [20, 50, 100, 200, 500];
+    if (this.totalCount > 0 && !options.includes(this.totalCount)) {
+      options.push(this.totalCount);
+    }
+    this.pageSizeOptions = options;
   }
   hasValidDateRange(): boolean {
     return (
@@ -271,6 +295,7 @@ const requestBody = {
         } else {
           this.errorMessage = 'Failed to export data.';
         }
+
       },
       error: (error) => {
         this.errorMessage = 'Error exporting data.';
@@ -279,6 +304,11 @@ const requestBody = {
       }
     });
 
+  }
+
+  exportExcel(): void {
+    this.downloadType = 'Excel';
+    this.exportData();
   }
 
   onDateApply(event: any) {
@@ -333,18 +363,20 @@ const requestBody = {
   }
 
   getSearchDetails() {
-    this.getStatusOnInitDetails(1);
+    this.currentPage = 1;
+    this.getStatusOnInitDetails(this.currentPage);
   }
 
 reloadData() {
   this.searchBy = '';
   this.alertType = 'New System Data';
   this.activationFilter = 'Activated';
+  this.ChangeFilter();
   this.mviFilter = 'All';
   this.rtoObj = null;
 
   this.pageSize = 20;
-  this.selectedPageSize = '20';
+  this.selectedPageSize = 20;
   this.currentPage = 1;
 
   this.getStatusOnInitDetails(1);
@@ -355,17 +387,14 @@ reloadData() {
     this.getStatusOnInitDetails(this.currentPage);
   }
 
-onPageSizeChange(event: Event) {
-  const value = (event.target as HTMLSelectElement).value;
-
-  if (value === 'ALL') {
-    this.selectedPageSize = 'ALL';
-    this.pageSize = this.totalCount;
-  } else {
-    this.selectedPageSize = Number(value);
-    this.pageSize = Number(value);
-  }
-
+onPageSizeChange(selection: PageSizeOption | Event) {
+  const size = selection instanceof Event
+    ? (selection.target as HTMLSelectElement).value
+    : selection;
+  const newSize = size === 'All' || size === 'ALL' ? this.totalCount : Number(size);
+  if (!Number.isFinite(newSize) || newSize < 1) return;
+  this.pageSize = newSize;
+  this.selectedPageSize = size;
   this.currentPage = 1;
   this.getStatusOnInitDetails(this.currentPage);
 }
@@ -597,14 +626,6 @@ getInstallationType(value: string): string {
   }
 }
   ChangeFilter(){
-    if (this.activationFilter === 'Activated') {
-      this.showMviDiv = true;
-    }
-    else if (this.activationFilter === 'Deactivated') {
-      this.showMviDiv = false;
-    }
-      else if (this.activationFilter === 'Not Activated') {
-
-      }
+    this.showMviDiv = this.activationFilter === 'Activated';
   }
 }

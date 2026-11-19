@@ -1,62 +1,6 @@
 th {
     padding: 5px;
 }
-/* 🔵 PAGINATION WRAPPER */
-.custom-pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  margin-top: 12px;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-/* 🔘 BUTTON BASE */
-.pg-btn,
-.pg-num {
-  min-width: 32px;
-  height: 30px;
-  padding: 0 8px;
-  border: 1px solid #0b58b9;
-  background: #fff;
-  color: #0b58b9;
-  font-size: 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* 🔢 NUMBER BUTTON */
-.pg-num {
-  font-weight: 600;
-}
-
-/* 🔥 ACTIVE PAGE */
-.pg-num.active {
-  background: #0b58b9;
-  color: #fff;
-}
-
-/* 🖱 HOVER */
-.pg-btn:hover,
-.pg-num:hover {
-  background: #0b58b9;
-  color: #fff;
-}
-
-/* ❌ DISABLED */
-.pg-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* ... DOTS */
-.pg-dots {
-  padding: 0 4px;
-  font-size: 14px;
-  color: #666;
-}
-
 .compliance-btn {
   font-size: 12px;
   font-weight: 700;

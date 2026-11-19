@@ -21,124 +21,28 @@
           <!-- <div class="table-responsive"> -->
           <div class="col-sm-12">
             <div id="vahanuploadresponseTable">
-              <!-- Search and Pagination Controls -->
-              <!-- TOP CONTROLS ROW (STANDARD) -->
-              <div class="top-controls-row">
-                <!-- LEFT SIDE -->
-                <div class="left-controls">
-                  <!-- SEARCH -->
-                  <div class="search-box">
-                    <input
-                      type="search"
-                      class="search-input inner"
-                      placeholder="Type here and press button...."
-                      maxlength="50"
-                      [(ngModel)]="searchText"
-                      (keyup.enter)="getSearchDetails()"
-                      name="searchby"
-                      />
-
-                    <button
-                      type="button"
-                      class="search-inner-btn"
-                      (click)="getSearchDetails()"
-                      >
-                      <i class="fa fa-search"></i>
-                    </button>
-                  </div>
-
-                  <!-- RELOAD -->
-                  <button
-                    class="reload-btn"
-                    (click)="reloadData()"
-                    [disabled]="loading"
-                    >
-                    <i
-                      class="fa fa-refresh"
-                      [class.fa-spin]="loading"
-                      style="margin-right: 5px"
-                    ></i>
-
-                    @if (!loading) {
-                      <span>Reload</span>
-                    }
-                    @if (loading) {
-                      <span>Reloading...</span>
-                    }
-                  </button>
+              <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here and press button...."
+                [showExcel]="false" [showFilters]="true" [searchText]="searchText"
+                (searchTextChange)="searchText = $event" (search)="getSearchDetails()" (reload)="reloadData()"
+                [loading]="loading" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+                [displayedCount]="pageCount" [totalRecords]="totalCount"
+                (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows"
+                totalLabel="Total Records" countSeparator="of">
+                <div toolbarFilters>
+                  <input ngxDaterangepickerMd [(ngModel)]="selectedDateRange" (datesUpdated)="onDateRangeChange($event)"
+                    placeholder="Select Date Range" type="text" class="form-control" [maxDate]="maxDate"
+                    [drops]="'down'" [locale]="{ format: 'DD-MMM-YYYY' }">
                 </div>
-                <div class="left-controls">
-                  <input
-                    ngxDaterangepickerMd
-                    [(ngModel)]="selectedDateRange"
-                    (datesUpdated)="onDateRangeChange($event)"
-                    placeholder="Select Date Range"
-                    type="text"
-                    class="form-control"
-                    [maxDate]="maxDate"
-                    [drops]="'down'"
-                    [locale]="{ format: 'DD-MMM-YYYY' }"
-                    />
-                </div>
-                <!-- RIGHT SIDE -->
-                <div class="right-controls">
-                  <!-- ROWS -->
-                  <select
-                    class="rows-select"
-                    [(ngModel)]="pageSize"
-                    (change)="onPageSizeChange(pageSize)"
-                    >
-                    @for (size of pageSizeOptions; track size) {
-                      <option
-                        [value]="size === totalCount ? totalCount : size"
-                        >
-                        {{ size === totalCount ? totalCount : size }}
-                      </option>
-                    }
-                  </select>
-
-                  <!-- TOTAL RECORDS -->
-                  <div class="total-records-text">
-                    Total Records : {{ pageCount }} of {{ totalCount }}
-                  </div>
-                </div>
-              </div>
-
-              <app-common-table
-                [columns]="tableColumns"
-                [rows]="vahanData"
-                emptyMessage="No Data Found"
-                tableClass="table table-striped app-table mb-1"
+              </app-common-data-toolbar>
+              <app-data-table [columns]="tableColumns" [rows]="vahanData" [loading]="loading"
+                emptyMessage="No Data Found" tableClass="table table-striped app-table mb-1"
                 tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
-                tableId="devicetable"
-                [sortKey]="sortKey"
-                [reverse]="reverse"
-                (sortChange)="sort($event)"
-                [cellTemplate]="vahanCell">
-                <ng-template #vahanCell let-dev let-column="column">
-                  @if (column.key === 'serial') {
-                    {{hasLength(dev.param2) ? dev.param2 : 'NA'}}<br />
-                    {{hasLength(dev.param8) ? dev.param8 : 'NA'}}
-                  } @else if (column.key === 'activation') {
-                    {{hasLength(dev.param3) ? dev.param3 : 'NA'}}<br />
-                    {{hasLength(dev.param4) ? formatDisplayDate(dev.param4) : 'NA'}}
-                  } @else if (column.key === 'action') {
-                    <button class="repush-btn" (click)="onRepush(dev)">Repush</button>
-                  } @else if (column.key === 'param11' || column.key === 'param5') {
-                    {{hasLength(dev[column.key]) ? formatDisplayDate(dev[column.key]) : 'NA'}}
-                  } @else {
-                    {{hasLength(dev[column.key]) ? dev[column.key] : 'NA'}}
-                  }
-                </ng-template>
-              </app-common-table>
-              <!-- Pagination Controls -->
+                tableId="devicetable" [sortKey]="sortKey" [reverse]="reverse" (sort)="sort($event)">
+              </app-data-table>
               <div class="float-end">
-                @if (totalCount > pageSize) {
-                  <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-                    [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-                    [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-                  </ngb-pagination>
-                }
+                <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+                  [disabled]="loading" (pageChange)="onPageChange($event)">
+                </app-pagination>
               </div>
               <!-- Pagination Controls -->
               <!-- PAGINATION -->

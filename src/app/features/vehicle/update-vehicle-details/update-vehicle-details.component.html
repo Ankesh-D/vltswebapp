@@ -74,220 +74,54 @@
       </div>
     </div> -->
     <div class="update-vehicle-list">
-      <form autocomplete="off" class="top-controls-row" (submit)="$event.preventDefault()">
-
-        <!-- LEFT SIDE -->
-        <div class="left-controls">
-
-          <label class="topbar-label" for="searchby">Search :</label>
-
-          <div class="search-box">
-            <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input inner"
-              id="searchby" placeholder="Type here and press button...." autocomplete="disabled" maxlength="50"
-              [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" />
-
-            <button type="button" class="search-inner-btn" (click)="getSearchDetails()" [disabled]="loading">
-              <i class="fa fa-search"></i>
-            </button>
-          </div>
-
-          <!-- RELOAD -->
-          <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading">
-            @if (!loading) {
-              <span>Reload</span>
-            }
-            @if (loading) {
-              <span>Reloading...</span>
-            }
-          </button>
-
-        </div>
-
-        <!-- RIGHT SIDE -->
-        <div class="right-controls">
-
-          <label class="total-records-text" for="vehiclePageSize">Show Rows :</label>
-
-          <select id="vehiclePageSize" class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
-
-            @for (size of pageSizeOptions; track size) {
-              <option [value]="size === totalCount ? totalCount : size">
-                {{ size === totalCount ? totalCount : size }}
-              </option>
-            }
-
-          </select>
-
-          <div class="total-records-text">
-            Total Records : {{pageCount}} of {{totalCount}}
-          </div>
-
-        </div>
-
-      </form>
-      <div class="vehicle-table-scroll">
-      <table class="table table-striped app-table mb-1 vehicle-details-table">
-        <colgroup>
-          <col class="column-index">
-          <col class="column-vehicle">
-          <col class="column-engine">
-          <col class="column-type">
-          <col class="column-year">
-          <col class="column-state">
-          <col class="column-rto">
-          <col class="column-make">
-          <col class="column-model">
-          <col class="column-status">
-          <col class="column-actions">
-        </colgroup>
-        <thead>
+      <app-common-data-toolbar variant="vehicle" searchLabel="Search :" searchPlaceholder="Type here and press button..."
+        [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
+        (reload)="reloadData()" [loading]="loading" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+        [displayedCount]="pageCount" [totalRecords]="totalCount" [showExcel]="false"
+        [showFilters]="false" (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows"
+        totalLabel="Total Records" countSeparator="of">
+      </app-common-data-toolbar>
+      <ng-template #vehicleBody let-vehicles>
+        @if (vehicles.length === 0) {
+          <tr><td class="no-data" colspan="11">NO DATA FOUND</td></tr>
+        }
+        @for (vehicle of vehicles; track vehicle) {
           <tr>
-            <th scope="col">#</th>
-            <th scope="col" (click)="sort('param7')" (keydown.enter)="sort('param7')" tabindex="0">
-              Vehicle No.<br>Chassis No.
-                @if (sortKey === 'param7') {
-                  <span class="sorting"
-                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-                }
-              </th>
-              <th scope="col" (click)="sort('param9')" (keydown.enter)="sort('param9')" tabindex="0">
-                Engine No.
-                @if (sortKey === 'param9') {
-                  <span class="sorting"
-                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-                }
-              </th>
-              <th scope="col" (click)="sort('param15')" (keydown.enter)="sort('param15')" tabindex="0">
-                Vehicle Type
-                @if (sortKey === 'param15') {
-                  <span class="sorting"
-                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-                }
-              </th>
-              <th scope="col" (click)="sort('param12')" (keydown.enter)="sort('param12')" tabindex="0">
-                Mfg Year
-                @if (sortKey === 'param12') {
-                  <span class="sorting"
-                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-                }
-              </th>
-              <th scope="col" (click)="sort('param13')" (keydown.enter)="sort('param13')" tabindex="0">
-                State Code
-                @if (sortKey === 'param13') {
-                  <span class="sorting"
-                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-                }
-              </th>
-              <th scope="col" (click)="sort('param14')" (keydown.enter)="sort('param14')" tabindex="0">
-                RTO Name
-                @if (sortKey === 'param14') {
-                  <span class="sorting"
-                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-                }
-              </th>
-              <th scope="col" (click)="sort('param26')" (keydown.enter)="sort('param26')" tabindex="0">
-                Make Name
-                @if (sortKey === 'param26') {
-                  <span class="sorting"
-                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-                }
-              </th>
-              <th scope="col" (click)="sort('param27')" (keydown.enter)="sort('param27')" tabindex="0">
-                Model Name
-                @if (sortKey === 'param27') {
-                  <span class="sorting"
-                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-                }
-              </th>
-              <th scope="col" (click)="sort('param21')" (keydown.enter)="sort('param21')" tabindex="0">
-                Activation Status
-                @if (sortKey === 'param21') {
-                  <span class="sorting"
-                  [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-                }
-              </th>
-              <th scope="col">Activity</th>
-            </tr>
-          </thead>
-          <tbody>
-            @if (vehicleDetails.length === 0 && !loading) {
-              <tr>
-                <td class="no-data" colspan="11">NO DATA FOUND</td>
-              </tr>
-            }
-            @for (vehicle of getPaginatedData(); track vehicle) {
-              <tr>
-                <td>{{vehicle.param1 || 'NA'}}</td>
-                <td>{{vehicle.param7 || 'NA'}}<br>{{vehicle.param8 || 'NA'}}</td>
-                <td>{{vehicle.param9 || 'NA'}}</td>
-                <td>{{vehicle.param15 || 'NA'}}</td>
-                <td>{{vehicle.param12 || 'NA'}}</td>
-                <td>{{vehicle.param13 || 'NA'}}</td>
-                <td>{{vehicle.param14 || 'NA'}}</td>
-                <td>{{vehicle.param26 || 'NA'}}</td>
-                <td>{{vehicle.param27 || 'NA'}}</td>
-                <td>
-                  <font style="font-weight:bold;">{{vehicle.param21}}</font>
-                  @if (vehicle.param21 === 'Activated') {
-                    <span><br>{{vehicle.param10 || 'NA'}}</span>
-                  }
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="btn-edit" type="button" (click)="openEditModal(vehicle)">
-                      Edit
-                    </button>
-                    &nbsp;
-                    <button class="btn-delete" type="button" (click)="openDeleteModal(vehicle)">
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+            <td>{{vehicle.param1 || 'NA'}}</td>
+            <td>{{vehicle.param7 || 'NA'}}<br>{{vehicle.param8 || 'NA'}}</td>
+            <td>{{vehicle.param9 || 'NA'}}</td>
+            <td>{{vehicle.param15 || 'NA'}}</td>
+            <td>{{vehicle.param12 || 'NA'}}</td>
+            <td>{{vehicle.param13 || 'NA'}}</td>
+            <td>{{vehicle.param14 || 'NA'}}</td>
+            <td>{{vehicle.param26 || 'NA'}}</td>
+            <td>{{vehicle.param27 || 'NA'}}</td>
+            <td>
+              <strong>{{vehicle.param21 || 'NA'}}</strong>
+              @if (vehicle.param21 === 'Activated') {
+                <br>{{vehicle.param10 || 'NA'}}
+              }
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-edit" type="button" (click)="openEditModal(vehicle)">Edit</button>
+                <button class="btn-delete" type="button" (click)="openDeleteModal(vehicle)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        }
+      </ng-template>
+      <div class="vehicle-table-scroll">
+        <app-data-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" [bodyTemplate]="vehicleBody" (sort)="sort($event)"
+          tableClass="table table-striped app-table mb-1 vehicle-details-table" emptyMessage="NO DATA FOUND">
+        </app-data-table>
       </div>
-        <!-- Pagination Controls -->
-        <div class="float-end">
-          @if (totalCount > pageSize) {
-            <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-              [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-              [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-            </ngb-pagination>
-          }
-        </div>
-        <!-- Pagination -->
-        <!-- <div *ngIf="totalCount > pageSize" class="pagination-wrapper">
-        <ul class="pagination"
-          style="display: flex; gap: 5px; list-style: none; padding: 0; margin: 0; align-items: center; justify-content: flex-end;">
-          <li [class.disabled]="currentPage === 1">
-            <button type="button" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
-              class="btn btn-sm shadow-sm"
-              style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
-              <i class="fa fa-angle-left" style="margin-right: 4px;"></i> Previous
-            </button>
-          </li>
-
-          <li *ngFor="let page of getPageNumbers()">
-            <span *ngIf="page === -1" style="font-size: 12px; color: #6c757d; padding: 0 5px; font-weight: bold;">...</span>
-            <button type="button" *ngIf="page !== -1" (click)="onPageChange(page)" class="btn btn-sm shadow-sm"
-              [style.background]="currentPage === page ? '#0b58b9' : '#fff'"
-              [style.color]="currentPage === page ? '#fff' : '#0b58b9'"
-              style="font-size: 11px; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1px solid #dee2e6; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-              {{ page }}
-            </button>
-          </li>
-
-          <li [class.disabled]="currentPage >= getTotalPages()">
-            <button type="button" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()"
-              class="btn btn-sm shadow-sm"
-              style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
-              Next <i class="fa fa-angle-right" style="margin-left: 4px;"></i>
-            </button>
-          </li>
-        </ul>
-      </div> -->
+      <div class="float-end">
+        <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+          [disabled]="loading" (pageChange)="onPageChange($event)">
+        </app-pagination>
+      </div>
     </div>
 
 

@@ -11,6 +11,9 @@
       <div class="overspeed-layout">
 
         <!-- LEFT FILTER PANEL -->
+        <app-common-data-toolbar [showFilters]="true" [showSearch]="false" [showReload]="false"
+          [showExcel]="false" [showPageSize]="false" [showTotal]="false">
+        <div toolbarFilters class="d-flex align-items-center gap-2 flex-wrap">
         <div class="left-filter-panel entrypagediv">
 
           <!-- FILTER BY -->
@@ -182,72 +185,28 @@
             </button>
           </div>
         </div>
+        </div>
+        </app-common-data-toolbar>
         <!-- *ngIf="showSummary" -->
         <!-- RIGHT REPORT PANEL -->
         <div class="right-report-panel" >
-          <!-- 🔹 TOP CONTROLS BAR -->
-          <div class="top-controls-row">
-
-            <!-- LEFT SIDE -->
-            <div class="left-controls">
-
-              <!-- 🔍 SEARCH BOX -->
-              <div class="search-box">
-                <input
-                  type="search"
-                  class="search-input inner"
-                  placeholder="Search vehicle / alert..."
-                  maxlength="50"
-                  [(ngModel)]="searchText"
-                  (keyup.enter)="getSearchDetails()" />
-
-                <button class="search-inner-btn" (click)="getSearchDetails()">
-                  <i class="fa fa-search"></i>
-                </button>
-              </div>
-
-              <!-- 🔄 RELOAD BUTTON -->
-              <button
-                class="reload-btn"
-                (click)="reloadData()"
-                [disabled]="loading">
-
-                <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
-                <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
-
-              </button>
-
-            </div>
-
-            <!-- RIGHT SIDE -->
-            <div class="right-controls">
-              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
-                [showPageSize]="false" [showTotal]="false" (excelExport)="exportToExcel()">
-              </app-common-data-toolbar>
-              <div class="total-records-text">Show Rows :</div>
-              <!-- ROWS SELECT -->
-              <select
-                class="rows-select"
-                [(ngModel)]="pageSize"
-                (change)="onPageSizeChanged(pageSize)">
-
-                @for (size of pageSizeOptions; track size) {
-                  <option
-                    [value]="size === totalCount ? 'All' : size">
-                    {{ size === totalCount ? 'All' : size }}
-                  </option>
-                }
-
-              </select>
-
-              <!-- TOTAL RECORD TEXT -->
-              <div class="total-records-text">
-                Total Records : {{ pageCount }} of {{ totalCount }}
-              </div>
-
-            </div>
-
-          </div>
+                                        <app-common-data-toolbar
+                                          [searchText]="searchText"
+                                          searchPlaceholder="Search vehicle / alert..."
+                                          (searchTextChange)="searchText=$event"
+                                          (search)="getSearchDetails()"
+                                          (reload)="reloadData()"
+                                          [loading]="loading"
+                                          [pageSize]="pageSize"
+                                          [pageSizeOptions]="pageSizeOptions"
+                                          [displayedCount]="pageCount"
+                                          [totalRecords]="totalCount"
+                                          (pageSizeChange)="onPageSizeChanged($event)"
+                                          (excelExport)="exportToExcel()"
+                                          pageSizeLabel="Show Rows"
+                                          totalLabel="Total Records"
+                                          countSeparator="of">
+                                        </app-common-data-toolbar>
           <!-- TABLE -->
           <div class="table-wrapper" >
             <ng-template #reportTableRows let-rows>
@@ -301,49 +260,11 @@
                   </tr>
                 }
 </ng-template>
-<app-common-table [columns]="tableColumns" [rows]="alertData" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table-grid"></app-common-table>
+<app-data-table [columns]="tableColumns" [rows]="alertData" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table-grid"></app-data-table>
           </div>
-          @if (totalCount > pageSize || page > 1) {
-            <div class="custom-pagination"style="display:flex;justify-content: end;">
-              <button class="pg-btn"
-                (click)="changePage(page - 1)"
-                [disabled]="page === 1">
-                Prev
-              </button>
-              @if (page > 3) {
-                <span class="pg-dots">...</span>
-              }
-              @if (page > 2) {
-                <button
-                  class="pg-num"
-                  (click)="changePage(page - 1)">
-                  {{ page - 1 }}
-                </button>
-              }
-              <button class="pg-num active">
-                {{ page }}
-              </button>
-              @if (page < totalPages - 1) {
-                <button
-                  class="pg-num"
-                  (click)="changePage(page + 1)">
-                  {{ page + 1 }}
-                </button>
-              }
-              @if (page < totalPages - 2) {
-                <span class="pg-dots">...</span>
-              }
-              <button class="pg-num"
-                (click)="changePage(totalPages)">
-                {{ totalPages }}
-              </button>
-              <button class="pg-btn"
-                (click)="changePage(page + 1)"
-                [disabled]="page === totalPages">
-                Next
-              </button>
-            </div>
-          }
+          <app-pagination [totalCount]="totalCount" [page]="page" [pageSize]="pageSize"
+            [disabled]="loading" (pageChange)="changePage($event)">
+          </app-pagination>
         </div>
 
       </div>

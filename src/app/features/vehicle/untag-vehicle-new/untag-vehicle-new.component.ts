@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -11,7 +11,9 @@ import { VehicleService } from '../../../core/services/vehicle.service';
 import { Device } from '../../dashboard/new-date-filter-dashboard/new-date-filter-dashboard.component';
 import { DeviceService } from '../../../core/services/device.service';
 import { UntagRequestDetailsComponent } from './untag-request-details/untag-request-details.component';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 export class RequestData {
   "param1": string =''; //"1",
   "param2": string =''; //"requestid",
@@ -28,26 +30,37 @@ export class RequestData {
 }
 @Component({
     selector: 'app-untag-vehicle-new',
-    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, UntagRequestDetailsComponent, NgbPaginationModule],
+    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, UntagRequestDetailsComponent,
+      CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './untag-vehicle-new.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './untag-vehicle-new.component.scss'
 })
-export class UntagVehicleNewComponent  implements OnInit, AfterViewInit {
+export class UntagVehicleNewComponent  implements OnInit {
   dataDetails: any[] = [];
   loading = false;
 
   searchText: string = '';
   currentPage = 1;
-  pageNo: number = 1;
   pageSize = 20;
   pageSizeOptions = [20, 50, 100, 200, 500];
   totalCount = 0;
   pageCount = 0;
 
-  sortKey: string = '';
-
-  reverse: boolean = false;
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { header: '#' },
+    { header: 'IMEI / Serial No / ICCID' },
+    { header: 'Vendor / Dealer' },
+    { header: 'Vehicle No / Chassis / Engine' },
+    { header: 'Type / Model / Make' },
+    { header: 'Customer / Mobile' },
+    { header: 'RTO' },
+    { header: 'Activation / Validity' },
+    { header: 'Polling / Last Time' },
+    { header: 'Status / Action Status' },
+    { header: 'MVI Approval Status / Approved By / Approved On', visible: () => this.roleId == 10 || this.roleId == 64 },
+    { header: 'Action' }
+  ];
   selectedDeviceId: string = '';
   selectedDeviceImei: string = '';
   untagRemarks: string = '';
@@ -74,7 +87,6 @@ export class UntagVehicleNewComponent  implements OnInit, AfterViewInit {
     this.getDetails(1);
   }
 
-  ngAfterViewInit() {}
   toggleFlag:boolean=false;
   togglefun() {
       this.toggleFlag = !this.toggleFlag;
@@ -87,7 +99,9 @@ export class UntagVehicleNewComponent  implements OnInit, AfterViewInit {
     if (this.totalCount > 100) options.push(100);
     if (this.totalCount > 200) options.push(200);
     if (this.totalCount > 500) options.push(500);
-    if (this.totalCount > 0 && this.totalCount < 100) options.push(this.totalCount); // 'All'
+    if (this.totalCount > 0 && this.totalCount < 100 && !options.includes(this.totalCount)) {
+      options.push(this.totalCount);
+    }
     this.pageSizeOptions = options;
   }
 
@@ -141,24 +155,8 @@ export class UntagVehicleNewComponent  implements OnInit, AfterViewInit {
   reloadData() {
     this.searchText = '';
     this.pageSize = 20;
-    this.pageNo = 1;
+    this.currentPage = 1;
     this.getDetails(1);
-  }
-
-  sort(key: string) {
-    this.sortKey = key;
-    this.reverse = !this.reverse;
-    this.dataDetails.sort((a, b) => {
-      const valA = (a as any)[key];
-      const valB = (b as any)[key];
-      let comparison = 0;
-      if (valA > valB) {
-        comparison = 1;
-      } else if (valA < valB) {
-        comparison = -1;
-      }
-      return this.reverse ? comparison * -1 : comparison;
-    });
   }
 
   onPageChange(page: number) {
@@ -166,54 +164,10 @@ export class UntagVehicleNewComponent  implements OnInit, AfterViewInit {
     this.getDetails(this.currentPage);
   }
 
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
-    this.pageSize = newSize == 'All' ? this.totalCount : Number(newSize);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount ? this.totalCount : Number(size);
     this.currentPage = 1;
     this.getDetails(this.currentPage);
-  }
-
-  getTotalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
-
-  getPageNumbers(): number[] {
-    const total = this.getTotalPages();
-    const pages: number[] = [];
-    const maxPages = 8;
-
-    if (total <= maxPages) {
-      for (let i = 1; i <= total; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) {
-          pages.push(i);
-        }
-        pages.push(-1);
-        pages.push(total);
-      } else if (this.currentPage >= total - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = total - 4; i <= total; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push(-1);
-        pages.push(total);
-      }
-    }
-    return pages;
-  }
-
-  getPaginatedData(): any[] {
-    return this.dataDetails;
   }
   // 🔹 Open Untag Modal
   @ViewChild('requestForm') requestForm!: NgForm;

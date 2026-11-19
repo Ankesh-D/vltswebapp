@@ -12,220 +12,132 @@
 
       <!-- ==================== GRID VIEW ==================== -->
       @if (detailsToggle) {
-        <form autocomplete="off" class="mb-2">
-          <div class="d-flex justify-content-between align-items-center flex-wrap">
-            <!-- Search + Reload -->
-            <div class="d-flex align-items-center flex-wrap">
-              <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Search :</label>
-              <div class="input-group input-group-sm">
-                <input type="search" class="form-control shadow-none" placeholder="Trip name / code..."
-                  [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" autocomplete="off"
-                  style="font-size: 11px; width: 200px;">
-                <div class="input-group-append">
-                  <button type="button" class="btn btn-primary search-btn" (click)="getSearchDetails()">
-                    <i class="fa fa-search" style="font-size: 11px;"></i>
-                  </button>
-                </div>
-              </div>
-              <button type="button" (click)="reloadData()" class="btn btn-outline-success btn-sm ms-2"
-                style="font-size: 11px;" title="Reload">
-                <i class="fa fa-refresh me-1" [class.fa-spin]="loading"></i>
-                {{ loading ? 'Reloading...' : 'Reload' }}
+        <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Trip name / code..."
+          [searchText]="searchText" (searchTextChange)="searchText = $event" (search)="getSearchDetails()"
+          (reload)="reloadData()" [loading]="loading" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+          [displayedCount]="pageCount" [totalRecords]="totalCount" [showFilters]="false" [showExcel]="true"
+          pageSizeLabel="Show Rows" totalLabel="Total Records" countSeparator="of"
+          (pageSizeChange)="onPageSizeChange($event)" (excelExport)="exportToExcel()">
+          <div toolbarBeforePageSize class="d-flex align-items-center flex-wrap">
+            <button type="button" class="btn btn-outline-secondary btn-sm me-2" style="font-size: 11px;"
+              (click)="printGrid()"><i class="fa fa-print me-1"></i>Print</button>
+            <div class="me-3 position-relative">
+              <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size: 11px;"
+                (click)="showColumnChooser = !showColumnChooser">
+                <i class="fa fa-columns me-1"></i> Columns
               </button>
-            </div>
-            <!-- Right controls -->
-            <div class="d-flex align-items-center flex-wrap mt-1 mt-md-0">
-              <div class="d-flex align-items-center me-3">
-                <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Download :</label>
-                <select name="downloadType" [(ngModel)]="selectedDownloadType" (change)="onDownloadChange()"
-                  class="form-control form-control-sm" style="font-size: 11px; width: auto;">
-                  <option value="">Select</option>
-                  <!-- <option value="Excel">Excel</option> -->
-                  <option value="">Excel</option>
-                  <!-- <option value="PDF">Print / PDF</option> -->
-                </select>
-              </div>
-              <div class="me-3 position-relative">
-                <button type="button" class="btn btn-outline-secondary btn-sm" style="font-size: 11px;"
-                  (click)="showColumnChooser = !showColumnChooser">
-                  <i class="fa fa-columns me-1"></i> Columns
-                </button>
-                @if (showColumnChooser) {
-                  <div class="column-chooser-panel shadow-sm">
-                    @for (col of columns; track col) {
-                      <div class="form-check">
-                        <label class="form-check-label">
-                          <input type="checkbox" class="form-check-input" [checked]="col.visible" (change)="toggleColumn(col)">
-                          {{ col.label }}
-                        </label>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-              <div class="d-flex align-items-center me-3">
-                <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Show Rows :</label>
-                <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" name="pageSize"
-                  class="form-control form-control-sm" style="font-size: 11px; width: auto;">
-                  @for (size of pageSizeOptions; track size) {
-                    <option [value]="size">{{ size }}</option>
+              @if (showColumnChooser) {
+                <div class="column-chooser-panel shadow-sm">
+                  @for (col of columns; track col) {
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" [checked]="col.visible" (change)="toggleColumn(col)">
+                        {{ col.label }}
+                      </label>
+                    </div>
                   }
-                </select>
-              </div>
-              <span class="fw-bold" style="font-size: 11px;">
-                Total Records : <span class="text-primary">{{ pageCount }} of {{ totalCount }}</span>
-              </span>
+                </div>
+              }
             </div>
           </div>
-        </form>
-        <div class="table-responsive">
-          <table class="table table-striped app-table table-sm table-bordered mb-1" id="schoolTripTable">
-            <thead>
-              <tr>
-                <th style="width:35px;">#</th>
-                @if (isColumnVisible('tripcode')) {
-                  <th (click)="sortBy('param2')" style="cursor:pointer;">Trip Code
-                    <i class="fa" [ngClass]="sortKey==='param2' ? (sortDir==='asc'?'fa-sort-up':'fa-sort-down') : 'fa-sort'"></i>
-                  </th>
-                }
-                @if (isColumnVisible('tripname')) {
-                  <th (click)="sortBy('param3')" style="cursor:pointer;">Trip Name
-                    <i class="fa" [ngClass]="sortKey==='param3' ? (sortDir==='asc'?'fa-sort-up':'fa-sort-down') : 'fa-sort'"></i>
-                  </th>
-                }
-                @if (isColumnVisible('triptype')) {
-                  <th>Type</th>
-                }
-                @if (isColumnVisible('vehicle')) {
-                  <th>Vehicle</th>
-                }
-                @if (isColumnVisible('driver')) {
-                  <th>Driver</th>
-                }
-                @if (isColumnVisible('source')) {
-                  <th>Source</th>
-                }
-                @if (isColumnVisible('destination')) {
-                  <th>Destination</th>
-                }
-                @if (isColumnVisible('starttime')) {
-                  <th>Start</th>
-                }
-                @if (isColumnVisible('endtime')) {
-                  <th>End</th>
-                }
-                @if (isColumnVisible('distance')) {
-                  <th>Distance (km)</th>
-                }
-                @if (isColumnVisible('duration')) {
-                  <th>Duration (min)</th>
-                }
-                @if (isColumnVisible('status')) {
-                  <th>Status</th>
-                }
-                <th style="width: 260px;">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (!loading && totalCount === 0) {
-                <tr>
-                  <td colspan="13" class="text-center">No Records Found</td>
-                </tr>
-              }
-              @for (row of detailData; track row; let i = $index) {
-                <tr>
-                  <td>
-                    <a href="javascript:void(0)" (click)="toggleTimeline(i)" title="Toggle timeline">
-                      {{ (pageSize * (currentPage - 1)) + i + 1 }}
-                      <i class="fa" [ngClass]="expandedRow === i ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                    </a>
-                  </td>
-                  @if (isColumnVisible('tripcode')) {
-                    <td>{{ row.param2 }}</td>
-                  }
-                  @if (isColumnVisible('tripname')) {
-                    <td>{{ row.param3 }}</td>
-                  }
-                  @if (isColumnVisible('triptype')) {
-                    <td>{{ row.param4 }}</td>
-                  }
-                  @if (isColumnVisible('vehicle')) {
-                    <td>{{ row.param23 }}</td>
-                  }
-                  @if (isColumnVisible('driver')) {
-                    <td>{{ row.param24 }}</td>
-                  }
-                  @if (isColumnVisible('source')) {
-                    <td>{{ row.param21 }}</td>
-                  }
-                  @if (isColumnVisible('destination')) {
-                    <td>{{ row.param22 }}</td>
-                  }
-                  @if (isColumnVisible('starttime')) {
-                    <td>{{ row.param9 }}</td>
-                  }
-                  @if (isColumnVisible('endtime')) {
-                    <td>{{ row.param10 }}</td>
-                  }
-                  @if (isColumnVisible('distance')) {
-                    <td>{{ row.param17 }}</td>
-                  }
-                  @if (isColumnVisible('duration')) {
-                    <td>{{ row.param18 }}</td>
-                  }
-                  @if (isColumnVisible('status')) {
-                    <td>
-                      <span class="badge" [ngClass]="row.param14 === 'Active' ? 'badge-success' : 'badge-secondary'">{{ row.param14 }}</span>
-                    </td>
-                  }
-                  <td class="text-center text-nowrap">
-                    <a class="btn btn-outline-secondary btn-sm" title="View" (click)="setData(row, 'view')"><i class="fa fa-eye"></i></a>
-                    <a class="btn btn-primary btn-sm" title="Edit" (click)="setData(row, 'edit')"><i class="fa fa-edit"></i></a>
-                    <a class="btn btn-outline-info btn-sm" title="Copy" (click)="setData(row, 'copy')"><i class="fa fa-copy"></i></a>
-                    <a class="btn btn-sm" title="{{ row.param14 === 'Active' ? 'Deactivate' : 'Activate' }}"
-                      [ngClass]="row.param14 === 'Active' ? 'btn-outline-warning' : 'btn-outline-success'"
-                      (click)="toggleStatus(row)">
-                      <i class="fa" [ngClass]="row.param14 === 'Active' ? 'fa-ban' : 'fa-check'"></i>
-                    </a>
-                    <a class="btn btn-danger btn-sm" title="Delete" (click)="openDeleteModal(row)"><i class="fa fa-trash"></i></a>
-                  </td>
-                </tr>
-                @if (expandedRow === i) {
-                  <tr>
-                    <td [attr.colspan]="13" class="bg-light">
-                      <div class="timeline">
-                        @for (stop of getStopsFromRow(row); track stop) {
-                          <div class="timeline-item">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                              <h6 class="mb-1">{{ stop.sequence }}. {{ stop.stopname }}</h6>
-                              <small class="text-muted">
-                                Arrival: <strong>{{ stop.arrivaltime }}</strong> &nbsp; Departure: <strong>{{ stop.departuretime }}</strong>
-                                &nbsp; Distance: <strong>{{ stop.distance }} km</strong> &nbsp; Students: <strong>{{ stop.studentcount }}</strong>
-                              </small>
-                            </div>
-                          </div>
-                        }
-                        @if (getStopsFromRow(row).length === 0) {
-                          <div class="timeline-item">
-                            <small class="text-muted">No stops recorded for this trip.</small>
-                          </div>
-                        }
-                      </div>
-                    </td>
-                  </tr>
-                }
-              }
-            </tbody>
-          </table>
-        </div>
-        <div class="float-end">
-          @if (totalCount > pageSize) {
-            <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-              [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-              [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-            </ngb-pagination>
+        </app-common-data-toolbar>
+        <app-data-table [columns]="tableColumns" [rows]="detailData" [loading]="loading"
+          [headerTemplate]="tripTableHeader" [bodyTemplate]="tripTableBody" [sortKey]="sortKey"
+          [reverse]="sortDir === 'desc'" tableClass="table table-striped app-table table-sm table-bordered mb-1"
+          tableId="schoolTripTable" (sort)="sortBy($event)">
+        </app-data-table>
+        <ng-template #tripTableHeader>
+          <tr>
+            <th style="width:35px;">#</th>
+            @if (isColumnVisible('tripcode')) {
+              <th (click)="sortBy('param2')" style="cursor:pointer;">Trip Code
+                <i class="fa" [ngClass]="sortKey==='param2' ? (sortDir==='asc'?'fa-sort-up':'fa-sort-down') : 'fa-sort'"></i>
+              </th>
+            }
+            @if (isColumnVisible('tripname')) {
+              <th (click)="sortBy('param3')" style="cursor:pointer;">Trip Name
+                <i class="fa" [ngClass]="sortKey==='param3' ? (sortDir==='asc'?'fa-sort-up':'fa-sort-down') : 'fa-sort'"></i>
+              </th>
+            }
+            @if (isColumnVisible('triptype')) { <th>Type</th> }
+            @if (isColumnVisible('vehicle')) { <th>Vehicle</th> }
+            @if (isColumnVisible('driver')) { <th>Driver</th> }
+            @if (isColumnVisible('source')) { <th>Source</th> }
+            @if (isColumnVisible('destination')) { <th>Destination</th> }
+            @if (isColumnVisible('starttime')) { <th>Start</th> }
+            @if (isColumnVisible('endtime')) { <th>End</th> }
+            @if (isColumnVisible('distance')) { <th>Distance (km)</th> }
+            @if (isColumnVisible('duration')) { <th>Duration (min)</th> }
+            @if (isColumnVisible('status')) { <th>Status</th> }
+            <th style="width: 260px;">Action</th>
+          </tr>
+        </ng-template>
+        <ng-template #tripTableBody let-rows>
+          @if (!rows.length && totalCount === 0) {
+            <tr><td [attr.colspan]="visibleTripColumnCount" class="text-center">No Records Found</td></tr>
           }
+          @for (row of rows; track row; let i = $index) {
+            <tr>
+              <td>
+                <a href="javascript:void(0)" (click)="toggleTimeline(i)" title="Toggle timeline">
+                  {{ (pageSize * (currentPage - 1)) + i + 1 }}
+                  <i class="fa" [ngClass]="expandedRow === i ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </a>
+              </td>
+              @if (isColumnVisible('tripcode')) { <td>{{ row.param2 }}</td> }
+              @if (isColumnVisible('tripname')) { <td>{{ row.param3 }}</td> }
+              @if (isColumnVisible('triptype')) { <td>{{ row.param4 }}</td> }
+              @if (isColumnVisible('vehicle')) { <td>{{ row.param23 }}</td> }
+              @if (isColumnVisible('driver')) { <td>{{ row.param24 }}</td> }
+              @if (isColumnVisible('source')) { <td>{{ row.param21 }}</td> }
+              @if (isColumnVisible('destination')) { <td>{{ row.param22 }}</td> }
+              @if (isColumnVisible('starttime')) { <td>{{ row.param9 }}</td> }
+              @if (isColumnVisible('endtime')) { <td>{{ row.param10 }}</td> }
+              @if (isColumnVisible('distance')) { <td>{{ row.param17 }}</td> }
+              @if (isColumnVisible('duration')) { <td>{{ row.param18 }}</td> }
+              @if (isColumnVisible('status')) {
+                <td><span class="badge" [ngClass]="row.param14 === 'Active' ? 'badge-success' : 'badge-secondary'">{{ row.param14 }}</span></td>
+              }
+              <td class="text-center text-nowrap">
+                <a class="btn btn-outline-secondary btn-sm" title="View" (click)="setData(row, 'view')"><i class="fa fa-eye"></i></a>
+                <a class="btn btn-primary btn-sm" title="Edit" (click)="setData(row, 'edit')"><i class="fa fa-edit"></i></a>
+                <a class="btn btn-outline-info btn-sm" title="Copy" (click)="setData(row, 'copy')"><i class="fa fa-copy"></i></a>
+                <a class="btn btn-sm" title="{{ row.param14 === 'Active' ? 'Deactivate' : 'Activate' }}"
+                  [ngClass]="row.param14 === 'Active' ? 'btn-outline-warning' : 'btn-outline-success'"
+                  (click)="toggleStatus(row)">
+                  <i class="fa" [ngClass]="row.param14 === 'Active' ? 'fa-ban' : 'fa-check'"></i>
+                </a>
+                <a class="btn btn-danger btn-sm" title="Delete" (click)="openDeleteModal(row)"><i class="fa fa-trash"></i></a>
+              </td>
+            </tr>
+            @if (expandedRow === i) {
+              <tr>
+                <td [attr.colspan]="visibleTripColumnCount" class="bg-light">
+                  <div class="timeline">
+                    @for (stop of getStopsFromRow(row); track stop) {
+                      <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                          <h6 class="mb-1">{{ stop.sequence }}. {{ stop.stopname }}</h6>
+                          <small class="text-muted">
+                            Arrival: <strong>{{ stop.arrivaltime }}</strong> &nbsp; Departure: <strong>{{ stop.departuretime }}</strong>
+                            &nbsp; Distance: <strong>{{ stop.distance }} km</strong> &nbsp; Students: <strong>{{ stop.studentcount }}</strong>
+                          </small>
+                        </div>
+                      </div>
+                    }
+                    @if (getStopsFromRow(row).length === 0) {
+                      <div class="timeline-item"><small class="text-muted">No stops recorded for this trip.</small></div>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </ng-template>
+        <div class="float-end">
+          <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+            (pageChange)="onPageChange($event)"></app-pagination>
         </div>
       }
 

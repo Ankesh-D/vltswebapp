@@ -8,10 +8,9 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { AlertService } from '../../../core/services/alert.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 declare var moment: any;
 @Component({
@@ -21,9 +20,9 @@ declare var moment: any;
         RouterModule,
         NgSelectModule,
         NgxDaterangepickerMd,
-        NgbPaginationModule,
         CommonDataToolbarComponent,
-        CommonTableComponent
+        DataTableComponent,
+        PaginationComponent
     ],
     templateUrl: './vendorwise-faulty-devices-count.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -31,12 +30,12 @@ declare var moment: any;
 })
 export class VendorwiseFaultyDevicesCountComponent implements OnInit {
   readonly rowClass = (row: any): string => this.checkAlertCount(row) ? 'high-alert-row' : '';
-  readonly tableColumns: CommonTableColumn<any>[] = [
-    { key: 'param1', label: '#', className: 'green py-1 text-center', cellClass: 'text-end px-2', clickable: () => true },
-    { key: 'param3', label: 'Vendor Name', className: 'green py-1 text-center', cellClass: 'text-left px-2 fw-bold text-primary', clickable: () => true },
-    { key: 'param4', label: 'Faulty device count', className: 'green py-1 text-end', cellClass: 'text-end px-2', clickable: () => true },
-    { key: 'param5', label: 'Activated', className: 'green py-1 text-end', cellClass: 'text-end px-2', clickable: () => true },
-    { key: 'param6', label: 'Not Activated', className: 'green py-1 text-end', cellClass: 'text-end px-2', clickable: () => true }
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { key: 'param1', header: '#', className: 'green py-1 text-center', cellClassName: 'text-end px-2', clickable: () => true },
+    { key: 'param3', header: 'Vendor Name', className: 'green py-1 text-center', cellClassName: 'text-left px-2 fw-bold text-primary', clickable: () => true },
+    { key: 'param4', header: 'Faulty device count', className: 'green py-1 text-end', cellClassName: 'text-end px-2', clickable: () => true },
+    { key: 'param5', header: 'Activated', className: 'green py-1 text-end', cellClassName: 'text-end px-2', clickable: () => true },
+    { key: 'param6', header: 'Not Activated', className: 'green py-1 text-end', cellClassName: 'text-end px-2', clickable: () => true }
   ];
 
   detailData: any[] = [];
@@ -142,8 +141,8 @@ export class VendorwiseFaultyDevicesCountComponent implements OnInit {
     this.detailModalPageCount = 1;
   }
 
-  onPageSizeChange(event: any) {
-    this.pageSize = Number(event.target.value);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = Number(size);
     this.pageCount = 1;
     this.getDetails();
   }

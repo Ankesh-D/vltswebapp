@@ -1,61 +1,59 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DeviceService, FirmwareDetailsReq, FirmwareDetailsResp } from '../../../core/services/device.service';
 import { ToastService } from '../../../core/services/toast.service';
-
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import moment from 'moment';
 import { Router } from '@angular/router';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent, PageSizeOption } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { CommonPaginationComponent } from '../../../shared/components/common-pagination/common-pagination.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
 @Component({
     selector: 'app-send-command-details',
-    imports: [FormsModule, RouterModule, NgbPaginationModule, CommonTableComponent],
+    imports: [FormsModule, RouterModule, CommonDataToolbarComponent, CommonPaginationComponent, DataTableComponent],
     templateUrl: './send-command-details.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./send-command-details.component.scss']
 })
 export class SendCommandDetailsComponent implements OnInit {
   public detailsRequest: FirmwareDetailsReq = new FirmwareDetailsReq();
-  public detailsData: FirmwareDetailsResp[]=[];
+  public detailsData: FirmwareDetailsResp[] = [];
 
-  pageSizeOptions: any[]=[10, 20, 50, 100, 500];
-  isExporting: boolean = false;
-  selectedDownloadType: any = '';
+  pageSizeOptions: PageSizeOption[] = [20];
   totalCount: number = 0;
   pageCount: number = 0;
   totalPages: number = 0;
-  pageSize: number = 10;
-  loading: boolean= false;
+  pageSize = 20;
+  loading = false;
   pageNo: number = 1;
   roleId: any;
-  readonly tableColumns: CommonTableColumn<FirmwareDetailsResp>[] = [
-    { key: 'param1', label: '#' },
-    { key: 'param8', label: 'Vendor Name', visible: () => this.roleId === '10' || this.roleId === '17' },
-    { key: 'param9', label: 'Device Model' },
-    { key: 'param5', label: 'Command Name' },
-    { key: 'param6', label: 'Command Sent', cellClass: 'text-end' },
-    { key: 'param7', label: 'Command Executed Date', cellClass: 'text-end' },
+  readonly tableColumns: DataTableColumn<FirmwareDetailsResp>[] = [
+    { key: 'param1', header: '#', width: '50px' },
+    { key: 'param8', header: 'Vendor Name', visible: () => this.roleId === '10' || this.roleId === '17' },
+    { key: 'param9', header: 'Device Model' },
+    { key: 'param5', header: 'Command Name' },
+    { key: 'param6', header: 'Command Sent', className: 'text-end', cellStyle: { maxWidth: '400px', wordWrap: 'break-word' } },
+    { key: 'param7', header: 'Command Executed Date', className: 'text-end' },
     {
       key: 'actions',
-      label: 'Action',
+      header: 'Action',
       className: 'text-end',
       actions: [
-        { label: 'Edit', icon: 'fa fa-edit', iconOnly: true, tone: 'primary', className: 'btn-outline-primary me-1', run: item => this.editCommand(item) },
-        { label: 'Delete', icon: 'fa fa-trash', iconOnly: true, tone: 'danger', className: 'btn-outline-danger', run: item => this.openDeleteModal(item) }
+        { label: 'Edit', icon: 'fa-edit', iconOnly: true, tone: 'primary', className: 'btn-outline-primary me-1', run: item => this.editCommand(item) },
+        { label: 'Delete', icon: 'fa-trash', iconOnly: true, tone: 'danger', className: 'btn-outline-danger', run: item => this.openDeleteModal(item) }
       ]
     }
   ];
   selectedCommand: any = null;
-deleteRemark: string = '';
-showDeleteModal: boolean = false;
+  deleteRemark = '';
+  showDeleteModal = false;
   constructor(private deviceService: DeviceService, private toastService: ToastService, private router: Router) {
     this.toastService.pageName = 'Send Command Details'; // Set page name for toast service
   }
   ngOnInit(): void {
     this.roleId = sessionStorage.getItem('roleid');
     // console.log(this.roleId)
-    this.getDetails('init');  
+    this.getDetails();
   }
   editCommand(item: any) {
 
@@ -90,7 +88,7 @@ deleteCommand() {
 
         this.showDeleteModal = false;
 
-        this.getDetails('search');
+        this.getDetails();
       }
       else {
         this.toastService.show(res.entity, 'error');
@@ -101,96 +99,87 @@ deleteCommand() {
     }
   });
 }
- updatePageSizeOptions() {
-    // Generate page size options based on total count
+  updatePageSizeOptions(): void {
     const options = [20];
     if (this.totalCount > 50) options.push(50);
     if (this.totalCount > 100) options.push(100);
     if (this.totalCount > 200) options.push(200);
     if (this.totalCount > 500) options.push(500);
     if (this.totalCount > 1000) options.push(1000);
-    if (this.totalCount > 0 && this.totalCount < 100) options.push(this.totalCount); // 'All'
+    if (this.totalCount > 0 && this.totalCount < 100 && !options.includes(this.totalCount)) {
+      options.push(this.totalCount);
+    }
     this.pageSizeOptions = options;
   }
-getDetails(tooluse?: any) {
+  getDetails(): void {
+    this.detailsRequest.param2 = this.pageNo;
+    this.detailsRequest.param3 = this.pageSize;
+    this.loading = true;
 
-  if (tooluse == 'init' || tooluse == 'search') {
+    this.deviceService.getCommandDetails(this.detailsRequest).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+        if (res.statuscode === 200) {
+          const rows = res?.entity?.listData || res?.entity || [];
+          this.detailsData = Array.isArray(rows) ? rows : [];
+          this.detailsData.forEach(row => {
+            if (row.param7) row.param7 = moment(row.param7).format('DD-MMM-YYYY');
+          });
 
-    if (tooluse == 'init') {
-      this.detailsRequest.param1 = '';
-    }
-
-    this.detailsRequest.param2 = 1;
-    this.detailsRequest.param3 = 20;
-  }
-
-  this.loading = true;
-
-  this.deviceService.getCommandDetails(this.detailsRequest).subscribe({
-
-    next: (res: any) => {
-
-      this.loading = false;
-
-      if (res.statuscode == 200) {
-        
-        this.detailsData = res?.entity?.listData || res?.entity || [];
-
-        this.detailsData.forEach((x: any) => {
-          if (x.param7) {
-            x.param7 = moment(x.param7).format('DD-MMM-YYYY');
-          }
-        });
-
-        const total = Number(res?.entity?.param1 || 0);
-
-        this.totalCount = total;
-        this.pageCount = this.detailsData.length;
-        this.totalPages = Math.ceil(total / Number(this.detailsRequest.param3));
-        this.updatePageSizeOptions();
-      } else {
-
-        this.toastService.show('No data found', 'error');
-
+          this.totalCount = Number(res?.entity?.param1 || 0);
+          this.pageCount = this.detailsData.length;
+          this.totalPages = Math.ceil(this.totalCount / this.pageSize);
+          this.updatePageSizeOptions();
+        } else {
+          this.toastService.show('No data found', 'error');
+          this.detailsData = [];
+          this.totalCount = 0;
+          this.pageCount = 0;
+          this.totalPages = 0;
+          this.updatePageSizeOptions();
+        }
+      },
+      error: (err) => {
+        this.loading = false;
         this.detailsData = [];
         this.totalCount = 0;
         this.pageCount = 0;
         this.totalPages = 0;
+        console.error(err);
+        this.toastService.show(err?.error?.entity || 'Something went wrong', 'error');
       }
-    },
-
-    error: (err) => {
-
-      this.loading = false;
-
-      console.error(err);
-
-      this.toastService.show(
-        err?.error?.entity || 'Something went wrong',
-        'error'
-      );
-    }
-  });
-}
-onPageChange(page: number) {
-    this.detailsRequest.param3 = Number(page);
-    this.getDetails('pageChange');
+    });
   }
+
+  getSearchDetails(): void {
+    this.pageNo = 1;
+    this.getDetails();
+  }
+
+  reloadData(): void {
+    this.detailsRequest.param1 = '';
+    this.pageNo = 1;
+    this.getDetails();
+  }
+
+  onPageSizeChange(size: PageSizeOption): void {
+    const parsedSize = Number(size);
+    if (!Number.isFinite(parsedSize) || parsedSize < 1) return;
+    this.pageSize = parsedSize;
+    this.pageNo = 1;
+    this.getDetails();
+  }
+
   changePage(p: number) {
     if (p < 1 || p > this.totalPages) return;
     this.pageNo = p;
 
-    this.getDetails('pageChange'); // 🔥 reload API
+    this.getDetails();
   }
-  onDownloadChange() {
 
+  openDeleteModal(item: any) {
+    this.selectedCommand = item;
+    this.deleteRemark = '';
+    this.showDeleteModal = true;
   }
-  getFileName(url: string): string {
-    return url.substring(url.lastIndexOf('/') + 1);
-  }
-openDeleteModal(item: any) {
-  this.selectedCommand = item;
-  this.deleteRemark = '';
-  this.showDeleteModal = true;
-}
 }

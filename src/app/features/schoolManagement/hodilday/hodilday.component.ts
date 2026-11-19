@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import dayjs from 'dayjs';
 
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { HolidayCalendarService } from '../../../core/services/holiday-calendar.service';
 import { HolidayValidationService } from '../../../core/services/holiday-validation.service';
@@ -40,7 +40,7 @@ import { ApplicableToType, CalendarViewType, HolidayStatus, HolidayType } from '
 
 @Component({
     selector: 'app-holiday-calendar-master',
-    imports: [CommonModule, FormsModule, NgSelectModule, NgbPaginationModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [CommonModule, FormsModule, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './hodilday.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './hodilday.component.scss'
@@ -97,18 +97,18 @@ export class HolidayCalendarMasterComponent implements OnInit {
   // Grid state
   // ---------------------------------------------------------------------
   holidayList: Holiday[] = [];
-  readonly tableColumns: CommonTableColumn<Holiday>[] = [
-    { key: 'rowNumber', label: '#', width: '30px' },
-    { key: 'holidayCode', label: 'Code', sortable: true, visible: () => this.visibleColumns['holidayCode'] },
-    { key: 'holidayName', label: 'Holiday Name', sortable: true, visible: () => this.visibleColumns['holidayName'] },
-    { key: 'holidayType', label: 'Type', sortable: true, visible: () => this.visibleColumns['holidayType'] },
-    { key: 'holidayDate', label: 'Date', sortable: true, visible: () => this.visibleColumns['holidayDate'] },
-    { key: 'applicableFrom', label: 'From', visible: () => this.visibleColumns['applicableFrom'] },
-    { key: 'applicableTo', label: 'To', visible: () => this.visibleColumns['applicableTo'] },
-    { key: 'academicSession', label: 'Academic Session', visible: () => this.visibleColumns['academicSession'] },
-    { key: 'applicableSchools', label: 'Applicable Schools', visible: () => this.visibleColumns['applicableSchools'] },
-    { key: 'status', label: 'Status', visible: () => this.visibleColumns['status'] },
-    { key: 'actions', label: 'Action', width: '150px' }
+  readonly tableColumns: DataTableColumn<Holiday>[] = [
+    { header: '#', key: 'rowNumber', width: '30px' },
+    { header: 'Code', key: 'holidayCode', sortKey: 'holidayCode', visible: () => this.visibleColumns['holidayCode'] },
+    { header: 'Holiday Name', key: 'holidayName', sortKey: 'holidayName', visible: () => this.visibleColumns['holidayName'] },
+    { header: 'Type', key: 'holidayType', sortKey: 'holidayType', visible: () => this.visibleColumns['holidayType'] },
+    { header: 'Date', key: 'holidayDate', sortKey: 'holidayDate', visible: () => this.visibleColumns['holidayDate'] },
+    { header: 'From', key: 'applicableFrom', visible: () => this.visibleColumns['applicableFrom'] },
+    { header: 'To', key: 'applicableTo', visible: () => this.visibleColumns['applicableTo'] },
+    { header: 'Academic Session', key: 'academicSession', visible: () => this.visibleColumns['academicSession'] },
+    { header: 'Applicable Schools', key: 'applicableSchools', visible: () => this.visibleColumns['applicableSchools'] },
+    { header: 'Status', key: 'status', visible: () => this.visibleColumns['status'] },
+    { header: 'Action', key: 'actions', width: '150px' }
   ];
   totalCount = 0;
   pageSize = 10;
@@ -116,6 +116,9 @@ export class HolidayCalendarMasterComponent implements OnInit {
   pageCount = 0;
   get holidayTableRows(): any[] {
     return this.loading ? Array.from({ length: 5 }) : this.holidayList.length ? this.holidayList : [null];
+  }
+  get visibleHolidayColumnCount(): number {
+    return Object.values(this.visibleColumns).filter(Boolean).length + 2;
   }
   filter: HolidayFilter = createEmptyFilter();
   sortColumn = 'holidayDate';
@@ -289,7 +292,8 @@ export class HolidayCalendarMasterComponent implements OnInit {
     this.loadHolidayList('pageChange');
   }
 
-  onPageSizeChange(): void {
+  onPageSizeChange(size: number | string = this.pageSize): void {
+    this.pageSize = Number(size);
     this.currentPage = 1;
     this.loadHolidayList('pageSize');
   }

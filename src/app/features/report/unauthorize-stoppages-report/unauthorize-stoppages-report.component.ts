@@ -21,18 +21,20 @@ import { RouteDeviationReportResp, UnauthorizedStoppageReportResp } from '../../
 import { RouteService } from '../../../core/services/route.service';
 import * as L from 'leaflet';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 @Component({
     selector: 'app-unauthorize-stoppages-report',
-    imports: [CommonModule, FormsModule, NgxDaterangepickerMd, NgSelectModule, TimepickerModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [CommonModule, FormsModule, NgxDaterangepickerMd, NgSelectModule, TimepickerModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './unauthorize-stoppages-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './unauthorize-stoppages-report.component.scss'
 })
 export class UnauthorizeStoppagesReportComponent  implements OnInit, AfterViewInit, OnDestroy {
-  readonly tableColumns: CommonTableColumn[] = [
+  readonly tableColumns: CommonTableColumn<UnauthorizedStoppageReportResp>[] = [
     { key: 'column1', label: '#' },
     { key: 'column2', label: 'Vehicle No.', visible: () => this.selectedVehicle !== 'All' && this.selectedVehicle !== null },
     { key: 'column3', headers: ['IMEI No.', 'Serial No.'], visible: () => this.selectedVehicle !== 'All' && this.selectedVehicle !== null },

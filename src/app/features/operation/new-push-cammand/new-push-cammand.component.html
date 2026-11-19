@@ -92,43 +92,12 @@
         }
         @if (showGrid) {
           <div class="result-grid">
-            <table class="table table-bordered mb-0">
-              <thead>
-                <tr>
-                  <th class="py-1" style="width: 50px;">#</th>
-                  <th class="py-1">IMEI</th>
-                  <th class="py-1">Command</th>
-                  <th class="py-1" style="width: 328px;">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (imei of submittedImeis; track imei; let i = $index) {
-                  <tr>
-                    <td>{{ i + 1 }}</td>
-                    <td>{{ imei }}</td>
-                    <!-- ✅ Show command instead of Queued -->
-                    <td class="text-success">{{ deviceCommand }}</td>
-                    <td class="text-center">
-                      <button class="btn btn-sm btn-primary me-2" (click)="resendCommand(imei)">Resend Command</button>
-                      <button
-                        class="btn btn-sm btn-success"
-                        [disabled]="loadingMap[i]"
-                        (click)="viewRawData(i, imei)">
-                        @if (loadingMap[i]) {
-                          <span class="spinner-border spinner-border-sm me-1"></span>
-                        }
-                        @if (!loadingMap[i]) {
-                          <span>View Raw Data</span>
-                        }
-                        @if (loadingMap[i]) {
-                          <span> &nbsp;Loading...</span>
-                        }
-                      </button>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
+            <app-data-table
+              [columns]="resultColumns"
+              [rows]="getSubmittedRows()"
+              tableClass="table table-bordered mb-0"
+              emptyMessage="NO DATA FOUND">
+            </app-data-table>
             <!-- <button class="btn btn-sm btn-secondary" (click)="resetForm()">
             Back
           </button> -->
@@ -148,77 +117,39 @@
         <button class="close-btn" (click)="isModalOpen = false">✖</button>
       </div>
       <div class="modal-body p-1" style="overflow-x: hidden;">
-        <div class="py-2">
-          <div class="row">
-            <div class="col-md-12">
-              <div class="d-flex justify-content-end">
-                <div>
-                  <button
-                    class="reload-btn"
-                    (click)="reloadData()"
-                    [disabled]="loading">
-                    <i class="fa fa-refresh pr-1" [class.fa-spin]="loading"></i>
-                    <span>{{ loading ? "Reloading..." : "Reload" }}</span>
-                  </button>
-                </div>
-                <div>
-                  <select
-                    class="rows-select"
-                    [(ngModel)]="pageSize"
-                    (change)="onPageSizeChange(pageSize)"
-                    >
-                    @for (size of pageSizeOptions; track size) {
-                      <option
-                        [value]="size === totalCount ? 'All' : size"
-                        >
-                        {{ size === totalCount ? "All" : size }}
-                      </option>
-                    }
-                  </select>
-                </div>
-                <div>
-                  <div class="total-records-text p-1">
-                    Total Records :  {{ totalCount }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <app-common-data-toolbar
+          variant="device"
+          [showSearch]="false"
+          [showFilters]="false"
+          [showExcel]="false"
+          [showPdf]="false"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [displayedCount]="rawData.length"
+          [totalRecords]="totalCount"
+          [loading]="isRawLoading"
+          (reload)="reloadData()"
+          (pageSizeChange)="onPageSizeChange($event)"
+          pageSizeLabel="Show Rows"
+          totalLabel="Total Records"
+          countSeparator="of">
+        </app-common-data-toolbar>
         <div class="table-responsive">
-          <table class="table table-striped app-table mb-0">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Date Time</th>
-                <th>Raw Packet</th>
-                <th>IP</th>
-                <th>Port</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of rawData; track item; let i = $index) {
-                <tr>
-                  <td>{{ item.param1}}</td>
-                  <td>{{ item.param3 }}</td>
-                  <td style="max-width:400px; word-break:break-all;">
-                    {{ item.param4 }}
-                  </td>
-                  <td>{{ item.param5 }}</td>
-                  <td>{{ item.param6 }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
+          <app-data-table
+            [columns]="rawDataColumns"
+            [rows]="rawData"
+            [loading]="isRawLoading"
+            tableClass="table table-striped app-table mb-0"
+            emptyMessage="NO DATA FOUND">
+          </app-data-table>
           <div class="float-end">
-            @if (totalCount > pageSize) {
-              <ngb-pagination [collectionSize]="totalCount"
-                [(page)]="pageNo" [pageSize]="pageSize"
-                (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-                [ellipses]="false" [boundaryLinks]="true" size="sm"
-                class="d-flex justify-content-center mt-2 mb-1">
-              </ngb-pagination>
-            }
+            <app-pagination
+              [totalCount]="totalCount"
+              [page]="pageNo"
+              [pageSize]="pageSize"
+              [disabled]="isRawLoading"
+              (pageChange)="onPageChange($event)">
+            </app-pagination>
           </div>
         </div>
       </div>

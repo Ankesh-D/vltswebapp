@@ -14,7 +14,6 @@ import { ToastService } from '../../../core/services/toast.service';
 import dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { Subject } from 'rxjs';
 import moment from 'moment';
 import { LoaderService } from '../../../core/services/loader.service';
 import { GeofenceInOutReportResp } from '../../../core/model/response.model';
@@ -22,17 +21,19 @@ import * as L from 'leaflet';
 import { GeofenceService } from '../../../core/services/geofence.service';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 @Component({
     selector: 'app-geofence-in-out-report',
-    imports: [MapLayerOptionsComponent, CommonModule, FormsModule, NgxDaterangepickerMd, NgSelectModule, TimepickerModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [MapLayerOptionsComponent, CommonModule, FormsModule, NgxDaterangepickerMd, NgSelectModule, TimepickerModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './geofence-in-out-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './geofence-in-out-report.component.scss'
 })
 export class GeofenceInOutReportComponent implements OnInit, AfterViewInit, OnDestroy {
-  readonly tableColumns: CommonTableColumn[] = [
+  readonly tableColumns: CommonTableColumn<GeofenceInOutReportResp>[] = [
     { key: 'column1', label: '#' },
     { key: 'column2', label: 'Vehicle No.' },
     { key: 'column3', label: 'Geofence Name' },
@@ -52,13 +53,14 @@ export class GeofenceInOutReportComponent implements OnInit, AfterViewInit, OnDe
     format: 'DD-MMM-YYYY'
   };
   loading = false;
+  filtersExpanded = true;
   showSummary = false;
   deviceType: 'NEW' | 'OLD' = 'NEW'; // default NEW
   filterBy = 'Vendor';
 
-  selectedVendor: any = null;
-  selectedRTO: any = null;
-  selectedVehicle: any = null;
+  selectedVendor: any = '';
+  selectedRTO: any = '';
+  selectedVehicle: any = '';
   selectedAlertType = '';
   selectedDateFilter = '';
 
@@ -87,9 +89,8 @@ export class GeofenceInOutReportComponent implements OnInit, AfterViewInit, OnDe
     this.roleId = sessionStorage.getItem('roleid') || '';
     this.toast.pageName = 'Geofence In Out Report'; // Set page name for toast service  
    }
-  searchInput = new Subject<string>();
-  filteredOptions: any[] = [];
   loadingVehicle: boolean = false;
+  private vehicleRequestId = 0;
   
   showPoliceStations = true;
   isLayersVisible = false;
@@ -102,47 +103,6 @@ export class GeofenceInOutReportComponent implements OnInit, AfterViewInit, OnDe
     this.filterBy = 'Vendor';
     this.loadAlertTypes();
     this.loadVendorList();
-    // this.fromDate = this.formatDate(this.selectedDateRange.startDate);
-    // this.toDate = this.formatDate(this.selectedDateRange.endDate);
-
-    this.searchInput.subscribe((vehicleSearch: any) => {
-    this.loading = true;
-    const vehicleSearchText = String(vehicleSearch ?? '').trim();
-    const req = {
-      selectvendorid: this.selectedVendor || '',
-      selectroleid: '',
-      routeid: '',
-      poiid: '',
-      selectcustomerid: '',
-      vehicleclassid: '',
-      //  searchtype: this.deviceType === 'NEW' ? 'TCP' : 'HTTP',
-      searchtype: '',
-      rtoid: this.selectedRTO || '',
-      searchby: vehicleSearchText //this.vehicleSearch
-    };
-    if (vehicleSearchText.length >= 4) {
-      this.loadingVehicle = true;
-      this.vehicleService.getVehicleListV2(req).subscribe({ next: (res: any) => {
-        const entity = res?.entity?.listData ?? res?.entity;
-        const vehicles = Array.isArray(entity) ? entity : [];
-        this.visibleVehicleList = [
-            { param1: 'All', param2: 'All' },
-            ...vehicles
-          ];
-        // this.visibleVehicleList.unshift({ param1: 'All', param2: 'All'});
-
-        this.loadingVehicle = false;
-        this.loading = false;
-      }, error: () => {
-        this.visibleVehicleList = [{ param1: 'All', param2: 'All' }];
-        this.loadingVehicle = false;
-        this.loading = false;
-      }});
-    } else {
-      this.loadingVehicle = false;
-      this.loading = false;
-    }
-  });
   }
   initializeDatePicker() {
     // this.selectedDate = moment().format('DD-MMM-YYYY');
@@ -187,6 +147,39 @@ export class GeofenceInOutReportComponent implements OnInit, AfterViewInit, OnDe
     this.fromDate = this.formatDate(start);
     this.toDate = this.formatDate(end);
   }
+
+  clearFilters(): void {
+    const startDate = moment().subtract(6, 'days');
+    const endDate = moment();
+
+    this.filterBy = 'Vendor';
+    this.selectedVendor = null;
+    this.selectedRTO = null;
+    this.resetVehicleList();
+    this.selectedAlertType = '';
+    this.selectedDateFilter = '';
+    this.fromTime = '00:00';
+    this.toTime = '23:59';
+    this.selectedDateRange = {
+      startDate: startDate.toDate(),
+      endDate: endDate.toDate()
+    };
+    this.fromDate = this.formatDate(startDate.toDate());
+    this.toDate = this.formatDate(endDate.toDate());
+    this.searchText = '';
+    this.reportData = [];
+    this.showSummary = false;
+    this.page = 1;
+    this.totalPages = 0;
+    this.pageCount = 0;
+    this.totalCount = 0;
+
+    const datePicker = $('#datepicker').data('daterangepicker');
+    if (datePicker) {
+      datePicker.setStartDate(startDate);
+      datePicker.setEndDate(endDate);
+    }
+  }
   
   formatDate(date: Date): string {
     return moment(date).format('DD-MMM-YYYY');
@@ -208,21 +201,18 @@ export class GeofenceInOutReportComponent implements OnInit, AfterViewInit, OnDe
 
   onFilterByChange(type: 'Vendor' | 'RTO') {
     this.filterBy = type;
-    // 🔥 RESET ALL FIELDS
     this.selectedVendor = null;
     this.selectedRTO = null;
-    this.selectedVehicle = null;
+    this.resetVehicleList();
     this.selectedAlertType = '';
-    this.vehicleSearch = '';
-
-    this.fullVehicleList = [];
-    this.visibleVehicleList = [{param1: 'All', param2: 'All'}];
 
     this.reportData = [];
     this.showSummary = false;
+    this.page = 1;
+    this.totalPages = 0;
     this.pageCount = 0;
-    this.totalCount =0;
-    // 🔄 LOAD NEW DATA
+    this.totalCount = 0;
+
     if (type === 'Vendor') {
       this.loadVendorList();
     } else {
@@ -247,31 +237,32 @@ export class GeofenceInOutReportComponent implements OnInit, AfterViewInit, OnDe
       if (res.status) this.alertTypeList = res.entity;
     });
   }
-  onVehicleSearchChange() {
-
-    if (!this.vehicleSearch) {
-      // 🔥 input empty → reset everything
-      this.fullVehicleList = [];
-      this.visibleVehicleList = [{param1: 'All', param2: 'All'}];
-      this.selectedVehicle = null;
-      this.isVehicleLoaded = false;
-    }
-
-  }
-  onVendorChange() {
+  private resetVehicleList(): void {
+    this.vehicleRequestId++;
     this.selectedVehicle = null;
-    this.vehicleSearch = '';
     this.fullVehicleList = [];
-    this.visibleVehicleList = [{param1: 'All', param2: 'All'}];
+    this.visibleVehicleList = [];
+    this.loadingVehicle = false;
     this.isVehicleLoaded = false;
-    // this.searchVehicle();
   }
-  searchVehicle() {
-    if (!this.selectedVendor && !this.selectedRTO) {
-      this.toast.show('Please select vendor or RTO', 'error');
-      return;
-    }
 
+  onVendorChange() {
+    this.resetVehicleList();
+    if (this.selectedVendor) {
+      this.loadVehicleList();
+    }
+  }
+
+  onRTOChange() {
+    this.resetVehicleList();
+    if (this.selectedRTO) {
+      this.loadVehicleList();
+    }
+  }
+
+  private loadVehicleList(): void {
+    const requestId = ++this.vehicleRequestId;
+    this.loadingVehicle = true;
     const req = {
       selectvendorid: this.selectedVendor || '',
       selectroleid: '',
@@ -281,44 +272,44 @@ export class GeofenceInOutReportComponent implements OnInit, AfterViewInit, OnDe
       vehicleclassid: '',
       searchtype: '',
       rtoid: this.selectedRTO || '',
-      searchby: this.vehicleSearch
+      searchby: ''
     };
 
-    this.vehicleService.getVehicleListV2(req).subscribe(res => {      
-      const data = res?.entity || [];
-      // ❌ NO DATA
-      if (!data || data.length === 0) {
-        this.fullVehicleList = [];
-        this.visibleVehicleList = [{param1: 'All', param2: 'All'}];
-        this.isVehicleLoaded = false;
-        this.toast.show('No vehicle found', 'error');   // 🔥 DIRECT
-        return;
-      }
+    this.vehicleService.getVehicleListV2(req).subscribe({
+      next: (res: any) => {
+        if (requestId !== this.vehicleRequestId) {
+          return;
+        }
 
-      // ✅ DATA FOUND
-      this.fullVehicleList = data;
-      this.visibleVehicleList = data.slice(0, this.vehicleLimit);
-      this.isVehicleLoaded = true;
-      this.toast.show('Vehicle loaded successfully', 'success'); // optional
-      this.cdr.detectChanges();
-    }, err => {
-      this.toast.show('Something went wrong', 'error'); // 🔥 DIRECT
-      this.isVehicleLoaded = false;
+        const entity = res?.entity?.listData ?? res?.entity;
+        const data = Array.isArray(entity) ? entity : [];
+        this.fullVehicleList = data;
+        this.visibleVehicleList = [
+          { param1: 'All', param2: 'All' },
+          ...data.slice(0, this.vehicleLimit)
+        ];
+        this.loadingVehicle = false;
+        this.isVehicleLoaded = true;
+
+        if (data.length === 0) {
+          this.toast.show('No vehicle found', 'error');
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        if (requestId !== this.vehicleRequestId) {
+          return;
+        }
+
+        this.fullVehicleList = [];
+        this.visibleVehicleList = [{ param1: 'All', param2: 'All' }];
+        this.loadingVehicle = false;
+        this.isVehicleLoaded = false;
+        this.toast.show('Something went wrong', 'error');
+      }
     });
   }
-
-  onRTOChange() {
-    this.selectedVehicle = null;
-    this.vehicleSearch = '';
-    this.fullVehicleList = [];
-    this.visibleVehicleList = [{param1: 'All', param2: 'All'}];
-    this.isVehicleLoaded = false;
-  }
-  customSearchFn(term: string, item: any): boolean {
-  return item.param2
-    ?.toLowerCase()
-    .includes(term.toLowerCase());
-}
 
   page = 1
   totalPages = 0
@@ -431,7 +422,6 @@ export class GeofenceInOutReportComponent implements OnInit, AfterViewInit, OnDe
   fullVehicleList: any[] = [];
   visibleVehicleList: any[] = [{param1: 'All', param2: 'All'}];
   vehicleLimit = 100;   // 🔥 only 100 items render
-  vehicleSearch = '';
   eventPage = 1;
   eventPageSize = 10;
   eventTotal = 0;

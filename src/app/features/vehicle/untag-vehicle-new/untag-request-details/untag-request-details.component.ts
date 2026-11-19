@@ -1,71 +1,117 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, AfterViewInit, DoCheck, OnChanges, AfterViewChecked, AfterContentChecked, ChangeDetectionStrategy } from '@angular/core';
-
-import { Router, RouterModule } from '@angular/router';
-import { FormsModule, NgForm } from '@angular/forms';
-import moment from 'moment';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Router } from '@angular/router';
 import { UntagRequestDetailsReq } from '../../../../core/model/request.model';
 import { UntaggedRequestDetailsResp } from '../../../../core/model/response.model';
 import { DeviceService } from '../../../../core/services/device.service';
 import { ToastService } from '../../../../core/services/toast.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-declare var $: any;
+import { CommonDataToolbarComponent } from '../../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-untag-request-details',
-    imports: [FormsModule, NgbPaginationModule],
+    imports: [CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './untag-request-details.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './untag-request-details.component.scss'
 })
 export class UntagRequestDetailsComponent implements OnInit {
-  @ViewChild('searchVendorForm') searchVendorForm!: NgForm;
   public detailsRequest: UntagRequestDetailsReq = new UntagRequestDetailsReq();
   public detailsData: UntaggedRequestDetailsResp[] = [];
   showAcknowledgementEntry: boolean = false;
   isDatePickerInitialized: boolean = false;
 
-  pageSizeOptions: any[]=[10, 20, 50, 100, 500];
-  isExporting: boolean = false;
-  selectedDownloadType: any = '';
+  pageSizeOptions: number[] = [10, 20, 50, 100, 500];
   totalCount: number = 0;
   pageCount: number = 0;
-  totalPages: number = 0;
-  pageSize: number = 10;
+  pageSize: number = 20;
   loading: boolean= false;
-  pageNo: number = 1;
   roleId: any;
   selectedDate: string = "";
+  readonly tableColumns: DataTableColumn<UntaggedRequestDetailsResp>[] = [
+    { header: 'Sr. No.', key: 'param1', width: '50px' },
+    {
+      headers: ['IMEI No.', 'Serial No.', 'ICCID No.'],
+      cellClassName: 'multiline-cell',
+      value: item => this.joinValues(item.param3, item.param4, item.param5)
+    },
+    {
+      headers: ['Vehicle No.', 'Chassis No.', 'Engine No.'],
+      cellClassName: 'multiline-cell',
+      value: item => this.joinValues(item.param9, item.param10, item.param11)
+    },
+    { header: 'Vendor Name', key: 'param7' },
+    {
+      headers: ['Vehicle Type', 'Mfg. Year'],
+      cellClassName: 'multiline-cell',
+      value: item => this.joinValues(item.param14, item.param13)
+    },
+    {
+      headers: ['Activation Date', 'Validity Upto'],
+      width: '100px',
+      cellClassName: 'multiline-cell',
+      value: item => this.joinValues(item.param12, item.param15)
+    },
+    {
+      headers: ['Customer Name', 'Customer Mobile No.'],
+      cellClassName: 'multiline-cell',
+      value: item => this.joinValues(item.param17, item.param18)
+    },
+    {
+      headers: ['Last Polling Time', 'Last Alert'],
+      cellClassName: 'multiline-cell',
+      value: item => this.joinValues(item.param19, item.param20)
+    },
+    {
+      headers: ['Request Time', 'Reason'],
+      cellClassName: 'multiline-cell',
+      value: item => this.joinValues(item.param22, item.param23)
+    },
+    { header: 'Action Status', key: 'param24' },
+    {
+      headers: ['Action Time', 'Action Remark'],
+      cellClassName: 'multiline-cell',
+      value: item => this.joinValues(item.param25, item.param26)
+    }
+  ];
+
   constructor(private deviceService: DeviceService, private toastService: ToastService, private router: Router) {
   }
+
+  private joinValues(...values: Array<string | null | undefined>): string {
+    return values.map(value => value || '-').join('\n');
+  }
+
   ngOnInit(): void {
-      this.getDetails('init');  
-    
+    this.pageSize = Number(this.detailsRequest.param3) || 20;
+    this.getDetails('init');
   }
   updatePageSizeOptions() {
-    // Generate page size options based on total count
     const options = [20];
     if (this.totalCount > 50) options.push(50);
     if (this.totalCount > 100) options.push(100);
     if (this.totalCount > 200) options.push(200);
     if (this.totalCount > 500) options.push(500);
-    if (this.totalCount > 0 && this.totalCount < 100) options.push(this.totalCount); // 'All'
+    if (this.totalCount > 0 && this.totalCount < 100 && !options.includes(this.totalCount)) {
+      options.push(this.totalCount);
+    }
     this.pageSizeOptions = options;
   }
- 
- 
-  getDetails(tooluse?: any) {
-    
-    if(tooluse=='init' || tooluse=='search') {
-      if(tooluse=='init') {
+
+  getDetails(tooluse: 'init' | 'search' | 'pageSize' | 'pagechange' | 'reload' = 'init') {
+    if (tooluse === 'init') {
         this.detailsRequest.param4 = "";
-      }
-      // this.detailsRequest.param2 = 1;
-      // this.detailsRequest.param3 = 10;
     }
-    if(tooluse=='pageSize') {
+    if (tooluse === 'search' || tooluse === 'pageSize') {
       this.detailsRequest.param2 = 1;
     }
-   
+    if (tooluse === 'reload') {
+      this.detailsRequest.param2 = 1;
+      this.detailsRequest.param4 = "";
+      this.detailsRequest.param3 = 20;
+    }
+
+    this.pageSize = Number(this.detailsRequest.param3) || 20;
     this.loading=true;
     this.deviceService.untaggedRequestsResponse(this.detailsRequest).subscribe({
       
@@ -76,14 +122,11 @@ export class UntagRequestDetailsComponent implements OnInit {
           const total = Number(res?.entity?.param1 || 0);
           this.totalCount = total;
           this.pageCount = this.detailsData.length;
-          // ✅ pages
-          this.totalPages = Math.ceil(total / this.pageSize);
           this.updatePageSizeOptions()
         } else {
           this.detailsData = [];
           this.totalCount = 0;
           this.pageCount = 0;
-          this.totalPages = 0;    
           this.toastService.show('No data found', 'error');
         }
     },
@@ -94,13 +137,16 @@ export class UntagRequestDetailsComponent implements OnInit {
       }
     });
   }
-  changePage(p: number) {
-    if (p < 1 || p > this.totalPages) return;
-    this.pageNo = p;
-    this.detailsRequest.param2 = this.pageNo;
-    this.getDetails('pagechage'); // 🔥 reload API
+
+  onPageSizeChange(size: number | string): void {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount
+      ? this.totalCount
+      : Number(size);
+    this.detailsRequest.param3 = this.pageSize;
+    this.detailsRequest.param2 = 1;
+    this.getDetails('pageSize');
   }
-  
+
   goToForm() {
     this.router.navigate(['acknowledgeactivation'])
   }
@@ -112,5 +158,4 @@ export class UntagRequestDetailsComponent implements OnInit {
     this.detailsRequest.param2 = Number(page);
     this.getDetails('pagechange');
   }
-  
 }

@@ -6,6 +6,7 @@
       "leaflet.markercluster"
     ],
     "outDir": "./dist/out-tsc",
+    "rootDir": "./src",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,

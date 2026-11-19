@@ -1,5 +1,4 @@
 import { Component, OnDestroy } from "@angular/core";
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from "@angular/common";
 
 import { FormsModule } from "@angular/forms";
@@ -15,6 +14,9 @@ import {
   DeviceService,
 } from "../../../core/services/device.service";
 import { ToastService } from "../../../core/services/toast.service";
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 type SearchType = "imei" | "serial" | "iccid";
 
@@ -57,6 +59,7 @@ export interface RawDataRequestModel {
 }
 
 export interface RawDataRowModel {
+  rowNumber?: number;
   param1: string; // Sr No
   param2: string; // UUID
   param3: string; // Server polling time
@@ -130,7 +133,7 @@ interface DetailCard {
 
  standalone: true,
 
- imports: [CommonModule, FormsModule,   NgbPaginationModule,NzTabsModule],
+ imports: [CommonModule, FormsModule, NzTabsModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
 
  templateUrl: "./univarsal-page.component.html",
 
@@ -1119,6 +1122,17 @@ rawLoading = false;
 rawError = '';
 
 rawRows: RawDataRowModel[] = [];
+readonly rawDataColumns: DataTableColumn<RawDataRowModel>[] = [
+  { header: 'Sr. No.', key: 'rowNumber' },
+  { header: 'Server Polling Time', key: 'param3' },
+  {
+    header: 'Raw Packet Data',
+    key: 'param4',
+    cellStyle: { 'max-width': '400px', 'white-space': 'pre-wrap', 'word-break': 'break-all' }
+  },
+  { header: 'Device IP', key: 'param5' },
+  { header: 'Port', key: 'param6' }
+];
 
 
 rawPacketTabs = [
@@ -1231,7 +1245,10 @@ loadRawData(): void {
 
         const entity = response?.entity;
 
-        this.rawRows = (entity?.listData ?? []) as RawDataRowModel[];
+        this.rawRows = ((entity?.listData ?? []) as RawDataRowModel[]).map((row, index) => ({
+          ...row,
+          rowNumber: (this.rawCurrentPage - 1) * this.rawPageSize + index + 1
+        }));
         this.rawTotalCount = Number(entity?.param1 ?? 0);
 
         if (!this.rawRows.length) {

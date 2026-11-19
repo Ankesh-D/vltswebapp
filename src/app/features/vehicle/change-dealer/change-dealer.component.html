@@ -37,165 +37,24 @@
           </div>
         </div>
 
-        <!-- SEARCH + CONTROLS -->
         <div class="table-responsive">
-          <form autocomplete="off" class="top-controls-row">
-            <!-- LEFT : SEARCH + RELOAD -->
-            <div class="left-controls">
-              <span class="search-label">Search :</span>
-
-              <div class="search-box">
-                <input
-                  type="search"
-                  readonly
-                  onfocus="this.removeAttribute('readonly')"
-                  class="search-input inner"
-                  placeholder="Type here and press button...."
-                  maxlength="50"
-                  [(ngModel)]="searchText"
-                  (keyup.enter)="getSearchDetails()"
-                  name="searchby"
-                  />
-
-                <button
-                  type="button"
-                  class="search-inner-btn"
-                  (click)="getSearchDetails()"
-                  >
-                  <i class="fa fa-search"></i>
-                </button>
-              </div>
-
-              <button
-                type="button"
-                class="reload-btn"
-                (click)="reloadData()"
-                [disabled]="loading"
-                >
-                {{ loading ? "Reloading..." : "Reload" }}
-              </button>
-            </div>
-
-            <!-- RIGHT : ROWS + TOTAL -->
-            <div class="right-controls">
-              <div class="control-item">
-                <label>Show Rows :</label>
-                <select
-                  [(ngModel)]="pageSize"
-                  (change)="onPageSizeChange($event)"
-                  name="pageSize"
-                  >
-                  @for (size of pageSizeOptions; track size) {
-                    <option
-                      [value]="size === totalCount ? totalCount : size"
-                      >
-                      {{ size === totalCount ? totalCount : size }}
-                    </option>
-                  }
-                </select>
-              </div>
-
-              <div class="total-records-text">
-                Total Records : {{ pageCount }} of {{ totalCount }}
-              </div>
-            </div>
-          </form>
-
-          <table
-            class="table-striped table mb-1"
-          style="border-top: 1px solid black;
-            border-bottom: 1px solid black;
-            font-size: 11px;">
-            <thead>
-              <tr>
-                <th style="width: 40px">#</th>
-                <th (click)="sort('param6')" style="cursor: pointer">
-                  Serial No.
-                  <hr />
-                  IMEI No.
-                  @if (sortKey === 'param6') {
-                    <span
-                      class="sorting"
-                      [ngClass]="{ sorting_desc: reverse, sorting_asc: !reverse }"
-                    ></span>
-                  }
-                </th>
-                <th (click)="sort('param7')" style="cursor: pointer">
-                  ICCID No.
-                  @if (sortKey === 'param7') {
-                    <span
-                      class="sorting"
-                      [ngClass]="{ sorting_desc: reverse, sorting_asc: !reverse }"
-                    ></span>
-                  }
-                </th>
-                <th (click)="sort('param16')" style="cursor: pointer">
-                  Dealer
-                  @if (sortKey === 'param16') {
-                    <span
-                      class="sorting"
-                      [ngClass]="{ sorting_desc: reverse, sorting_asc: !reverse }"
-                    ></span>
-                  }
-                </th>
-                @if (roleId !== '11') {
-                  <th
-                    (click)="sort('param15')"
-                    style="cursor: pointer"
-                    >
-                    Vendor
-                    @if (sortKey === 'param15') {
-                      <span
-                        class="sorting"
-                        [ngClass]="{ sorting_desc: reverse, sorting_asc: !reverse }"
-                      ></span>
-                    }
-                  </th>
-                }
-                <th style="width: 52px;" class="text-center">Activity</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (deviceDetails.length === 0 && !loading) {
-                <tr>
-                  <td style="font-weight: bold; text-align: center" colspan="100">
-                    NO DATA FOUND
-                  </td>
-                </tr>
-              }
-              @for (device of getPaginatedData(); track device) {
-                <tr>
-                  <td>{{ device.param1 || "NA" }}</td>
-                  <td>
-                    {{ device.param6 || "NA" }}<br />{{ device.param5 || "NA" }}
-                  </td>
-                  <td>{{ device.param7 || "NA" }}</td>
-                  <td>{{ device.param16 || "NA" }}</td>
-                  @if (roleId !== '11') {
-                    <td>{{ device.param15 || "NA" }}</td>
-                  }
-                  <td class="text-center">
-                    <div class="btn-group btn-group-sm">
-                      <button
-                        type="button"
-                        (click)="getDeviceDataForChange(device)"
-                        >
-                        Edit
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-          <!-- Pagination Controls -->
+          <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here and press button...."
+            [showExcel]="false" [showFilters]="false" [searchText]="searchText"
+            (searchTextChange)="searchText = $event" (search)="getSearchDetails()" (reload)="reloadData()"
+            [loading]="loading" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+            [displayedCount]="pageCount" [totalRecords]="totalCount"
+            (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows"
+            totalLabel="Total Records" countSeparator="of">
+          </app-common-data-toolbar>
+          <app-data-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
+            [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped app-table mb-1"
+            tableId="devicetable" tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;"
+            (sort)="sort($event)">
+          </app-data-table>
           <div class="float-end">
-            @if (totalCount > pageSize) {
-              <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-                [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-                [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-              </ngb-pagination>
-            }
+            <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+              [disabled]="loading" (pageChange)="onPageChange($event)">
+            </app-pagination>
           </div>
         </div>
 

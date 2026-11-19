@@ -11,17 +11,20 @@ import { ToastService } from '../../../core/services/toast.service';
 import dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import { PvtParseDataResponse } from '../../../core/model/response.model';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 @Component({
     selector: 'app-pvt-parsed-data',
-    imports: [FormsModule, NgxDaterangepickerMd, CommonTableComponent],
+    imports: [FormsModule, NgxDaterangepickerMd, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './pvt-parsed-data.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './pvt-parsed-data.component.scss'
 })
 export class PvtParsedDataComponent implements OnInit, AfterViewInit {
-  readonly tableColumns: CommonTableColumn[] = [
+  readonly tableColumns: CommonTableColumn<PvtParseDataResponse>[] = [
     { key: 'column1', label: '#' },
     { key: 'column2', label: 'IMEI No.' },
     { key: 'column3', label: 'Alert Name' },
@@ -33,6 +36,7 @@ export class PvtParsedDataComponent implements OnInit, AfterViewInit {
 
 
   loading = false;
+  filtersExpanded = true;
   showSummary = false;
 deviceType: 'NEW' | 'OLD' = 'NEW'; // default NEW
   filterBy= '';
@@ -51,6 +55,11 @@ deviceType: 'NEW' | 'OLD' = 'NEW'; // default NEW
   vendorList: any[] = [];
   rtoList: any[] = [];
   vehicleList: any[] = [];
+  visibleVehicleList: any[] = [];
+  vehicleLoading = false;
+  isVehicleLoaded = false;
+  vehicleLimit = 100;
+  private vehicleRequestId = 0;
   alertTypeList: any[] = [];
   alertData: PvtParseDataResponse[] = [];
   roleId: string = '';
@@ -98,6 +107,40 @@ onDateRangeChange(e: any) {
   this.fromDate = this.formatDate(start);
   this.toDate = this.formatDate(end);
 }
+
+clearFilters(): void {
+  const today = new Date();
+
+  this.filterBy = 'Vendor';
+  this.selectedVendor = '';
+  this.selectedRTO = '';
+  this.resetVehicleList();
+  this.selectedAlertType = '';
+  this.selectedDateFilter = '';
+  this.selectedDateRange = {
+    startDate: dayjs().startOf('day'),
+    endDate: dayjs().endOf('day')
+  };
+  this.fromDate = this.formatDate(today);
+  this.toDate = this.fromDate;
+  this.fromTime = '00:00';
+  this.toTime = '23:59';
+  this.searchText = '';
+  this.alertData = [];
+  this.showSummary = false;
+  this.page = 1;
+  this.totalPages = 0;
+  this.pageCount = 0;
+  this.totalCount = 0;
+  this.packetcount = '';
+  this.vehicleregno = '';
+  this.customername = '';
+  this.customermobileno = '';
+  this.rtoname = '';
+  this.vendorname = '';
+  this.vehicleclassname = '';
+}
+
   ngAfterViewInit() {
     
   }
@@ -124,13 +167,8 @@ onDateRangeChange(e: any) {
   // 🔥 RESET ALL FIELDS
   this.selectedVendor = '';
   this.selectedRTO = '';
-  this.selectedVehicle = '';
+  this.resetVehicleList();
   this.selectedAlertType = '';
-
-  this.vehicleSearch = '';
-
-  this.fullVehicleList = [];
-  this.visibleVehicleList = [];
 
   this.alertData = [];
   this.showSummary = false;
@@ -145,6 +183,14 @@ onDateRangeChange(e: any) {
   } else {
     this.loadRTOList();
   }
+}
+
+private resetVehicleList(): void {
+  this.vehicleRequestId++;
+  this.selectedVehicle = '';
+  this.visibleVehicleList = [];
+  this.vehicleLoading = false;
+  this.isVehicleLoaded = false;
 }
 
   loadVendorList() {
@@ -164,35 +210,22 @@ onDateRangeChange(e: any) {
       if (res.status) this.alertTypeList = res.entity;
     });
   }
-  onVehicleSearchChange() {
-
-  if (!this.vehicleSearch) {
-    // 🔥 input empty → reset everything
-    this.fullVehicleList = [];
-    this.visibleVehicleList = [];
-    this.selectedVehicle = '';
-    this.isVehicleLoaded = false;
-  }
-
-}
 onVendorChange() {
-  this.selectedVehicle = '';
-  this.vehicleSearch = '';
-  this.fullVehicleList = [];
-  this.visibleVehicleList = [];
-  this.isVehicleLoaded = false;
+  this.resetVehicleList();
+  if (this.selectedVendor) {
+    this.loadVehicleList();
+  }
 }
-searchVehicle() {
-
-  if (!this.vehicleSearch) {
-    this.toast.show('Please enter vehicle number', 'error');
-    return;
+onRTOChange() {
+  this.resetVehicleList();
+  if (this.selectedRTO) {
+    this.loadVehicleList();
   }
+}
 
-  if (!this.selectedVendor && !this.selectedRTO) {
-    this.toast.show('Please select vendor or RTO', 'error');
-    return;
-  }
+private loadVehicleList(): void {
+  const requestId = ++this.vehicleRequestId;
+  this.vehicleLoading = true;
 
   const req = {
     selectvendorid: this.selectedVendor || '',
@@ -201,52 +234,39 @@ searchVehicle() {
     poiid: '',
     selectcustomerid: '',
     vehicleclassid: '',
-  //  searchtype: this.deviceType === 'NEW' ? 'TCP' : 'HTTP',
-  searchtype:'',
+    searchtype: '',
     rtoid: this.selectedRTO || '',
-    searchby: this.vehicleSearch
+    searchby: ''
   };
 
-  this.vehicleService.getVehicleListV2(req).subscribe(res => {
+  this.vehicleService.getVehicleListV2(req).subscribe({
+    next: (res: any) => {
+      if (requestId !== this.vehicleRequestId) {
+        return;
+      }
 
-    const data = res?.entity || [];
+      const data = Array.isArray(res?.entity) ? res.entity : [];
+      this.visibleVehicleList = data.slice(0, this.vehicleLimit);
+      this.isVehicleLoaded = true;
+      this.vehicleLoading = false;
 
-    // ❌ NO DATA
-    if (!data || data.length === 0) {
+      if (data.length === 0) {
+        this.toast.show('No vehicle found', 'error');
+      }
 
-      this.fullVehicleList = [];
-      this.visibleVehicleList = [];
+      this.cdr.detectChanges();
+    },
+    error: () => {
+      if (requestId !== this.vehicleRequestId) {
+        return;
+      }
+
+      this.vehicleLoading = false;
       this.isVehicleLoaded = false;
-
-      this.toast.show('No vehicle found', 'error');   // 🔥 DIRECT
-
-      return;
+      this.toast.show('Something went wrong', 'error');
     }
-
-    // ✅ DATA FOUND
-    this.fullVehicleList = data;
-    this.visibleVehicleList = data.slice(0, this.vehicleLimit);
-    this.isVehicleLoaded = true;
-
-    this.toast.show('Vehicle loaded successfully', 'success'); // optional
-
-    this.cdr.detectChanges();
-
-  }, err => {
-
-    this.toast.show('Something went wrong', 'error'); // 🔥 DIRECT
-    this.isVehicleLoaded = false;
-
   });
 }
-
-  onRTOChange() {
- this.selectedVehicle = '';
-  this.vehicleSearch = '';
-  this.fullVehicleList = [];
-  this.visibleVehicleList = [];
-  this.isVehicleLoaded = false;
-  }
 
 page=1
 totalPages = 0
@@ -413,13 +433,6 @@ onPageSizeChange(size: any) {
 }
 
 
-fullVehicleList: any[] = [];
-visibleVehicleList: any[] = [];
-
-vehicleLimit = 100;   // 🔥 only 100 items render
-vehicleSearch = '';
-
-
 eventPage = 1;
 eventPageSize = 10;
 eventTotal = 0;
@@ -502,9 +515,6 @@ changeEventPage(page: number) {
 
   this.loadEventData(); // 🔥 reload API
 }
-
-
-isVehicleLoaded = false;
 
 
 onEventPageSizeChange(size: any) {

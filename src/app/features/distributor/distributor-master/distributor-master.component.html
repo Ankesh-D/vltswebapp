@@ -35,88 +35,32 @@
                     <div class="row fade-in-up">
                       <div class="col-12 text-center mb-3">
                         <div id="activatedTable">
-                          <div class="mt-2"
-                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 10px;">
-                            <!-- Left Side: Search and Reload -->
-                            <div style="display: flex; align-items: center;">
-                              <span
-                                style="font-weight: bold; font-size: 12px; margin-right: 10px;">Search
-                              :</span>
-                              <div
-                                style="display: flex; align-items: center; border: 1px solid #0b58b9; border-radius: 4px; overflow: hidden; background: white; margin-right: 10px;">
-                                <input type="search" readonly
-                                  (focus)="searchInput.removeAttribute('readonly')"
-                                  #searchInput class="tabletitlesearch" id="searchby"
-                                  placeholder="Type here..." name="searchby"
-                                  style="border: none; height: 24px; width: 180px; padding: 0 8px; outline: none; font-size: 11px;"
-                                  autocomplete="off" maxlength="50"
-                                  [(ngModel)]="detailRequest.param1"
-                                  (keyup.enter)="getDetails('search')">
-                                <button id="searchbtn" (click)="getDetails('search')"
-                                  style="background: #0b58b9; color: white; border: none; height: 24px; width: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                                  <i class="fa fa-search" style="font-size: 12px;"></i>
-                                </button>
-                              </div>
-                              <button (click)="getDetails('initial')"
-                                style="background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
-                                <i class="fa fa-refresh" [class.fa-spin]="!isDataLoaded"
-                                style="margin-right: 5px;"></i>
-                                @if (isDataLoaded) {
-                                  <span>Reload</span>
-                                }
-                                @if (!isDataLoaded) {
-                                  <span>Reloading...</span>
-                                }
-                              </button>
-                            </div>
-                            <!-- Right Side: Download, Page Size, Count -->
-                            <div style="display: flex; align-items: center; font-size: 11px;">
-                              <div
-                                style="display: flex; align-items: center; margin-right: 15px;">
-                                <label
-                                  style="margin: 0 5px 0 0; font-weight: bold; color: #333;">Show
-                                Rows:</label>
-                                <select name="pageSize" [(ngModel)]="detailRequest.param3"
-                                  (change)="getDetails('itemperpage')"
-                                  style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; color: #333; outline: none; background: white;">
-                                  @for (size of pageSizeOptions; track size) {
-                                    <option [value]="size === totalCount ? totalCount : size">
-                                      {{size === totalCount ? totalCount : size}}
-                                    </option>
-                                  }
-                                </select>
-                              </div>
-                              <div style="font-weight: bold; color: #0b58b9;">
-                                Total Records : {{ pageCount }} of {{ totalCount }}
-                              </div>
-                            </div>
-                          </div>
+                          <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here..."
+                            [showExcel]="false" [showFilters]="false" [searchText]="detailRequest.param1"
+                            (searchTextChange)="detailRequest.param1 = $event" (search)="getSearchDetails()"
+                            (reload)="reloadData()" [loading]="!isDataLoaded" [pageSize]="detailRequest.param3"
+                            [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
+                            (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows"
+                            totalLabel="Total Records" countSeparator="of">
+                          </app-common-data-toolbar>
                           <div class="table table-striped">
-                            <app-common-table [columns]="tableColumns" [rows]="detailsData" [loading]="!isDataLoaded"
-                              [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="distributorCell"
-                              tableClass="table table-striped app-table"
+                            <app-data-table [columns]="tableColumns" [rows]="detailsData" [loading]="!isDataLoaded"
+                              [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped app-table"
                               tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px; width: 100%;"
-                              (sortChange)="sort($event)">
-                            </app-common-table>
-                            <ng-template #distributorCell let-detail let-column="column">
-                              @if (column.key === 'actions') {
-                                <div class="btn-group-sm">
-                                  <button type="button" class="btn btn-primary grid-action-btn"
-                                    (click)="setData(detail)" style="margin-right: 5px;">Edit</button>
-                                  <button type="button" class="btn btn-danger grid-action-btn"
-                                    (click)="openDeleteModal(detail)">Delete</button>
-                                </div>
-                              } @else {
-                                {{column.value ? column.value(detail) : ''}}
-                              }
+                              (sort)="sort($event)">
+                            </app-data-table>
+                            <ng-template #distributorActionsCell let-detail>
+                              <div class="btn-group-sm">
+                                <button type="button" class="btn btn-primary grid-action-btn"
+                                  (click)="setData(detail)" style="margin-right: 5px;">Edit</button>
+                                <button type="button" class="btn btn-danger grid-action-btn"
+                                  (click)="openDeleteModal(detail)">Delete</button>
+                              </div>
                             </ng-template>
                             <div class="float-end">
-                              @if (totalCount > detailRequest.param3) {
-                                <ngb-pagination [collectionSize]="totalCount" [(page)]="detailRequest.param2"
-                                  [pageSize]="detailRequest.param3" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-                                  [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-                                </ngb-pagination>
-                              }
+                              <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="detailRequest.param3"
+                                [disabled]="!isDataLoaded" (pageChange)="onPageChange($event)">
+                              </app-pagination>
                             </div>
                           </div>
                           <!-- <div class="pagination-wrapper" *ngIf="getTotalPages() > 1">

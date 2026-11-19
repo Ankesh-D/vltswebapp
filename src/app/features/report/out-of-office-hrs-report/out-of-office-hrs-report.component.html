@@ -1,5 +1,4 @@
 <div class="content-i">
-
   <div class="content-box pt-0">
     <div class="element-wrapper">
       <div class="element-box">
@@ -8,116 +7,50 @@
             <div class="card main-card">
               <div class="card-body p-2">
                 <div class="col-md-12 pagetitleborder">
-                  <div class="pagetitlestyle mb-2"><span>Out of Office Hours Ussage Report</span>
+                  <div class="pagetitlestyle mb-2"><span>Out of Office Hours Ussage Report</span></div>
                 </div>
-              </div>
-              <div class="top-controls-row">
-                <!-- LEFT SIDE -->
-                <div class="left-controls pb-2">
-                  <!-- 🔍 SEARCH BOX -->
-                  <div class="search-box">
-                    <input
-                      type="search"
-                      class="search-input inner"
-                      placeholder="Search Here..."
-                      maxlength="50"
-                      [(ngModel)]="searchText"
-                      (keyup.enter)="getSearchDetails()"
-                      />
 
-                    <button class="search-inner-btn" (click)="getSearchDetails()">
-                      <i class="fa fa-search"></i>
-                    </button>
+                <app-common-data-toolbar [showFilters]="true" [searchText]="searchText"
+                  (searchTextChange)="searchText=$event" (search)="getSearchDetails()" (reload)="reloadData()"
+                  [loading]="!listLoaded" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+                  [displayedCount]="detailData.length" [totalRecords]="totalCount || 0"
+                  (pageSizeChange)="onPageSizeChange($event)" (excelExport)="downloadExcel()"
+                  pageSizeLabel="Show Rows" totalLabel="Total Records">
+                  <div toolbarFilters class="d-flex align-items-center gap-2 flex-wrap">
+                    <label class="mb-0">Date</label>
+                    <input class="form-control form-control-sm text-center" type="text" name="date" id="datepicker"
+                      required placeholder="Select Date" style="width: 200px">
                   </div>
+                </app-common-data-toolbar>
 
-                  <!-- 🔄 RELOAD BUTTON -->
-                  <button
-                    class="reload-btn"
-                    (click)="reloadData()"
-                    [disabled]="loading">
-                    <i class="fa fa-refresh pr-1" [class.fa-spin]="loading"></i>
-                    <span>{{ loading ? "Reloading..." : "Reload" }}</span>
-                  </button>
-                </div>
-                <div>
-                  <div style="width: 200px; margin-right: 10px;">
-                    <input
-                      class="form-control form-control-sm text-center"
-                      type="text"
-                      name="date"
-                      id="datepicker"
-                      required
-                      placeholder="Select Date"
-                    /></div>
-                  </div>
-                  <!-- CENTER SECTION -->
-                  <div class="d-flex justify-content-">
-
-
-
-                    <!-- RIGHT SIDE -->
-                    <div class="right-controls">
-                      <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
-                        [showPageSize]="false" [showTotal]="false" (excelExport)="downloadExcel()">
-                      </app-common-data-toolbar>
-                      <!-- <div class="total-records-text">Show Rows :</div> -->
-                      <!-- ROWS SELECT -->
-                      <!-- <select
-                      class="rows-select"
-                      [(ngModel)]="pageSize"
-                      (change)="onPageSizeChange(pageSize)"
-                      >
-                    <option
-                      *ngFor="let size of pageSizeOptions"
-                      [value]="size === totalCount ? 'All' : size"
-                      >
-                      {{ size === totalCount ? "All" : size }}
-                    </option>
-                  </select> -->
-
-                  <!-- TOTAL RECORD TEXT {{ pageCount }} of -->
-                  <div class="total-records-text">
-                    Total Records :  {{ totalCount }}
-                  </div>
-                </div>
-              </div>
-
-              <div class="table-responsive status-table">
-                <ng-template #reportTableRows let-rows>
-@for (v of rows; track v; let i = $index) {
+                <div class="table-responsive status-table">
+                  <ng-template #reportTableRows let-rows>
+                    @for (v of rows; track v; let i = $index) {
                       <tr>
-                        <td class="text-end p-2">{{v.param1 }}</td> <!-- rowno -->
+                        <td class="text-end p-2">{{v.param1}}</td>
                         <td class="p-2">
-                          <span class="fw-bold">{{ v.param3 == "" ? "-" : v.param3 }}</span>  <!--rolename-->
-                          ({{ v.param9=='' ? '' : v.param9 }}) <!--username-->
+                          <span class="fw-bold">{{ v.param3 == '' ? '-' : v.param3 }}</span>
+                          ({{ v.param9 == '' ? '' : v.param9 }})
                         </td>
-                        <!-- <td class="p-2">{{ v.param5 == '' ? '-' : v.param5 }}</td> --> <!--login date-->
-                        <td class="p-2">{{ v.param5 == '' ? '-' : v.param5 }}</td> <!--login time-->
-                        <td class="p-2">{{ v.param6 == '' ? '-' : v.param6 }}</td> <!--logout time-->
-                        <td class="p-2 text-end">{{ v.param7 == '' ? '-' : v.param7 }}</td> <!--usage duration-->
-                        <td class="p-2 text-end">{{ v.param10=='' ? '-' : v.param10 }}</td> <!--out of office hours usage-->
+                        <td class="p-2">{{ v.param5 == '' ? '-' : v.param5 }}</td>
+                        <td class="p-2">{{ v.param6 == '' ? '-' : v.param6 }}</td>
+                        <td class="p-2 text-end">{{ v.param7 == '' ? '-' : v.param7 }}</td>
+                        <td class="p-2 text-end">{{ v.param10 == '' ? '-' : v.param10 }}</td>
                       </tr>
                     }
-
                     @if (listLoaded && (!detailData || detailData.length === 0)) {
-                      <tr>
-                        <td colspan="10" class="text-center">
-                          NO DATA FOUND
-                        </td>
-                      </tr>
+                      <tr><td colspan="6" class="text-center">NO DATA FOUND</td></tr>
                     }
-</ng-template>
-<app-common-table [columns]="tableColumns" [rows]="detailData" [loading]="!listLoaded && detailData.length === 0" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table table-striped app-table small-table"></app-common-table>
-                <!-- Pagination Controls -->
-                <div class="float-end">
-                  @if (totalCount > pageSize) {
-                    <ngb-pagination [collectionSize]="totalCount"
-                      [(page)]="pageCount" [pageSize]="pageSize"
-                      (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-                      [ellipses]="false" [boundaryLinks]="true" size="sm"
-                      class="d-flex justify-content-center mt-2 mb-1">
-                    </ngb-pagination>
-                  }
+                  </ng-template>
+                  <app-data-table [columns]="tableColumns" [rows]="detailData" [loading]="!listLoaded && detailData.length === 0"
+                    [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows"
+                    tableClass="table table-striped app-table small-table">
+                  </app-data-table>
+                  <div class="float-end">
+                    <app-pagination [totalCount]="totalCount || 0" [page]="pageCount" [pageSize]="pageSize"
+                      [disabled]="!listLoaded" (pageChange)="onPageChange($event)">
+                    </app-pagination>
+                  </div>
                 </div>
               </div>
             </div>
@@ -126,7 +59,6 @@
       </div>
     </div>
   </div>
-</div>
 </div>
 
 <!-- <div *ngIf="showDetailsModal">

@@ -1,16 +1,17 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { POIService, POI, POIRequest, POIListResponse, POIUpdateRequest } from '../../../core/services/poi.service';
+import { POIService, POI, POIRequest, POIUpdateRequest } from '../../../core/services/poi.service';
 import { ToastComponent } from '../../assets/inactive-assets/toast.component';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastService } from '../../../core/services/toast.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-poi-list',
-    imports: [CommonModule, FormsModule, RouterModule, ToastComponent, NgbPaginationModule, CommonTableComponent],
+    imports: [CommonModule, FormsModule, RouterModule, ToastComponent, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './poi-list.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./poi-list.component.scss']
@@ -28,20 +29,21 @@ export class POIListComponent implements OnInit {
   // Sorting
   sortKey: string = '';
   reverse: boolean = false;
-  readonly tableColumns: CommonTableColumn<POI>[] = [
-    { key: 'param1', label: '#', value: poi => poi.param1 || 'NA' },
-    { key: 'param3', label: 'POI Name', sortable: true, value: poi => poi.param3 || 'NA' },
-    { key: 'param7', label: 'Latitude', sortable: true, width: '90px', value: poi => poi.param7 || 'NA' },
-    { key: 'param8', label: 'Longitude', sortable: true, width: '90px', value: poi => poi.param8 || 'NA' },
-    { key: 'param9', label: 'Range(km)', sortable: true, width: '70px', value: poi => poi.param9 || poi.param6 || 'NA' },
-    { key: 'icon', label: 'Icon', sortable: true, sortKey: 'param5', width: '65px' },
-    { key: 'createdDate', label: 'Created Date Time', sortable: true, sortKey: 'param10', width: '150px', value: poi => this.getCreatedDateTime(poi) },
+  @ViewChild('poiIconCell', { static: true }) poiIconCell!: TemplateRef<{ $implicit: POI }>;
+  readonly tableColumns: DataTableColumn<POI>[] = [
+    { key: 'param1', header: '#', value: poi => poi.param1 || 'NA' },
+    { key: 'param3', header: 'POI Name', sortKey: 'param3', value: poi => poi.param3 || 'NA' },
+    { key: 'param7', header: 'Latitude', sortKey: 'param7', width: '90px', value: poi => poi.param7 || 'NA' },
+    { key: 'param8', header: 'Longitude', sortKey: 'param8', width: '90px', value: poi => poi.param8 || 'NA' },
+    { key: 'param9', header: 'Range(km)', sortKey: 'param9', width: '70px', value: poi => poi.param9 || poi.param6 || 'NA' },
+    { key: 'icon', header: 'Icon', sortKey: 'param5', width: '65px' },
+    { key: 'createdDate', header: 'Created Date Time', sortKey: 'param10', width: '150px', value: poi => this.getCreatedDateTime(poi) },
     {
       key: 'actions',
-      label: 'Action',
+      header: 'Action',
       actions: [
-        { label: 'Edit', icon: 'fa fa-edit', tone: 'primary', className: 'btn-outline-primary me-2 shadow-sm', run: poi => this.openEditModal(poi) },
-        { label: 'Delete', icon: 'fa fa-trash', tone: 'danger', className: 'btn-outline-danger shadow-sm', run: poi => this.openDeleteModal(poi) }
+        { label: 'Edit', icon: 'fa-edit', tone: 'primary', className: 'btn-outline-primary me-2 shadow-sm', run: poi => this.openEditModal(poi) },
+        { label: 'Delete', icon: 'fa-trash', tone: 'danger', className: 'btn-outline-danger shadow-sm', run: poi => this.openDeleteModal(poi) }
       ]
     }
   ];
@@ -98,6 +100,8 @@ export class POIListComponent implements OnInit {
   }
   
   ngOnInit() {
+    const iconColumn = this.tableColumns.find(column => column.key === 'icon');
+    if (iconColumn) iconColumn.cellTemplate = this.poiIconCell;
     this.loadPOIs();
   }
   
@@ -159,36 +163,25 @@ export class POIListComponent implements OnInit {
     }
     
     this.pois.sort((a, b) => {
-      const aVal = (a as any)[key] || '';
-      const bVal = (b as any)[key] || '';
+      const aVal = String(a[key as keyof POI] ?? '');
+      const bVal = String(b[key as keyof POI] ?? '');
       return this.reverse 
-        ? String(bVal).localeCompare(String(aVal))
-        : String(aVal).localeCompare(String(bVal));
+        ? bVal.localeCompare(aVal)
+        : aVal.localeCompare(bVal);
     });
   }
   
   onPageChange(page: number): void {
-    if (page > 0 && page <= this.getTotalPages()) {
+    if (page > 0 && page <= Math.ceil(this.totalCount / this.pageSize)) {
       this.currentPage = page;
       this.loadPOIs();
     }
   }
   
-  onPageSizeChange(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const newSize = target.value;
-    this.pageSize = newSize === 'All' ? this.totalCount : parseInt(newSize);
+  onPageSizeChange(size: number | string): void {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount ? this.totalCount : Number(size);
     this.currentPage = 1;
     this.loadPOIs();
-  }
-  
-  getTotalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
-  
-  getPageNumbers(): number[] {
-    const totalPages = this.getTotalPages();
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
   
   updatePageSizeOptions(): void {
@@ -198,7 +191,9 @@ export class POIListComponent implements OnInit {
     if (this.totalCount > 200) options.push(200);
     if (this.totalCount > 500) options.push(500);
     if (this.totalCount > 1000) options.push(1000);
-    if (this.totalCount > 0 && this.totalCount < 100) options.push(this.totalCount); // 'All'
+    if (this.totalCount > 0 && this.totalCount < 100 && !options.includes(this.totalCount)) {
+      options.push(this.totalCount);
+    }
     this.pageSizeOptions = options;
   }
   

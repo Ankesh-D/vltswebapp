@@ -7,13 +7,14 @@ import { SchoolManagementService } from '../../../core/services/school-managemen
 import { SchoolMasterDeleteReq, SchoolMasterDetailsReq, SchoolMasterFormReq } from '../../../core/model/request.model';
 import { SchoolMasterDetailsResp } from '../../../core/model/response.model';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { MapboxService } from '../../../core/services/mapbox.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-school-master',
-    imports: [FormsModule, NgSelectModule, NgbPaginationModule, CommonTableComponent],
+    imports: [FormsModule, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './school-master.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './school-master.component.scss'
@@ -28,23 +29,23 @@ export class SchoolMasterComponent implements OnInit, OnDestroy {
   totalCount: any = 0;
   pageCount: any = 0;
   detailData: SchoolMasterDetailsResp[] = [];
-  readonly tableColumns: CommonTableColumn<SchoolMasterDetailsResp>[] = [
-    { key: 'param1', label: '#', width: '25px' },
-    { key: 'param3', label: 'School Name', width: '150px' },
-    { key: 'param4', label: 'Code', width: '150px' },
-    { key: 'contact', label: 'Contact Person (Contact Number)', width: '150px',
+  readonly tableColumns: DataTableColumn<SchoolMasterDetailsResp>[] = [
+    { key: 'param1', header: '#', width: '25px' },
+    { key: 'param3', header: 'School Name', width: '150px' },
+    { key: 'param4', header: 'Code', width: '150px' },
+    { key: 'contact', header: 'Contact Person (Contact Number)', width: '150px',
       value: data => `${data.param5 || ''} ${data.param6 === '0' ? '-' : data.param6 ? `(${data.param6})` : ''}`.trim() },
-    { key: 'param7', label: 'Email', width: '150px' },
-    { key: 'param18', label: 'State', width: '150px' },
-    { key: 'param17', label: 'City', width: '150px' },
-    { key: 'param8', label: 'Address', width: '150px' },
-    { key: 'param13', label: 'Pincode', width: '150px' },
+    { key: 'param7', header: 'Email', width: '150px' },
+    { key: 'param18', header: 'State', width: '150px' },
+    { key: 'param17', header: 'City', width: '150px' },
+    { key: 'param8', header: 'Address', width: '150px' },
+    { key: 'param13', header: 'Pincode', width: '150px' },
     {
       key: 'actions',
-      label: 'Action',
+      header: 'Action',
       actions: [
-        { label: 'Edit', icon: 'fa fa-edit', tone: 'primary', className: 'mx-2', run: data => this.editSchool(data) },
-        { label: 'Delete', icon: 'fa fa-trash', tone: 'danger', run: data => this.openDeleteModal(data) }
+        { label: 'Edit', icon: 'fa-edit', iconOnly: true, tone: 'primary', className: 'btn btn-primary btn-sm mx-2', run: data => this.editSchool(data) },
+        { label: 'Delete', icon: 'fa-trash', iconOnly: true, tone: 'danger', className: 'btn btn-danger btn-sm', run: data => this.openDeleteModal(data) }
       ]
     }
   ];
@@ -316,6 +317,7 @@ export class SchoolMasterComponent implements OnInit, OnDestroy {
 
 
   onPageSizeChange(event: any) {
+    this.pageSize = Number(event);
     this.schoolDetailsRequest.param3 = Number(event);
     this.getDetails('pageSize');
   }

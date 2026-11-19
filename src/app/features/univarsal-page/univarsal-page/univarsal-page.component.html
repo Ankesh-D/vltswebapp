@@ -741,55 +741,67 @@
       </button>
     </div>
 
-    <!-- Filters -->
-    <div class="raw-modal-filters">
-      <div class="raw-modal-date">
-        <label for="rawDate">Date</label>
-        <input
-          id="rawDate"
-          type="date"
-          [(ngModel)]="rawSelectedDate">
+    <app-common-data-toolbar
+      variant="device"
+      [showSearch]="false"
+      [showReload]="false"
+      [showFilters]="true"
+      [showExcel]="false"
+      [showPdf]="false"
+      [showPageSize]="false"
+      [displayedCount]="rawRows.length"
+      [totalRecords]="rawTotalCount"
+      [loading]="rawLoading"
+      totalLabel="Total Records"
+      countSeparator="of">
+      <div toolbarFilters class="raw-modal-filters">
+        <div class="raw-modal-date">
+          <label for="rawDate">Date</label>
+          <input
+            id="rawDate"
+            type="date"
+            [(ngModel)]="rawSelectedDate">
+        </div>
+
+        <div class="raw-modal-tabs">
+          @for (packet of rawPacketTabs; track packet.value) {
+            <button
+              type="button"
+              [class.active]="rawPacketType === packet.value"
+              [disabled]="rawLoading"
+              (click)="selectRawPacket(packet.value)">
+              {{ packet.label }}
+            </button>
+          }
+        </div>
+
+        <div class="raw-modal-actions">
+          <button
+            type="button"
+            class="vts-btn vts-btn-primary"
+            [disabled]="rawLoading"
+            (click)="searchRawData()">
+            <i class="bi bi-search"></i>
+            Apply Date
+          </button>
+
+          <button
+            type="button"
+            class="vts-btn vts-btn-outline"
+            [disabled]="rawLoading"
+            (click)="clearRawFilters()">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Reset
+          </button>
+        </div>
       </div>
-
-      <div class="raw-modal-actions">
-        <button
-          type="button"
-          class="vts-btn vts-btn-primary"
-          [disabled]="rawLoading"
-          (click)="searchRawData()">
-          <i class="bi bi-search"></i>
-          Apply Date
-        </button>
-
-        <button
-          type="button"
-          class="vts-btn vts-btn-outline"
-          [disabled]="rawLoading"
-          (click)="clearRawFilters()">
-          <i class="bi bi-arrow-counterclockwise"></i>
-          Reset
-        </button>
-      </div>
-    </div>
-
-    <!-- Packet Tabs -->
-    <div class="raw-modal-tabs">
-      <button
-        *ngFor="let packet of rawPacketTabs"
-        type="button"
-        [class.active]="rawPacketType === packet.value"
-        [disabled]="rawLoading"
-        (click)="selectRawPacket(packet.value)">
-        {{ packet.label }}
-      </button>
-    </div>
+    </app-common-data-toolbar>
 
     <!-- Table -->
     <div class="raw-modal-table-wrapper">
 
       <div class="raw-modal-table-heading">
         <h4>Raw Data Records</h4>
-        <span>Total Records: {{ rawTotalCount }}</span>
       </div>
 
       <div *ngIf="rawLoading" class="raw-modal-state">
@@ -806,36 +818,12 @@
       <div
         class="raw-table-scroll"
         *ngIf="!rawLoading && rawRows.length">
-
-        <table class="vahan-comparison-table raw-modal-table">
-          <thead>
-            <tr>
-              <th>Sr. No.</th>
-              <th>Server Polling Time</th>
-              <th>Raw Packet Data</th>
-              <th>Device IP</th>
-              <th>Port</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr *ngFor="let row of rawRows; let i = index">
-              <td>
-                {{ (rawCurrentPage - 1) * rawPageSize + i + 1 }}
-              </td>
-
-              <td>{{ row.param3 }}</td>
-
-              <td class="raw-modal-packet">
-                <pre>{{ row.param4 }}</pre>
-              </td>
-
-              <td>{{ row.param5 }}</td>
-              <td>{{ row.param6 }}</td>
-            </tr>
-          </tbody>
-        </table>
-
+        <app-data-table
+          [columns]="rawDataColumns"
+          [rows]="rawRows"
+          tableClass="vahan-comparison-table raw-modal-table"
+          emptyMessage="No raw data found.">
+        </app-data-table>
       </div>
 
       <div
@@ -848,19 +836,13 @@
 
     <!-- Pagination -->
     <div class="raw-modal-pagination">
-      <ngb-pagination
-        *ngIf="rawTotalCount > rawPageSize"
-        [collectionSize]="rawTotalCount"
-        [(page)]="rawCurrentPage"
+      <app-pagination
+        [totalCount]="rawTotalCount"
+        [page]="rawCurrentPage"
         [pageSize]="rawPageSize"
-        (pageChange)="changeRawPage($event)"
-        [maxSize]="5"
-        [rotate]="true"
-        [ellipses]="false"
-        [boundaryLinks]="true"
-        size="sm"
-        class="d-flex justify-content-center mt-2 mb-1">
-      </ngb-pagination>
+        [disabled]="rawLoading"
+        (pageChange)="changeRawPage($event)">
+      </app-pagination>
     </div>
 
   </div>

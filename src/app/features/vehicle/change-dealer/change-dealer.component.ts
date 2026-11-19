@@ -5,13 +5,15 @@ import { RouterModule } from '@angular/router';
 import { DeviceService } from '../../../core/services/device.service';
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { EncryptionService } from '../../../core/services/encryption.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 declare var $: any;
 
 @Component({
     selector: 'app-change-dealer',
-    imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule],
+    imports: [CommonModule, FormsModule, RouterModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './change-dealer.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./change-dealer.component.scss']
@@ -26,6 +28,14 @@ export class ChangeDealerComponent implements OnInit, AfterViewInit {
   pageSizeOptions = [20, 50, 100, 200, 500];
   totalCount = 0;
   pageCount = 0;
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { header: '#', key: 'param1', width: '40px' },
+    { header: '', headers: ['Serial No.', 'IMEI No.'], sortKey: 'param6', value: device => `${device.param6 || 'NA'}\n${device.param5 || 'NA'}`, cellStyle: { 'white-space': 'pre-line' } },
+    { header: 'ICCID No.', key: 'param7', sortKey: 'param7' },
+    { header: 'Dealer', key: 'param16', sortKey: 'param16' },
+    { header: 'Vendor', key: 'param15', sortKey: 'param15', visible: () => this.roleId !== '11' },
+    { header: 'Activity', className: 'text-center', actions: [{ label: 'Edit', className: 'btn btn-sm btn-primary', run: device => this.getDeviceDataForChange(device) }] }
+  ];
 
   sortKey: string = '';
   reverse: boolean = false;
@@ -147,9 +157,8 @@ export class ChangeDealerComponent implements OnInit, AfterViewInit {
     this.getChangeDealerData(this.currentPage);
   }
 
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
-    this.pageSize = newSize === 'All' ? this.totalCount : Number(newSize);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount ? this.totalCount : Number(size);
     this.currentPage = 1;
     this.getChangeDealerData(this.currentPage);
   }

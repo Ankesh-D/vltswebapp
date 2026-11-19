@@ -20,100 +20,35 @@
                 <div class="pagetitlestyle"><span>Vendor Wise Installed Counts Overall Report</span>
               </div>
             </div>
-            <div
-              style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0px; padding: 0 10px;">
-              <!-- Left Side: Search and Reload -->
-              <div style="display: flex; align-items: center;">
-                <span style="font-weight: bold; font-size: 12px; margin-right: 10px;">vendor
-                </span>
-                <ng-select class="vendor-select" [items]="vendorlist" bindLabel="param2"
-                  bindValue="param1" [(ngModel)]="selectedVendorFilter"
-                  (change)="onVendorFilterChange($event)" placeholder="All">
-                </ng-select>
-
-
-
-                <button class="mx-2" (click)="reloadData()"
-                  style="background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
-                  <i class="fa fa-refresh" [class.fa-spin]="!listLoaded"
-                  style="margin-right: 5px;"></i>
-                  @if (listLoaded) {
-                    <span>Reload</span>
-                  }
-                  @if (!listLoaded) {
-                    <span>Reloading...</span>
-                  }
-                </button>
-                <!-- <input
-                ngxDaterangepickerMd
-                [(ngModel)]="selectedRange"
-                (datesUpdated)="onDateApply($event)"
-                [showDropdowns]="true"
-                [alwaysShowCalendars]="true"
-                [autoApply]="false"
-                [locale]="{ format: 'DD-MMM-YYYY' }"
-
-                class="form-control"
-                style="font-size:12px"
-                /> -->
-                <input type="text" id="datepicker" class="form-control" name="date" />
-
-                <!-- <select [(ngModel)]="alertType" (change)="onAlertTypeChange()"
-                style="height: 26px; font-size: 11px; margin-left: 10px; border: 1px solid #0b58b9; border-radius: 4px;">
-
-                <option value="">All</option>
-                <option value="new">New</option>
-                <option value="old">Old</option>
-
-              </select> -->
-
-            </div>
-
-            <!-- Right Side: Download, Page Size, Count -->
-            <div style="display: flex; align-items: center; font-size: 11px;">
-              <div class="toggle-container modern-toggle mx-2">
-                <button class="toggle-option" [class.active]="vehicleType === 'NEW'"
-                  (click)="onChangeVehicleType('NEW')">
-                  NEW
-                </button>
-                <button class="toggle-option" [class.active]="vehicleType === 'ALL'"
-                  (click)="onChangeVehicleType('ALL')">
-                  ALL
-                </button>
-                <button class="toggle-option" [class.active]="vehicleType === 'OLD'"
-                  (click)="onChangeVehicleType('OLD')">
-                  OLD
-                </button>
-              </div>
-              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
-                [showPageSize]="false" [showTotal]="false" (excelExport)="downloadExcel()">
+              <app-common-data-toolbar
+                [showSearch]="false"
+                [showFilters]="true"
+                (reload)="reloadData()"
+                [loading]="!listLoaded"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                [displayedCount]="detailData.length"
+                [totalRecords]="totalCount || 0"
+                (pageSizeChange)="onPageSizeChange($event)"
+                (excelExport)="downloadExcel()"
+                pageSizeLabel="Show Rows"
+                totalLabel="Total Records">
+                <div toolbarFilters class="d-flex align-items-center gap-2 flex-wrap">
+                  <label class="mb-0">Vendor</label>
+                  <ng-select class="vendor-select" [items]="vendorlist" bindLabel="param2" bindValue="param1"
+                    [(ngModel)]="selectedVendorFilter" (change)="onVendorFilterChange($event)" placeholder="All">
+                  </ng-select>
+                  <input type="text" id="datepicker" class="form-control" name="date" />
+                </div>
+                <div toolbarBeforePageSize class="toggle-container modern-toggle mx-2">
+                  <button class="toggle-option" [class.active]="vehicleType === 'NEW'"
+                    (click)="onChangeVehicleType('NEW')">NEW</button>
+                  <button class="toggle-option" [class.active]="vehicleType === 'ALL'"
+                    (click)="onChangeVehicleType('ALL')">ALL</button>
+                  <button class="toggle-option" [class.active]="vehicleType === 'OLD'"
+                    (click)="onChangeVehicleType('OLD')">OLD</button>
+                </div>
               </app-common-data-toolbar>
-
-              <div style="display: flex; align-items: center; margin-right: 15px;">
-                <!-- <label style="margin: 0 5px 0 0; font-weight: bold;">Download</label>
-                <select  class="rows-select">
-                  <option value="">Select</option>
-                  <option value="excel">Excel</option>
-                </select> -->
-                <label style="margin: 0 5px 0 0; font-weight: bold;">Show Rows:</label>
-
-                <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)"
-                  style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px;">
-
-                  @for (size of pageSizeOptions; track size) {
-                    <option [value]="size">
-                      {{ size }}
-                    </option>
-                  }
-
-                </select>
-              </div>
-
-              <div style="font-weight: bold; color: #0b58b9;">
-                Total Records : {{ totalCount }}
-              </div>
-            </div>
-          </div>
           <!-- "vendorname": "APM KINGSTRACK INDIA PVT LTD",
           "vendorid": "30016",
           "over_speed_count": "8",
@@ -134,10 +69,13 @@
               </tr>
             }
           </ng-template>
-          <app-common-table [columns]="tableColumns" [rows]="detailData" [loading]="!listLoaded"
+          <app-data-table [columns]="tableColumns" [rows]="detailData" [loading]="!listLoaded"
             [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="installedCountRows"
             tableClass="table table-striped app-table small-table">
-          </app-common-table>
+          </app-data-table>
+          <app-pagination [totalCount]="totalCount || 0" [page]="pageCount" [pageSize]="pageSize"
+            [disabled]="!listLoaded" (pageChange)="onPageChange($event)">
+          </app-pagination>
             <!-- <div style="display:flex; justify-content: center; margin-top:10px; gap:10px;">
 
             <button (click)="pageCount = pageCount - 1; getDetails()"

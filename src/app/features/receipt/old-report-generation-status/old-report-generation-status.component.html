@@ -24,59 +24,23 @@
                   <div class="row fade-in-up">
                     <div class="col-12 text-center mb-3">
                       <div id="activatedTable">
-                        <div
-                          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 10px;">
-                          <!-- Left Side: Search and Reload -->
-                          <div style="display: flex; align-items: center;">
-                            <span style="font-weight: bold; font-size: 12px; margin-right: 10px;">Search :</span>
-                            <div
-                              style="display: flex; align-items: center; border: 1px solid #0b58b9; border-radius: 4px; overflow: hidden; background: white; margin-right: 10px;">
-                              <input type="search" readonly (focus)="searchInput.removeAttribute('readonly')"
-                                #searchInput class="tabletitlesearch" id="searchby" placeholder="Type here..."
-                                style="border: none; height: 24px; width: 180px; padding: 0 8px; outline: none; font-size: 11px;"
-                                autocomplete="off" maxlength="50" [(ngModel)]="searchBy"
-                                (keyup.enter)="getSearchDetails()">
-                              <button id="searchbtn" (click)="getSearchDetails()"
-                                style="background: #0b58b9; color: white; border: none; height: 24px; width: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                                <i class="fa fa-search" style="font-size: 12px;"></i>
-                              </button>
-                            </div>
-                            <button (click)="reloadData()"
-                              style="background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
-                              <i class="fa fa-refresh" [class.fa-spin]="!isVehicleListLoaded"
-                              style="margin-right: 5px;"></i>
-                              @if (isVehicleListLoaded) {
-                                <span>Reload</span>
-                              }
-                              @if (!isVehicleListLoaded) {
-                                <span>Reloading...</span>
-                              }
-                            </button>
-                          </div>
-                          <!-- Right Side: Download, Page Size, Count -->
-                          <div style="display: flex; align-items: center; font-size: 11px;">
-                            <div style="display: flex; align-items: center; margin-right: 15px;">
-                              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
-                                [showPageSize]="false" [showTotal]="false" [exportLoading]="isExporting"
-                                (excelExport)="selectedDownloadType = 'Excel'; onDownloadChange()"></app-common-data-toolbar>
-                            </div>
-                            <div style="display: flex; align-items: center; margin-right: 15px;">
-                              <label style="margin: 0 5px 0 0; font-weight: bold; color: #333;">Show Rows:</label>
-                              <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)"
-                                style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; color: #333; outline: none; background: white;">
-                                @for (size of pageSizeOptions; track size) {
-                                  <option [value]="size">
-                                    {{ size }}
-                                  </option>
-                                }
-                              </select>
-                            </div>
-                            <div style="font-weight: bold; color: #0b58b9;">
-                              Total Records : {{ pageCount }} of {{ totalCount }}
-                            </div>
-                          </div>
-                        </div>
+                        <app-common-data-toolbar variant="device" searchLabel="Search :"
+                          searchPlaceholder="Type here..." [searchText]="searchBy"
+                          (searchTextChange)="searchBy = $event" (search)="getSearchDetails()"
+                          (reload)="reloadData()" [loading]="!isVehicleListLoaded"
+                          [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+                          [displayedCount]="pageCount" [totalRecords]="totalCount"
+                          [exportLoading]="isExporting" [showExcel]="true" [showPdf]="false"
+                          pageSizeLabel="Show Rows" totalLabel="Total Records" countSeparator="of"
+                          (pageSizeChange)="onPageSizeChange($event)"
+                          (excelExport)="selectedDownloadType = 'Excel'; onDownloadChange()">
+                        </app-common-data-toolbar>
                         <ng-template #vehicleRows let-rows>
+                          @if (!rows.length) {
+                            <tr>
+                              <td [attr.colspan]="task != 11 ? 12 : 11" class="empty-state text-center">NO DATA FOUND</td>
+                            </tr>
+                          }
                           @for (detail of rows; track detail) {
                             <tr>
                               <td>{{ detail.param1 }}</td>
@@ -108,32 +72,16 @@
                             </tr>
                           }
                         </ng-template>
-                        <app-common-table [columns]="tableColumns" [rows]="vehicleDetails"
+                        <app-data-table [columns]="tableColumns" [rows]="vehicleDetails"
                           [loading]="!isVehicleListLoaded" [sortKey]="sortKey" [reverse]="reverse"
-                          [bodyTemplate]="vehicleRows" tableClass="table table-striped app-table app-table"
+                          [bodyTemplate]="vehicleRows" tableClass="table table-striped app-table"
                           tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;"
-                          (sortChange)="sort($event)">
-                        </app-common-table>
-                          @if (getTotalPages() > 1) {
-                            <div class="pagination-wrapper">
-                              <ul class="pagination"
-                                style="list-style: none; display: flex; justify-content: center; gap: 5px;">
-                                <li [class.disabled]="currentPage === 1">
-                                  <button (click)="onPageChange(currentPage - 1)"
-                                  [disabled]="currentPage === 1">Previous</button>
-                                </li>
-                                @for (page of getPageNumbers(); track page) {
-                                  <li [class.active]="currentPage === page">
-                                    <button (click)="onPageChange(page)">{{page}}</button>
-                                  </li>
-                                }
-                                <li [class.disabled]="currentPage >= getTotalPages()">
-                                  <button (click)="onPageChange(currentPage + 1)"
-                                  [disabled]="currentPage >= getTotalPages()">Next</button>
-                                </li>
-                              </ul>
-                            </div>
-                          }
+                          (sort)="sort($event)">
+                        </app-data-table>
+                        <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+                          [disabled]="!isVehicleListLoaded" align="center"
+                          (pageChange)="onPageChange($event)">
+                        </app-pagination>
                           <br>
                           </div>
                         </div>

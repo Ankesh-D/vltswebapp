@@ -102,11 +102,20 @@
         </div>
       </form> -->
        <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here..." [showExcel]="true"
+          [showFilters]="true"
           [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
-          (reload)="reloadData()" [loading]="loading" [exportLoading]="isExporting" [pageSize]="pageSize" [showOldNew]="true"
-          [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount" (oldNewChange)="onTypeChange($event)"
+          (reload)="reloadData()" [loading]="loading" [exportLoading]="isExporting" [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
           (pageSizeChange)="onPageSizeChange($event)" (excelExport)="exportPDFExcel($event)" pageSizeLabel="Show Rows"
           totalLabel="Total Records" countSeparator="of">
+          <div toolbarFilters class="form-group">
+            <label for="deviceTypeFilter">Type :</label>
+            <select id="deviceTypeFilter" class="form-select form-select-sm" [ngModel]="deviceType"
+              (ngModelChange)="onTypeChange($event)">
+              <option [ngValue]="'new'">New</option>
+              <option [ngValue]="'old'">Old</option>
+            </select>
+          </div>
           @if (isExporting) {
             <span class="dealer-exporting"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Generating...</span>
           }

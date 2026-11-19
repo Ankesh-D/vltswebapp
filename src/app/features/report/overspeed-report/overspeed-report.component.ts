@@ -11,13 +11,15 @@ import { ToastService } from '../../../core/services/toast.service';
 import dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 
 @Component({
     selector: 'app-overspeed-report',
-    imports: [NgxDaterangepickerMd, FormsModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [NgxDaterangepickerMd, FormsModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './overspeed-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./overspeed-report.component.scss']

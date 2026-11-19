@@ -18,6 +18,71 @@
                     <div class="row fade-in-up">
                       <div class="col-12 mb-3 text-center">
                         <div id="activatedTable">
+                          <app-common-data-toolbar
+                            variant="vehicle"
+                            [wrapFilters]="true"
+                            searchLabel="Search vehicles"
+                            searchPlaceholder="Search here..."
+                            [searchText]="searchBy"
+                            (searchTextChange)="searchBy = $event"
+                            (search)="getSearchDetails()"
+                            (reload)="reloadData()"
+                            [loading]="!isVehicleListLoaded"
+                            [pageSize]="pageSize"
+                            [pageSizeOptions]="pageSizeOptions"
+                            [displayedCount]="pageCount"
+                            [totalRecords]="totalCount"
+                            [showFilters]="true"
+                            [showExcel]="true"
+                            [showPdf]="false"
+                            (pageSizeChange)="onPageSizeChange($event)"
+                            (excelExport)="exportExcel()"
+                            pageSizeLabel="Show Rows"
+                            totalLabel="Total Records"
+                            countSeparator="of">
+                            <div toolbarFilters class="generation-status-filters">
+                              <label class="generation-status-date">
+                                <span>Date:</span>
+                                @if (selectedRange) {
+                                  <input ngxDaterangepickerMd [(ngModel)]="selectedRange"
+                                    (datesUpdated)="onDateApply($event)" [singleDatePicker]="false"
+                                    [autoApply]="false" [showDropdowns]="true" [alwaysShowCalendars]="true"
+                                    [locale]="{ format: 'DD-MMM-YYYY' }" [maxDate]="maxDate" />
+                                }
+                              </label>
+                              <select aria-label="Vendor filter" [(ngModel)]="vendorObj" (change)="onChangeVendor()">
+                                <option [ngValue]="null">All Vendor</option>
+                                @for (item of vendorList; track item) {
+                                  <option [ngValue]="item">{{ item.param2 }}</option>
+                                }
+                              </select>
+                              <select aria-label="RTO filter" [(ngModel)]="rtoObj" (change)="onChangeRTO()">
+                                <option [ngValue]="null">All RTO</option>
+                                @for (item of rtoList; track item) {
+                                  <option [ngValue]="item">{{ item.param2 }}</option>
+                                }
+                              </select>
+                              <select aria-label="Report type filter" [(ngModel)]="alertType" (change)="applyFilters()">
+                                <option value="New System Data">All Type</option>
+                                <option value="Renewal">Renewal</option>
+                                <option value="Installation">Installation</option>
+                              </select>
+                              <select aria-label="Activation status filter" [(ngModel)]="activationFilter"
+                                (ngModelChange)="onActivationFilterChange()">
+                                <option value="">Activation Status</option>
+                                <option value="Activated">Activated</option>
+                                <option value="Not Activated">Not Activated</option>
+                              </select>
+                              @if (showMviDiv) {
+                                <select aria-label="MVI status filter" [(ngModel)]="mviFilter" (change)="applyFilters()">
+                                  <option value="All">All MVI Status</option>
+                                  <option value="Pending">Pending</option>
+                                  <option value="Verified">Approved</option>
+                                </select>
+                              }
+                            </div>
+                          </app-common-data-toolbar>
+                          @if (false) {
                         <div style=" display: flex; justify-content: space-between;
                             align-items: center; margin-bottom: 10px;  padding: 0 10px; " >
                             <!-- Left Side: Search and Reload -->
@@ -298,7 +363,9 @@
                       </div>
                     </div> -->
                   </div>
+                  }
                   <div class="table-striped table table-container">
+                    @if (false) {
                     <div class="table-filters">
                       <div class="filter-item">
                         <select [(ngModel)]="vendorObj" (change)="onChangeVendor()"
@@ -367,7 +434,17 @@ style="
                         </select>
                       </div>
                     </div>
+                    }
                     <ng-template #vehicleRows let-rows>
+                      @if (!isVehicleListLoaded) {
+                        <tr>
+                          <td class="empty-state text-center" colspan="13">Loading...</td>
+                        </tr>
+                      } @else if (rows.length === 0) {
+                        <tr>
+                          <td class="empty-state text-center" colspan="13">No data found.</td>
+                        </tr>
+                      } @else {
                       @for (detail of rows; track detail) {
                         <tr>
                           <td>{{ detail.param1 || 'NA' }}</td>
@@ -416,13 +493,18 @@ style="
                           </td>
                         </tr>
                       }
+                      }
                     </ng-template>
-                    <app-common-table [columns]="tableColumns" [rows]="vehicleDetails"
+                    <app-data-table [columns]="tableColumns" [rows]="vehicleDetails"
                       [loading]="!isVehicleListLoaded" [bodyTemplate]="vehicleRows"
                       tableClass="table table-striped app-table"
                       tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;">
-                    </app-common-table>
+                    </app-data-table>
+                    <app-common-pagination [totalRecords]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+                      [disabled]="!isVehicleListLoaded" (pageChange)="onPageChange($event)">
+                    </app-common-pagination>
           </div>
+          @if (false) {
           @if (getTotalPages() > 1) {
 <div class="pagination-wrapper" style="
                             display: flex;
@@ -484,6 +566,7 @@ style="
                 Next
               </button>
             </div>
+          }
           }
           <br />
         </div>

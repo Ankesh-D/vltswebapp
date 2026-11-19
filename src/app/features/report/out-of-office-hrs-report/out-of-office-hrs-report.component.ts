@@ -5,30 +5,30 @@ import { RouterModule } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ToastService } from '../../../core/services/toast.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ReportService } from '../../../core/services/report.service';
 import { OutOfOfficeHrsReportReq } from '../../../core/model/request.model';
 
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 declare var moment: any;
 
 @Component({
     selector: 'app-out-of-office-hrs-report',
-    imports: [FormsModule, RouterModule, NgSelectModule, NgxDaterangepickerMd, NgbPaginationModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [FormsModule, RouterModule, NgSelectModule, NgxDaterangepickerMd, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './out-of-office-hrs-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './out-of-office-hrs-report.component.scss'
 })
 export class OutOfOfficeHrsReportComponent  implements OnInit {
-  readonly tableColumns: CommonTableColumn[] = [
-    { key: 'column1', label: '#', className: 'green py-1 text-center' },
-    { key: 'column2', label: 'User Name (Role)', className: 'green py-1 text-center' },
-    { key: 'column3', label: 'Login Time', className: 'green py-1 text-end' },
-    { key: 'column4', label: 'Log Out Time', className: 'green py-1 text-end' },
-    { key: 'column5', label: 'Usage Duration(min)', className: 'green py-1 text-end' },
-    { key: 'column6', label: 'Out of Office Hours Usage(min)', className: 'green py-1 text-end' }
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { key: 'column1', header: '#', className: 'green py-1 text-center' },
+    { key: 'column2', header: 'User Name (Role)', className: 'green py-1 text-center' },
+    { key: 'column3', header: 'Login Time', className: 'green py-1 text-end' },
+    { key: 'column4', header: 'Log Out Time', className: 'green py-1 text-end' },
+    { key: 'column5', header: 'Usage Duration(min)', className: 'green py-1 text-end' },
+    { key: 'column6', header: 'Out of Office Hours Usage(min)', className: 'green py-1 text-end' }
   ];
 
   detailData: any[] = [];
@@ -126,8 +126,8 @@ export class OutOfOfficeHrsReportComponent  implements OnInit {
     this.detailModalPageCount = 1;
   }
 
-  onPageSizeChange(event: any) {
-    this.pageSize = Number(event.target.value);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = Number(size);
     this.pageCount = 1;
     this.getDetails();
   }
@@ -359,7 +359,8 @@ export class OutOfOfficeHrsReportComponent  implements OnInit {
     this.getDetails();
   }
   getSearchDetails() {
-
+    this.searchBy = this.searchText;
+    this.pageCount = 1;
     this.getDetails();
   }
   reloadData() {

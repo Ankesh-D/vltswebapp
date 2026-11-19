@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -16,7 +16,9 @@ import dayjs, { Dayjs } from 'dayjs';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ValidationsService } from '../../../core/services/validations.service';
 import { SimValidityService } from '../../../core/services/sim-validity.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 type ForceActionType = 'polling' | 'emr' | 'smsack' | 'simvalidity' | 'otp' | 'activate';
 type RowAction = ForceActionType | 'validityUpdate' | 'compliance';
@@ -43,7 +45,8 @@ export class SimValidityUpdateRequest {
 
 @Component({
     selector: 'app-forcefull-vehicle-installation',
-    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, NgxDaterangepickerMd, NgbPaginationModule],
+    imports: [CommonModule, FormsModule, RouterModule, NgSelectModule, NgxDaterangepickerMd,
+      CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './forcefull-vehicle-installation.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './forcefull-vehicle-installation.component.scss'
@@ -92,6 +95,7 @@ export class ForcefullVehicleInstallationComponent implements OnInit {
   totalCount: number = 0;
   pageCount: number = 0;
   pageSizeOptions = [10, 20, 50, 100]; m2mProviderObj: any;
+  readonly tableColumns: DataTableColumn<any>[] = Array.from({ length: 13 }, () => ({}));
   ;
   m2mProviderList: any[] = [];
   fromDate: any = "";
@@ -99,8 +103,6 @@ export class ForcefullVehicleInstallationComponent implements OnInit {
   private rowLoading = new Map<string, RowAction>();
   private complianceByRow = new Map<string, ComplianceItem[]>();
   private readonly highlightedComplianceKeys = new Set(['secure_APN', 'network_switch', 'network_stable']);
-
-  @ViewChild('searchVendorForm') searchVendorForm!: NgForm;
 
   constructor(
     private dashboardService: DashboardService,
@@ -119,7 +121,7 @@ export class ForcefullVehicleInstallationComponent implements OnInit {
     this.loadVendorList();
     this.loadNetworkList();
     this.loadM2MProviderList();
-    // this.loadDevices();
+    this.loadDevices();
   }
   formatDate(date: Date): string {
     return moment(date).format('DD-MMM-YYYY');
@@ -131,7 +133,9 @@ export class ForcefullVehicleInstallationComponent implements OnInit {
     if (this.totalCount > 100) options.push(100);
     if (this.totalCount > 200) options.push(200);
     if (this.totalCount > 500) options.push(500);
-    if (this.totalCount > 0 && this.totalCount < 100) options.push(this.totalCount); // 'All'
+    if (this.totalCount > 0 && this.totalCount < 100 && !options.includes(this.totalCount)) {
+      options.push(this.totalCount);
+    }
     this.pageSizeOptions = options;
   }
   initializeDateRangePicker() {
@@ -253,77 +257,11 @@ export class ForcefullVehicleInstallationComponent implements OnInit {
   //     return sorted;
   //   }
 
-  getTotalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
   onPageChange(page: number) {
     this.currentPage = page;
     this.loadDevices();
   }
-
-  getPageNumbers(): number[] {
-    const total = this.getTotalPages();
-    const pages: number[] = [];
-    const maxPages = 8;
-
-    if (total <= maxPages) {
-      for (let i = 1; i <= total; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (this.currentPage <= 4) {
-        for (let i = 1; i <= 5; i++) {
-          pages.push(i);
-        }
-        pages.push(-1); // Ellipsis
-        pages.push(total);
-      } else if (this.currentPage >= total - 3) {
-        pages.push(1);
-        pages.push(-1); // Ellipsis
-        for (let i = total - 4; i <= total; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push(1);
-        pages.push(-1); // Ellipsis
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push(-1); // Ellipsis
-        pages.push(total);
-      }
-    }
-    return pages;
-  }
-
-  shouldShowPage(page: number): boolean {
-    return page !== -1;
-  }
-  changePage(p: number) {
-
-    if (p < 1 || p > this.totalPages) return;
-
-    this.currentPage = p;
-
-    this.loadDevices(); // 🔥 reload API
-  }
-  onPageSizeChanged(size: any) {
-
-    if (size === 'All') {
-      this.pageSize = this.totalCount;
-    } else {
-      this.pageSize = Number(size);
-    }
-
-    // this.pageSize = 1; // 🔥 reset page
-    this.loadDevices(); // 🔄 reload
-  }
-  totalPages: number = 0;
   loadDevices(): void {
-    // if (this.searchVendorForm.invalid) {
-    //   this.toastService.show('Please select a vendor.');
-    //   return;
-    // }
     this.loading = true;
     const request = {
       param1: this.searchText, //search text
@@ -345,8 +283,6 @@ param9: this.selectedVendor ? this.selectedVendor : '',
           this.totalCount = total;
           this.devices = response.entity.listData;
           this.pageCount = this.devices.length;
-          // ✅ pages
-          this.totalPages = Math.ceil(total / this.pageSize);
           this.updatePageSizeOptions(); // Update page size options based on total count
           // this.totalCount = response.entity.param1 || 0;
 
@@ -363,7 +299,6 @@ param9: this.selectedVendor ? this.selectedVendor : '',
         }
         // this.devices = this.extractRows(response);
         // this.filteredDevices = [...this.devices];
-        // this.currentPage = Math.min(this.currentPage, this.totalPages);
         // this.pruneComplianceCache();
       },
       error: (error) => {
@@ -490,20 +425,6 @@ param9: this.selectedVendor ? this.selectedVendor : '',
     this.currentPage = 1;
     this.pageSize = 20;
     this.loadDevices();
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage -= 1;
-      this.loadDevices();
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage += 1;
-      this.loadDevices();
-    }
   }
 
   forceDeviceAction(device: any, actionType: ForceActionType): void {

@@ -15,18 +15,20 @@ import { Subject } from 'rxjs';
 import moment from 'moment';
 import { LoaderService } from '../../../core/services/loader.service';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 @Component({
   selector: 'app-emergency-alert-count-report',
   standalone: true,
-  imports: [CommonModule, NgxDaterangepickerMd, FormsModule, NgSelectModule, CommonDataToolbarComponent, CommonTableComponent],
+  imports: [CommonModule, NgxDaterangepickerMd, FormsModule, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
   templateUrl: './emergency-alert-count-report.component.html',
   styleUrl: './emergency-alert-count-report.component.scss'
 })
 export class EmergencyAlertCountReportComponent implements OnInit, AfterViewInit {
-  readonly tableColumns: CommonTableColumn[] = [
+  readonly tableColumns: CommonTableColumn<SOSSessionResponse>[] = [
     { key: 'column1', label: 'Sr. No.' },
     { key: 'column2', label: 'Vehicle Reg No' },
     { key: 'column3', label: 'Chassis No' },

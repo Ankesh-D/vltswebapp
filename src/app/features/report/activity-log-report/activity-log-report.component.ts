@@ -12,18 +12,20 @@ import dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import { EventLogReportResp } from '../../../core/model/response.model';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 @Component({
     selector: 'app-activity-log-report',
-    imports: [NgxDaterangepickerMd, FormsModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [NgxDaterangepickerMd, FormsModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './activity-log-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./activity-log-report.component.scss']
 })
 export class ActivityLogReportComponent implements OnInit, AfterViewInit {
-  readonly tableColumns: CommonTableColumn[] = [
+  readonly tableColumns: CommonTableColumn<EventLogReportResp>[] = [
     { key: 'column1', label: '#' },
     { key: 'column2', label: 'User Name' },
     { key: 'column3', label: 'Page Name' },
@@ -370,23 +372,8 @@ pageSizeOptions = [10, 20, 50, 100];
 
 // 🔎 SEARCH
 getSearchDetails() {
+  this.page = 1;
   this.getAlertOverview();
-
-  // agar backend search hai to yaha API call karo
-  // abhi ke liye existing data filter example
-
-  if (!this.searchText) {
-    return this.getAlertOverview();
-  }
-
-  const text = this.searchText.toLowerCase();
-
-  this.alertData = this.alertData.filter((item: any) =>
-    Object.values(item).some(val =>
-      String(val).toLowerCase().includes(text)
-    )
-  );
- 
 }
 
 

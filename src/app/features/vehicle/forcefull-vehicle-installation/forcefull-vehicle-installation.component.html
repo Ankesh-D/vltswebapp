@@ -5,96 +5,57 @@
         <!-- HEADER -->
         <div class="table-responsive">
           <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
-            <div class="col-md-12 pagetitleborder p-0">
-              <div class="page-header-row mb-3">
+            <div class="col-md-12 pagetitleborder p-0 force-installation-header">
+              <div>
                 <!-- TITLE -->
-                <div class="pagetitlestyle mb-3">
+                <div class="pagetitlestyle">
                   Forcefully Activation Details
                 </div>
               </div>
 
-              <div class="top-controls-row">
-                <!-- LEFT CONTROLS -->
-                <div class="left-controls d-flex gap-2 flex-wrap">
-                  <form #searchVendorForm="ngForm" (ngSubmit)="getSearchDetails()"
-                    class="d-flex gap-2 align-items-start flex-wrap">
-                    <!-- VENDOR SELECT -->
-                    <div class="vendor-control">
-                      <ng-select [items]="vendorList" bindLabel="param2" bindValue="param1" placeholder="Select Vendor"
-                        [(ngModel)]="selectedVendor" name="vendorId" #vendorIdRef="ngModel" required
-                        class="vendor-select" style="min-width: 200px;">
-                      </ng-select>
-                      <!-- <div class="invalid-feedback d-block"
-                      *ngIf="vendorIdRef.invalid && (vendorIdRef.dirty || vendorIdRef.touched)">
-                      Vendor selection is required.
-                    </div> -->
-                  </div>
-                  <!-- SEARCH INPUT -->
-                  <div class="search-control mx-2">
-                    <div class="search-box">
-                      <input type="search"  class="search-input inner" placeholder="Search..." maxlength="50"
-                        [(ngModel)]="searchText" name="searchby" (keydown.enter)="getSearchDetails()"/>
-
-                      <!-- <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
-                      <i class="fa fa-search"></i>
-                    </button> -->
-
-                  </div>
-
-                </div>
-
-                <!-- ACTION BUTTONS -->
-                <div class="button-group d-flex gap-2 mx-2">
-                  <button type="submit" class="btn btn-sm btn-primary" style="height: 27px; font-size: 11px;">
-                    <i class="fa fa-search"></i> Search
-                  </button>
-                  <button type="reset" (click)="clearSearch()" class="btn btn-sm btn-secondary mx-1"
-                    style="height: 27px; font-size: 11px;">
-                    <i class="fa fa-times"></i> Clear
-                  </button>
-                  <!-- <button
+              <app-common-data-toolbar
+                variant="device"
+                searchLabel="Search :"
+                searchPlaceholder="Search..."
+                [searchText]="searchText"
+                (searchTextChange)="searchText = $event"
+                (search)="onSearch()"
+                (reload)="reloadData()"
+                [loading]="loading"
+                [showFilters]="true"
+                [showExcel]="false"
+                [showPdf]="false"
+                pageSizeLabel="Show Rows"
+                totalLabel="Total Records"
+                countSeparator="of"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                [displayedCount]="pageCount"
+                [totalRecords]="totalCount"
+                (pageSizeChange)="onPageSizeChange($event)">
+                <ng-select
+                  style="width: 200px; font-size: 11px;"
+                  toolbarFilters
+                  [items]="vendorList"
+                  bindLabel="param2"
+                  bindValue="param1"
+                  placeholder="Select Vendor"
+                  [(ngModel)]="selectedVendor"
+                  [ngModelOptions]="{ standalone: true }"
+                  (change)="onVendorChange()"
+                  name="vendorId"
+                  class="vendor-select"
+                  [disabled]="vendorLoading || loading || hasRowLoading">
+                </ng-select>
+                <button
+                  toolbarFilters
                   type="button"
-                  class="btn btn-sm btn-info mx-1"
-                  (click)="reloadData()"
-                  [disabled]="loading">
-                  <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
-                  {{ loading ? 'Reloading...' : 'Reload' }}
-                </button> -->
-              </div>
-            </form>
-          </div>
-          <!-- Right Controls -->
-          <div class="right-control d-flex gap-2 flex-wrap">
-            <!-- Show Rows -->
-            <div class="d-flex align-items-center me-3">
-              <label class="mb-0 me-2 fw-bold" style="font-size: 11px;">Show Rows :</label>
-              <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChanged(pageSize)">
-
-                @for (size of pageSizeOptions; track size) {
-                  <option [value]="size === totalCount ? totalCount : size">
-                    {{ size === totalCount ? totalCount : size }}
-                  </option>
-                }
-
-              </select>
-            </div>
-
-            <!-- Total Records -->
-            <span class="fw-bold align-items-center m-1" style="font-size: 11px;">
-              Total Records : <span class="text-primary">{{pageCount}} of {{totalCount}}</span>
-            </span>
-
-            <div>
-              <button type="button" class="reload-btn mx-2" style="width: 90px;" (click)="reloadData()" [disabled]="loading">
-                {{ loading ? 'Reloading...' : 'Reload' }}
-              </button>
-              <!-- <button (click)="reloadData()" [disabled]="loading" class="btn btn-sm"
-              style="margin-left: 10px; background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 27px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
-              <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px;"></i>
-              <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
-            </button> -->
-          </div>
-        </div>
+                  class="btn btn-sm btn-secondary"
+                  (click)="clearSearch()"
+                  [disabled]="loading || hasRowLoading">
+                  <i class="fa fa-times"></i> Clear
+                </button>
+              </app-common-data-toolbar>
       </div>
     </div>
     <!-- <div class="row my-2">
@@ -135,9 +96,7 @@
 
 
   <div class="">
-    <table class="table-striped app-table table mb-1"
-      style="border-top: 1px solid black; border-bottom: 1px solid black;margin-left: 0px;" id="devicetable">
-      <thead class="device-thead">
+    <ng-template #forceTableHeader>
         <tr>
           <th rowspan="2" style="width:35px;">#</th>
           <th rowspan="2">
@@ -159,7 +118,7 @@
             <hr class="m-0">
             SIM 2
           </th>
-          <th colspan="9" class="text-center">Compliance Check</th>
+          <th colspan="7" class="text-center">Compliance Check</th>
         </tr>
         <tr>
           <th>Device Validity Update</th>
@@ -172,15 +131,14 @@
           <!-- <th>Last Panic Location</th> -->
           <th>Action</th>
         </tr>
-      </thead>
-      <tbody>
-        @if (totalCount==0) {
+    </ng-template>
+    <ng-template #forceTableBody let-rows>
+        @if (rows.length === 0) {
           <tr>
-            <td colspan="19" class="text-center">No Data Found</td>
+            <td colspan="13" class="text-center">No Data Found</td>
           </tr>
         }
-        @if (totalCount!=0) {
-          @for (item of devices; track item; let i = $index) {
+        @for (item of rows; track item; let i = $index) {
             <tr>
               <td>{{item.param1}}</td>
               <td>{{item.param20}}
@@ -314,19 +272,27 @@
                 }
               </td>
             </tr>
-          }
         }
-      </tbody>
-    </table>
-    <!-- Pagination Controls -->
-    <div class="float-end">
-      @if (totalCount > pageSize) {
-        <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-          [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-          [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-        </ngb-pagination>
-      }
-    </div>
+    </ng-template>
+    <app-data-table
+      [columns]="tableColumns"
+      [rows]="devices"
+      [loading]="loading"
+      [headerTemplate]="forceTableHeader"
+      [bodyTemplate]="forceTableBody"
+      tableClass="table-striped app-table table mb-1"
+      tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px; font-size: 11px;"
+      tableId="devicetable"
+      headerClass="device-thead"
+      emptyMessage="No Data Found">
+    </app-data-table>
+    <app-pagination
+      [totalCount]="totalCount"
+      [page]="currentPage"
+      [pageSize]="pageSize"
+      [disabled]="loading"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
     <!-- <div class="custom-pagination" style="display:flex;justify-content: end;"
     *ngIf="totalCount > pageSize || currentPage > 1">
 
@@ -366,7 +332,7 @@
 </div>
 </div>
 </div>
-</div>
+
 <!-- <div class="content-i">
 <div class="content-box">
   <div class="row">

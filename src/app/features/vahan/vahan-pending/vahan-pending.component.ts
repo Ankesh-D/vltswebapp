@@ -6,14 +6,15 @@ import { VahanService } from '../../../core/services/vahan.service';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ToastService } from '../../../core/services/toast.service';
 import moment from 'moment';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 declare var $: any;
 
 @Component({
     selector: 'app-vahan-pending',
-    imports: [CommonModule, FormsModule, RouterModule, NgxDaterangepickerMd, NgbPaginationModule, CommonTableComponent],
+    imports: [CommonModule, FormsModule, RouterModule, NgxDaterangepickerMd, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './vahan-pending.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./vahan-pending.component.scss']
@@ -43,17 +44,17 @@ maxDate:any;
   // Sorting
   sortKey: string = '';
   reverse: boolean = false;
-  readonly tableColumns: CommonTableColumn<any>[] = [
-    { key: 'param1', header: '#', width: '40px', sortable: false },
-    { key: 'param10', header: 'Vehicle No.', sortable: true },
-    { key: 'serial', headers: ['Serial No.', 'IMEI No.'], sortable: true, sortKey: 'param2' },
-    { key: 'param7', header: 'Vendor', sortable: true },
-    { key: 'activation', headers: ['Activation No.', 'Activation Date'], sortable: true, sortKey: 'param3' },
-    { key: 'param11', header: 'Valid Upto', sortable: true },
-    { key: 'param5', header: 'Sim Validity', sortable: true },
-    { key: 'param12', header: 'Vahan Uploaded Date', sortable: true },
-    { key: 'param9', header: 'Response', sortable: true },
-    { key: 'action', header: 'Action' }
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { key: 'param1', header: '#', width: '40px' },
+    { key: 'param10', header: 'Vehicle No.', sortKey: 'param10' },
+    { key: 'serial', headers: ['Serial No.', 'IMEI No.'], sortKey: 'param2', value: dev => `${this.hasLength(dev.param2) ? dev.param2 : 'NA'}\n${this.hasLength(dev.param8) ? dev.param8 : 'NA'}`, cellStyle: { 'white-space': 'pre-line' } },
+    { key: 'param7', header: 'Vendor', sortKey: 'param7' },
+    { key: 'activation', headers: ['Activation No.', 'Activation Date'], sortKey: 'param3', value: dev => `${this.hasLength(dev.param3) ? dev.param3 : 'NA'}\n${this.hasLength(dev.param4) ? this.formatDisplayDate(dev.param4) : 'NA'}`, cellStyle: { 'white-space': 'pre-line' } },
+    { key: 'param11', header: 'Valid Upto', sortKey: 'param11', value: dev => this.hasLength(dev.param11) ? this.formatDisplayDate(dev.param11) : 'NA' },
+    { key: 'param5', header: 'Sim Validity', sortKey: 'param5', value: dev => this.hasLength(dev.param5) ? this.formatDisplayDate(dev.param5) : 'NA' },
+    { key: 'param12', header: 'Vahan Uploaded Date', sortKey: 'param12' },
+    { key: 'param9', header: 'Response', sortKey: 'param9' },
+    { key: 'action', header: 'Action', actions: [{ label: 'Push', className: 'repush-btn', run: dev => this.onRepush(dev) }] }
   ];
 
   constructor(

@@ -6,11 +6,12 @@ import { ToastService } from '../../../core/services/toast.service';
 import { SchoolManagementService } from '../../../core/services/school-management.service';
 import { MapboxService } from '../../../core/services/mapbox.service';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { StudentMasterDeleteReq, StudentMasterDetailsReq, StudentMasterFormReq } from '../../../core/model/request.model';
 import { StudentMasterDetailsResp } from '../../../core/model/response.model';
 import { ValidationsService } from '../../../core/services/validations.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-student-master',
@@ -18,8 +19,9 @@ import { CommonTableColumn, CommonTableComponent } from '../../../shared/compone
         CommonModule,
         FormsModule,
         NgSelectModule,
-        NgbPaginationModule,
-        CommonTableComponent
+        CommonDataToolbarComponent,
+        DataTableComponent,
+        PaginationComponent
     ],
     templateUrl: './student-master.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -29,28 +31,27 @@ export class StudentMasterComponent implements OnInit, OnDestroy {
 
   roleId: any = '';
   pageSize: any = 10;
-  searchText: any = '';
   loading: any = false;
   pageSizeOptions: any = [10, 25, 50, 100];
   totalCount: any = 0;
   pageCount: any = 0;
   detailData: StudentMasterDetailsResp[] = [];
-  readonly tableColumns: CommonTableColumn<StudentMasterDetailsResp>[] = [
-    { key: 'student-index', label: '#', width: '25px' },
-    { key: 'school', label: 'School Name', width: '150px' },
-    { key: 'student', label: 'Student Name', width: '150px' },
-    { key: 'standard', label: 'Standard', width: '150px' },
-    { key: 'guardian-type', label: 'Guardian Type', width: '150px' },
-    { key: 'guardian-name', label: 'Guardian Name', width: '150px' },
-    { key: 'alternate-number', label: 'Alternate Number', width: '150px' },
-    { key: 'address', label: 'Address', width: '150px' },
-    { key: 'state', label: 'State', width: '150px' },
-    { key: 'city', label: 'City', width: '150px' },
-    { key: 'pincode', label: 'Pincode', width: '150px' },
-    { key: 'contact-person', label: 'Contact Person', width: '150px' },
-    { key: 'email', label: 'Email', width: '150px' },
-    { key: 'location', label: 'Location', width: '150px' },
-    { key: 'actions', label: 'Action', width: '150px' }
+  readonly tableColumns: DataTableColumn<StudentMasterDetailsResp>[] = [
+    { key: 'student-index', header: '#', width: '25px' },
+    { key: 'school', header: 'School Name', width: '150px' },
+    { key: 'student', header: 'Student Name', width: '150px' },
+    { key: 'standard', header: 'Standard', width: '150px' },
+    { key: 'guardian-type', header: 'Guardian Type', width: '150px' },
+    { key: 'guardian-name', header: 'Guardian Name', width: '150px' },
+    { key: 'alternate-number', header: 'Alternate Number', width: '150px' },
+    { key: 'address', header: 'Address', width: '150px' },
+    { key: 'state', header: 'State', width: '150px' },
+    { key: 'city', header: 'City', width: '150px' },
+    { key: 'pincode', header: 'Pincode', width: '150px' },
+    { key: 'contact-person', header: 'Contact Person', width: '150px' },
+    { key: 'email', header: 'Email', width: '150px' },
+    { key: 'location', header: 'Location', width: '150px' },
+    { key: 'actions', header: 'Action', width: '150px' }
   ];
   detailsToggle: boolean = true;
   updateFlag: boolean = false;
@@ -204,17 +205,19 @@ export class StudentMasterComponent implements OnInit, OnDestroy {
   getDetails(type: string) {
     if(type === 'search') {
       this.studentDetailsRequest.param2 = 1;
-      this.studentDetailsRequest.param3 = 10;
+      this.pageSize = 10;
+      this.studentDetailsRequest.param3 = this.pageSize;
     }
     if(type === 'pageSize') {
-       this.studentDetailsRequest.param2 = 1;
+      this.studentDetailsRequest.param2 = 1;
       this.studentDetailsRequest.param1 = '';
+      this.studentDetailsRequest.param3 = this.pageSize;
     }
     if(type === 'reload') {
-      this.searchText = '';
+      this.pageSize = 10;
       this.studentDetailsRequest.param1 = '';
       this.studentDetailsRequest.param2 = 1;
-      this.studentDetailsRequest.param3 = 10;
+      this.studentDetailsRequest.param3 = this.pageSize;
     }
     if(type === 'pageChange') {
       this.loading = true;
@@ -242,13 +245,15 @@ export class StudentMasterComponent implements OnInit, OnDestroy {
     });
   }
   updatePageSizeOptions() {
-    // Generate page size options based on total count
-    const options = [20];
-    if (this.totalCount > 50) options.push(50);
-    if (this.totalCount > 100) options.push(100);
-    if (this.totalCount > 200) options.push(200);
-    if (this.totalCount > 500) options.push(500);
-    if (this.totalCount > 0 && this.totalCount < 100) options.push(this.totalCount); // 'All'
+    const options = [10, 25, 50, 100];
+    if (!options.includes(this.pageSize)) options.unshift(this.pageSize);
+    if (this.totalCount > 50 && !options.includes(50)) options.push(50);
+    if (this.totalCount > 100 && !options.includes(100)) options.push(100);
+    if (this.totalCount > 200 && !options.includes(200)) options.push(200);
+    if (this.totalCount > 500 && !options.includes(500)) options.push(500);
+    if (this.totalCount > 0 && this.totalCount < 100 && !options.includes(this.totalCount)) {
+      options.push(this.totalCount);
+    }
     this.pageSizeOptions = options;
   }
   onPageChange(page: number) {
@@ -397,7 +402,8 @@ export class StudentMasterComponent implements OnInit, OnDestroy {
     this.deleteDetails();    
   }
   onPageSizeChange(event: any) {
-    this.studentDetailsRequest.param3 = Number(event);
+    this.pageSize = Number(event);
+    this.studentDetailsRequest.param3 = this.pageSize;
     this.getDetails('pageSize');
   }
 

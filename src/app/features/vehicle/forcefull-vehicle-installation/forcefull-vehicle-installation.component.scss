@@ -348,6 +348,14 @@
 .vendor-control {
   width: 270px;
 }
+
+.force-installation-header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
 ::ng-deep .ng-select .ng-select-container {
   min-height: 27px !important;
   height: 27px !important;

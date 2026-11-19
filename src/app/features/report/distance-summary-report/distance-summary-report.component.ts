@@ -5,14 +5,17 @@ import { ReportService } from '../../../core/services/report.service';
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { VehicleService } from '../../../core/services/vehicle.service';
 import { EncryptionService } from '../../../core/services/encryption.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 declare var $: any;
 
 @Component({
   selector: 'app-distance-summary-report',
   standalone: true,
-    imports: [CommonModule, FormsModule, CommonTableComponent],
+    imports: [CommonModule, FormsModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
   templateUrl: './distance-summary-report.component.html',
   styleUrl: './distance-summary-report.component.scss'
 })
@@ -382,10 +385,8 @@ export class DistanceSummaryReportComponent {
     this.getDistanceTravelledDetails(page);
   }
   
-  onPageSizeChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    const newSize = target.value;
-    this.pageSize = newSize === 'All' ? this.totalCount : parseInt(newSize);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = size === 'All' ? this.totalCount : Number(size);
     this.currentPage = 1;
     this.getDistanceTravelledDetails(1);
   }

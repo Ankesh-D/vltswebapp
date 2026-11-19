@@ -5,14 +5,17 @@ import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AlertService } from '../../../core/services/alert.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 declare var $: any;
 declare var moment: any;
 
 @Component({
     selector: 'app-inactive-asset-down',
-    imports: [CommonModule, FormsModule, NgSelectModule, CommonTableComponent],
+    imports: [CommonModule, FormsModule, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './inactive-asset-down.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './inactive-asset-down.component.scss'
@@ -268,9 +271,14 @@ onChangeVehicleType(type: string) {
   this.vehicleType = "NEW";
   this.getDetails();
 }
-  onPageSizeChange(event: any) {
-  this.pageSize = event.target.value;
-  this.pageCount = 1; // reset page
+  onPageSizeChange(size: number | string): void {
+    this.pageSize = size === 'All' ? this.totalCount : Number(size);
+    this.pageCount = 1;
+    this.getDetails();
+  }
+
+onPageChange(page: number): void {
+  this.pageCount = page;
   this.getDetails();
 }
 

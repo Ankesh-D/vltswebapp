@@ -10,7 +10,7 @@
           (reload)="reloadData()" [loading]="loading" [exportLoading]="isExporting" [pageSize]="pageSize"
           [pageSizeOptions]="pageSizeOptions" [displayedCount]="pageCount" [totalRecords]="totalCount"
           (pageSizeChange)="onPageSizeChange($event)" (excelExport)="exportToExcel()" pageSizeLabel="Show Rows"
-          totalLabel="Total Records" countSeparator="of">
+          totalLabel="Total Records" countSeparator="of" [showFilters]="false">
           @if (isExporting) {
             <span class="dealer-exporting"><i class="fa fa-spinner fa-spin" aria-hidden="true"></i> Generating...</span>
           }
@@ -25,8 +25,42 @@
         tableClass="table table-striped table-sm table-bordered mb-1"
         tableId="devicetable"
         (sort)="sort($event)"
-        (cellClick)="onCellClick($event)"
       ></app-data-table>
+        <ng-template #modelStatusCell let-model>
+          <span [style.background-color]="model.param20 === 'Approved' ? '#28a745' : (model.param20 === 'Pending' ? '#ffc107' : '#dc3545')"
+            [style.color]="model.param20 === 'Pending' ? '#333' : 'white'"
+            style="padding: 2px 4px; border-radius: 50px; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; min-width: 60px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+            {{model.param20 || 'NA'}}
+          </span>
+        </ng-template>
+        <ng-template #modelActivityCell let-model>
+          <button type="button" (click)="openApprovalModal(model)" [disabled]="roleId=='17' || roleId=='18' || roleId=='19'"
+            [style.background-color]="model.param20 === 'Approved' ? '#dc3545' : '#0b58b9'"
+            style="cursor:pointer; min-width: 95px; border: none; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-flex; align-items: center; justify-content: center; gap: 5px;">
+            <i class="fa" [ngClass]="model.param20 === 'Approved' ? 'fa-times' : 'fa-check'"></i>
+            {{model.param20 === 'Approved' ? 'Disapprove' : 'Approve'}}
+          </button>
+        </ng-template>
+        <ng-template #tacValidityCell let-model>
+          @if (model.param34 === 'Pending' && model.param20 !== 'Pending') {
+            <button type="button" (click)="openTacValidityModal(model)" title="Approve TAC Validity"
+              style="cursor:pointer; width: 28px; height: 28px; border: 1px solid #0b58b9; background: #fff; color: #0b58b9; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s;">
+              <i class="fa fa-pencil"></i>
+            </button>
+          }
+          @if (model.param34 !== 'Pending') {
+            <button type="button" disabled title="Approved"
+              style="cursor:default; width: 28px; height: 28px; border: 1px solid #28a745; background: #f0fff4; color: #28a745; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;">
+              <i class="fa fa-check"></i>
+            </button>
+          }
+          @if (model.param34 === 'Pending' && model.param20 === 'Pending') {
+            <button type="button" disabled title="Pending Model Approval"
+              style="cursor:not-allowed; width: 28px; height: 28px; border: 1px solid #dee2e6; background: #f8f9fa; color: #adb5bd; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;">
+              <i class="fa fa-clock-o"></i>
+            </button>
+          }
+        </ng-template>
         <!-- <div class="top-controls-row">
           <div class="left-controls">
             <div class="search-box">
@@ -120,12 +154,9 @@
 
         <!-- Pagination Controls -->
         <div class="float-end">
-          @if (totalCount > pageSize) {
-            <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-              [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-              [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-            </ngb-pagination>
-          }
+          <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+            [disabled]="loading" (pageChange)="onPageChange($event)">
+          </app-pagination>
         </div>
         <!-- <div *ngIf="totalCount > 0" class="pagination-wrapper">
         <ul class="pagination">

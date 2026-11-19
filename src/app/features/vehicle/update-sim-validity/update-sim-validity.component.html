@@ -1,115 +1,44 @@
 <section class="sim-validity-page">
-  <form autocomplete="off" class="top-controls-row" (submit)="$event.preventDefault()">
-    <div class="left-controls">
-      <label class="topbar-label" for="searchby">Search:</label>
-      <div class="search-box">
-        <input type="search" class="search-input inner" id="searchby"
-          placeholder="Search ICCID or mobile number" maxlength="50"
-          [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby">
-        <button type="button" class="search-inner-btn" aria-label="Search" [disabled]="loading"
-          (click)="getSearchDetails()">
-          <i class="fa fa-search" aria-hidden="true"></i>
-        </button>
-      </div>
-      <button type="button" class="reload-btn" [disabled]="loading" (click)="reloadData()">
-        <i class="fa fa-refresh" [class.fa-spin]="loading" aria-hidden="true"></i>
-        {{ loading ? 'Reloading...' : 'Reload' }}
-      </button>
-    </div>
+  <app-common-data-toolbar variant="vehicle" searchLabel="Search :" searchPlaceholder="Search ICCID or mobile number"
+    [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
+    (reload)="reloadData()" [loading]="loading" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+    [displayedCount]="pageCount" [totalRecords]="totalCount" [showExcel]="false" [showFilters]="false"
+    (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows" totalLabel="Total Records"
+    countSeparator="of">
+  </app-common-data-toolbar>
 
-    <div class="right-controls">
-      <label class="total-records-text" for="pageSize">Show Rows:</label>
-      <select class="rows-select" id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
-        @for (size of pageSizeOptions; track size) {
-          <option [value]="size === totalCount ? totalCount : size">
-            {{ size === totalCount ? 'All' : size }}
-          </option>
-        }
-      </select>
-      <span class="record-count">Total Records: {{pageCount}} of {{totalCount}}</span>
-    </div>
-  </form>
-
-  <div class="sim-table-scroll">
-    <table class="table table-striped app-table mb-1 sim-validity-table">
-      <colgroup>
-        <col class="column-index">
-        <col class="column-iccid">
-        <col class="column-mobile">
-        <col class="column-mobile">
-        <col class="column-validity">
-        <col class="column-validity">
-        <col class="column-action">
-      </colgroup>
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col" (click)="sort('param7')" (keydown.enter)="sort('param7')" tabindex="0">
-            ICCID No
-            @if (sortKey === 'param7') {
-              <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-            }
-          </th>
-          <th scope="col" (click)="sort('param8')" (keydown.enter)="sort('param8')" tabindex="0">
-            Mobile No. 1<br>Mobile Network 1
-            @if (sortKey === 'param8') {
-              <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-            }
-          </th>
-          <th scope="col" (click)="sort('param9')" (keydown.enter)="sort('param9')" tabindex="0">
-            Mobile No. 2<br>Mobile Network 2
-            @if (sortKey === 'param9') {
-              <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-            }
-          </th>
-          <th scope="col" (click)="sort('param50')" (keydown.enter)="sort('param50')" tabindex="0">
-            Mobile No. 1 Validity
-            @if (sortKey === 'param50') {
-              <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-            }
-          </th>
-          <th scope="col" (click)="sort('param51')" (keydown.enter)="sort('param51')" tabindex="0">
-            Mobile No. 2 Validity
-            @if (sortKey === 'param51') {
-              <span class="sorting" [ngClass]="{'sorting_desc': reverse, 'sorting_asc': !reverse}"></span>
-            }
-          </th>
-          <th scope="col">Update</th>
-        </tr>
-      </thead>
-      <tbody>
-        @if (simValidityData.length === 0 && !loading) {
-          <tr>
-            <td class="no-data" colspan="7">NO DATA FOUND</td>
-          </tr>
-        }
-        @for (device of getPaginatedData(); track device) {
-          <tr>
-            <td>{{device.param1 || 'NA'}}</td>
-            <td>{{device.param7 || 'NA'}}</td>
-            <td>{{device.param8 || 'NA'}}<br>{{device.param10 || 'NA'}}</td>
-            <td>{{device.param9 || 'NA'}}<br>{{device.param11 || 'NA'}}</td>
-            <td>{{device.param50 || 'NA'}}</td>
-            <td>{{device.param51 || 'NA'}}</td>
-            <td>
-              <button type="button" class="btn-table-update" (click)="updateSimValidity(device)"
-                [disabled]="isUpdating(device.param1) || loading">
-                <i class="fa" [ngClass]="isUpdating(device.param1) ? 'fa-spinner fa-spin' : 'fa-refresh'" aria-hidden="true"></i>
-                <span>{{ isUpdating(device.param1) ? 'Updating...' : 'Update' }}</span>
-              </button>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-
-  <div class="pagination-wrapper">
-    @if (totalCount > pageSize) {
-      <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-        [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-        [ellipses]="false" [boundaryLinks]="true" size="sm" class="sim-pagination">
-      </ngb-pagination>
+  <ng-template #simValidityBody let-devices>
+    @if (devices.length === 0) {
+      <tr><td class="no-data" colspan="7">NO DATA FOUND</td></tr>
     }
+    @for (device of devices; track device) {
+      <tr>
+        <td>{{device.param1 || 'NA'}}</td>
+        <td>{{device.param7 || 'NA'}}</td>
+        <td>{{device.param8 || 'NA'}}<br>{{device.param10 || 'NA'}}</td>
+        <td>{{device.param9 || 'NA'}}<br>{{device.param11 || 'NA'}}</td>
+        <td>{{device.param50 || 'NA'}}</td>
+        <td>{{device.param51 || 'NA'}}</td>
+        <td>
+          <button type="button" class="btn-table-update" (click)="updateSimValidity(device)"
+            [disabled]="isUpdating(device.param1) || loading">
+            <i class="fa" [ngClass]="isUpdating(device.param1) ? 'fa-spinner fa-spin' : 'fa-refresh'"
+              aria-hidden="true"></i>
+            <span>{{isUpdating(device.param1) ? 'Updating...' : 'Update'}}</span>
+          </button>
+        </td>
+      </tr>
+    }
+  </ng-template>
+  <div class="sim-table-scroll">
+    <app-data-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
+      [sortKey]="sortKey" [reverse]="reverse" [bodyTemplate]="simValidityBody" (sort)="sort($event)"
+      tableClass="table table-striped app-table mb-1 sim-validity-table" emptyMessage="NO DATA FOUND">
+    </app-data-table>
+  </div>
+  <div class="pagination-wrapper">
+    <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+      [disabled]="loading" (pageChange)="onPageChange($event)">
+    </app-pagination>
   </div>
 </section>

@@ -10,126 +10,51 @@
          
         </div>
 
-        <!-- Search and Pagination Controls -->
-        <form autocomplete="off">
-          <div class="top-controls-row">
-            <!-- Left Side: Search and Reload -->
-            <div class="left-controls">
-              <span class="search-label">Search :</span>
-              <div class="search-box">
-                <input
-                  type="search"
-                  readonly
-                  onfocus="this.removeAttribute('readonly');"
-                  class="search-input-inner"
-                  id="searchby"
-                  placeholder="Type here..."
-                  autocomplete="off"
-                  maxlength="50"
-                  [(ngModel)]="searchText"
-                  (keyup.enter)="getSearchDetails()"
-                  name="searchby">
-                <button type="button" class="search-inner-btn" (click)="getSearchDetails()" title="Search">
-                  <i class="fa fa-search"></i>
-                </button>
-              </div>
-              <button type="button" class="reload-btn" (click)="reloadData()" [disabled]="loading">
-                <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-refresh'"></i>
-                <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
-              </button>
-            </div>
+        <app-common-data-toolbar
+          variant="device"
+          searchLabel="Search :"
+          searchPlaceholder="Type here..."
+          [searchText]="searchText"
+          (searchTextChange)="searchText = $event"
+          (search)="getSearchDetails()"
+          (reload)="reloadData()"
+          [loading]="loading"
+          [showFilters]="false"
+          [showExcel]="false"
+          [showPdf]="false"
+          pageSizeLabel="Show Rows"
+          totalLabel="Total Records"
+          countSeparator="of"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [displayedCount]="pageCount"
+          [totalRecords]="totalCount"
+          (pageSizeChange)="onPageSizeChange($event)">
+        </app-common-data-toolbar>
 
-            <!-- Right Side: Download, Page Size and Count -->
-            <div class="right-controls">
-              <div class="control-item">
-                <label for="excelpdfdownload">Download :</label>
-                <select name="excelpdfdownload" id="excelpdfdownload" class="rows-select">
-                  <option value="Select">Select</option>
-                  <!-- <option value="Excel" id="downloadexcel">Excel</option> -->
-                  <option>Excel</option>
-                </select>
-              </div>
-              <div class="control-item">
-                <label>Show Rows :</label>
-                <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize" class="rows-select">
-                  @for (size of pageSizeOptions; track size) {
-                    <option [value]="size === totalCount ? totalCount : size">
-                      {{size === totalCount ? totalCount : size}}
-                    </option>
-                  }
-                </select>
-              </div>
-              <div class="total-records-text">
-                Total Records : {{pageCount}} of {{totalCount}}
-              </div>
-            </div>
-          </div>
-        </form>
-
-        <ng-template #poiCell let-poi let-column="column">
-          @if (column.key === 'icon') {
-            @if (poi.param5 || poi.param4) {
-              <img [src]="poi.param5 || poi.param4" style="height:17px;" alt="POI Icon" />
-            }
-          } @else {
-            {{ poiTable.cellValue(poi, column) }}
+        <ng-template #poiIconCell let-poi>
+          @if (poi.param5 || poi.param4) {
+            <img [src]="poi.param5 || poi.param4" style="height:17px;" alt="POI Icon" />
           }
         </ng-template>
-        <app-common-table #poiTable [columns]="tableColumns" [rows]="pois" [loading]="loading"
-          [sortKey]="sortKey" [reverse]="reverse" [cellTemplate]="poiCell"
+        <app-data-table
+          [columns]="tableColumns"
+          [rows]="pois"
+          [loading]="loading"
+          [sortKey]="sortKey"
+          [reverse]="reverse"
           tableClass="table table-striped app-table" tableStyle="border-top: 1px solid black; border-bottom: 1px solid black;"
-          emptyMessage="NO DATA FOUND" (sortChange)="sort($event)">
-        </app-common-table>
+          emptyMessage="NO DATA FOUND"
+          (sort)="sort($event)">
+        </app-data-table>
 
-        <!-- Pagination Controls -->
-        <div class="float-end">
-          @if (totalCount > pageSize) {
-            <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-              [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-              [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-            </ngb-pagination>
-          }
-        </div>
-        <!-- <div *ngIf="totalCount > 0" class="app-pagination">
-        <ul class="app-pagination-list">
-
-          <li>
-            <button
-              class="app-page-btn nav-btn"
-              (click)="onPageChange(currentPage - 1)"
-              [disabled]="currentPage === 1">
-              <i class="fa fa-angle-left"></i>
-              Previous
-            </button>
-          </li>
-
-          <li *ngFor="let page of getPageNumbers()">
-
-            <span *ngIf="page === -1" class="app-page-dots">...</span>
-
-            <button
-              *ngIf="page !== -1"
-              class="app-page-btn"
-              [class.active]="currentPage === page"
-              (click)="onPageChange(page)">
-              {{ page }}
-            </button>
-
-          </li>
-
-          <li>
-            <button
-              class="app-page-btn nav-btn"
-              (click)="onPageChange(currentPage + 1)"
-              [disabled]="currentPage >= getTotalPages()">
-              Next
-              <i class="fa fa-angle-right"></i>
-            </button>
-          </li>
-
-        </ul>
-      </div> -->
-
+        <app-pagination
+          [totalCount]="totalCount"
+          [page]="currentPage"
+          [pageSize]="pageSize"
+          [disabled]="loading"
+          (pageChange)="onPageChange($event)">
+        </app-pagination>
       @if (errorMessage) {
         <div class="alert alert-danger" style="margin-top: 10px;">
           {{errorMessage}}

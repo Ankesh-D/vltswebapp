@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { saveAs } from 'file-saver';
 
 import { ToastService } from '../../../core/services/toast.service';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { SchoolTripService } from '../../../core/services/school-trip.service';
 import { SchoolManagementService } from '../../../core/services/school-management.service';
 import { TripService } from '../../../core/services/trip.service';
@@ -41,7 +43,7 @@ interface LookupOption {
 
 @Component({
     selector: 'app-school-trip-master',
-    imports: [CommonModule, FormsModule, NgSelectModule, NgbPaginationModule],
+    imports: [CommonModule, FormsModule, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './school-trip-master.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './school-trip-master.component.scss'
@@ -84,6 +86,22 @@ export class SchoolTripMasterComponent implements OnInit, OnDestroy {
     { key: 'duration', label: 'Duration (min)', visible: false },
     { key: 'status', label: 'Status', visible: true }
   ];
+  readonly tableColumns: DataTableColumn<SchoolTripMasterDetailsResp>[] = [
+    { header: '#', key: 'rowNumber' },
+    { header: 'Trip Code', key: 'param2', sortKey: 'param2', visible: () => this.isColumnVisible('tripcode') },
+    { header: 'Trip Name', key: 'param3', sortKey: 'param3', visible: () => this.isColumnVisible('tripname') },
+    { header: 'Type', key: 'param4', visible: () => this.isColumnVisible('triptype') },
+    { header: 'Vehicle', key: 'param23', visible: () => this.isColumnVisible('vehicle') },
+    { header: 'Driver', key: 'param24', visible: () => this.isColumnVisible('driver') },
+    { header: 'Source', key: 'param21', visible: () => this.isColumnVisible('source') },
+    { header: 'Destination', key: 'param22', visible: () => this.isColumnVisible('destination') },
+    { header: 'Start', key: 'param9', visible: () => this.isColumnVisible('starttime') },
+    { header: 'End', key: 'param10', visible: () => this.isColumnVisible('endtime') },
+    { header: 'Distance (km)', key: 'param17', visible: () => this.isColumnVisible('distance') },
+    { header: 'Duration (min)', key: 'param18', visible: () => this.isColumnVisible('duration') },
+    { header: 'Status', key: 'param14', visible: () => this.isColumnVisible('status') },
+    { header: 'Action', key: 'actions' }
+  ];
 
   // ==================== Form state ====================
   updateFlag = false;
@@ -110,6 +128,10 @@ export class SchoolTripMasterComponent implements OnInit, OnDestroy {
   poiList: LookupOption[] = [];
 
   private subs: Subscription[] = [];
+
+  get visibleTripColumnCount(): number {
+    return this.columns.filter(column => column.visible).length + 2;
+  }
 
   constructor(
     public toastService: ToastService,
@@ -237,7 +259,12 @@ export class SchoolTripMasterComponent implements OnInit, OnDestroy {
   }
   getSearchDetails(): void { this.getDetails('search'); }
   reloadData(): void { this.getDetails('reload'); }
-  onPageSizeChange(): void { this.detailsRequest.param2 = 1; this.currentPage = 1; this.getDetails(); }
+  onPageSizeChange(size: number | string = this.pageSize): void {
+    this.pageSize = Number(size);
+    this.detailsRequest.param2 = 1;
+    this.currentPage = 1;
+    this.getDetails();
+  }
   onPageChange(page: number): void { this.detailsRequest.param2 = page; this.getDetails(); }
 
   sortBy(key: string): void {

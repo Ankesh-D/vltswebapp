@@ -11,6 +11,8 @@ import { NgSelectModule } from "@ng-select/ng-select";
 import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
 
 import { DashboardService } from "../../../core/services/dashboard.service";
+import { CommonDataToolbarComponent } from "../../../shared/components/common-data-toolbar/common-data-toolbar.component";
+import { DataTableColumn, DataTableComponent } from "../../../shared/components/data-table/data-table.component";
 
 @Component({
   selector: "app-forceactivationreport",
@@ -27,6 +29,8 @@ import { DashboardService } from "../../../core/services/dashboard.service";
     NgSelectModule,
 
     NgxDaterangepickerMd,
+    CommonDataToolbarComponent,
+    DataTableComponent,
   ],
 
   templateUrl: "./forceactivationreport.component.html",
@@ -34,6 +38,14 @@ import { DashboardService } from "../../../core/services/dashboard.service";
   styleUrl: "./forceactivationreport.component.scss",
 })
 export class ForceactivationreportComponent implements OnInit {
+  readonly reportColumns: DataTableColumn<any>[] = [
+    { key: "index", header: "#" },
+    { key: "device", header: "Device Details" },
+    { key: "vehicle", header: "Vehicle Details" },
+    { key: "activatedBy", header: "Activated By" },
+    { key: "activationDate", header: "Activation Date" },
+    { key: "mvi", header: "MVI Approved" },
+  ];
   // =========================================
   // ROLE / USER DATA
   // =========================================

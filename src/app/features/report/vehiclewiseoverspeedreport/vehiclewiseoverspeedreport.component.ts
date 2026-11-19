@@ -15,29 +15,29 @@ import { Subject } from 'rxjs';
 import moment from 'moment';
 import { LoaderService } from '../../../core/services/loader.service';
 import { OverspeedReportReq } from '../../../core/model/request.model';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { OverspeedReportResp } from '../../../core/model/response.model';
 import { PanicSessionMapComponent } from '../../dashboard/panic-session-map/panic-session-map.component';
 import { PanicSession, apiField } from '../../dashboard/panic-session-map/panic-session.model';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 @Component({
   selector: 'app-vehiclewiseoverspeedreport',
   standalone: true,
-  imports: [CommonModule, NgxDaterangepickerMd, FormsModule, NgSelectModule, NgbPaginationModule, PanicSessionMapComponent, CommonDataToolbarComponent, CommonTableComponent],
+  imports: [CommonModule, NgxDaterangepickerMd, FormsModule, NgSelectModule, PanicSessionMapComponent, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
   templateUrl: './vehiclewiseoverspeedreport.component.html',
   styleUrl: './vehiclewiseoverspeedreport.component.scss'
 })
 export class VehiclewiseoverspeedreportComponent implements OnInit, AfterViewInit {
-  readonly tableColumns: CommonTableColumn[] = [
-    { key: 'column1', label: '#' },
-    { key: 'column2', label: 'Vehicle No.' },
+  readonly tableColumns: DataTableColumn<OverspeedReportResp>[] = [
+    { key: 'column1', header: '#' },
+    { key: 'column2', header: 'Vehicle No.' },
     { key: 'column3', headers: ['IMEI No.', 'Serial No.'] },
-    { key: 'column4', label: 'Vehicle Class' },
-    { key: 'column5', label: 'Event Counts' },
-    { key: 'column6', label: 'Track' }
+    { key: 'column4', header: 'Vehicle Class' },
+    { key: 'column5', header: 'Event Counts' },
+    { key: 'column6', header: 'Track' }
   ];
 
   // today: Dayjs = dayjs();

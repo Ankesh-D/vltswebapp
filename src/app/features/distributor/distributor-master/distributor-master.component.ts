@@ -1,16 +1,17 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ToastComponent } from '../../assets/inactive-assets/toast.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Distributor, DistributorDeleteRequest, DistributorEntryRequest, DistributorRequest, DistributorService } from '../../../core/services/distributor.service';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastService } from '../../../core/services/toast.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 @Component({
     selector: 'app-distributor-master',
-    imports: [FormsModule, CommonModule, ToastComponent, NgSelectModule, NgbPaginationModule, CommonTableComponent],
+    imports: [FormsModule, CommonModule, ToastComponent, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './distributor-master.component.html',
     styleUrl: './distributor-master.component.scss',
     changeDetection: ChangeDetectionStrategy.Eager
@@ -24,17 +25,17 @@ export class DistributorMasterComponent implements OnInit, AfterViewInit, OnDest
   sortKey: any;
   reverse: boolean = false;
   detailsData: any[] = [];
-  readonly tableColumns: CommonTableColumn<any>[] = [
-    { key: 'rowno', label: '#', width: '40px', value: detail => detail.rowno },
-    { key: 'param7', label: 'Vendor', sortable: true, visible: () => this.roleId != '11', value: detail => detail.param4 },
-    { key: 'param11', label: 'Distributor Name', sortable: true, value: detail => detail.param2 },
-    { key: 'param5', label: 'Contact Person', sortable: true, value: detail => detail.param9 },
-    { key: 'param4', label: 'Mobile No.', sortable: true, value: detail => detail.param11 },
-    { key: 'param6', label: 'State', sortable: true, value: detail => detail.param8 },
-    { key: 'param28', label: 'City', sortable: true, value: detail => detail.param7 },
-    { key: 'param19', label: 'Address', sortable: true, value: detail => detail.param6 },
-    { key: 'param16', label: 'Pincode', sortable: true, value: detail => detail.param13 },
-    { key: 'actions', label: 'Actions' }
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { key: 'rowno', header: '#', width: '40px', value: detail => detail.rowno },
+    { key: 'param7', header: 'Vendor', sortKey: 'param7', visible: () => this.roleId != '11', value: detail => detail.param4 },
+    { key: 'param11', header: 'Distributor Name', sortKey: 'param11', value: detail => detail.param2 },
+    { key: 'param5', header: 'Contact Person', sortKey: 'param5', value: detail => detail.param9 },
+    { key: 'param4', header: 'Mobile No.', sortKey: 'param4', value: detail => detail.param11 },
+    { key: 'param6', header: 'State', sortKey: 'param6', value: detail => detail.param8 },
+    { key: 'param28', header: 'City', sortKey: 'param28', value: detail => detail.param7 },
+    { key: 'param19', header: 'Address', sortKey: 'param19', value: detail => detail.param6 },
+    { key: 'param16', header: 'Pincode', sortKey: 'param16', value: detail => detail.param13 },
+    { key: 'actions', header: 'Actions' }
   ];
   pageSizeOptions = [20, 50, 100, 200, 500];
   pageCount: number = 0;
@@ -53,6 +54,7 @@ export class DistributorMasterComponent implements OnInit, AfterViewInit, OnDest
   deleteRemark: string = '';
   deleteRequest: DistributorDeleteRequest = new DistributorDeleteRequest();
   detailRequest: DistributorRequest = new DistributorRequest();
+      @ViewChild('distributorActionsCell', { static: true }) distributorActionsCell!: TemplateRef<{ $implicit: any }>;
       @ViewChild('deleteForm') deleteForm!: NgForm;
       @ViewChild('entryForm') entryForm!: NgForm;
   entryType: string = 'insert'; // insert | update
@@ -62,6 +64,8 @@ export class DistributorMasterComponent implements OnInit, AfterViewInit, OnDest
 
 
   ngOnInit(): void {
+    const actionsColumn = this.tableColumns.find(column => column.key === 'actions');
+    if (actionsColumn) actionsColumn.cellTemplate = this.distributorActionsCell;
     this.roleId = sessionStorage.getItem('roleid') || '';
     this.getDetails('initial');
     if(this.roleId=='10') {
@@ -82,18 +86,23 @@ export class DistributorMasterComponent implements OnInit, AfterViewInit, OnDest
   }
   onPageChange(page: number) {
     this.currentPage = page;
+    this.detailRequest.param2 = page;
     this.getDetails('');
   }
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
-    this.pageSize = newSize === 'All' ? this.totalCount : Number(newSize);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount ? this.totalCount : Number(size);
+    this.detailRequest.param3 = this.pageSize;
     this.currentPage = 1;
     this.detailsData = [];
     this.totalCount = 0;
+    this.getDetails('itemperpage');
+  }
+  reloadData() {
     this.getDetails('initial');
   }
-  reloadData() {}
-  getSearchDetails() {}
+  getSearchDetails() {
+    this.getDetails('search');
+  }
   getPageNumbers(): number[] {
     const totalPages = this.getTotalPages();
     const currentPage = this.currentPage;
@@ -136,12 +145,15 @@ export class DistributorMasterComponent implements OnInit, AfterViewInit, OnDest
     this.isDataLoaded = false;
     if(optype==='initial') {
       this.detailRequest = new DistributorRequest();
+      this.currentPage = 1;
     }
     if(optype==='search') {
       this.detailRequest.param2 = 1;
+      this.currentPage = 1;
     }
     if(optype==='itemperpage') {
       this.detailRequest.param2 = 1;
+      this.currentPage = 1;
     }
     // {
     //   param1: this.searchBy || '',

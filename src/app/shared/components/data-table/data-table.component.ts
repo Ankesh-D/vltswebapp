@@ -6,19 +6,30 @@ export type DataTableCellStyle = Record<string, string | number | null | undefin
 
 export interface DataTableColumn<T = Record<string, unknown>> {
   header?: string;
+  label?: string;
   headers?: string[];
+  subLabel?: string;
   cellTemplate?: TemplateRef<{ $implicit: T }>;
   key?: string;
   sortKey?: string;
+  sortable?: boolean;
+  showSortIndicator?: boolean;
   width?: string;
   height?: string;
   value?: (row: T) => string | number;
   className?: string;
+  cellClass?: string | ((row: T) => string);
   cellClassName?: string | ((row: T) => string);
   cellStyle?: DataTableCellStyle | ((row: T) => DataTableCellStyle);
   clickable?: (row: T) => boolean;
   actions?: DataTableAction<T>[];
   visible?: () => boolean;
+}
+
+export interface DataTableCellContext<T> {
+  $implicit: T;
+  column: DataTableColumn<T>;
+  index: number;
 }
 
 export interface DataTableAction<T = Record<string, unknown>> {
@@ -39,12 +50,14 @@ export interface DataTableAction<T = Record<string, unknown>> {
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.scss']
 })
-export class DataTableComponent<T = Record<string, unknown>> {
+export class DataTableComponent<T = any> {
   @Input() columns: DataTableColumn<T>[] = [];
   @Input() rows: T[] = [];
   @Input() expandedRow: T | null = null;
   @Input() rowDetailTemplate?: TemplateRef<{ $implicit: T }>;
   @Input() headerTemplate?: TemplateRef<unknown>;
+  @Input() headerRowsTemplate?: TemplateRef<unknown>;
+  @Input() cellTemplate?: TemplateRef<DataTableCellContext<T>>;
   /** Custom bodies preserve grouped cells, form controls and page-specific row actions. */
   @Input() bodyTemplate?: TemplateRef<{ $implicit: T[] }>;
   @Input() headerClass = '';
@@ -57,10 +70,12 @@ export class DataTableComponent<T = Record<string, unknown>> {
   @Input() tableClass = 'table table-striped mb-0';
   @Input() tableId = '';
   @Input() tableStyle = '';
+  @Input() wrapperClass = '';
   @Input() sortKey = '';
   @Input() reverse = false;
 
   @Output() sort = new EventEmitter<string>();
+  @Output() sortChange = new EventEmitter<string>();
   @Output() cellClick = new EventEmitter<{ row: T; column: DataTableColumn<T> }>();
 
   getValue(row: T, column: DataTableColumn<T>): string | number {
@@ -72,6 +87,10 @@ export class DataTableComponent<T = Record<string, unknown>> {
     return value === null || value === undefined || value === '' ? 'NA' : String(value);
   }
 
+  cellValue(row: T, column: DataTableColumn<T>): string | number {
+    return this.getValue(row, column);
+  }
+
   getActionLabel(row: T, action: DataTableAction<T>): string {
     return typeof action.label === 'function' ? action.label(row) : action.label;
   }
@@ -80,10 +99,21 @@ export class DataTableComponent<T = Record<string, unknown>> {
     return this.columns.filter(column => !column.visible || column.visible());
   }
 
-  getCellClassName(row: T, column: DataTableColumn<T>): string | null {
-    return typeof column.cellClassName === 'function'
-      ? column.cellClassName(row)
-      : column.cellClassName || null;
+  getCellClassName(row: T, column: DataTableColumn<T>): string {
+    const resolve = (className?: string | ((row: T) => string)) =>
+      typeof className === 'function' ? className(row) : className || '';
+    return [resolve(column.cellClass), resolve(column.cellClassName)].filter(Boolean).join(' ');
+  }
+
+  getHeader(column: DataTableColumn<T>): string {
+    return column.header ?? column.label ?? '';
+  }
+
+  sortColumn(column: DataTableColumn<T>): void {
+    if (!column.sortKey && !column.sortable) return;
+    const key = column.sortKey || column.key || '';
+    this.sort.emit(key);
+    this.sortChange.emit(key);
   }
 
   getCellStyle(row: T, column: DataTableColumn<T>): DataTableCellStyle | null {

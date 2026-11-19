@@ -1,15 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { DeviceService, Device, DeviceRequest } from '../../../core/services/device.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-activated-devices-for-home-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule],
+  imports: [CommonModule, RouterModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
   templateUrl: './activated-devices-for-home-dashboard.component.html',
   styleUrl: './activated-devices-for-home-dashboard.component.scss'
 })
@@ -35,6 +36,18 @@ export class ActivatedDevicesForHomeDashboardComponent  implements OnInit {
   
   // Filter type display
   filterType: string = 'Total Device';
+  readonly tableColumns: DataTableColumn<Device>[] = [
+    { header: '#', key: 'param1', width: '35px' },
+    { headers: ['IMEI No.', 'Serial No.'], sortKey: 'param5' },
+    { headers: ['ICCID No.', 'M2M Code'], sortKey: 'param7' },
+    { headers: ['Mobile N/W 1', 'Mobile N/W 2'], sortKey: 'param8' },
+    { headers: ['Mobile No. 1', 'Mobile No. 2'], sortKey: 'param9' },
+    { headers: ['Mobile No. 1 Validity', 'Mobile No. 2 Validity'], sortKey: 'param50', width: '130px' },
+    { headers: ['Dealer', 'Vendor'], sortKey: 'param16', width: '160px' },
+    { header: 'Vehicle Status', sortKey: 'param47' },
+    { header: 'Activation Status', sortKey: 'param34' },
+    { header: 'Polling Status', sortKey: 'param48' }
+  ];
   
   constructor(
     private toast: ToastService,
@@ -207,7 +220,7 @@ export class ActivatedDevicesForHomeDashboardComponent  implements OnInit {
   }
 
   onPageSizeChange(size: number | string) {
-    if (size === 'All' || size === this.totalCount) {
+    if (size === 'All' || Number(size) === this.totalCount) {
       this.pageSize = this.totalCount;
     } else {
       this.pageSize = Number(size);
@@ -222,6 +235,10 @@ export class ActivatedDevicesForHomeDashboardComponent  implements OnInit {
     if (this.totalCount > 0 && page > totalPages) return;
     this.currentPage = page;
     this.loadDevices();
+  }
+
+  onSearchTextChange(searchText: string) {
+    this.searchText = searchText;
   }
 
   reloadData() {

@@ -31,6 +31,9 @@
 
                 <!-- ================= FILTER SECTION ================= -->
 
+                <app-common-data-toolbar [showFilters]="true" [showSearch]="false" [showReload]="false"
+                  [showExcel]="false" [showPageSize]="false" [showTotal]="false">
+                <div toolbarFilters class="d-flex align-items-center gap-2 flex-wrap">
                 <div class="row mt-3">
 
 <!-- FROM DATE -->
@@ -388,6 +391,8 @@
                   </div>
 
                 </div>
+                </div>
+                </app-common-data-toolbar>
 
 
                 <!-- ================= ADDED ROLE USER TABLE ================= -->
@@ -498,225 +503,44 @@
 
     <div class="table-responsive">
 
-      <table class="table table-bordered table-striped table-sm">
-
-        <thead>
-
-          <tr>
-
-            <th>#</th>
-
-            <th>Device Details</th>
-
-            <th>Vehicle Details</th>
-
-            <th>Activated By</th>
-
-            <th>Activation Date</th>
-
-            <th>MVI Approved</th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody>
-
-
-          <!-- NO DATA -->
-
-          <tr *ngIf="reportData.length === 0">
-
-            <td
-              colspan="6"
-              class="text-center fw-bold">
-
-              NO DATA FOUND
-
-            </td>
-
-          </tr>
-
-
-          <!-- REPORT DATA -->
-
-          <tr
-            *ngFor="
-              let item of reportData;
-              let i = index
-            ">
-
-            <!-- SR NO -->
-
-            <td>
-
-              {{
-                ((currentPage - 1) * itemsPerPage)
-                + i
-                + 1
-              }}
-
-            </td>
-
-
-            <!-- DEVICE DETAILS -->
-
-            <td>
-
-              <div>
-
-                <strong>IMEI:</strong>
-
-                {{ item.param2 || 'NA' }}
-
-              </div>
-
-
-              <div>
-
-                <strong>Unique No:</strong>
-
-                {{ item.param3 || 'NA' }}
-
-              </div>
-
-
-              <div>
-
-                <strong>ICCID:</strong>
-
-                {{ item.param4 || 'NA' }}
-
-              </div>
-
-
-              <div>
-
-                <strong>Vendor:</strong>
-
-                {{ item.param5 || 'NA' }}
-
-              </div>
-
-            </td>
-
-
-            <!-- VEHICLE DETAILS -->
-
-            <td>
-
-              <div>
-
-                <strong>Vehicle No:</strong>
-
-                {{ item.param7 || 'NA' }}
-
-              </div>
-
-
-              <div>
-
-                <strong>Chassis No:</strong>
-
-                {{ item.param8 || 'NA' }}
-
-              </div>
-
-
-              <div>
-
-                <strong>Customer:</strong>
-
-                {{ item.param9 || 'NA' }}
-
-              </div>
-
-
-              <div>
-
-                <strong>Customer Mobile:</strong>
-
-                {{ item.param10 || 'NA' }}
-
-              </div>
-
-
-              <div>
-
-                <strong>MFG Year:</strong>
-
-                {{ item.param11 || 'NA' }}
-
-              </div>
-
-            </td>
-
-
-            <!-- ACTIVATED BY -->
-
-            <td>
-
-              {{ item.param17 || 'NA' }}
-
-            </td>
-
-
-            <!-- ACTIVATION DATE -->
-
-            <td>
-
-              {{ item.param13 || 'NA' }}
-
-            </td>
-
-
-            <!-- MVI APPROVAL -->
-
-            <td>
-
-
-              <span
-                class="badge badge-success"
-                *ngIf="
-                  item.param15 === '1' ||
-                  item.param15 === 'Approved' ||
-                  item.param15 === 'APPROVED'
-                ">
-
-                Approved
-
-              </span>
-
-
-              <span
-                class="badge badge-danger"
-                *ngIf="
-                  item.param15 !== '1' &&
-                  item.param15 !== 'Approved' &&
-                  item.param15 !== 'APPROVED'
-                ">
-
-                Not Approved
-
-              </span>
-
-
-              <div
-                class="small mt-1"
-                *ngIf="item.param16">
-
-                {{ item.param16 }}
-
-              </div>
-
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
+      <ng-template #activationReportRows let-rows>
+  @if (rows.length === 0) {
+    <tr><td colspan="6" class="text-center fw-bold">NO DATA FOUND</td></tr>
+  }
+  @for (item of rows; track item; let i = $index) {
+    <tr>
+      <td>{{ ((currentPage - 1) * itemsPerPage) + i + 1 }}</td>
+      <td>
+        <div><strong>IMEI:</strong> {{ item.param2 || 'NA' }}</div>
+        <div><strong>Unique No:</strong> {{ item.param3 || 'NA' }}</div>
+        <div><strong>ICCID:</strong> {{ item.param4 || 'NA' }}</div>
+        <div><strong>Vendor:</strong> {{ item.param5 || 'NA' }}</div>
+      </td>
+      <td>
+        <div><strong>Vehicle No:</strong> {{ item.param7 || 'NA' }}</div>
+        <div><strong>Chassis No:</strong> {{ item.param8 || 'NA' }}</div>
+        <div><strong>Customer:</strong> {{ item.param9 || 'NA' }}</div>
+        <div><strong>Customer Mobile:</strong> {{ item.param10 || 'NA' }}</div>
+        <div><strong>MFG Year:</strong> {{ item.param11 || 'NA' }}</div>
+      </td>
+      <td>{{ item.param17 || 'NA' }}</td>
+      <td>{{ item.param13 || 'NA' }}</td>
+      <td>
+        <span class="badge badge-success" *ngIf="item.param15 === '1' || item.param15 === 'Approved' || item.param15 === 'APPROVED'">
+          Approved
+        </span>
+        <span class="badge badge-danger" *ngIf="item.param15 !== '1' && item.param15 !== 'Approved' && item.param15 !== 'APPROVED'">
+          Not Approved
+        </span>
+        <div class="small mt-1" *ngIf="item.param16">{{ item.param16 }}</div>
+      </td>
+    </tr>
+  }
+</ng-template>
+<app-data-table [columns]="reportColumns" [rows]="reportData" [loading]="loadingReport"
+  [bodyTemplate]="activationReportRows" tableClass="table table-bordered table-striped table-sm"
+  emptyMessage="NO DATA FOUND">
+</app-data-table>
 
     </div>
 

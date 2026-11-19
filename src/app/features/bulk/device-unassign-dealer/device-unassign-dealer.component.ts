@@ -4,15 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { DeviceService } from '../../../core/services/device.service';
 import { EncryptionService } from '../../../core/services/encryption.service';
-import { LoadingComponent } from '../../../shared/components/loading/loading.component';
-import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
-import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastService } from '../../../core/services/toast.service';
+import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var jAlert: any;
 
 @Component({
     selector: 'app-device-unassign-dealer',
-    imports: [CommonModule, FormsModule, RouterModule, NgbPaginationModule],
+    imports: [CommonModule, FormsModule, RouterModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './device-unassign-dealer.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./device-unassign-dealer.component.scss']
@@ -29,6 +29,17 @@ export class DeviceUnassignDealerComponent implements OnInit {
   totalCount = 0;
   pageCount = 0;
 roleId: string = "";
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { header: '#', key: 'param1', width: '20px' },
+    { header: '', headers: ['Vehicle No.', 'Chassis No.'], sortKey: 'param21', value: device => `${device.param20 || 'NA'}\n${device.param21 || 'NA'}`, cellStyle: { 'white-space': 'pre-line' } },
+    { header: '', headers: ['Serial No.', 'IMEI No.'], sortKey: 'param6', value: device => `${device.param6 || 'NA'}\n${device.param5 || 'NA'}`, cellStyle: { 'white-space': 'pre-line' } },
+    { header: 'ICCID No.', key: 'param7', sortKey: 'param7' },
+    { header: 'Customer Details', sortKey: 'param36', value: device => `${device.param36 || 'NA'}\n${device.param37 || 'NA'}`, cellStyle: { 'white-space': 'pre-line' } },
+    { header: 'Dealer', key: 'param16', sortKey: 'param16' },
+    { header: 'Vendor', key: 'param15', sortKey: 'param15' },
+    { header: 'Vehicle Status', value: device => device.param38 === 'Assigned' ? 'Installed' : 'Not Installed', sortKey: 'param27' },
+    { header: 'Activity', actions: [{ label: 'Edit', className: 'btn btn-sm btn-primary', run: device => this.openUnassignModal(device) }] }
+  ];
   // Sorting
   sortKey: string = '';
   reverse: boolean = false;
@@ -156,9 +167,8 @@ roleId: string = "";
     this.getUnassignDeviceData(this.currentPage);
   }
 
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
-    this.pageSize = newSize === 'All' ? this.totalCount : Number(newSize);
+  onPageSizeChange(size: number | string) {
+    this.pageSize = size === 'All' || Number(size) === this.totalCount ? this.totalCount : Number(size);
     this.currentPage = 1;
     this.getUnassignDeviceData(this.currentPage);
   }

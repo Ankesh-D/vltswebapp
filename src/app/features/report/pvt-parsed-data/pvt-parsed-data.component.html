@@ -1,30 +1,44 @@
 <div class="content-i">
   <div class="content-box">
-    <div class="element-box">
+    <div class="element-box alert-report-design">
 
       <!-- PAGE TITLE -->
-      <div class="pagetitlestyle">
+      <div class="pagetitlestyle pb-2 alert-overview-page-header">
         <span>PVT Parsed Data</span>
+        <button type="button" class="btn btn-sm filters-toggle-btn"
+          [attr.aria-expanded]="filtersExpanded"
+          aria-controls="pvt-parsed-filter-panel"
+          (click)="filtersExpanded = !filtersExpanded">
+          <i class="fa fa-filter" aria-hidden="true"></i>
+          <span>{{ filtersExpanded ? 'Hide filters' : 'Show filters' }}</span>
+          <i class="fa"
+            [class.fa-chevron-up]="filtersExpanded"
+            [class.fa-chevron-down]="!filtersExpanded"
+            aria-hidden="true"></i>
+        </button>
       </div>
 
       <!-- MAIN LAYOUT -->
       <div class="overspeed-layout">
 
         <!-- LEFT FILTER PANEL -->
-        <div class="left-filter-panel entrypagediv">
+        <div toolbarFilters class="alert-overview-filters" [hidden]="!filtersExpanded">
+        <div id="pvt-parsed-filter-panel" class="left-filter-panel entrypagediv alert-filter-panel">
 
           <!-- FILTER BY -->
           <div class="form-group filterby-row">
-            <label style="margin: 2px;" class="control-label">Filter By :</label>
+            <label class="control-label">Filter By</label>
 
             <div class="filterby-options">
               <label class="radio-item">
-                <input type="radio" name="filter" (change)="onFilterByChange('Vendor')" checked>
+                <input type="radio" name="filter" [checked]="filterBy === 'Vendor'"
+                  (change)="onFilterByChange('Vendor')">
                 Vendor
               </label>
 
               <label class="radio-item">
-                <input type="radio" name="filter" (change)="onFilterByChange('RTO')">
+                <input type="radio" name="filter" [checked]="filterBy === 'RTO'"
+                  (change)="onFilterByChange('RTO')">
                 RTO
               </label>
             </div>
@@ -88,37 +102,21 @@
         <div class="form-group">
           <label class="control-label">Select Vehicle / Chassis No <span style="color:red">*</span></label>
 
-
-          <!-- 🔍 SEARCH BOX -->
-          <div class="vehicle-search-box">
-
-            <input type="text" class="form-control search-input" placeholder="Enter Vehicle Number"
-              [(ngModel)]="vehicleSearch" (keyup.enter)="searchVehicle()" />
-
-            <button class="btn-search-blue" (click)="searchVehicle()">
-              <i class="fa fa-search"></i>
-            </button>
-
-          </div>
-
-
-          <!-- 🚗 DROPDOWN -->
-
-          @if (isVehicleLoaded && visibleVehicleList.length > 0) {
-            <select class="searchable full-control"
-              [(ngModel)]="selectedVehicle" placeholder="Select Vehicle">
-              <option value="" disabled selected hidden>
-                Select Vehicle
+          <select class="searchable full-control"
+            [(ngModel)]="selectedVehicle"
+            [disabled]="vehicleLoading || (!selectedVendor && !selectedRTO)">
+            <option value="">
+              {{ vehicleLoading ? 'Loading vehicles...' : 'Select Vehicle' }}
+            </option>
+            @if (!vehicleLoading && isVehicleLoaded && visibleVehicleList.length === 0) {
+              <option value="" disabled>No vehicles found</option>
+            }
+            @for (v of visibleVehicleList; track v) {
+              <option [ngValue]="v.param1">
+                {{ v.param2 }}
               </option>
-              <option [ngValue]="null">Select Vehicle</option>
-              @for (v of visibleVehicleList; track v) {
-                <option [ngValue]="v.param1">
-                  {{ v.param2 }}
-                </option>
-              }
-            </select>
-          }
-
+            }
+          </select>
         </div>
 
         <!-- ALERT TYPE -->
@@ -134,99 +132,66 @@
         </select>
       </div> -->
 
-      <!-- DATE -->
-      <div class="date-row">
-        <div class="date-col" style="width:100%">
-          <label class="control-label">Select Date Range<span style="color:red">*</span> </label>
+      <div class="alert-date-actions">
+        <div class="form-group alert-date-range">
+          <label class="control-label">Select Date Range<span style="color:red">*</span></label>
           <input placeholder="Select Date Range" type="text" class="form-control" ngxDaterangepickerMd
             [(ngModel)]="selectedDateRange" [maxDate]="today" [opens]="'right'" [drops]="'up'"
             [locale]="{ format: 'DD-MMM-YYYY' }" (applyDaterangepicker)="onDateRangeChange($event)" />
-
         </div>
-      </div>
 
-      <div class="date-row">
-
-        <div class="date-col">
+        <div class="form-group">
           <label class="control-label">From Time<span style="color:red">*</span></label>
           <input type="time" class="form-control" [(ngModel)]="fromTime" step="60" />
         </div>
 
-        <div class="date-col">
+        <div class="form-group">
           <label class="control-label">To Time<span style="color:red">*</span></label>
           <input type="time" class="form-control" [(ngModel)]="toTime" step="60" />
         </div>
 
+        <div class="search-btn-row">
+          <button type="button" class="search-btn-clear" (click)="clearFilters()">
+            <i class="fa fa-eraser" aria-hidden="true"></i>
+            <span>Clear</span>
+          </button>
+          <button type="button" class="search-btn-full" (click)="getAlertOverview()">
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <span>Apply filters</span>
+          </button>
+        </div>
       </div>
-      <!-- SEARCH -->
-      <div class="search-btn-row">
-        <button class="search-btn-full" (click)="getAlertOverview()">
-          <i class="fa fa-search"></i> Search
-        </button>
-      </div>
+    </div>
     </div>
     <!-- *ngIf="showSummary" -->
     <!-- RIGHT REPORT PANEL -->
     <div class="right-report-panel">
-      <!-- 🔹 TOP CONTROLS BAR -->
-      <div class="top-controls-row">
-
-        <!-- LEFT SIDE -->
-        <div class="left-controls">
-
-          <!-- 🔍 SEARCH BOX -->
-          <div class="search-box">
-            <input type="search" class="search-input inner" placeholder="Search vehicle / alert..." maxlength="50"
-              [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" />
-
-            <button class="search-inner-btn" (click)="getSearchDetails()">
-              <i class="fa fa-search"></i>
-            </button>
-          </div>
-
-          <!-- 🔄 RELOAD BUTTON -->
-          <button class="reload-btn" (click)="reloadData()" [disabled]="loading">
-
-            <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
-            <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
-
-          </button>
-
-        </div>
-
-        <!-- RIGHT SIDE -->
-        <div class="right-controls">
-          <div class="total-records-text">Show Rows :</div>
-          <!-- ROWS SELECT -->
-          <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChanged(pageSize)">
-
-            @for (size of pageSizeOptions; track size) {
-              <option [value]="size === totalCount ? 'All' : size">
-                {{ size === totalCount ? 'All' : size }}
-              </option>
-            }
-
-          </select>
-
-          <!-- TOTAL RECORD TEXT -->
-          <div class="total-records-text">
-            Total Records : {{ pageCount }} of {{ totalCount }}
-          </div>
-
-        </div>
-
-      </div>
+                        <app-common-data-toolbar class="alert-overview-results-toolbar"
+                          [searchText]="searchText"
+                          searchPlaceholder="Search here..."
+                          (searchTextChange)="searchText=$event"
+                          (search)="getSearchDetails()"
+                          (reload)="reloadData()"
+                          [loading]="loading"
+                          [pageSize]="pageSize"
+                          [pageSizeOptions]="pageSizeOptions"
+                          [displayedCount]="pageCount"
+                          [totalRecords]="totalCount"
+                          (pageSizeChange)="onPageSizeChanged($event)"
+                          [showExcel]="false"
+                          pageSizeLabel="Show Rows"
+                          totalLabel="Total Records"
+                          countSeparator="of">
+                        </app-common-data-toolbar>
       <!-- TABLE -->
       <div class="table-wrapper">
-        <!-- Summary Start -->
-        <div class="card mb-3 shadow-sm">
+        <!-- <div class="card mb-3 shadow-sm pvt-summary-card">
           <div class="card-header text-black py-0 text-center">
             <strong>Summary</strong>
           </div>
 
           <div class="card-body py-1">
             <div class="row">
-              <!-- Vendor Name -->
               <div class="col-md-3 col-sm-6 mb-2">
                 <div class="summary-item">
                   <small class="text-muted d-block">Vendor Name</small>
@@ -234,14 +199,12 @@
                 </div>
               </div>
 
-              <!-- RTO Name -->
               <div class="col-md-3 col-sm-6 mb-2">
                 <div class="summary-item">
                   <small class="text-muted d-block">RTO Name</small>
                   <strong>{{ rtoname || '-' }}</strong>
                 </div>
               </div>
-              <!-- Vehicle Registration No -->
               <div class="col-md-3 col-sm-6 mb-2">
                 <div class="summary-item">
                   <small class="text-muted d-block">Vehicle Reg. No.</small>
@@ -249,7 +212,6 @@
                 </div>
               </div>
 
-              <!-- Vehicle Class -->
               <div class="col-md-3 col-sm-6 mb-2">
                 <div class="summary-item">
                   <small class="text-muted d-block">Vehicle Class</small>
@@ -257,7 +219,6 @@
                 </div>
               </div>
 
-              <!-- Customer Name -->
               <div class="col-md-3 col-sm-6 mb-2">
                 <div class="summary-item">
                   <small class="text-muted d-block">Customer Name</small>
@@ -265,7 +226,6 @@
                 </div>
               </div>
 
-              <!-- Customer Mobile No -->
               <div class="col-md-6 col-sm-6 mb-2">
                 <div class="summary-item">
                   <small class="text-muted d-block">Customer Mobile No.</small>
@@ -273,28 +233,20 @@
                 </div>
               </div>
 
-              <!-- Packet Count -->
               <div class="col-md-3 col-sm-6 mb-2">
                 <div class="summary-item">
                   <small class="text-muted d-block">Packet Count</small>
                   <strong>{{ packetcount || 0 }}</strong>
                 </div>
               </div>
-
-
-
-
-
-
-
             </div>
           </div>
-        </div>
+        </div> -->
         <!-- Summary End -->
         <ng-template #reportTableRows let-rows>
 @if (alertData.length === 0) {
               <tr>
-                <td colspan="10" class="no-data">
+                <td colspan="7" class="no-data text-center">
                   NO DATA FOUND
                 </td>
               </tr>
@@ -312,42 +264,12 @@
               </tr>
             }
 </ng-template>
-<app-common-table [columns]="tableColumns" [rows]="alertData" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table table-striped app-table"></app-common-table>
+<app-data-table [columns]="tableColumns" [rows]="alertData" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table table-striped app-table table-grid"></app-data-table>
 
       </div>
-      @if (totalCount > pageSize || page > 1) {
-        <div class="custom-pagination" style="display:flex;justify-content: end;"
-          >
-          <button class="pg-btn" (click)="changePage(page - 1)" [disabled]="page === 1">
-            Prev
-          </button>
-          @if (page > 3) {
-            <span class="pg-dots">...</span>
-          }
-          @if (page > 2) {
-            <button class="pg-num" (click)="changePage(page - 1)">
-              {{ page - 1 }}
-            </button>
-          }
-          <button class="pg-num active">
-            {{ page }}
-          </button>
-          @if (page < totalPages - 1) {
-            <button class="pg-num" (click)="changePage(page + 1)">
-              {{ page + 1 }}
-            </button>
-          }
-          @if (page < totalPages - 2) {
-            <span class="pg-dots">...</span>
-          }
-          <button class="pg-num" (click)="changePage(totalPages)">
-            {{ totalPages }}
-          </button>
-          <button class="pg-btn" (click)="changePage(page + 1)" [disabled]="page === totalPages">
-            Next
-          </button>
-        </div>
-      }
+      <app-pagination [totalCount]="totalCount" [page]="page" [pageSize]="pageSize"
+        [disabled]="loading" (pageChange)="changePage($event)">
+      </app-pagination>
     </div>
 
   </div>

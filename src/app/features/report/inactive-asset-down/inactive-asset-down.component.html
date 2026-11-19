@@ -19,99 +19,41 @@
                 <!-- <div class="pagetitlestyle"><span>Inactive Assets Down Details</span></div> -->
                 <div class="pagetitlestyle"><span>Vendorwise inactive devices counts</span></div>
               </div>
-              <div
-                style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0px; padding: 0 10px;">
-                <!-- Left Side: Search and Reload -->
-                <div style="display: flex; align-items: center;">
-                  <!-- <span style="font-weight: bold; font-size: 12px; margin-right: 10px;">Search
-                :</span> -->
-                <ng-select class="vendor-select" [(ngModel)]="selectedVendorFilter"
-                  (change)="onVendorFilterChange($event)" placeholder="All">
-                  @for (vendor of vendorlist; track vendor) {
-                    <ng-option [value]="vendor.param1">
-                      {{ vendor.param2 }}
-                    </ng-option>
-                  }
-                </ng-select>
-
-
-
-                <button class="mx-2" (click)="reloadData()"
-                  style="background: #fff; border: 1px solid #0b58b9; color: #0b58b9; border-radius: 4px; height: 26px; padding: 0 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; font-weight: bold;">
-                  <i class="fa fa-refresh" [class.fa-spin]="!listLoaded"
-                  style="margin-right: 5px;"></i>
-                  @if (listLoaded) {
-                    <span>Reload</span>
-                  }
-                  @if (!listLoaded) {
-                    <span>Reloading...</span>
-                  }
-                </button>
-                <!-- <input
-                ngxDaterangepickerMd
-                [(ngModel)]="selectedRange"
-                (datesUpdated)="onDateApply($event)"
-                [showDropdowns]="true"
-                [alwaysShowCalendars]="true"
-                [autoApply]="false"
-                [locale]="{ format: 'DD-MMM-YYYY' }"
-
-                class="form-control"
-                style="font-size:12px"
-                /> -->
-                <span style="font-weight: bold; font-size: 12px; margin-right: 5px;">
-                Inactive Since </span>
-                <ng-select class="days-select" [(ngModel)]="selectedDays"
-                  (change)="onDaysInputChange()" placeholder="Select Days">
-                  @for (option of daysOptions; track option) {
-                    <ng-option [value]="option">
-                      {{ option.label }}
-                    </ng-option>
-                  }
-                </ng-select>
-
-              </div>
-
-              <!-- Right Side: Download, Page Size, Count -->
-              <div style="display: flex; align-items: center; font-size: 11px;">
-                <div class="toggle-container modern-toggle mx-2">
-                  <button class="toggle-option" [class.active]="vehicleType === 'NEW'"
-                    (click)="onChangeVehicleType('NEW')">
-                    New(Installation)
-                  </button>
-                  <button class="toggle-option" [class.active]="vehicleType === 'OLD'"
-                    (click)="onChangeVehicleType('OLD')">
-                    Old(Renewal)
-                  </button>
+              <app-common-data-toolbar
+                [showSearch]="false"
+                [showFilters]="true"
+                (reload)="reloadData()"
+                [loading]="!listLoaded"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="pageSizeOptions"
+                [displayedCount]="detailData.length"
+                [totalRecords]="totalCount || 0"
+                (pageSizeChange)="onPageSizeChange($event)"
+                [showExcel]="false"
+                pageSizeLabel="Show Rows"
+                totalLabel="Total Records">
+                <div toolbarFilters class="d-flex align-items-center gap-2 flex-wrap">
+                  <ng-select class="vendor-select" [(ngModel)]="selectedVendorFilter"
+                    (change)="onVendorFilterChange($event)" placeholder="All">
+                    @for (vendor of vendorlist; track vendor) {
+                      <ng-option [value]="vendor.param1">{{ vendor.param2 }}</ng-option>
+                    }
+                  </ng-select>
+                  <label class="mb-0">Inactive Since</label>
+                  <ng-select class="days-select" [(ngModel)]="selectedDays"
+                    (change)="onDaysInputChange()" placeholder="Select Days">
+                    @for (option of daysOptions; track option) {
+                      <ng-option [value]="option">{{ option.label }}</ng-option>
+                    }
+                  </ng-select>
                 </div>
-                <!-- <div style="display: flex; align-items: center; margin-right: 15px;">
-                <label for="excelpdfdownload" style="margin: 0 5px 0 0; font-weight: bold; color: #333;">Download:</label>
-                <select name="excelpdfdownload" id="excelpdfdownload"
-                  style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; color: #333; outline: none; background: white;">
-                  <option value="Select">Select</option>
-                  <option value="Excel">Excel</option>
-                  <option style="display: none" value="Pdf" id="exportpdf">Pdf</option>
-                </select>
-              </div> -->
-
-              <!-- <div style="display: flex; align-items: center; margin-right: 15px;">
-              <label style="margin: 0 5px 0 0; font-weight: bold;">Show Rows:</label>
-
-              <select [(ngModel)]="pageSize" (change)="onPageSizeChange($event)"
-                style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px;">
-
-                <option *ngFor="let size of pageSizeOptions" [value]="size">
-                  {{ size }}
-                </option>
-
-              </select>
-            </div> -->
-
-            <div style="font-weight: bold; color: #0b58b9;">
-              Total Records : {{ totalCount }}
-            </div>
-          </div>
-        </div>
+                <div toolbarBeforePageSize class="toggle-container modern-toggle mx-2">
+                  <button class="toggle-option" [class.active]="vehicleType === 'NEW'"
+                    (click)="onChangeVehicleType('NEW')">New(Installation)</button>
+                  <button class="toggle-option" [class.active]="vehicleType === 'OLD'"
+                    (click)="onChangeVehicleType('OLD')">Old(Renewal)</button>
+                </div>
+              </app-common-data-toolbar>
 
         <div class="table-responsive status-table">
           <ng-template #reportTableRows let-rows>
@@ -137,7 +79,10 @@
                 </tr>
               }
 </ng-template>
-<app-common-table [columns]="tableColumns" [rows]="detailData" [loading]="!listLoaded && detailData.length === 0" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table table-striped app-table small-table"></app-common-table>
+<app-data-table [columns]="tableColumns" [rows]="detailData" [loading]="!listLoaded && detailData.length === 0" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table table-striped app-table small-table"></app-data-table>
+        <app-pagination [totalCount]="totalCount || 0" [page]="pageCount" [pageSize]="pageSize"
+          [disabled]="!listLoaded" (pageChange)="onPageChange($event)">
+        </app-pagination>
 
         </div>
       </div>

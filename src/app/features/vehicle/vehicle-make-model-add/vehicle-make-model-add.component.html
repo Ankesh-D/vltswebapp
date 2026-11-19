@@ -53,6 +53,44 @@
 
         <!-- Tab Content -->
         <div class="tab-body">
+            <app-common-data-toolbar
+              variant="device"
+              searchLabel="Search"
+              searchPlaceholder="Search..."
+              [searchText]="searchText"
+              (searchTextChange)="onSearchTextChange($event)"
+              (search)="onSearch()"
+              (reload)="reloadList()"
+              [loading]="tableLoading"
+              [showFilters]="activeTab === 'model'"
+              [showExcel]="false"
+              [showPdf]="false"
+              pageSizeLabel="Show Rows"
+              totalLabel="Total Records"
+              countSeparator="of"
+              [pageSize]="pageSize"
+              [pageSizeOptions]="pageSizeOptions"
+              [displayedCount]="pageCount"
+              [totalRecords]="totalCount"
+              (pageSizeChange)="onPageSizeChange($event)">
+              <label
+                toolbarFilters
+                class="d-flex align-items-center gap-2 mb-0"
+                [hidden]="activeTab !== 'model'">
+                Select Make
+                <select
+                  class="form-control"
+                  [(ngModel)]="selectedMakeId"
+                  [ngModelOptions]="{ standalone: true }"
+                  (change)="onMakeChange($event)">
+                  <option value="">Select Make</option>
+                  @for (make of makeList; track make) {
+                    <option [value]="make.param1">{{ make.param2 }}</option>
+                  }
+                </select>
+              </label>
+            </app-common-data-toolbar>
+
           <!-- MAKE -->
           <!-- MAKE TAB -->
           @if (activeTab === 'make') {
@@ -62,80 +100,34 @@
                 <button class="btn-add" (click)="addMake()">+ Add</button>
               </div>
               <div class="table-wrapper">
-                <table class="table table-bordered table-sm">
-                  <thead>
-                    <tr>
-                      <th>Sr.No</th>
-                      <th>Make Name</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (item of makeList; track item; let i = $index) {
-                      <tr>
-                        <td>{{ i + 1 }}</td>
-                        <td>{{ item.param2 }}</td>
-                        <td>
-                          <button class="btn-edit" (click)="editMake(item)">
-                            Edit
-                          </button>
-                          <button class="btn-delete" (click)="openDeleteModal('make', item)">Delete</button>
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table></div>
+                  <app-data-table
+                    [columns]="tableColumns"
+                    [rows]="tableRows"
+                    [loading]="tableLoading"
+                    tableClass="table table-bordered table-sm"
+                    emptyMessage="No vehicle makes found">
+                  </app-data-table>
+                </div>
               </div>
             }
 
             <!-- MODEL -->
             @if (activeTab === 'model') {
               <div>
-                <!-- SELECT MAKE -->
-                <div class="form-group"><div class="header-row">
-                  <label class="header-row">Select Make</label>
-                  <button class="btn-add" (click)="addModel()">+ Add</button></div>
-                  <select class="form-control" (change)="onMakeChange($event)">
-                    <option value="">Select Make</option>
-                    @for (m of makeList; track m) {
-                      <option [value]="m.param1">
-                        {{ m.param2 }}
-                      </option>
-                    }
-                  </select>
+                <div class="header-row">
+                  <h3>Vehicle Model List</h3>
+                  <button class="btn-add" (click)="addModel()">+ Add</button>
                 </div>
-                <!-- TABLE -->
-                @if (modelList.length > 0) {
-                  <div>
-                    <div class="header-row">
-                      <h3>Vehicle Model List</h3>
-                      <!-- <button class="btn-add" (click)="addModel()">+ Add</button> -->
-                    </div>
-                    <div class="table-wrapper">
-                      <table class="table table-bordered table-sm">
-                        <thead>
-                          <tr>
-                            <th>ID</th>
-                            <th>Model Name</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          @for (item of modelList; track item; let i = $index) {
-                            <tr>
-                              <td>{{ i + 1 }}</td>
-                              <td>{{ item.param2 }}</td>
-                              <td>
-                                <button class="btn-edit" (click)="editModel(item)">Edit</button>
-                                <button class="btn-delete" (click)="openDeleteModal('model', item)">Delete</button>
-                              </td>
-                            </tr>
-                          }
-                        </tbody>
-                      </table></div>
-                    </div>
-                  }
+                <div class="table-wrapper">
+                  <app-data-table
+                    [columns]="tableColumns"
+                    [rows]="tableRows"
+                    [loading]="tableLoading"
+                    tableClass="table table-bordered table-sm"
+                    [emptyMessage]="selectedMakeId ? 'No vehicle models found' : 'Select a make to view models'">
+                  </app-data-table>
                 </div>
+              </div>
               }
 
               <!-- CLASS -->
@@ -146,31 +138,24 @@
                     <button class="btn-add" (click)="addClass()">+ Add</button>
                   </div>
                   <div class="table-wrapper">
-                    <table class="table table-bordered table-sm">
-                      <thead>
-                        <tr>
-                          <th>Sr.No</th>
-                          <th>Class Name</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @for (item of classList; track item; let i = $index) {
-                          <tr>
-                            <td>{{ i + 1 }}</td>
-                            <td>{{ item.param2 }}</td>
-                            <td>
-                              <button class="btn-edit" (click)="editClass(item)">Edit</button>
-                              <button class="btn-delete" (click)="openDeleteModal('class', item)">Delete</button>
-                            </td>
-                          </tr>
-                        }
-                      </tbody>
-                    </table>
+                    <app-data-table
+                      [columns]="tableColumns"
+                      [rows]="tableRows"
+                      [loading]="tableLoading"
+                      tableClass="table table-bordered table-sm"
+                      emptyMessage="No vehicle classes found">
+                    </app-data-table>
                   </div>
                 </div>
               }
             </div>
+            <app-pagination
+              [totalCount]="totalCount"
+              [page]="currentPage"
+              [pageSize]="pageSize"
+              [disabled]="tableLoading"
+              (pageChange)="onPageChange($event)">
+            </app-pagination>
           </div>
         </div>
       </div>

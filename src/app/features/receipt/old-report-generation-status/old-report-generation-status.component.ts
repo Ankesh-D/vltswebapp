@@ -12,12 +12,13 @@ import { CommonDataToolbarComponent } from '../../../shared/components/common-da
 import { ToastService } from '../../../core/services/toast.service';
 import { UnderscoreToSpacePipe } from '../../../shared/underscore-to-space.pipe';
 import { LoaderService } from '../../../core/services/loader.service';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { DataTableColumn, DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 declare var moment: any;
 @Component({
     selector: 'app-old-report-generation-status',
-    imports: [FormsModule, CommonModule, UnderscoreToSpacePipe, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [FormsModule, CommonModule, UnderscoreToSpacePipe, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './old-report-generation-status.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './old-report-generation-status.component.scss'
@@ -32,19 +33,19 @@ export class OldReportGenerationStatusComponent implements OnInit, OnDestroy {
 selectedM2mProvider: string = '';
   // New properties for the vehicle list table
   vehicleDetails: any[] = [];
-  readonly tableColumns: CommonTableColumn<any>[] = [
-    { key: 'param1', label: '#', width: '40px' },
-    { key: 'param7', label: 'Vendor', sortable: true, visible: () => this.task != 11 },
-    { key: 'param11', headers: ['Vehicle No.', 'Chassis No.'], sortable: true },
-    { key: 'param5', label: 'Serial No.', sortable: true },
-    { key: 'param4', label: 'IMEI No.', sortable: true },
-    { key: 'param6', label: 'ICCID No.', sortable: true },
-    { key: 'param28', label: 'Customer Details', sortable: true },
-    { key: 'param19', label: 'Vehicle Type', sortable: true },
-    { key: 'param16', label: 'Manufacturing Year', sortable: true },
-    { key: 'param14', label: 'Activation Date', sortable: true },
-    { key: 'param64', label: 'Valid Upto', sortable: true, sortKey: 'param53' },
-    { key: 'param75', label: 'RTO Approved', sortable: true, sortKey: 'param53' }
+  readonly tableColumns: DataTableColumn<any>[] = [
+    { key: 'param1', header: '#', width: '40px' },
+    { key: 'param7', header: 'Vendor', sortKey: 'param7', visible: () => this.task != 11 },
+    { key: 'param11', headers: ['Vehicle No.', 'Chassis No.'], sortKey: 'param11' },
+    { key: 'param5', header: 'Serial No.', sortKey: 'param5' },
+    { key: 'param4', header: 'IMEI No.', sortKey: 'param4' },
+    { key: 'param6', header: 'ICCID No.', sortKey: 'param6' },
+    { key: 'param28', header: 'Customer Details', sortKey: 'param28' },
+    { key: 'param19', header: 'Vehicle Type', sortKey: 'param19' },
+    { key: 'param16', header: 'Manufacturing Year', sortKey: 'param16' },
+    { key: 'param14', header: 'Activation Date', sortKey: 'param14' },
+    { key: 'param64', header: 'Valid Upto', sortKey: 'param53' },
+    { key: 'param75', header: 'RTO Approved', sortKey: 'param53' }
   ];
   isVehicleListLoaded: boolean = false;
   sortKey: string = '';
@@ -167,7 +168,7 @@ getStatusOnInitDetails(pageNumber: number) {
 if (response && response.status && response.entity && Array.isArray(response.entity.listData)) {
           this.vehicleDetails = response.entity.listData;
           this.isVehicleListLoaded = true;
-          this.totalCount = response.entity.param1 || 0;
+          this.totalCount = Number(response.entity.param1) || 0;
           this.pageCount = this.vehicleDetails.length;
           this.detailsflag = true;
           this.receiptstatusflag = false; // Set receiptstatusflag
@@ -209,11 +210,13 @@ if (response && response.status && response.entity && Array.isArray(response.ent
   }
 
   getSearchDetails() {
+    this.currentPage = 1;
     this.getStatusOnInitDetails(1);
   }
 
   reloadData() {
     this.searchBy = '';
+    this.currentPage = 1;
     this.getStatusOnInitDetails(1);
   }
 
@@ -222,45 +225,12 @@ if (response && response.status && response.entity && Array.isArray(response.ent
     this.getStatusOnInitDetails(this.currentPage);
   }
 
-  onPageSizeChange(event: Event) {
-    const newSize = (event.target as HTMLSelectElement).value;
+  onPageSizeChange(newSize: number | string) {
     this.pageSize = newSize === 'All' ? this.totalCount : Number(newSize);
     this.currentPage = 1;
     this.vehicleDetails = [];
     this.totalCount = 0;
     this.getStatusOnInitDetails(this.currentPage);
-  }
-
-  getTotalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
-
-  getPageNumbers(): number[] {
-    const totalPages = this.getTotalPages();
-    const currentPage = this.currentPage;
-    const maxPagesToShow = 7; // Show 7 page numbers at a time
-
-    if (totalPages <= maxPagesToShow) {
-      // If total pages are 7 or less, show all page numbers
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-
-    const maxPagesBeforeCurrent = Math.floor(maxPagesToShow / 2);
-    const maxPagesAfterCurrent = Math.ceil(maxPagesToShow / 2) - 1;
-    let startPage: number;
-    let endPage: number;
-
-    if (currentPage <= maxPagesBeforeCurrent + 1) {
-      startPage = 1;
-      endPage = maxPagesToShow;
-    } else if (currentPage + maxPagesAfterCurrent >= totalPages) {
-      startPage = totalPages - maxPagesToShow + 1;
-      endPage = totalPages;
-    } else {
-      startPage = currentPage - maxPagesBeforeCurrent;
-      endPage = currentPage + maxPagesAfterCurrent;
-    }
-    return Array.from({ length: (endPage - startPage + 1) }, (_, i) => startPage + i);
   }
 
   getPaginatedData(): any[] {

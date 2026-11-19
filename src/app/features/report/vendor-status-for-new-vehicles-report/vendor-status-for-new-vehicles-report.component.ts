@@ -15,12 +15,14 @@ import { VendorStatusForNewVehiclesReportReq } from '../../../core/model/request
 import { VendorStatusForNewVehiclesReportResp } from '../../../core/model/response.model';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CommonDataToolbarComponent } from '../../../shared/components/common-data-toolbar/common-data-toolbar.component';
-import { CommonTableColumn, CommonTableComponent } from '../../../shared/components/common-table/common-table.component';
+import { CommonTableColumn } from '../../../shared/components/common-table/common-table.component';
+import { DataTableComponent } from '../../../shared/components/data-table/data-table.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 declare var $: any;
 
 @Component({
     selector: 'app-vendor-status-for-new-vehicles-report',
-    imports: [CommonModule, NgxDaterangepickerMd, FormsModule, NgSelectModule, CommonDataToolbarComponent, CommonTableComponent],
+    imports: [CommonModule, NgxDaterangepickerMd, FormsModule, NgSelectModule, CommonDataToolbarComponent, DataTableComponent, PaginationComponent],
     templateUrl: './vendor-status-for-new-vehicles-report.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './vendor-status-for-new-vehicles-report.component.scss'
@@ -188,6 +190,7 @@ getDate() {
 onRTOChange() {
   this.searchText = '';
   this.reportData = [];
+  this.page = 1;
   setTimeout(() => {
     if(this.selectedRTO==null || this.selectedRTO.param1=="") {
       this.selectedRTO = this.rtoList[0];
@@ -214,15 +217,17 @@ getReportDetails() {
   const fromDate = daterange[0] ? dayjs(daterange[0]).format('DD-MMM-YYYY') : '';
   const toDate = daterange[1] ? dayjs(daterange[1]).format('DD-MMM-YYYY') : '';
   this.reportRequest.param1 = this.searchText;
-  this.reportRequest.param2 = "";
-  this.reportRequest.param3 = "";
+  this.reportRequest.param2 = String(this.page);
+  this.reportRequest.param3 = String(this.pageSize);
   this.reportRequest.param4 = fromDate;
   this.reportRequest.param5 = toDate;
   this.reportRequest.param6 = '';
   this.reportRequest.param8 = this.selectedRTO ? this.selectedRTO.param1 : '';
 
+  this.loading = true;
   this.ReportService.vendorStatusForNewVehiclesReport(this.reportRequest).subscribe({
     next: (response: any) => {
+      this.loading = false;
       if(response.statuscode==200) {
         this.reportData = response.entity.listData || [];
         this.totalCount = Number(response.entity.param1 || 0);
@@ -239,6 +244,7 @@ getReportDetails() {
       }
     },
     error: (error: any) => {
+      this.loading = false;
       this.toast.show('Something went wrong', 'error');
     }
   })
@@ -260,23 +266,8 @@ pageSizeOptions = [10, 20, 50, 100];
 
 // 🔎 SEARCH
 getSearchDetails() {
+  this.page = 1;
   this.getReportDetails();
-
-  // agar backend search hai to yaha API call karo
-  // abhi ke liye existing data filter example
-
-  if (!this.searchText) {
-    return this.getReportDetails();
-  }
-
-  const text = this.searchText.toLowerCase();
-
-  this.reportData = this.reportData.filter((item: any) =>
-    Object.values(item).some(val =>
-      String(val).toLowerCase().includes(text)
-    )
-  );
- 
 }
 
 
@@ -284,6 +275,7 @@ getSearchDetails() {
 reloadData() {
   this.searchText = '';
   this.selectedRTO = this.rtoList[0];
+  this.page = 1;
   this.getReportDetails();
 }
 

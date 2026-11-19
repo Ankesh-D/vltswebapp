@@ -25,236 +25,124 @@
 
       @if (!toggleFlag) {
         <div class="table-responsive">
-          <form autocomplete="off" class="top-controls-row">
-            <!-- LEFT SIDE -->
-            <div class="left-controls">
-              <label class="topbar-label">Search :</label>
-              <div class="search-box">
-                <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input inner"
-                  id="searchby" placeholder="Type here and press button...." autocomplete="off" maxlength="50"
-                  [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" />
-                <button class="search-inner-btn" (click)="getSearchDetails()">
-                  <i class="fa fa-search"></i>
-                </button>
-              </div>
-              <!-- RELOAD -->
-              <button class="reload-btn" (click)="reloadData()">
-                @if (!loading) {
-                  <span>Reload</span>
-                }
-                @if (loading) {
-                  <span>Reloading...</span>
-                }
-              </button>
-            </div>
-            <!-- RIGHT SIDE -->
-            <div class="right-controls">
-              <div class="total-records-text">Show Rows :</div>
-              <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
-                @for (size of pageSizeOptions; track size) {
-                  <option [value]="size === totalCount ? totalCount : size">
-                    {{ size === totalCount ? totalCount : size }}
-                  </option>
-                }
-              </select>
-              <div class="total-records-text">
-                Total Records : {{pageCount}} of {{totalCount}}
-              </div>
-            </div>
-          </form>
-          <table class="table table-striped app-table mb-1"
-            style="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>
-                  IMEI
-                  <hr class="my-0">
-                  Serial No
-                  <hr class="my-0">
-                  ICCID
-                </th>
-                <th>
-                  Vendor
-                  <hr class="my-0">
-                  Dealer
-                </th>
-                <th>
-                  Vehicle No
-                  <hr class="my-0">
-                  Chassis
-                  <hr class="my-0"> Engine
-                </th>
-                <th>
-                  Type
-                  <hr class="my-0">
-                  Model
-                  <hr class="my-0"> Make
-                </th>
-                <th>
-                  Customer
-                  <hr class="my-0">
-                  Mobile
-                </th>
-                <th>
-                  RTO
-                </th>
-                <th>
-                  Activation
-                  <hr class="my-0">
-                  Validity
-                </th>
-                <th>
-                  Polling
-                  <hr class="my-0">
-                  Last Time
-                </th>
-                <th>Status
-                  <hr class="my-0">
-                  Action Status
-                </th>
-                @if (roleId==10||roleId==64) {
-                  <th>
-                    MVI Approval Status
-                    <hr class="my-0">
-                    Approved By
-                    <hr class="my-0">
-                    Approved On
-                  </th>
-                }
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (dataDetails.length === 0 && !loading) {
-                <tr>
-                  <td style="font-weight: bold; text-align: center;" colspan="12">NO DATA FOUND</td>
-                </tr>
+          <app-common-data-toolbar
+            variant="device"
+            searchLabel="Search :"
+            searchPlaceholder="Type here and press button..."
+            [searchText]="searchText"
+            (searchTextChange)="searchText = $event"
+            (search)="getSearchDetails()"
+            (reload)="reloadData()"
+            [loading]="loading"
+            [showFilters]="false"
+            [showExcel]="false"
+            [showPdf]="false"
+            pageSizeLabel="Show Rows"
+            totalLabel="Total Records"
+            countSeparator="of"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            [displayedCount]="pageCount"
+            [totalRecords]="totalCount"
+            (pageSizeChange)="onPageSizeChange($event)">
+          </app-common-data-toolbar>
+
+          <ng-template #untagTableHeader>
+            <tr>
+              <th>#</th>
+              <th>IMEI<hr class="my-0">Serial No<hr class="my-0">ICCID</th>
+              <th>Vendor<hr class="my-0">Dealer</th>
+              <th>Vehicle No<hr class="my-0">Chassis<hr class="my-0">Engine</th>
+              <th>Type<hr class="my-0">Model<hr class="my-0">Make</th>
+              <th>Customer<hr class="my-0">Mobile</th>
+              <th>RTO</th>
+              <th>Activation<hr class="my-0">Validity</th>
+              <th>Polling<hr class="my-0">Last Time</th>
+              <th>Status<hr class="my-0">Action Status</th>
+              @if (roleId==10||roleId==64) {
+                <th>MVI Approval Status<hr class="my-0">Approved By<hr class="my-0">Approved On</th>
               }
-              @for (d of dataDetails; track d) {
-                <tr>
-                  <!-- Sr -->
-                  <td>{{d.param1}}</td>
-                  <!-- IMEI + Serial + ICCID -->
-                  <td>
-                    {{ d.param5 }}<br>
-                    {{ d.param6 }} <br>
-                    {{ d.param7 }}
-                  </td>
-                  <!-- Vendor -->
-                  <td>
-                    {{ d.param15 }}
-                    <br>
-                      {{ d.param16 }}
-                    </td>
-                    <!-- Vehicle -->
-                    <td>
-                      {{ d.param20 }}<br>
-                      {{ d.param21 }} <br> {{ d.param22 }}
-                    </td>
-                    <!-- Type -->
-                    <td>
-                      {{ d.param65 }}<br>
-                      {{ d.param53 }} <br> {{ d.param52 }}
-                    </td>
-                    <!-- Customer -->
-                    <td>
-                      {{ d.param37 }}<br>
-                      {{ d.param38 }}
-                    </td>
-                    <!-- RTO -->
-                    <td>
-                      {{ d.param27 }}
-                    </td>
-                    <!-- Dates -->
-                    <td>
-                      {{ d.param23 }}<br>
-                      {{ d.param54 }}
-                    </td>
-                    <!-- Polling -->
-                    <td>
+              <th>Action</th>
+            </tr>
+          </ng-template>
+          <ng-template #untagTableBody let-rows>
+            @if (rows.length === 0) {
+              <tr>
+                <td style="font-weight: bold; text-align: center;"
+                  [attr.colspan]="roleId==10||roleId==64 ? 12 : 11">NO DATA FOUND</td>
+              </tr>
+            }
+            @for (d of rows; track d) {
+              <tr>
+                <td>{{d.param1}}</td>
+                <td>{{ d.param5 }}<br>{{ d.param6 }}<br>{{ d.param7 }}</td>
+                <td>{{ d.param15 }}<br>{{ d.param16 }}</td>
+                <td>{{ d.param20 }}<br>{{ d.param21 }}<br>{{ d.param22 }}</td>
+                <td>{{ d.param65 }}<br>{{ d.param53 }}<br>{{ d.param52 }}</td>
+                <td>{{ d.param37 }}<br>{{ d.param38 }}</td>
+                <td>{{ d.param27 }}</td>
+                <td>{{ d.param23 }}<br>{{ d.param54 }}</td>
+                <td>
                   <span [ngClass]="{
               'text-success': d.param48 === 'Received',
               'text-warning': d.param48 === 'Not Received',
               'text-danger': d.param48 === 'Never Received'||d.param48 === 'Never Received..'
             }">
-                        {{ d.param48 || 'Never Received' }}
-                      </span>
-                      <br>
-                        {{ d.param60 }}
-                      </td>
-                      <td>
-                        <span
-                        [ngClass]="{'text-danger': d.param34=='Pending OTP', 'text-success': d.param34=='Activated'}">{{d.param34}}</span>
-                        <hr class="my-0">
-                        <span
-                        [ngClass]="{'text-danger': d.param71=='Rejected', 'text-success': d.param71=='Approved', 'text-warning': d.param71=='Pending'}">{{d.param71}}</span>
-                      </td>
-                      <!-- mvi verificaltion addded  -->
-                      @if (roleId==10||roleId==64) {
-                        <td >
-                          <div style="margin: 0px; padding: 0px;"
+                    {{ d.param48 || 'Never Received' }}
+                  </span>
+                  <br>{{ d.param60 }}
+                </td>
+                <td>
+                  <span [ngClass]="{'text-danger': d.param34=='Pending OTP', 'text-success': d.param34=='Activated'}">{{d.param34}}</span>
+                  <hr class="my-0">
+                  <span [ngClass]="{'text-danger': d.param71=='Rejected', 'text-success': d.param71=='Approved', 'text-warning': d.param71=='Pending'}">{{d.param71}}</span>
+                </td>
+                @if (roleId==10||roleId==64) {
+                  <td>
+                    <div style="margin: 0px; padding: 0px;"
             [ngClass]="{
               'text-warning': d.param74 === 'Pending',
               'text-success': d.param74 === 'Verified',
               'text-danger': d.param74 === 'Rejected'
             }"
-                            >
-                            {{ d.param74 || 'NA' }}
-                          </div>
-                          {{ d.param75||"-" }} <br>
-                          {{ d. param76||"-" }}
-                        </td>
-                      }
-                      <!-- Action -->
-                      <td>
-                        @if (d.param34=='Pending OTP') {
-                          <button class="btn btn-danger btn-sm" (click)="setdataData(d)">
-                            <i class="fa fa-trash"></i>
-                          </button>
-                        }
-                        @if (d.param34=='Activated') {
-                          <button class="btn btn-danger btn-sm" (click)="untagDevice(d)">
-                            <i class="fa fa-trash"></i>
-                          </button>
-                        }
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-              <!-- Pagination -->
-              <div class="float-end">
-                @if (totalCount > pageSize) {
-                  <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-                    [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-                    [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-                  </ngb-pagination>
+                    >
+                      {{ d.param74 || 'NA' }}
+                    </div>
+                    {{ d.param75||"-" }}<br>{{ d.param76||"-" }}
+                  </td>
                 }
-              </div>
-              <!-- <div class="custom-pagination" style="display:flex;justify-content: end;"
-              *ngIf="totalCount > pageSize || currentPage > 1">
-              <button class="pg-btn" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
-                Prev
-              </button>
-              <span *ngIf="currentPage > 3" class="pg-dots">...</span>
-              <button *ngIf="currentPage > 2" class="pg-num" (click)="onPageChange(currentPage - 1)">
-                {{ currentPage - 1 }}
-              </button>
-              <button class="pg-num active">
-                {{ currentPage }}
-              </button>
-              <button *ngIf="currentPage < getTotalPages() - 1" class="pg-num" (click)="onPageChange(currentPage + 1)">
-                {{ currentPage + 1 }}
-              </button>
-              <span *ngIf="currentPage < getTotalPages() - 2" class="pg-dots">...</span>
-              <button class="pg-num" (click)="onPageChange(currentPage)">
-                {{ getTotalPages() }}
-              </button>
-              <button class="pg-btn" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === getTotalPages()">
-                Next
-              </button>
-            </div> -->
+                <td>
+                  @if (d.param34=='Pending OTP') {
+                    <button class="btn btn-danger btn-sm" (click)="setdataData(d)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  }
+                  @if (d.param34=='Activated') {
+                    <button class="btn btn-danger btn-sm" (click)="untagDevice(d)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </ng-template>
+          <app-data-table
+            [columns]="tableColumns"
+            [rows]="dataDetails"
+            [loading]="loading"
+            [headerTemplate]="untagTableHeader"
+            [bodyTemplate]="untagTableBody"
+            tableClass="table table-striped app-table mb-1"
+            tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; font-size: 11px;"
+            emptyMessage="NO DATA FOUND">
+          </app-data-table>
+          <app-pagination
+            [totalCount]="totalCount"
+            [page]="currentPage"
+            [pageSize]="pageSize"
+            [disabled]="loading"
+            (pageChange)="onPageChange($event)">
+          </app-pagination>
           </div>
         }
         @if (toggleFlag) {

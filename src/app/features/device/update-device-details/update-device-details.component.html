@@ -29,74 +29,40 @@
 
 </div> -->
 
-<div class="table-responsive">
-  <form autocomplete="off" class="top-controls-row">
-
-    <!-- LEFT SIDE -->
-    <div class="left-controls">
-
-      <label class="topbar-label">Search :</label>
-
-      <div class="search-box">
-        <input type="search" readonly onfocus="this.removeAttribute('readonly');" class="search-input inner"
-          id="searchby" placeholder="Type here and press button...." autocomplete="disabled" maxlength="50"
-          [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchby" />
-
-        <button class="search-inner-btn" (click)="getSearchDetails()">
-          <i class="fa fa-search"></i>
-        </button>
-      </div>
-
-      <!-- RELOAD -->
-      <button class="reload-btn" (click)="reloadData()">
-        @if (!loading) {
-          <span>Reload</span>
-        }
-        @if (loading) {
-          <span>Reloading...</span>
-        }
-      </button>
-
-    </div>
-
-    <!-- RIGHT SIDE -->
-    <div class="right-controls">
-
-      <div class="total-records-text">Show Rows :</div>
-
-      <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)" name="pageSize">
-
-        @for (size of pageSizeOptions; track size) {
-          <option [value]="size === totalCount ? 'All' : size">
-            {{ size === totalCount ? 'All' : size }}
-          </option>
-        }
-
-      </select>
-
-      <div class="total-records-text">
-        Total Records : {{pageCount}} of {{totalCount}}
-      </div>
-
-    </div>
-
-  </form>
-  <ng-template #updateDeviceCell let-device let-column="column">
-    @switch (column.key) {
-      @case ('param6') { {{device.param6 || 'NA'}}<br>{{device.param5 || 'NA'}} }
-      @case ('param32') { {{device.param32 || 'NA'}}<br>{{device.param33 || 'NA'}} }
-      @case ('param9') { {{device.param8 || 'NA'}}<br>{{device.param9 || 'NA'}} }
-      @case ('param38') {
+<app-common-data-toolbar variant="vehicle" searchLabel="Search :" searchPlaceholder="Search by serial/IMEI/mobile..."
+  [searchText]="searchText" (searchTextChange)="searchText=$event" (search)="getSearchDetails()"
+  (reload)="reloadData()" [loading]="loading" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+  [displayedCount]="pageCount" [totalRecords]="totalCount" [showExcel]="false" [showFilters]="false"
+  (pageSizeChange)="onPageSizeChange($event)" pageSizeLabel="Show Rows" totalLabel="Total Records"
+  countSeparator="of">
+</app-common-data-toolbar>
+<ng-template #updateDeviceBody let-devices>
+  @if (devices.length === 0) {
+    <tr><td class="no-data" colspan="9">NO DATA FOUND</td></tr>
+  }
+  @for (device of devices; track device) {
+    <tr>
+      <td>{{device.param1 || 'NA'}}</td>
+      <td>{{device.param6 || 'NA'}}<br>{{device.param5 || 'NA'}}</td>
+      <td>{{device.param7 || 'NA'}}</td>
+      <td>{{device.param32 || 'NA'}}<br>{{device.param33 || 'NA'}}</td>
+      <td>{{device.param8 || 'NA'}}<br>{{device.param9 || 'NA'}}</td>
+      <td>{{device.param13 || 'NA'}}</td>
+      <td>
         <font [ngClass]="{'status-installed': device.param38 === 'Assigned', 'status-not-installed': device.param38 !== 'Assigned'}">
           {{device.param38 === 'Assigned' ? 'Installed' : 'Not Installed'}}
         </font>
-      }
-      @case ('param27') {
+      </td>
+      <td>
         <font [ngClass]="{'status-pending': (device.param27 === 'Pending OTP' || device.param27 === 'Not Assigned'), 'status-activated': device.param27 === 'Activated', 'status-not-activated': device.param27 !== 'Activated' && device.param27 !== 'Pending OTP' && device.param27 !== 'Not Assigned'}"
-          style="font-weight:bold;">{{(device.param27 === 'Pending OTP' || device.param27 === 'Not Assigned') ? 'Pending' : device.param27}}</font>
-        @if (device.param27 === 'Activated') { <font class="status-activated"><br>{{device.param23 || 'NA'}}</font> }
-      }
-      @case ('activity') {
+          style="font-weight: bold;">
+          {{(device.param27 === 'Pending OTP' || device.param27 === 'Not Assigned') ? 'Pending' : (device.param27 || 'NA')}}
+        </font>
+        @if (device.param27 === 'Activated') {
+          <font class="status-activated"><br>{{device.param23 || 'NA'}}</font>
+        }
+      </td>
+      <td>
         @if (device.param30 === 'update' || device.param30 === 'noupdate') {
           <div class="action-buttons">
             <button type="button" class="btn-edit" (click)="openEditModal(device)" title="Edit"
@@ -109,65 +75,19 @@
             </button>
           </div>
         }
-      }
-      @default { {{device[column.key] || 'NA'}} }
-    }
-  </ng-template>
-  <app-common-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
-    [cellTemplate]="updateDeviceCell" [sortKey]="sortKey" [reverse]="reverse" (sortChange)="sort($event)"
-    tableClass="table table-striped mb-1 app-table" emptyMessage="NO DATA FOUND">
-  </app-common-table>
-
-      <!-- Pagination -->
-      <!-- Pagination Controls -->
-      <div class="float-right">
-        @if (totalCount > pageSize) {
-          <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-            [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-            [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-          </ngb-pagination>
-        }
-      </div>
-      <!-- <div *ngIf="totalCount > pageSize" class="pagination-wrapper">
-      <ul class="pagination"
-        style="display: flex; gap: 5px; list-style: none; padding: 0; margin: 0; align-items: center; justify-content: flex-end;">
-        <li [class.disabled]="currentPage === 1">
-          <button type="button" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1"
-            class="btn btn-sm shadow-sm"
-            style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
-            <i class="fa fa-angle-left" style="margin-right: 4px;"></i> Previous
-          </button>
-        </li>
-
-        <li *ngFor="let page of getPageNumbers()">
-          <span *ngIf="page === -1" style="font-size: 12px; color: #6c757d; padding: 0 5px; font-weight: bold;">...</span>
-          <button type="button" *ngIf="page !== -1" (click)="onPageChange(page)" class="btn btn-sm shadow-sm"
-            [style.background]="currentPage === page ? '#0b58b9' : '#fff'"
-            [style.color]="currentPage === page ? '#fff' : '#0b58b9'"
-            style="font-size: 11px; width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 1px solid #dee2e6; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-            {{ page }}
-          </button>
-        </li>
-
-        <li [class.disabled]="currentPage >= getTotalPages()">
-          <button type="button" (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()"
-            class="btn btn-sm shadow-sm"
-            style="font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; color: #0b58b9; transition: all 0.3s ease; font-weight: bold; display: flex; align-items: center;">
-            Next <i class="fa fa-angle-right" style="margin-left: 4px;"></i>
-          </button>
-        </li>
-      </ul>
-    </div> -->
-  </div>
-
-  <!-- <div class="pagination-wrapper" *ngIf="getTotalPages() > 1">
-  <button *ngFor="let page of getPageNumbers()" (click)="onPageChange(page)"
-    [disabled]="page === -1 || currentPage === page" [class.active]="currentPage === page">
-    <span *ngIf="page === -1">...</span>
-    <span *ngIf="page !== -1">{{page}}</span>
-  </button>
-</div> -->
-
+      </td>
+    </tr>
+  }
+</ng-template>
+<app-data-table [columns]="tableColumns" [rows]="getPaginatedData()" [loading]="loading"
+  [bodyTemplate]="updateDeviceBody" [sortKey]="sortKey" [reverse]="reverse" (sort)="sort($event)"
+  tableClass="table table-striped mb-1 app-table" emptyMessage="NO DATA FOUND">
+</app-data-table>
+<div class="float-right">
+  <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+    [disabled]="loading" (pageChange)="onPageChange($event)">
+  </app-pagination>
+</div>
 
 <!-- Update Device Modal Overlay -->
 @if (showEditModal) {

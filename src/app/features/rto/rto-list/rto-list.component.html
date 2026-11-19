@@ -24,130 +24,37 @@
           </button>
         </div>
       }
-      <!-- SEARCH + CONTROLS BAR -->
-      <div class="top-controls-row">
-        <!-- LEFT SEARCH -->
-        <div class="left-controls">
-          <!-- SEARCH WITH INNER BUTTON -->
-          <div class="search-box">
-            <input type="search" class="search-input inner" placeholder="Type here and press button...."
-              maxlength="50" [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" name="searchTextBox" />
-
-            <button type="button" class="search-inner-btn" (click)="getSearchDetails()">
-              <i class="fa fa-search"></i>
-            </button>
-          </div>
-
-          <!-- RELOAD -->
-            <button (click)="reloadData()" [disabled]="loading" style="
-                margin-left: 10px;
-                background: #fff;
-                border: 1px solid #0b58b9;
-                color: #0b58b9;
-                border-radius: 4px;
-                height: 26px;
-                padding: 0 12px;
-                font-size: 11px;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                font-weight: bold;
-              ">
-            <i class="fa fa-refresh" [class.fa-spin]="loading" style="margin-right: 5px"></i>
-            <span>{{ loading ? "Reloading..." : "Reload" }}</span>
-          </button>
-        </div>
-        <!-- <div>
-        <div>
-          <label class="control-label" for="statename" style="color: #0e0e0e">State:</label>
-          <select class="" name="statename" id="statename" [(ngModel)]="selectedStateCode"
-            (change)="onStateChange()" style="height: 23px">
+      <app-common-data-toolbar variant="device" searchLabel="Search :" searchPlaceholder="Type here and press button..."
+        [searchText]="searchText" (searchTextChange)="searchText = $event" (search)="getSearchDetails()"
+        (reload)="reloadData()" [loading]="loading" [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions"
+        [displayedCount]="pageCount" [totalRecords]="totalCount" [showFilters]="true"
+        pageSizeLabel="Show Rows" totalLabel="Total Records" countSeparator="of"
+        (pageSizeChange)="onPageSizeChange($event)">
+        <div toolbarFilters class="d-flex align-items-center">
+          <label class="me-2 mb-0" for="rto-state-filter">State:</label>
+          <select id="rto-state-filter" name="statename" [(ngModel)]="selectedStateCode"
+            (ngModelChange)="onStateChange()" class="form-select form-select-sm">
             <option value="">All States</option>
-            <option *ngFor="let rto of rtolist" [value]="rto.param1">
-              {{ rto.param2 }}
-            </option>
+            @for (rto of rtolist; track rto) {
+              <option [value]="rto.param1">{{ rto.param2 }}</option>
+            }
           </select>
         </div>
-      </div> -->
-      <!-- RIGHT CONTROLS -->
-      <div class="right-controls">
-        <div style="display: flex; align-items: center; margin-right: 15px">
-          <!-- <label class="total-records-text">
-          Download: &nbsp;
-        </label> -->
-
-        <!-- <select [(ngModel)]="selectedDownloadType" (change)="onDownloadChange()"
-        [disabled]="isExporting"
-        style="height: 24px; border: 1px solid #0b58b9; border-radius: 4px; font-size: 11px; padding: 0 5px; background: white;">
-
-        <option value="">Select</option>
-        <option value="Excel">Excel</option>
-      </select> -->
-
-      <!-- <span *ngIf="isExporting"
-      style="margin-left:8px; font-size:11px; color:#0b58b9;">
-      <i class="fa fa-spinner fa-spin"></i> Generating...
-    </span> -->
-  </div>
-  <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChange(pageSize)">
-    @for (size of pageSizeOptions; track size) {
-      <option [value]="size === totalCount ? totalCount : size">
-        {{ size === totalCount ? totalCount : size }}
-      </option>
-    }
-  </select>
-
-  <div class="total-records-text">
-    Total Records : {{ pageCount }} of {{ totalCount }}
-  </div>
-</div>
-</div>
-
-<div class="table-responsive">
-  <div id="dataTable1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4">
-    <!-- <div class="col-sm-12"> -->
-    <app-common-table [columns]="tableColumns" [rows]="rtos" [loading]="loading"
-      [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped app-table mb-1"
-      tableId="devicetable" tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
-      (sortChange)="sort($event)">
-    </app-common-table>
-
-    <!-- Pagination Controls -->
-    <div class="float-end">
-      @if (totalCount > pageSize) {
-        <ngb-pagination [collectionSize]="totalCount" [(page)]="currentPage"
-          [pageSize]="pageSize" (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true"
-          [ellipses]="false" [boundaryLinks]="true" size="sm" class="d-flex justify-content-center mt-2 mb-1">
-        </ngb-pagination>
-      }
+      </app-common-data-toolbar>
+      <div class="table-responsive">
+        <app-data-table [columns]="tableColumns" [rows]="rtos" [loading]="loading"
+          [sortKey]="sortKey" [reverse]="reverse" tableClass="table table-striped app-table mb-1"
+          tableId="devicetable" tableStyle="border-top: 1px solid black; border-bottom: 1px solid black; margin-left: 0px;"
+          (sort)="sort($event)">
+        </app-data-table>
+      </div>
+      <div class="float-end">
+        <app-pagination [totalCount]="totalCount" [page]="currentPage" [pageSize]="pageSize"
+          (pageChange)="onPageChange($event)"></app-pagination>
+      </div>
     </div>
-    <!-- <div *ngIf="totalCount > 0" class="pagination-wrapper" style="text-align: center; margin-top: 10px">
-    <ul class="pagination" style="display: inline-flex; list-style: none; padding: 0">
-      <li [class.disabled]="currentPage === 1">
-        <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
-          Previous
-        </button>
-      </li>
-      <li *ngFor="let page of getPageNumbers()">
-        <span *ngIf="page === -1">...</span>
-        <button *ngIf="page !== -1" (click)="onPageChange(page)" [class.active]="currentPage === page">
-          {{ page }}
-        </button>
-      </li>
-      <li [class.disabled]="currentPage >= getTotalPages()">
-        <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">
-          Next
-        </button>
-      </li>
-    </ul>
-  </div> -->
-<!-- </div> -->
+  </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<!-- </div> -->
 
 <!-- Edit Modal -->
 @if (showEditModal) {

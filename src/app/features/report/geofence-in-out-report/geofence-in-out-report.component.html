@@ -1,170 +1,171 @@
 <div class="content-i">
   <div class="content-box">
-    <div class="element-box">
+    <div class="element-box alert-report-design">
 
       <!-- PAGE TITLE -->
-      <div class="pagetitlestyle">
+      <div class="pagetitlestyle pb-2 alert-overview-page-header">
         <span>Geofence In-Out Report</span>
+        <button type="button" class="btn btn-sm filters-toggle-btn"
+          [attr.aria-expanded]="filtersExpanded"
+          aria-controls="geofence-in-out-filter-panel"
+          (click)="filtersExpanded = !filtersExpanded">
+          <i class="fa fa-filter" aria-hidden="true"></i>
+          <span>{{ filtersExpanded ? 'Hide filters' : 'Show filters' }}</span>
+          <i class="fa"
+            [class.fa-chevron-up]="filtersExpanded"
+            [class.fa-chevron-down]="!filtersExpanded"
+            aria-hidden="true"></i>
+        </button>
       </div>
 
       <!-- MAIN LAYOUT -->
       <div class="overspeed-layout">
 
         <!-- LEFT FILTER PANEL -->
-        <div class="left-filter-panel entrypagediv">
+        <div toolbarFilters class="alert-overview-filters" [hidden]="!filtersExpanded">
+          <div id="geofence-in-out-filter-panel" class="left-filter-panel entrypagediv alert-filter-panel">
 
           <!-- FILTER BY -->
           <div class="form-group filterby-row">
-            <label style="margin: 2px;" class="control-label">Filter By :</label>
+            <label class="control-label">Filter By</label>
 
             <div class="filterby-options">
               <label class="radio-item">
-                <input type="radio" name="filter" (change)="onFilterByChange('Vendor')" checked>
+                <input type="radio" name="filter" [checked]="filterBy === 'Vendor'"
+                  (change)="onFilterByChange('Vendor')">
                 Vendor
               </label>
 
               <label class="radio-item">
-                <input type="radio" name="filter" (change)="onFilterByChange('RTO')">
+                <input type="radio" name="filter" [checked]="filterBy === 'RTO'"
+                  (change)="onFilterByChange('RTO')">
                 RTO
               </label>
             </div>
           </div>
 
           <!-- VENDOR -->
-          <!-- VENDOR -->
           @if (filterBy === 'Vendor') {
             <div class="form-group">
               <label class="control-label">Select Vendor <span style="color:red">*</span></label>
-              <ng-select name="vendor" class="searchable full-control" placeholder="Select Vendor"
+              <select class="searchable full-control" 
+                placeholder="Select Vendor"
                 [(ngModel)]="selectedVendor" (change)="onVendorChange()">
+                <option value="">Select Vendor</option>
                 @for (v of vendorList; track v) {
-                  <ng-option [value]="v.param1">{{v.param2}}</ng-option>
+                  <option [value]="v.param1">
+                    {{v.param2}}
+                  </option>
                 }
-              </ng-select>
+              </select>
             </div>
           }
           <!-- RTO -->
           @if (filterBy === 'RTO') {
             <div class="form-group">
               <label class="control-label">Select RTO <span style="color:red">*</span></label>
-              <ng-select name="rto" class="searchable full-control" placeholder="Select RTO" [(ngModel)]="selectedRTO"
-                (change)="onRTOChange()">
+              <select class="searchable full-control"
+                placeholder="Select RTO"
+                [(ngModel)]="selectedRTO" (change)="onRTOChange()">
+                <option value="">Select RTO</option>
                 @for (r of rtoList; track r) {
-                  <ng-option [value]="r.param1">
-                  {{r.param2}}</ng-option>
+                  <option [value]="r.param1">
+                    {{r.param2}}
+                  </option>
                 }
-              </ng-select>
+              </select>
             </div>
           }
           <!-- 🔥 DEVICE TYPE -->
 
           <!-- VEHICLE -->
-          <div class="form-group">
-            <label class="control-label">Enter Vehicle No <span style="color:red">*</span></label>
-            <!-- 🔍 SEARCH BOX -->
-
-
-
-            <!-- 🚗 DROPDOWN -->
-            <ng-select [items]="visibleVehicleList" bindLabel="param2" bindValue="param1" [typeahead]="searchInput"
-              [loading]="loadingVehicle" [(ngModel)]="selectedVehicle"
-              placeholder="Enter last 4 digit of vehicle number....">
+          <!-- <div class="form-group">
+            <label class="control-label">Select Vehicle / Chassis No <span style="color:red">*</span></label>
+            <ng-select [items]="visibleVehicleList" bindLabel="param2" bindValue="param1"
+              [loading]="loadingVehicle"
+              [disabled]="loadingVehicle || (!selectedVendor && !selectedRTO)"
+              [(ngModel)]="selectedVehicle"
+              placeholder="Select Vehicle"
+              notFoundText="No vehicles found">
             </ng-select>
 
-          </div>
+          </div> -->
+          <div class="form-group">
+          <label class="control-label">Select Vehicle / Chassis No <span style="color:red">*</span></label>
+
+          <select class="searchable full-control"
+            [(ngModel)]="selectedVehicle"
+            placeholder="Select Vehicle"
+            [disabled]="loadingVehicle || (!selectedVendor && !selectedRTO)">
+            <option value="">
+              {{ loadingVehicle ? 'Loading vehicles...' : 'Select Vehicle' }}
+            </option>
+            @if (!loadingVehicle && isVehicleLoaded && visibleVehicleList.length === 0) {
+              <option value="" disabled>No vehicles found</option>
+            }
+            @for (v of visibleVehicleList; track v) {
+              <option [ngValue]="v.param1">
+                {{ v.param2 }}
+              </option>
+            }
+          </select>
+        </div>
 
 
-          <!-- DATE -->
-          <div class="date-row">
-            <div class="date-col" style="width:100%">
-              <label class="control-label">Select Date Range<span style="color:red">*</span> </label>
+          <div class="alert-date-actions">
+            <div class="form-group alert-date-range">
+              <label class="control-label">Select Date Range<span style="color:red">*</span></label>
               <input type="text" id="datepicker" class="form-control" name="date"/>
             </div>
-          </div>
-
-          <div class="date-row">
-
-            <div class="date-col">
+            <div class="form-group">
               <label class="control-label">From Time<span style="color:red">*</span></label>
               <input type="time" class="form-control" [(ngModel)]="fromTime" step="60" />
             </div>
 
-            <div class="date-col">
+            <div class="form-group">
               <label class="control-label">To Time<span style="color:red">*</span></label>
               <input type="time" class="form-control" [(ngModel)]="toTime" step="60" />
             </div>
 
+            <div class="search-btn-row">
+              <button type="button" class="search-btn-clear" (click)="clearFilters()">
+                <i class="fa fa-eraser" aria-hidden="true"></i>
+                <span>Clear</span>
+              </button>
+              <button type="button" class="search-btn-full" (click)="getAlertOverview()">
+                <i class="fa fa-search" aria-hidden="true"></i>
+                <span>Apply filters</span>
+              </button>
+            </div>
           </div>
-          <!-- SEARCH -->
-          <div class="search-btn-row">
-            <button class="search-btn-full btn-reset" style="background-color: #b5e5b5;">
-              <i class="fa fa-refresh"></i> Reset
-            </button>
-            <button class="search-btn-full btn-search" (click)="getAlertOverview()">
-              <i class="fa fa-search"></i> Search
-            </button>
           </div>
         </div>
         <!-- *ngIf="showSummary" -->
         <!-- RIGHT REPORT PANEL -->
         <div class="right-report-panel">
-          <!-- 🔹 TOP CONTROLS BAR -->
-          <div class="top-controls-row">
-
-            <!-- LEFT SIDE -->
-            <div class="left-controls">
-
-              <!-- 🔍 SEARCH BOX -->
-              <div class="search-box">
-                <input type="search" class="search-input inner" placeholder="Search here..." maxlength="50"
-                  [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" />
-
-                <button class="search-inner-btn" (click)="getSearchDetails()">
-                  <i class="fa fa-search"></i>
-                </button>
-              </div>
-
-              <!-- 🔄 RELOAD BUTTON -->
-              <button class="reload-btn" (click)="reloadData()" [disabled]="loading">
-
-                <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
-                <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
-
-              </button>
-
-            </div>
-
-            <!-- RIGHT SIDE -->
-            <div class="right-controls">
-              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
-                [showPageSize]="false" [showTotal]="false" (excelExport)="exportToExcel()">
-              </app-common-data-toolbar>
-              <div class="total-records-text">Show Rows :</div>
-              <!-- ROWS SELECT -->
-              <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChanged(pageSize)">
-
-                @for (size of pageSizeOptions; track size) {
-                  <option [value]="size === totalCount ? 'All' : size">
-                    {{ size === totalCount ? 'All' : size }}
-                  </option>
-                }
-
-              </select>
-
-              <!-- TOTAL RECORD TEXT -->
-              <div class="total-records-text">
-                Total Records : {{ pageCount }} of {{ totalCount }}
-              </div>
-
-            </div>
-
-          </div>
+                                        <app-common-data-toolbar class="alert-overview-results-toolbar"
+                                          [searchText]="searchText"
+                                          searchPlaceholder="Search here..."
+                                          (searchTextChange)="searchText=$event"
+                                          (search)="getSearchDetails()"
+                                          (reload)="reloadData()"
+                                          [loading]="loading"
+                                          [pageSize]="pageSize"
+                                          [pageSizeOptions]="pageSizeOptions"
+                                          [displayedCount]="pageCount"
+                                          [totalRecords]="totalCount"
+                                          (pageSizeChange)="onPageSizeChanged($event)"
+                                          (excelExport)="exportToExcel()"
+                                          pageSizeLabel="Show Rows"
+                                          totalLabel="Total Records"
+                                          countSeparator="of">
+                                        </app-common-data-toolbar>
           <!-- TABLE -->
           <div class="table-wrapper">
             <ng-template #reportTableRows let-rows>
 @if (reportData.length === 0) {
                   <tr>
-                    <td colspan="11" class="no-data">
+                    <td colspan="8" class="no-data">
                       NO DATA FOUND
                     </td>
                   </tr>
@@ -197,42 +198,12 @@
                 </tr>
               }
 </ng-template>
-<app-common-table [columns]="tableColumns" [rows]="reportData" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table-grid"></app-common-table>
+<app-data-table [columns]="tableColumns" [rows]="reportData" [loading]="loading" [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="reportTableRows" tableClass="table-grid"></app-data-table>
 
         </div>
-        @if (totalCount > pageSize || page > 1) {
-          <div class="custom-pagination" style="display:flex;justify-content: end;"
-            >
-            <button class="pg-btn" (click)="changePage(page - 1)" [disabled]="page === 1">
-              Prev
-            </button>
-            @if (page > 3) {
-              <span class="pg-dots">...</span>
-            }
-            @if (page > 2) {
-              <button class="pg-num" (click)="changePage(page - 1)">
-                {{ page - 1 }}
-              </button>
-            }
-            <button class="pg-num active">
-              {{ page }}
-            </button>
-            @if (page < totalPages - 1) {
-              <button class="pg-num" (click)="changePage(page + 1)">
-                {{ page + 1 }}
-              </button>
-            }
-            @if (page < totalPages - 2) {
-              <span class="pg-dots">...</span>
-            }
-            <button class="pg-num" (click)="changePage(totalPages)">
-              {{ totalPages }}
-            </button>
-            <button class="pg-btn" (click)="changePage(page + 1)" [disabled]="page === totalPages">
-              Next
-            </button>
-          </div>
-        }
+        <app-pagination [totalCount]="totalCount" [page]="page" [pageSize]="pageSize"
+          [disabled]="loading" (pageChange)="changePage($event)">
+        </app-pagination>
       </div>
 
     </div>

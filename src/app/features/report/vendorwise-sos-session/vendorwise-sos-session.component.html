@@ -10,6 +10,9 @@
       <!-- MAIN LAYOUT -->
       <div class="overspeed-layout">
         <!-- LEFT FILTER PANEL -->
+        <app-common-data-toolbar [showFilters]="true" [showSearch]="false" [showReload]="false"
+          [showExcel]="false" [showPageSize]="false" [showTotal]="false">
+        <div toolbarFilters class="d-flex align-items-center gap-2 flex-wrap">
         <div class="left-filter-panel entrypagediv">
 
           <!-- VENDOR -->
@@ -64,60 +67,28 @@
             </button>
           </div>
         </div>
+        </div>
+        </app-common-data-toolbar>
         <!-- *ngIf="showSummary" -->
         <!-- RIGHT REPORT PANEL -->
         <div class="right-report-panel">
-          <!-- 🔹 TOP CONTROLS BAR -->
-          <div class="top-controls-row">
-
-            <!-- LEFT SIDE -->
-            <div class="left-controls">
-
-              <!-- 🔍 SEARCH BOX -->
-              <div class="search-box">
-                <input type="search" class="search-input inner" placeholder="Search here..." maxlength="50"
-                  [(ngModel)]="searchText" (keyup.enter)="getSearchDetails()" />
-
-                <button class="search-inner-btn" (click)="getSearchDetails()">
-                  <i class="fa fa-search"></i>
-                </button>
-              </div>
-
-              <!-- 🔄 RELOAD BUTTON -->
-              <button class="reload-btn" (click)="reloadData()" [disabled]="loading">
-
-                <i class="fa fa-refresh" [class.fa-spin]="loading"></i>
-                <span>{{ loading ? 'Reloading...' : 'Reload' }}</span>
-
-              </button>
-
-            </div>
-
-            <!-- RIGHT SIDE -->
-            <div class="right-controls">
-              <app-common-data-toolbar [showSearch]="false" [showReload]="false" [showExcel]="true"
-                [showPageSize]="false" [showTotal]="false" (excelExport)="exportToExcel()">
-              </app-common-data-toolbar>
-              <div class="total-records-text">Show Rows :</div>
-              <!-- ROWS SELECT -->
-              <select class="rows-select" [(ngModel)]="pageSize" (change)="onPageSizeChanged(pageSize)">
-
-                @for (size of pageSizeOptions; track size) {
-                  <option [value]="size === totalCount ? 'All' : size">
-                    {{ size === totalCount ? 'All' : size }}
-                  </option>
-                }
-
-              </select>
-
-              <!-- TOTAL RECORD TEXT -->
-              <div class="total-records-text">
-                Total Records : {{ pageCount }} of {{ totalCount }}
-              </div>
-
-            </div>
-
-          </div>
+                                        <app-common-data-toolbar
+                                          [searchText]="searchText"
+                                          searchPlaceholder="Search here..."
+                                          (searchTextChange)="searchText=$event"
+                                          (search)="getSearchDetails()"
+                                          (reload)="reloadData()"
+                                          [loading]="loading"
+                                          [pageSize]="pageSize"
+                                          [pageSizeOptions]="pageSizeOptions"
+                                          [displayedCount]="pageCount"
+                                          [totalRecords]="totalCount"
+                                          (pageSizeChange)="onPageSizeChanged($event)"
+                                          (excelExport)="exportToExcel()"
+                                          pageSizeLabel="Show Rows"
+                                          totalLabel="Total Records"
+                                          countSeparator="of">
+                                        </app-common-data-toolbar>
           <!-- TABLE -->
           <ng-template #vendorSosRows let-rows>
             @for (d of rows; track d; let i = $index) {
@@ -131,14 +102,12 @@
               </tr>
             }
           </ng-template>
-          <app-common-table [columns]="tableColumns" [rows]="alertData" [loading]="loading"
+          <app-data-table [columns]="tableColumns" [rows]="alertData" [loading]="loading"
             [emptyMessage]="'NO DATA FOUND'" [bodyTemplate]="vendorSosRows" tableClass="table-grid">
-          </app-common-table>
-          @if (totalCount > pageSize || page > 1) {
-            <app-common-pagination [page]="page" [pageSize]="pageSize" [totalRecords]="totalCount"
-              [disabled]="loading" (pageChange)="changePage($event)">
-            </app-common-pagination>
-          }
+          </app-data-table>
+          <app-pagination [totalCount]="totalCount" [page]="page" [pageSize]="pageSize"
+            [disabled]="loading" (pageChange)="changePage($event)">
+          </app-pagination>
         </div>
 
       </div>

@@ -30,6 +30,7 @@ export class CommonDataToolbarComponent implements AfterViewInit, OnDestroy {
   @Input() showSearch = true;
   @Input() showReload = true;
   @Input() showFilters = false;
+  @Input() wrapFilters = false;
   @Input() showDateRange = false;
   @Input() dateRangeStart = '';
   @Input() dateRangeEnd = '';
@@ -39,9 +40,9 @@ export class CommonDataToolbarComponent implements AfterViewInit, OnDestroy {
   @Input() showOldNew = false;
   @Input() oldNewValue: OldNewOption = 'new';
   @Input() showTotal = true;
-  @Input() pageSizeLabel = 'Rows';
+  @Input() pageSizeLabel = 'Show Rows';
   @Input() totalLabel = 'Total Records';
-  @Input() countSeparator = '/';
+  @Input() countSeparator = 'of';
 
   @Output() readonly searchTextChange = new EventEmitter<string>();
   @Output() readonly search = new EventEmitter<void>();
@@ -57,7 +58,7 @@ export class CommonDataToolbarComponent implements AfterViewInit, OnDestroy {
   ];
 
   get selectedPageSize(): PageSizeOption {
-    return this.variant === 'vehicle' && this.pageSize === this.totalRecords ? 'All' : this.pageSize;
+    return this.pageSize === this.totalRecords ? 'All' : this.pageSize;
   }
 
 
